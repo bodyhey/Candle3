@@ -57,8 +57,8 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication a(argc, argv);
-    a.setApplicationDisplayName("Candle");
-    a.setApplicationVersion("1.2.15b");
+    a.setApplicationDisplayName("G-Pilot");
+    a.setApplicationVersion("1.3");
 
 #ifdef GLES
     QFontDatabase::addApplicationFont(":/fonts/Ubuntu-R.ttf");
