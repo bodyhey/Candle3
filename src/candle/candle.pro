@@ -47,6 +47,7 @@ SOURCES += main.cpp\
     connection/serialconnection.cpp \
     form_partial/main/jog.cpp \
     form_partial/main/state.cpp \
+    frmgrblconfigurator.cpp \
         frmmain.cpp \
     frmsettings.cpp \
     frmabout.cpp \
@@ -86,6 +87,7 @@ HEADERS  += frmmain.h \
     connection/serialconnection.h \
     form_partial/main/jog.h \
     form_partial/main/state.h \
+    frmgrblconfigurator.h \
     frmsettings.h \
     frmabout.h \
     drawers/gcodedrawer.h \
@@ -120,6 +122,7 @@ FORMS    += frmmain.ui \
     form_partial/main/jog.ui \
     form_partial/main/state.ui \
     frmdebug.ui \
+    frmgrblconfigurator.ui \
     frmsettings.ui \
     frmabout.ui
 
