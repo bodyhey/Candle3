@@ -5,7 +5,7 @@
 #define FRMMAIN_H
 
 #include <QMainWindow>
-#include <QtSerialPort/QSerialPort>
+//#include <QtSerialPort/QSerialPort>
 #include <QSettings>
 #include <QTimer>
 #include <QBasicTimer>
@@ -20,6 +20,7 @@
 #include <QGroupBox>
 #include <exception>
 
+#include "connection/connection.h"
 #include "parser/gcodeviewparse.h"
 
 #include "drawers/origindrawer.h"
@@ -43,8 +44,8 @@
 #include "frmsettings.h"
 #include "frmabout.h"
 
-#include "scriptvars.h"
-#include "scriptfunctions.h"
+#include "scripting/scriptvars.h"
+#include "scripting/scriptfunctions.h"
 
 #ifdef WINDOWS
     #include <QtWinExtras/QtWinExtras>
@@ -214,8 +215,11 @@ private slots:
     void on_mnuViewPanels_aboutToShow();
     void on_dockVisualizer_visibilityChanged(bool visible);
 
-    void onSerialPortReadyRead();
-    void onSerialPortError(QSerialPort::SerialPortError);
+    // void onSerialPortReadyRead();
+    // void onSerialPortError(QSerialPort::SerialPortError);
+    void onConnectionLineReceived(QString);
+    void onConnectionError(QString);
+
     void onTimerConnection();
     void onTimerStateQuery();
     void onTableInsertLine();
@@ -329,8 +333,8 @@ private:
     GCodeTableModel *m_currentModel;
     HeightMapTableModel m_heightMapModel;
 
-    // Serial port
-    QSerialPort m_serialPort;
+    // Connection
+    Connection *m_connection;
 
     // Queues
     QList<CommandAttributes> m_commands;

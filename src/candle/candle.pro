@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT       = core gui opengl serialport script uitools
-greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
+equals(QT_MAJOR_VERSION, 5): QT += widgets
 
 win32: {
     QT += winextras
@@ -38,6 +38,15 @@ CONFIG += c++14
 QMAKE_CXXFLAGS += -std=c++14
 
 SOURCES += main.cpp\
+    communicator.cpp \
+    config/configuration.cpp \
+    config/formtoconfigurationtransformer.cpp \
+    config/persister.cpp \
+    config/provider.cpp \
+    connection/connection.cpp \
+    connection/serialconnection.cpp \
+    form_partial/main/jog.cpp \
+    form_partial/main/state.cpp \
         frmmain.cpp \
     frmsettings.cpp \
     frmabout.cpp \
@@ -49,23 +58,34 @@ SOURCES += main.cpp\
     drawers/shaderdrawable.cpp \
     drawers/tooldrawer.cpp \
     drawers/machineboundsdrawer.cpp \
+    machine/settings.cpp \
     parser/arcproperties.cpp \
     parser/gcodeparser.cpp \
     parser/gcodepreprocessorutils.cpp \
     parser/gcodeviewparse.cpp \
     parser/linesegment.cpp \
     parser/pointsegment.cpp \
+    scripting/scripting.cpp \
     tables/gcodetablemodel.cpp \
     tables/heightmaptablemodel.cpp \
     widgets/combobox.cpp \
     widgets/comboboxkey.cpp \
     widgets/glwidget.cpp \
     drawers/selectiondrawer.cpp \
-    scriptvars.cpp \
-    scriptfunctions.cpp \
+    scripting/scriptvars.cpp \
+    scripting/scriptfunctions.cpp \
     widgets/dropwidget.cpp
 
 HEADERS  += frmmain.h \
+    communicator.h \
+    config/configuration.h \
+    config/formtoconfigurationtransformer.h \
+    config/persister.h \
+    config/provider.h \
+    connection/connection.h \
+    connection/serialconnection.h \
+    form_partial/main/jog.h \
+    form_partial/main/state.h \
     frmsettings.h \
     frmabout.h \
     drawers/gcodedrawer.h \
@@ -76,12 +96,14 @@ HEADERS  += frmmain.h \
     drawers/shaderdrawable.h \
     drawers/tooldrawer.h \
     drawers/machineboundsdrawer.h \
+    machine/settings.h \
     parser/arcproperties.h \
     parser/gcodeparser.h \
     parser/gcodepreprocessorutils.h \
     parser/gcodeviewparse.h \
     parser/linesegment.h \
     parser/pointsegment.h \
+    scripting/scripting.h \
     tables/gcodetablemodel.h \
     tables/heightmaptablemodel.h \
     utils/interpolation.h \
@@ -90,11 +112,13 @@ HEADERS  += frmmain.h \
     widgets/comboboxkey.h \
     widgets/glwidget.h \
     drawers/selectiondrawer.h \
-    scriptvars.h \
-    scriptfunctions.h \
+    scripting/scriptvars.h \
+    scripting/scriptfunctions.h \
     widgets/dropwidget.h
 
 FORMS    += frmmain.ui \
+    form_partial/main/jog.ui \
+    form_partial/main/state.ui \
     frmdebug.ui \
     frmsettings.ui \
     frmabout.ui
