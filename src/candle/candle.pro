@@ -28,7 +28,7 @@ contains(QT_CONFIG, opengles.) {
 
 TARGET = Candle
 TEMPLATE = app
-RC_ICONS += images/candle.ico
+RC_ICONS += images/gpilot.ico
 
 DEFINES += sNan=\"65536\"
 

@@ -1,6 +1,6 @@
 G-Pilot (formerly Candle)
 -----------
-
+<img src="screenshots/gpilot_big.jpg" width="200" height="200" align="right">
 What G stands for?
 
 - G-code Pilot: G-code is a programming language used to control CNC machines, so "G-Pilot" may suggest that the program is used for piloting or controlling using G-code.
@@ -9,7 +9,7 @@ What G stands for?
 - Genius Pilot: "G-Pilot" may suggest that the program is smart or advanced, similar to a pilot with high piloting skills.
 - Graphical Pilot: If the program offers a graphical interface for controlling CNC machines, the name "G-Pilot" may suggest that it is a graphics-based tool.
 
-*This fork is based on the `experimental` branch. The main goal is to add joystick/joypad support. Other than that, I'm making improvements/bugfixes at my discretion.*
+*This fork is based on the Candle `experimental` branch. The main goal is to add joystick/joypad support. Other than that, I'm making improvements/bugfixes at my discretion.*
 
 *Any help is welcome!*
 
