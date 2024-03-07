@@ -18,6 +18,7 @@
 #include <QTranslator>
 #include <QScriptValueIterator>
 #include "frmmain.h"
+#include "form_partial/main/jog.h"
 #include "ui_frmmain.h"
 #include "ui_frmsettings.h"
 #include "widgets/widgetmimedata.h"
@@ -119,6 +120,17 @@ frmMain::frmMain(QWidget *parent) :
 
     m_settings = new frmSettings(this);
     ui->setupUi(this);
+
+    ui->widgetJog->setParent(nullptr);
+    ui->widgetJog->deleteLater();
+
+    ui->widgetJog = new partMainJog(this);
+    // ui->widgetJog->setParent(ui->grpJog);
+    // ui->widgetJog->setLayout(lay);
+    ui->widgetJog->show();
+    // ui->widgetJog->parentWidget()->adjustSize();
+
+    static_cast<QVBoxLayout*>(ui->grpJog->layout())->insertWidget(0, ui->widgetJog);
 
     // Drag&drop placeholders
     ui->fraDropDevice->setVisible(false);

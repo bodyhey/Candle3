@@ -45,7 +45,9 @@ SOURCES += main.cpp\
     config/provider.cpp \
     connection/connection.cpp \
     connection/serialconnection.cpp \
+    form_partial/main/control.cpp \
     form_partial/main/jog.cpp \
+    form_partial/main/override.cpp \
     form_partial/main/state.cpp \
     frmgrblconfigurator.cpp \
         frmmain.cpp \
@@ -85,7 +87,9 @@ HEADERS  += frmmain.h \
     config/provider.h \
     connection/connection.h \
     connection/serialconnection.h \
+    form_partial/main/control.h \
     form_partial/main/jog.h \
+    form_partial/main/override.h \
     form_partial/main/state.h \
     frmgrblconfigurator.h \
     frmsettings.h \
@@ -119,7 +123,9 @@ HEADERS  += frmmain.h \
     widgets/dropwidget.h
 
 FORMS    += frmmain.ui \
+    form_partial/main/control.ui \
     form_partial/main/jog.ui \
+    form_partial/main/override.ui \
     form_partial/main/state.ui \
     frmdebug.ui \
     frmgrblconfigurator.ui \

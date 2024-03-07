@@ -7,13 +7,13 @@ namespace Ui {
 class State;
 }
 
-class State : public QWidget
+class partMainState : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit State(QWidget *parent = nullptr);
-    ~State();
+    explicit partMainState(QWidget *parent = nullptr);
+    ~partMainState();
 
 private:
     Ui::State *ui;

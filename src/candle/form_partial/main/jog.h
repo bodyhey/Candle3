@@ -4,19 +4,19 @@
 #include <QWidget>
 
 namespace Ui {
-class Jog;
+class widgetJog;
 }
 
-class Jog : public QWidget
+class partMainJog : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit Jog(QWidget *parent = nullptr);
-    ~Jog();
+    explicit partMainJog(QWidget *parent = nullptr);
+    ~partMainJog();
 
 private:
-    Ui::Jog *ui;
+    Ui::widgetJog *ui;
 };
 
 #endif // JOG_H

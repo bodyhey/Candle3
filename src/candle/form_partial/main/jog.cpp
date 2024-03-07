@@ -1,14 +1,14 @@
 #include "jog.h"
 #include "ui_jog.h"
 
-Jog::Jog(QWidget *parent)
+partMainJog::partMainJog(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::Jog)
+    , ui(new Ui::widgetJog)
 {
     ui->setupUi(this);
 }
 
-Jog::~Jog()
+partMainJog::~partMainJog()
 {
     delete ui;
 }

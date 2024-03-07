@@ -1,14 +1,14 @@
 #include "state.h"
 #include "ui_state.h"
 
-State::State(QWidget *parent)
+partMainState::partMainState(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::State)
 {
     ui->setupUi(this);
 }
 
-State::~State()
+partMainState::~partMainState()
 {
     delete ui;
 }
