@@ -28,7 +28,7 @@ contains(QT_CONFIG, opengles.) {
 
 TARGET = Candle
 TEMPLATE = app
-RC_ICONS += images/candle.ico
+RC_ICONS += images/gpilot.ico
 
 DEFINES += sNan=\"65536\"
 
@@ -36,6 +36,8 @@ TRANSLATIONS += translations/candle_en.ts translations/candle_ru.ts translations
 
 CONFIG += c++14
 QMAKE_CXXFLAGS += -std=c++14
+
+SUBDIRS += vendor/PropertyEditor
 
 SOURCES += main.cpp\
     communicator.cpp \
@@ -45,8 +47,11 @@ SOURCES += main.cpp\
     config/provider.cpp \
     connection/connection.cpp \
     connection/serialconnection.cpp \
+    form_partial/main/control.cpp \
     form_partial/main/jog.cpp \
+    form_partial/main/override.cpp \
     form_partial/main/state.cpp \
+    frmgrblconfigurator.cpp \
         frmmain.cpp \
     frmsettings.cpp \
     frmabout.cpp \
@@ -84,8 +89,11 @@ HEADERS  += frmmain.h \
     config/provider.h \
     connection/connection.h \
     connection/serialconnection.h \
+    form_partial/main/control.h \
     form_partial/main/jog.h \
+    form_partial/main/override.h \
     form_partial/main/state.h \
+    frmgrblconfigurator.h \
     frmsettings.h \
     frmabout.h \
     drawers/gcodedrawer.h \
@@ -117,9 +125,12 @@ HEADERS  += frmmain.h \
     widgets/dropwidget.h
 
 FORMS    += frmmain.ui \
+    form_partial/main/control.ui \
     form_partial/main/jog.ui \
+    form_partial/main/override.ui \
     form_partial/main/state.ui \
     frmdebug.ui \
+    frmgrblconfigurator.ui \
     frmsettings.ui \
     frmabout.ui
 
@@ -130,8 +141,10 @@ RESOURCES += \
     images.qrc
 
 INCLUDEPATH += ../designerplugins/customwidgetsplugin
+INCLUDEPATH += ../vendor/PropertyEditor
 
 LIBS += -L../designerplugins/customwidgetsplugin/release -lcustomwidgets
+LIBS += -L../vendor/PropertyEditor\release -lPropertyEditor
 
 qtPrepareTool(LRELEASE, lrelease)
 for(tsfile, TRANSLATIONS) {

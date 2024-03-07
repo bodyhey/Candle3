@@ -4,6 +4,10 @@
 #include "connection/connection.h"
 #include "machine/settings.h"
 
+#ifdef WINDOWS
+    #include <QtWinExtras/QtWinExtras>
+#endif
+
 struct CommandAttributes {
     int length;
     int consoleIndex;
@@ -73,6 +77,8 @@ enum SendCommandResult {
 
 class Communicator : public QObject
 {
+    Q_OBJECT
+
 public:
     Communicator(Connection *connection);    
     SendCommandResult sendCommand(QString command, int tableIndex = -1, bool showInConsole = true, bool wait = false);
@@ -87,11 +93,19 @@ private:
     SenderState m_senderState;
     DeviceState m_deviceState;
 
-    //slots:
+    bool m_reseting;
+    bool m_resetCompleted;
+    bool m_aborting;
+    bool m_statusReceived;
+    QMap<DeviceState, QString> m_deviceStatuses;
+    QMap<DeviceState, QString> m_statusCaptions;
+    QMap<DeviceState, QString> m_statusBackColors;
+    QMap<DeviceState, QString> m_statusForeColors;
+
     void onSerialPortReadyRead(QString);
     void setSenderState(int);
     void setDeviceState(int);
-
+    bool dataIsReset(QString);
 signals:
     void responseReceived(QString command, int tableIndex, QString response);
     void statusReceived(QString status);

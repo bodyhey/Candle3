@@ -21,6 +21,7 @@
 #include <exception>
 
 #include "connection/connection.h"
+#include "frmgrblconfigurator.h"
 #include "parser/gcodeviewparse.h"
 
 #include "drawers/origindrawer.h"
@@ -138,6 +139,7 @@ private slots:
     void on_actRecentClear_triggered();
     void on_actFileExit_triggered();
     void on_actServiceSettings_triggered();
+    void on_actConfigureGRBL_triggered();
     void on_actAbout_triggered();
     void on_actJogStepNext_triggered();
     void on_actJogStepPrevious_triggered();
@@ -343,6 +345,7 @@ private:
     // Forms
     frmSettings *m_settings;
     frmAbout m_frmAbout;
+    frmGrblConfigurator m_grblConfigurator;
 
     // Filenames
     QString m_settingsFileName;

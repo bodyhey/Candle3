@@ -9,7 +9,7 @@ class FormToConfigurationTransformer
 public:
     FormToConfigurationTransformer();
 
-    static Configuration transformToConfiguration(frmSettings *form);
+    static Configuration* transformToConfiguration(frmSettings *form);
     static void transformToForm(frmSettings *form, Configuration *configuration);
 };
 

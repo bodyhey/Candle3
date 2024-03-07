@@ -8,17 +8,89 @@
 
 Communicator::Communicator(Connection *connection) : m_connection(connection)
 {
+    m_reseting = false;
+    m_resetCompleted = true;
+    m_aborting = false;
+    m_statusReceived = false;
+
+    m_deviceState = DeviceUnknown;
+    m_senderState = SenderUnknown;
+
+    // Initializing variables
+    m_deviceStatuses[DeviceUnknown] = "Unknown";
+    m_deviceStatuses[DeviceIdle] = "Idle";
+    m_deviceStatuses[DeviceAlarm] = "Alarm";
+    m_deviceStatuses[DeviceRun] = "Run";
+    m_deviceStatuses[DeviceHome] = "Home";
+    m_deviceStatuses[DeviceHold0] = "Hold:0";
+    m_deviceStatuses[DeviceHold1] = "Hold:1";
+    m_deviceStatuses[DeviceQueue] = "Queue";
+    m_deviceStatuses[DeviceCheck] = "Check";
+    m_deviceStatuses[DeviceDoor0] = "Door:0";
+    m_deviceStatuses[DeviceDoor1] = "Door:1";
+    m_deviceStatuses[DeviceDoor2] = "Door:2";
+    m_deviceStatuses[DeviceDoor3] = "Door:3";
+    m_deviceStatuses[DeviceJog] = "Jog";
+    m_deviceStatuses[DeviceSleep] = "Sleep";
+
+    m_statusCaptions[DeviceUnknown] = tr("Unknown");
+    m_statusCaptions[DeviceIdle] = tr("Idle");
+    m_statusCaptions[DeviceAlarm] = tr("Alarm");
+    m_statusCaptions[DeviceRun] = tr("Run");
+    m_statusCaptions[DeviceHome] = tr("Home");
+    m_statusCaptions[DeviceHold0] = tr("Hold") + " (0)";
+    m_statusCaptions[DeviceHold1] = tr("Hold") + " (1)";
+    m_statusCaptions[DeviceQueue] = tr("Queue");
+    m_statusCaptions[DeviceCheck] = tr("Check");
+    m_statusCaptions[DeviceDoor0] = tr("Door") + " (0)";
+    m_statusCaptions[DeviceDoor1] = tr("Door") + " (1)";
+    m_statusCaptions[DeviceDoor2] = tr("Door") + " (2)";
+    m_statusCaptions[DeviceDoor3] = tr("Door") + " (3)";
+    m_statusCaptions[DeviceJog] = tr("Jog");
+    m_statusCaptions[DeviceSleep] = tr("Sleep");
+
+    m_statusBackColors[DeviceUnknown] = "red";
+    m_statusBackColors[DeviceIdle] = "palette(button)";
+    m_statusBackColors[DeviceAlarm] = "red";
+    m_statusBackColors[DeviceRun] = "lime";
+    m_statusBackColors[DeviceHome] = "lime";
+    m_statusBackColors[DeviceHold0] = "yellow";
+    m_statusBackColors[DeviceHold1] = "yellow";
+    m_statusBackColors[DeviceQueue] = "yellow";
+    m_statusBackColors[DeviceCheck] = "palette(button)";
+    m_statusBackColors[DeviceDoor0] = "red";
+    m_statusBackColors[DeviceDoor1] = "red";
+    m_statusBackColors[DeviceDoor2] = "red";
+    m_statusBackColors[DeviceDoor3] = "red";
+    m_statusBackColors[DeviceJog] = "lime";
+    m_statusBackColors[DeviceSleep] = "blue";
+
+    m_statusForeColors[DeviceUnknown] = "white";
+    m_statusForeColors[DeviceIdle] = "palette(text)";
+    m_statusForeColors[DeviceAlarm] = "white";
+    m_statusForeColors[DeviceRun] = "black";
+    m_statusForeColors[DeviceHome] = "black";
+    m_statusForeColors[DeviceHold0] = "black";
+    m_statusForeColors[DeviceHold1] = "black";
+    m_statusForeColors[DeviceQueue] = "black";
+    m_statusForeColors[DeviceCheck] = "palette(text)";
+    m_statusForeColors[DeviceDoor0] = "white";
+    m_statusForeColors[DeviceDoor1] = "white";
+    m_statusForeColors[DeviceDoor2] = "white";
+    m_statusForeColors[DeviceDoor3] = "white";
+    m_statusForeColors[DeviceJog] = "black";
+    m_statusForeColors[DeviceSleep] = "white";
 }
 
 void Communicator::onSerialPortReadyRead(QString data)
 {
-    /*
     // Filter prereset responses
     if (m_reseting) {
-        if (!dataIsReset(data)) continue;
-        else {
+        if (!dataIsReset(data)) {
+            return;
+        } else {
             m_reseting = false;
-            m_timerStateQuery.setInterval(m_settings->queryStateTime());
+//            m_timerStateQuery.setInterval(m_settings->queryStateTime());
         }
     }
 
@@ -27,7 +99,7 @@ void Communicator::onSerialPortReadyRead(QString data)
         DeviceState state = DeviceUnknown;
 
         m_statusReceived = true;
-
+/*
         // Update machine coordinates
         static QRegExp mpx("MPos:([^,]*),([^,]*),([^,^>^|]*)");
         if (mpx.indexIn(data) != -1) {
@@ -675,9 +747,13 @@ void Communicator::onSerialPortReadyRead(QString data)
             }
             // @TODO ui
             // ui->txtConsole->appendPlainText(data);
-        }
+        }*/
     } else {
         // Blank response
     }
-    */
+}
+
+bool Communicator::dataIsReset(QString data)
+{
+    return QRegExp("^GRBL|GCARVIN\\s\\d\\.\\d.").indexIn(data.toUpper()) != -1;
 }

@@ -18,10 +18,13 @@
 #include <QTranslator>
 #include <QScriptValueIterator>
 #include "frmmain.h"
+#include "form_partial/main/jog.h"
 #include "ui_frmmain.h"
 #include "ui_frmsettings.h"
 #include "widgets/widgetmimedata.h"
 #include "connection/serialconnection.h"
+
+#define FILE_FILTER_TEXT "G-Code files (*.nc *.ncc *.ngc *.tap *.gc *.gcode *.txt)"
 
 frmMain::frmMain(QWidget *parent) :
     QMainWindow(parent),
@@ -117,6 +120,17 @@ frmMain::frmMain(QWidget *parent) :
 
     m_settings = new frmSettings(this);
     ui->setupUi(this);
+
+    ui->widgetJog->setParent(nullptr);
+    ui->widgetJog->deleteLater();
+
+    ui->widgetJog = new partMainJog(this);
+    // ui->widgetJog->setParent(ui->grpJog);
+    // ui->widgetJog->setLayout(lay);
+    ui->widgetJog->show();
+    // ui->widgetJog->parentWidget()->adjustSize();
+
+    static_cast<QVBoxLayout*>(ui->grpJog->layout())->insertWidget(0, ui->widgetJog);
 
     // Drag&drop placeholders
     ui->fraDropDevice->setVisible(false);
@@ -506,7 +520,7 @@ void frmMain::on_actFileSave_triggered()
 void frmMain::on_actFileSaveAs_triggered()
 {
     if (!m_heightMapMode) {
-        QString fileName = (QFileDialog::getSaveFileName(this, tr("Save file as"), m_lastFolder, tr("G-Code files (*.nc *.ncc *.ngc *.tap *.txt)")));
+        QString fileName = (QFileDialog::getSaveFileName(this, tr("Save file as"), m_lastFolder, tr(FILE_FILTER_TEXT)));
 
         if (!fileName.isEmpty()) if (saveProgramToFile(fileName, &m_programModel)) {
             m_programFileName = fileName;
@@ -535,7 +549,7 @@ void frmMain::on_actFileSaveAs_triggered()
 
 void frmMain::on_actFileSaveTransformedAs_triggered()
 {
-    QString fileName = (QFileDialog::getSaveFileName(this, tr("Save file as"), m_lastFolder, tr("G-Code files (*.nc *.ncc *.ngc *.tap *.txt)")));
+    QString fileName = (QFileDialog::getSaveFileName(this, tr("Save file as"), m_lastFolder, tr(FILE_FILTER_TEXT)));
 
     if (!fileName.isEmpty()) {
         saveProgramToFile(fileName, &m_programHeightmapModel);
@@ -610,6 +624,11 @@ void frmMain::on_actServiceSettings_triggered()
 
         emit settingsRejected();
     }
+}
+
+void frmMain::on_actConfigureGRBL_triggered()
+{
+    m_grblConfigurator.exec();
 }
 
 void frmMain::on_actAbout_triggered()
@@ -692,7 +711,7 @@ void frmMain::on_cmdFileOpen_clicked()
         if (!saveChanges(false)) return;
 
         QString fileName  = QFileDialog::getOpenFileName(this, tr("Open"), m_lastFolder,
-                                   tr("G-Code files (*.nc *.ncc *.ngc *.tap *.txt);;All files (*.*)"));
+                                   tr(FILE_FILTER_TEXT";;All files (*.*)"));
 
         if (!fileName.isEmpty()) m_lastFolder = fileName.left(fileName.lastIndexOf(QRegExp("[/\\\\]+")));
 
@@ -4497,7 +4516,9 @@ bool frmMain::isGCodeFile(QString fileName)
           || fileName.endsWith(".nc", Qt::CaseInsensitive)
           || fileName.endsWith(".ncc", Qt::CaseInsensitive)
           || fileName.endsWith(".ngc", Qt::CaseInsensitive)
-          || fileName.endsWith(".tap", Qt::CaseInsensitive);
+          || fileName.endsWith(".tap", Qt::CaseInsensitive)
+          || fileName.endsWith(".gc", Qt::CaseInsensitive)
+          || fileName.endsWith(".gcode", Qt::CaseInsensitive);
 }
 
 bool frmMain::isHeightmapFile(QString fileName)

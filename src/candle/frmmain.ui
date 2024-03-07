@@ -14,11 +14,11 @@
    <bool>true</bool>
   </property>
   <property name="windowTitle">
-   <string>Candle</string>
+   <string>G-Pilot</string>
   </property>
   <property name="windowIcon">
    <iconset resource="images.qrc">
-    <normaloff>:/images/candle_256.png</normaloff>:/images/candle_256.png</iconset>
+    <normaloff>:/images/gpilot_icon.png</normaloff>:/images/gpilot_icon.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">/*StyledToolButton[adjustSize=&quot;true&quot;] {
@@ -394,6 +394,7 @@ QLabel[overrided=&quot;false&quot;] {
      <string>&amp;Service</string>
     </property>
     <addaction name="actServiceSettings"/>
+    <addaction name="actConfigureGRBL"/>
    </widget>
    <widget class="QMenu" name="mnuHelp">
     <property name="title">
@@ -3174,6 +3175,11 @@ padding-right: 8;</string>
   <action name="actControlFlood">
    <property name="text">
     <string>Flood</string>
+   </property>
+  </action>
+  <action name="actConfigureGRBL">
+   <property name="text">
+    <string>Configure GRBL</string>
    </property>
   </action>
  </widget>
