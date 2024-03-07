@@ -36,6 +36,10 @@ Build requirements:
 ------------------
 Qt 5.12.12 with MinGW/GCC 64bit compiler
 
+Start with:
+
+git clone --recurse-submodules https://github.com/etet100/G-Pilot-Formerly-Candle
+
 Downloads:
 ----------
 No new releases yet. Sorry!
