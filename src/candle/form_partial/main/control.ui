@@ -6,14 +6,420 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>198</width>
+    <height>104</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="StyledToolButton" name="cmdHome">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Home</string>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../images.qrc">
+       <normaloff>:/images/search_for_home2.png</normaloff>:/images/search_for_home2.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="adjustSize" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="StyledToolButton" name="cmdHold">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Hold</string>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../images.qrc">
+       <normaloff>:/images/pause.png</normaloff>:/images/pause.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="adjustSize" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="StyledToolButton" name="cmdReset">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Reset</string>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../images.qrc">
+       <normaloff>:/images/restart.png</normaloff>:/images/restart.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="adjustSize" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="StyledToolButton" name="cmdUnlock">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Unlock</string>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../images.qrc">
+       <normaloff>:/images/unlock1.png</normaloff>:/images/unlock1.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="adjustSize" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="StyledToolButton" name="cmdCheck">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Check</string>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../images.qrc">
+       <normaloff>:/images/check1.png</normaloff>:/images/check1.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="adjustSize" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="StyledToolButton" name="cmdSleep">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Sleep</string>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../images.qrc">
+       <normaloff>:/images/power4.png</normaloff>:/images/power4.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="adjustSize" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="StyledToolButton" name="cmdDoor">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Door</string>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../images.qrc">
+       <normaloff>:/images/door.png</normaloff>:/images/door.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="adjustSize" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="StyledToolButton" name="cmdFlood">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Flood</string>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../images.qrc">
+       <normaloff>:/images/flood.png</normaloff>:/images/flood.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="adjustSize" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
- <resources/>
- <connections/>
+ <customwidgets>
+  <customwidget>
+   <class>StyledToolButton</class>
+   <extends>QToolButton</extends>
+   <header>styledtoolbutton.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../images.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>cmdHome</sender>
+   <signal>clicked()</signal>
+   <receiver>partMainControl</receiver>
+   <slot>onCmdHomeClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>32</x>
+     <y>26</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>14</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdHold</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>partMainControl</receiver>
+   <slot>onCmdHoldClicked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>95</x>
+     <y>29</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>90</x>
+     <y>5</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdReset</sender>
+   <signal>clicked()</signal>
+   <receiver>partMainControl</receiver>
+   <slot>onCmdResetClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>126</x>
+     <y>32</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>146</x>
+     <y>32</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdUnlock</sender>
+   <signal>clicked()</signal>
+   <receiver>partMainControl</receiver>
+   <slot>onCmdUnlockClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>176</x>
+     <y>17</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>194</x>
+     <y>18</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdDoor</sender>
+   <signal>clicked()</signal>
+   <receiver>partMainControl</receiver>
+   <slot>onCmdDoorClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>118</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>122</x>
+     <y>101</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdSleep</sender>
+   <signal>clicked()</signal>
+   <receiver>partMainControl</receiver>
+   <slot>onCmdSleepClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>71</x>
+     <y>82</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>75</x>
+     <y>100</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdCheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>partMainControl</receiver>
+   <slot>onCmdCheckClicked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>30</x>
+     <y>71</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>38</x>
+     <y>98</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdFlood</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>partMainControl</receiver>
+   <slot>onCmdFloodClicked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>173</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>194</x>
+     <y>77</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onCmdHomeClicked()</slot>
+  <slot>onCmdCheckClicked(bool)</slot>
+  <slot>onCmdFloodClicked(bool)</slot>
+  <slot>onCmdResetClicked()</slot>
+  <slot>onCmdUnlockClicked()</slot>
+  <slot>onCmdHoldClicked(bool)</slot>
+  <slot>onCmdSleepClicked()</slot>
+  <slot>onCmdDoorClicked()</slot>
+ </slots>
 </ui>

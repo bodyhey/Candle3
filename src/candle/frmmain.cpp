@@ -19,6 +19,7 @@
 #include <QScriptValueIterator>
 #include "frmmain.h"
 #include "form_partial/main/jog.h"
+#include "form_partial/main/control.h"
 #include "ui_frmmain.h"
 #include "ui_frmsettings.h"
 #include "widgets/widgetmimedata.h"
@@ -122,15 +123,18 @@ frmMain::frmMain(QWidget *parent) :
     ui->setupUi(this);
 
     ui->widgetJog->setParent(nullptr);
-    ui->widgetJog->deleteLater();
+    static_cast<QVBoxLayout*>(ui->grpJog->layout())->removeWidget(ui->widgetJog);
 
     ui->widgetJog = new partMainJog(this);
-    // ui->widgetJog->setParent(ui->grpJog);
-    // ui->widgetJog->setLayout(lay);
-    ui->widgetJog->show();
-    // ui->widgetJog->parentWidget()->adjustSize();
-
     static_cast<QVBoxLayout*>(ui->grpJog->layout())->insertWidget(0, ui->widgetJog);
+    ui->widgetJog->show();
+
+    QWidget *widgetControl = new partMainControl(this);
+    static_cast<QVBoxLayout*>(ui->grpControl->layout())->insertWidget(0, widgetControl);
+    widgetControl->show();
+
+    this->m_partState = new partMainState(this);
+    static_cast<QVBoxLayout*>(ui->grpState->layout())->insertWidget(0, this->m_partState);
 
     // Drag&drop placeholders
     ui->fraDropDevice->setVisible(false);
@@ -626,7 +630,7 @@ void frmMain::on_actServiceSettings_triggered()
     }
 }
 
-void frmMain::on_actConfigureGRBL_triggered()
+void frmMain::onActConfigureGRBLTriggered()
 {
     m_grblConfigurator.exec();
 }
@@ -1602,6 +1606,11 @@ void frmMain::onConnectionLineReceived(QString data)
         // Update machine coordinates
         static QRegExp mpx("MPos:([^,]*),([^,]*),([^,^>^|]*)");
         if (mpx.indexIn(data) != -1) {
+            this->m_partState->setMachineCoordinates(QVector3D(
+                mpx.cap(1).toDouble(),
+                mpx.cap(2).toDouble(),
+                mpx.cap(3).toDouble()
+            ));
             ui->txtMPosX->setValue(mpx.cap(1).toDouble());
             ui->txtMPosY->setValue(mpx.cap(2).toDouble());
             ui->txtMPosZ->setValue(mpx.cap(3).toDouble());
@@ -1620,6 +1629,7 @@ void frmMain::onConnectionLineReceived(QString data)
 
             // Update status
             if (state != m_deviceState) {
+                this->m_partState->setStatus(m_statusCaptions[state], m_statusBackColors[state], m_statusForeColors[state]);
                 ui->txtStatus->setText(m_statusCaptions[state]);
                 ui->txtStatus->setStyleSheet(QString("background-color: %1; color: %2;")
                                              .arg(m_statusBackColors[state]).arg(m_statusForeColors[state]));
@@ -2331,7 +2341,6 @@ void frmMain::onTableCellChanged(QModelIndex i1, QModelIndex i2)
     }
 
     if (!m_programLoading) {
-
         // Clear cached args
         model->setData(model->index(i1.row(), 5), QVariant());
 
@@ -3248,6 +3257,7 @@ void frmMain::loadPlugins()
 void frmMain::openPort()
 {
     if (m_connection->openConnection()) {
+        this->m_partState->setStatus(tr("Port opened"), "palette(button)", "palette(text)");
         ui->txtStatus->setText(tr("Port opened"));
         ui->txtStatus->setStyleSheet(QString("background-color: palette(button); color: palette(text);"));
         grblReset();
@@ -3289,7 +3299,7 @@ void frmMain::writeConsole(QString command)
     ui->txtConsole->appendPlainText(command);
 }
 
-frmMain::SendCommandResult frmMain::sendCommand(QString command, int tableIndex, bool showInConsole, bool wait)
+SendCommandResult frmMain::sendCommand(QString command, int tableIndex, bool showInConsole, bool wait)
 {
     // tableIndex:
     // 0...n - commands from g-code program
@@ -3960,6 +3970,7 @@ void frmMain::updateControlsState() {
         QAbstractItemView::EditKeyPressed | QAbstractItemView::AnyKeyPressed);
 
     if (!portOpened) {
+        this->m_partState->setStatus(tr("Not connected"), "palette(button)", "palette(text)");
         ui->txtStatus->setText(tr("Not connected"));
         ui->txtStatus->setStyleSheet(QString("background-color: palette(button); color: palette(text);"));
         emit deviceStateChanged(-1);

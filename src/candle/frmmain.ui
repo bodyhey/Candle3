@@ -1280,7 +1280,7 @@ QLabel[overrided=&quot;false&quot;] {
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>-359</y>
+          <y>0</y>
           <width>272</width>
           <height>801</height>
          </rect>
@@ -1633,12 +1633,15 @@ QLabel[overrided=&quot;false&quot;] {
            <property name="title">
             <string>Control</string>
            </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
            <property name="overrided" stdset="0">
             <bool>false</bool>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
             <item>
-             <layout class="QGridLayout" name="gridLayout_5">
+             <layout class="QGridLayout" name="layControl">
               <item row="0" column="5">
                <widget class="StyledToolButton" name="cmdUnlock">
                 <property name="enabled">
@@ -2785,8 +2788,8 @@ padding-right: 8;</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>232</width>
-          <height>131</height>
+          <width>272</width>
+          <height>130</height>
          </rect>
         </property>
         <property name="acceptDrops">
@@ -3258,12 +3261,12 @@ padding-right: 8;</string>
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1429</x>
-     <y>599</y>
+     <x>1425</x>
+     <y>603</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1429</x>
-     <y>992</y>
+     <x>1425</x>
+     <y>996</y>
     </hint>
    </hints>
   </connection>
@@ -3274,12 +3277,12 @@ padding-right: 8;</string>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>272</x>
-     <y>724</y>
+     <x>276</x>
+     <y>1087</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1429</x>
-     <y>398</y>
+     <x>1425</x>
+     <y>402</y>
     </hint>
    </hints>
   </connection>
@@ -3290,8 +3293,8 @@ padding-right: 8;</string>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>207</x>
-     <y>724</y>
+     <x>235</x>
+     <y>1087</y>
     </hint>
     <hint type="destinationlabel">
      <x>689</x>
@@ -3306,8 +3309,8 @@ padding-right: 8;</string>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>168</x>
-     <y>724</y>
+     <x>196</x>
+     <y>1087</y>
     </hint>
     <hint type="destinationlabel">
      <x>428</x>
@@ -3322,12 +3325,12 @@ padding-right: 8;</string>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>272</x>
-     <y>724</y>
+     <x>276</x>
+     <y>1087</y>
     </hint>
     <hint type="destinationlabel">
-     <x>222</x>
-     <y>382</y>
+     <x>226</x>
+     <y>707</y>
     </hint>
    </hints>
   </connection>
@@ -3422,8 +3425,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>82</x>
-     <y>248</y>
+     <x>86</x>
+     <y>574</y>
     </hint>
    </hints>
   </connection>
@@ -3438,8 +3441,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>82</x>
-     <y>293</y>
+     <x>86</x>
+     <y>656</y>
     </hint>
    </hints>
   </connection>
@@ -3454,8 +3457,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>208</x>
-     <y>248</y>
+     <x>212</x>
+     <y>574</y>
     </hint>
    </hints>
   </connection>
@@ -3470,8 +3473,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>271</x>
-     <y>248</y>
+     <x>275</x>
+     <y>574</y>
     </hint>
    </hints>
   </connection>
@@ -3502,7 +3505,7 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>987</x>
+     <x>983</x>
      <y>951</y>
     </hint>
    </hints>
@@ -3518,7 +3521,7 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1033</x>
+     <x>1029</x>
      <y>951</y>
     </hint>
    </hints>
@@ -3534,7 +3537,7 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1119</x>
+     <x>1115</x>
      <y>951</y>
     </hint>
    </hints>
@@ -3550,7 +3553,7 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1205</x>
+     <x>1201</x>
      <y>951</y>
     </hint>
    </hints>
@@ -3566,8 +3569,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1429</x>
-     <y>485</y>
+     <x>1425</x>
+     <y>489</y>
     </hint>
    </hints>
   </connection>
@@ -3582,8 +3585,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1334</x>
-     <y>569</y>
+     <x>1330</x>
+     <y>573</y>
     </hint>
    </hints>
   </connection>
@@ -3598,8 +3601,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1428</x>
-     <y>569</y>
+     <x>1424</x>
+     <y>573</y>
     </hint>
    </hints>
   </connection>
@@ -3614,8 +3617,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1429</x>
-     <y>599</y>
+     <x>1425</x>
+     <y>603</y>
     </hint>
    </hints>
   </connection>
@@ -3630,8 +3633,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1381</x>
-     <y>717</y>
+     <x>1377</x>
+     <y>721</y>
     </hint>
    </hints>
   </connection>
@@ -3646,8 +3649,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1358</x>
-     <y>870</y>
+     <x>1354</x>
+     <y>874</y>
     </hint>
    </hints>
   </connection>
@@ -3662,8 +3665,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1395</x>
-     <y>990</y>
+     <x>1391</x>
+     <y>994</y>
     </hint>
    </hints>
   </connection>
@@ -3678,7 +3681,7 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1453</x>
+     <x>1449</x>
      <y>1247</y>
     </hint>
    </hints>
@@ -3694,8 +3697,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>272</x>
-     <y>382</y>
+     <x>276</x>
+     <y>707</y>
     </hint>
    </hints>
   </connection>
@@ -3710,8 +3713,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>197</x>
-     <y>724</y>
+     <x>225</x>
+     <y>1087</y>
     </hint>
    </hints>
   </connection>
@@ -3726,8 +3729,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1429</x>
-     <y>366</y>
+     <x>1425</x>
+     <y>370</y>
     </hint>
    </hints>
   </connection>
@@ -3742,8 +3745,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1429</x>
-     <y>382</y>
+     <x>1425</x>
+     <y>386</y>
     </hint>
    </hints>
   </connection>
@@ -3758,8 +3761,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1429</x>
-     <y>398</y>
+     <x>1425</x>
+     <y>402</y>
     </hint>
    </hints>
   </connection>
@@ -3774,8 +3777,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>111</x>
-     <y>518</y>
+     <x>115</x>
+     <y>881</y>
     </hint>
    </hints>
   </connection>
@@ -3790,8 +3793,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>145</x>
-     <y>248</y>
+     <x>149</x>
+     <y>574</y>
     </hint>
    </hints>
   </connection>
@@ -3806,8 +3809,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>145</x>
-     <y>293</y>
+     <x>149</x>
+     <y>656</y>
     </hint>
    </hints>
   </connection>
@@ -3822,8 +3825,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>208</x>
-     <y>293</y>
+     <x>212</x>
+     <y>656</y>
     </hint>
    </hints>
   </connection>
@@ -3838,8 +3841,8 @@ padding-right: 8;</string>
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>271</x>
-     <y>293</y>
+     <x>275</x>
+     <y>656</y>
     </hint>
    </hints>
   </connection>

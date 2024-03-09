@@ -19,9 +19,8 @@ public:
     ~frmAbout();
 
 private slots:
-    void on_cmdOk_clicked();
-
-    void on_lblAbout_linkActivated(const QString &link);
+    void onCmdOkClicked();
+    void onLblAboutLinkActivated(const QString &link);
 
 private:
     Ui::frmAbout *ui;

@@ -23,6 +23,18 @@
    <property name="sizeConstraint">
     <enum>QLayout::SetMinimumSize</enum>
    </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <layout class="QGridLayout" name="gridLayout_3">
      <item row="2" column="2">
@@ -112,6 +124,52 @@
        </property>
       </widget>
      </item>
+     <item row="3" column="3">
+      <layout class="QHBoxLayout" name="horizontalLayout_8">
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="StyledToolButton" name="cmdZMinus">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string>Z-</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../../images.qrc">
+           <normaloff>:/images/1401562699_icon-arrow-down-b.png</normaloff>:/images/1401562699_icon-arrow-down-b.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>32</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="adjustSize" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
      <item row="2" column="1">
       <widget class="StyledToolButton" name="cmdStop">
        <property name="sizePolicy">
@@ -129,35 +187,6 @@
        <property name="icon">
         <iconset resource="../../images.qrc">
          <normaloff>:/images/brake.png</normaloff>:/images/brake.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="adjustSize" stdset="0">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="StyledToolButton" name="cmdYPlus">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="toolTip">
-        <string>Y+</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="../../images.qrc">
-         <normaloff>:/images/1401562173_chevron-up.png</normaloff>:/images/1401562173_chevron-up.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -216,51 +245,34 @@
        </item>
       </layout>
      </item>
-     <item row="3" column="3">
-      <layout class="QHBoxLayout" name="horizontalLayout_8">
-       <item>
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="StyledToolButton" name="cmdZMinus">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="toolTip">
-          <string>Z-</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="../../images.qrc">
-           <normaloff>:/images/1401562699_icon-arrow-down-b.png</normaloff>:/images/1401562699_icon-arrow-down-b.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>32</width>
-           <height>32</height>
-          </size>
-         </property>
-         <property name="adjustSize" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
+     <item row="0" column="1">
+      <widget class="StyledToolButton" name="cmdYPlus">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Y+</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../images.qrc">
+         <normaloff>:/images/1401562173_chevron-up.png</normaloff>:/images/1401562173_chevron-up.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="adjustSize" stdset="0">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -313,6 +325,13 @@
        </item>
       </widget>
      </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_22">
+       <property name="text">
+        <string>Feed:</string>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="1">
       <widget class="ComboBoxKey" name="cboJogStep">
        <property name="editable">
@@ -358,13 +377,6 @@
        </item>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_22">
-       <property name="text">
-        <string>Feed:</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>
@@ -391,5 +403,246 @@
  <resources>
   <include location="../../images.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>cmdYPlus</sender>
+   <signal>pressed()</signal>
+   <receiver>widgetJog</receiver>
+   <slot>onCmdYPlusPressed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>80</x>
+     <y>32</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>26</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdYPlus</sender>
+   <signal>released()</signal>
+   <receiver>widgetJog</receiver>
+   <slot>onCmdYPlusReleased()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>75</x>
+     <y>30</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>112</x>
+     <y>121</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdZPlus</sender>
+   <signal>pressed()</signal>
+   <receiver>widgetJog</receiver>
+   <slot>onCmdZPlusPressed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>200</x>
+     <y>32</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>215</x>
+     <y>1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdZPlus</sender>
+   <signal>released()</signal>
+   <receiver>widgetJog</receiver>
+   <slot>onCmdZPlusReleased()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>185</x>
+     <y>35</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>185</x>
+     <y>4</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdZMinus</sender>
+   <signal>pressed()</signal>
+   <receiver>widgetJog</receiver>
+   <slot>onCmdZMinusPressed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>205</x>
+     <y>107</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>221</x>
+     <y>86</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdZMinus</sender>
+   <signal>released()</signal>
+   <receiver>widgetJog</receiver>
+   <slot>onCmdZMinusReleased()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>184</x>
+     <y>137</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>223</x>
+     <y>66</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdXMinus</sender>
+   <signal>pressed()</signal>
+   <receiver>widgetJog</receiver>
+   <slot>onCmdXMinusPressed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>30</x>
+     <y>82</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>12</x>
+     <y>3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdXMinus</sender>
+   <signal>released()</signal>
+   <receiver>widgetJog</receiver>
+   <slot>onCmdXMinusReleased()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>18</x>
+     <y>77</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>58</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdXPlus</sender>
+   <signal>pressed()</signal>
+   <receiver>widgetJog</receiver>
+   <slot>onCmdXPlusPressed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>120</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>136</x>
+     <y>3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdXPlus</sender>
+   <signal>released()</signal>
+   <receiver>widgetJog</receiver>
+   <slot>onCmdXPlusReleased()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>138</x>
+     <y>71</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>110</x>
+     <y>6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdYMinus</sender>
+   <signal>pressed()</signal>
+   <receiver>widgetJog</receiver>
+   <slot>onCmdYMinusPressed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>64</x>
+     <y>116</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>120</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdYMinus</sender>
+   <signal>released()</signal>
+   <receiver>widgetJog</receiver>
+   <slot>onCmdYMinusReleased()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>83</x>
+     <y>136</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>7</x>
+     <y>97</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkKeyboardControl</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>widgetJog</receiver>
+   <slot>onChkKeyboardControlToggled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>64</x>
+     <y>228</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>216</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmdStop</sender>
+   <signal>clicked()</signal>
+   <receiver>widgetJog</receiver>
+   <slot>onCmdStopClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>66</x>
+     <y>78</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>58</x>
+     <y>144</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onCmdYPlusPressed()</slot>
+  <slot>onCmdYPlusReleased()</slot>
+  <slot>onCmdYMinusPressed()</slot>
+  <slot>onCmdYMinusReleased()</slot>
+  <slot>onCmdXPlusPressed()</slot>
+  <slot>onCmdXPlusReleased()</slot>
+  <slot>onCmdXMinusPressed()</slot>
+  <slot>onCmdXMinusReleased()</slot>
+  <slot>onCmdZPlusPressed()</slot>
+  <slot>onCmdZPlusReleased()</slot>
+  <slot>onCmdZMinusPressed()</slot>
+  <slot>onCmdZMinusReleased()</slot>
+  <slot>onChkKeyboardControlToggled(bool)</slot>
+  <slot>onCmdStopClicked()</slot>
+ </slots>
 </ui>

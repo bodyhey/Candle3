@@ -25,12 +25,12 @@ frmAbout::~frmAbout()
     delete ui;
 }
 
-void frmAbout::on_cmdOk_clicked()
+void frmAbout::onCmdOkClicked()
 {
     this->hide();
 }
 
-void frmAbout::on_lblAbout_linkActivated(const QString &link)
+void frmAbout::onLblAboutLinkActivated(const QString &link)
 {
     QDesktopServices::openUrl(link);
 }

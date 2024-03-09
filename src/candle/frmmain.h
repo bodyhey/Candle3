@@ -20,7 +20,11 @@
 #include <QGroupBox>
 #include <exception>
 
+#include "globals.h"
+
 #include "connection/connection.h"
+#include "form_partial/main/jog.h"
+#include "form_partial/main/state.h"
 #include "frmgrblconfigurator.h"
 #include "parser/gcodeviewparse.h"
 
@@ -57,38 +61,6 @@ namespace Ui {
 class frmMain;
 class frmProgram;
 }
-
-struct CommandAttributes {
-    int length;
-    int consoleIndex;
-    int tableIndex;
-    QString command;
-
-    CommandAttributes() {
-    }
-
-    CommandAttributes(int len, int consoleIdx, int tableIdx, QString cmd) {
-        length = len;
-        consoleIndex = consoleIdx;
-        tableIndex = tableIdx;
-        command = cmd;
-    }
-};
-
-struct CommandQueue {
-    QString command;
-    int tableIndex;
-    bool showInConsole;
-
-    CommandQueue() {
-    }
-
-    CommandQueue(QString cmd, int idx, bool show) {
-        command = cmd;
-        tableIndex = idx;
-        showInConsole = show;
-    }
-};
 
 class CancelException : public std::exception {
 public:
@@ -139,7 +111,7 @@ private slots:
     void on_actRecentClear_triggered();
     void on_actFileExit_triggered();
     void on_actServiceSettings_triggered();
-    void on_actConfigureGRBL_triggered();
+    void onActConfigureGRBLTriggered();
     void on_actAbout_triggered();
     void on_actJogStepNext_triggered();
     void on_actJogStepPrevious_triggered();
@@ -257,41 +229,6 @@ private:
     static const int PROGRESSMINLINES = 10000;
     static const int PROGRESSSTEP = 1000;    
 
-    enum SenderState {
-        SenderUnknown = -1,
-        SenderTransferring = 0,
-        SenderPausing = 1,
-        SenderPaused = 2,
-        SenderStopping = 3,
-        SenderStopped = 4,
-        SenderChangingTool = 5,
-        SenderPausing2 = 6
-    };
-
-    enum DeviceState {
-        DeviceUnknown = -1,
-        DeviceIdle = 1,
-        DeviceAlarm = 2,
-        DeviceRun = 3,
-        DeviceHome = 4,
-        DeviceHold0 = 5,
-        DeviceHold1 = 6,
-        DeviceQueue = 7,
-        DeviceCheck = 8,
-        DeviceDoor0 = 9,
-        DeviceDoor1 = 10,
-        DeviceDoor2 = 11,
-        DeviceDoor3 = 12,
-        DeviceJog = 13,
-        DeviceSleep =14
-    };
-
-    enum SendCommandResult {
-        SendDone = 0,
-        SendEmpty = 1,
-        SendQueue = 2
-    };
-
     // Ui
     Ui::frmMain *ui;
 
@@ -346,6 +283,10 @@ private:
     frmSettings *m_settings;
     frmAbout m_frmAbout;
     frmGrblConfigurator m_grblConfigurator;
+
+    // Partials
+    partMainJog *m_partJog;
+    partMainState *m_partState;
 
     // Filenames
     QString m_settingsFileName;
@@ -459,7 +400,7 @@ private:
     bool updateHeightMapGrid();
     void updateHeightMapGrid(double arg1);
     void resizeTableHeightMapSections();
-    bool eventFilter(QObject *obj, QEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
     // Utility
     int bufferLength();
