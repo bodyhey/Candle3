@@ -36,13 +36,11 @@ void frmMain::onConnectionLineReceived(QString data)
 
             // Update status
             if (state != m_communicator->m_deviceState) {
-                this->m_partState->setStatusText(m_statusCaptions[state], m_statusBackColors[state], m_statusForeColors[state]);
-                ui->txtStatus->setText(m_statusCaptions[state]);
-                ui->txtStatus->setStyleSheet(QString("background-color: %1; color: %2;")
-                                                 .arg(m_statusBackColors[state]).arg(m_statusForeColors[state]));
+                emit deviceStateChanged(state);
             }
 
             // Update controls
+            // @TODO should i move it do deviceStateChanged handler??
             ui->cmdCheck->setEnabled(state != DeviceRun && (m_communicator->m_senderState == SenderStopped));
             ui->cmdCheck->setChecked(state == DeviceCheck);
             ui->cmdHold->setChecked(state == DeviceHold0 || state == DeviceHold1 || state == DeviceQueue);

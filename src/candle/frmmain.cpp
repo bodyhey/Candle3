@@ -1636,6 +1636,14 @@ void frmMain::onWorkPosChanged(QVector3D pos)
     m_storedVars.setCoords("W", pos);
 }
 
+void frmMain::onDeviceStateChanged(DeviceState state)
+{
+    this->m_partState->setStatusText(m_statusCaptions[state], m_statusBackColors[state], m_statusForeColors[state]);
+    ui->txtStatus->setText(m_statusCaptions[state]);
+    ui->txtStatus->setStyleSheet(QString("background-color: %1; color: %2;")
+                                     .arg(m_statusBackColors[state]).arg(m_statusForeColors[state]));
+}
+
 void frmMain::onTimerConnection()
 {
     if (!m_connection->isConnected()) {
