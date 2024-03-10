@@ -46,7 +46,8 @@ private:
     SenderState m_senderState;
     DeviceState m_deviceState;
     QTime m_startTime;
-
+    QVector3D m_machinePos;
+    QVector3D m_workPos;
     bool m_reseting;
     bool m_resetCompleted;
     bool m_aborting;
@@ -63,6 +64,7 @@ private:
     bool dataIsFloating(QString data);
     bool dataIsEnd(QString data);
     bool dataIsReset(QString data);
+    bool compareCoordinates(double x, double y, double z);
 signals:
     void responseReceived(QString command, int tableIndex, QString response);
     void statusReceived(QString status);

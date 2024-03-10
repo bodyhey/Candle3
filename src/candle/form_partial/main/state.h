@@ -18,7 +18,7 @@ public:
     ~partMainState();
     void setStatusText(QString, QString bgColor, QString fgColor);
     void setState(DeviceState);
-    void setWorldCoordinates(QVector3D);
+    void setWorkCoordinates(QVector3D);
     void setMachineCoordinates(QVector3D);
 
 private:

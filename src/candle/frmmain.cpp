@@ -35,6 +35,9 @@ frmMain::frmMain(QWidget *parent) :
     m_connection = new SerialConnection(this);
     m_communicator = new Communicator(m_connection, ui, m_settings, this);
 
+    connect(this, SIGNAL(machinePosChanged(QVector3D)), this, SLOT(onMachinePosChanged(QVector3D)));
+    connect(this, SIGNAL(workPosChanged(QVector3D)), this, SLOT(onWorkPosChanged(QVector3D)));
+
     // Initializing variables
     m_deviceStatuses[DeviceUnknown] = "Unknown";
     m_deviceStatuses[DeviceIdle] = "Idle";
@@ -1616,20 +1619,13 @@ void frmMain::onConnectionLineReceived(QString data)
         // Update machine coordinates
         static QRegExp mpx("MPos:([^,]*),([^,]*),([^,^>^|]*)");
         if (mpx.indexIn(data) != -1) {
-            this->m_partState->setMachineCoordinates(QVector3D(
+            QVector3D pos(
                 mpx.cap(1).toDouble(),
                 mpx.cap(2).toDouble(),
                 mpx.cap(3).toDouble()
-            ));
-            ui->txtMPosX->setValue(mpx.cap(1).toDouble());
-            ui->txtMPosY->setValue(mpx.cap(2).toDouble());
-            ui->txtMPosZ->setValue(mpx.cap(3).toDouble());
-
-            // Update stored vars
-            m_storedVars.setCoords("M", QVector3D(
-                ui->txtMPosX->value(),
-                ui->txtMPosY->value(),
-                ui->txtMPosZ->value()));
+            );
+            m_communicator->m_machinePos = pos;
+            emit machinePosChanged(pos);
         }
 
         // Status
@@ -1684,7 +1680,7 @@ void frmMain::onConnectionLineReceived(QString data)
                 case DeviceHold0: // Hold
                 case DeviceHold1:
                 case DeviceQueue:
-                    if (!m_communicator->m_reseting && compareCoordinates(x, y, z)) {
+                    if (!m_communicator->m_reseting && m_communicator->compareCoordinates(x, y, z)) {
                         x = sNan;
                         y = sNan;
                         z = sNan;
@@ -1721,15 +1717,23 @@ void frmMain::onConnectionLineReceived(QString data)
         }
 
         // Update work coordinates
-        ui->txtWPosX->setValue(ui->txtMPosX->value() - workOffset.x());
-        ui->txtWPosY->setValue(ui->txtMPosY->value() - workOffset.y());
-        ui->txtWPosZ->setValue(ui->txtMPosZ->value() - workOffset.z());
+        QVector3D pos(
+            m_communicator->m_machinePos.x() - workOffset.x(),
+            m_communicator->m_machinePos.y() - workOffset.y(),
+            m_communicator->m_machinePos.z() - workOffset.z()
+        );
+        m_communicator->m_workPos = pos;
+        emit workPosChanged(pos);
 
-        // Update stored vars
-        m_storedVars.setCoords("W", QVector3D(
-                ui->txtWPosX->value(),
-                ui->txtWPosY->value(),
-                ui->txtWPosZ->value()));
+        // ui->txtWPosX->setValue(ui->txtMPosX->value() - workOffset.x());
+        // ui->txtWPosY->setValue(ui->txtMPosY->value() - workOffset.y());
+        // ui->txtWPosZ->setValue(ui->txtMPosZ->value() - workOffset.z());
+
+        // // Update stored vars
+        // m_storedVars.setCoords("W", QVector3D(
+        //         ui->txtWPosX->value(),
+        //         ui->txtWPosY->value(),
+        //         ui->txtWPosZ->value()));
 
         // Update tool position
         QVector3D toolPosition;
@@ -2273,6 +2277,28 @@ void frmMain::onConnectionError(QString error)
     updateControlsState();
 }
 
+void frmMain::onMachinePosChanged(QVector3D pos)
+{
+    this->m_partState->setMachineCoordinates(pos);
+
+    ui->txtMPosX->setValue(pos.x());
+    ui->txtMPosY->setValue(pos.y());
+    ui->txtMPosZ->setValue(pos.z());
+
+    m_storedVars.setCoords("M", pos);
+}
+
+void frmMain::onWorkPosChanged(QVector3D pos)
+{
+    this->m_partState->setWorkCoordinates(pos);
+
+    ui->txtWPosX->setValue(pos.x());
+    ui->txtWPosY->setValue(pos.y());
+    ui->txtWPosZ->setValue(pos.z());
+
+    m_storedVars.setCoords("W", pos);
+}
+
 void frmMain::onTimerConnection()
 {
     if (!m_connection->isConnected()) {
@@ -2782,11 +2808,11 @@ void frmMain::loadSettings()
     foreach (QDockWidget *w, findChildren<QDockWidget*>()) w->setStyleSheet("");
 
     // Restore docks
-        // Signals/slots
+    // Signals/slots
     foreach (QDockWidget *w, findChildren<QDockWidget*>())
         connect(w, &QDockWidget::topLevelChanged, this, &frmMain::onDockTopLevelChanged);
 
-        // Panels
+    // Panels
     ui->scrollContentsDevice->restoreState(this, set.value("panelsDevice").toStringList());
     ui->scrollContentsModification->restoreState(this, set.value("panelsModification").toStringList());
     ui->scrollContentsUser->restoreState(this, set.value("panelsUser").toStringList());
@@ -4455,11 +4481,6 @@ double frmMain::toInches(double value)
     return m_settings->units() == 0 ? value : value / 25.4;
 }
 
-bool frmMain::compareCoordinates(double x, double y, double z)
-{
-    return ui->txtMPosX->value() == x && ui->txtMPosY->value() == y && ui->txtMPosZ->value() == z;
-}
-
 bool frmMain::isGCodeFile(QString fileName)
 {
     return fileName.endsWith(".txt", Qt::CaseInsensitive)
@@ -4480,22 +4501,6 @@ int frmMain::buttonSize()
 {
     return ui->cmdHome->minimumWidth();
 }
-
-// void frmMain::setSenderState(SenderState state)
-// {
-//     if (m_communicator->m_senderState != state) {
-//         m_communicator->m_senderState = state;
-//         emit senderStateChanged(state);
-//     }
-// }
-
-// void frmMain::setDeviceState(DeviceState state)
-// {
-//     if (m_communicator->m_deviceState != state) {
-//         m_communicator->m_deviceState = state;
-//         emit deviceStateChanged(state);
-//     }
-// }
 
 void frmMain::completeTransfer()
 {

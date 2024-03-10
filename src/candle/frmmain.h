@@ -191,10 +191,11 @@ private slots:
     void on_mnuViewPanels_aboutToShow();
     void on_dockVisualizer_visibilityChanged(bool visible);
 
-    // void onSerialPortReadyRead();
-    // void onSerialPortError(QSerialPort::SerialPortError);
     void onConnectionLineReceived(QString);
     void onConnectionError(QString);
+
+    void onMachinePosChanged(QVector3D pos);
+    void onWorkPosChanged(QVector3D pos);
 
     void onTimerConnection();
     void onTimerStateQuery();
@@ -397,7 +398,7 @@ private:
     void jogContinuous();
     double toMetric(double value);
     double toInches(double value);
-    bool compareCoordinates(double x, double y, double z);
+    //bool compareCoordinates(double x, double y, double z);
     bool isGCodeFile(QString fileName);
     bool isHeightmapFile(QString fileName);
     int buttonSize();
@@ -407,6 +408,11 @@ private:
     static bool actionLessThan(const QAction *a1, const QAction *a2);
     static bool actionTextLessThan(const QAction *a1, const QAction *a2);
     static QScriptValue importExtension(QScriptContext *context, QScriptEngine *engine);
+
+signals:
+    void machinePosChanged(QVector3D pos);
+    void workPosChanged(QVector3D pos);
+
 };
 
 typedef QMap<QString, QList<QKeySequence>> ShortcutsMap;

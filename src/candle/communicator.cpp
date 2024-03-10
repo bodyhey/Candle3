@@ -11,7 +11,11 @@ Communicator::Communicator(
     Ui::frmMain *ui,
     frmSettings *frmSettings,
     QObject *parent = nullptr
-    ) : QObject(parent), m_connection(connection), m_settings(frmSettings), ui(ui) {
+    ) : QObject(parent),
+        m_connection(connection),
+        m_settings(frmSettings),
+        ui(ui)
+    {
     m_reseting = false;
     m_resetCompleted = true;
     m_aborting = false;
@@ -19,6 +23,9 @@ Communicator::Communicator(
 
     m_deviceState = DeviceUnknown;
     m_senderState = SenderUnknown;
+
+    m_machinePos = QVector3D(0, 0, 0);
+    m_workPos = QVector3D(0, 0, 0);
 
     this->connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
     this->connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));
@@ -927,4 +934,9 @@ bool Communicator::dataIsEnd(QString data) {
 bool Communicator::dataIsReset(QString data)
 {
     return QRegExp("^GRBL|GCARVIN\\s\\d\\.\\d.").indexIn(data.toUpper()) != -1;
+}
+
+bool Communicator::compareCoordinates(double x, double y, double z)
+{
+    return m_machinePos.x() == x && m_machinePos.y() == y && m_machinePos.z() == z;
 }

@@ -26,10 +26,10 @@ void partMainState::setState(DeviceState state)
     // @TODO
 }
 
-void partMainState::setWorldCoordinates(QVector3D pos)
+void partMainState::setWorkCoordinates(QVector3D pos)
 {
     ui->txtWPosX->setValue(pos.x());
-    ui->txtMPosY->setValue(pos.y());
+    ui->txtWPosY->setValue(pos.y());
     ui->txtWPosZ->setValue(pos.z());
 }
 
