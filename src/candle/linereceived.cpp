@@ -196,7 +196,7 @@ void frmMain::onConnectionLineReceived(QString data)
             static QRegExp as("A:([^,^>^|]+)");
             if (as.indexIn(data) != -1) {
                 QString q = as.cap(1);
-                m_spindleCW = q.contains("S");
+                m_communicator->m_spindleCW = q.contains("S");
                 if (q.contains("S") || q.contains("C")) {
                     m_timerToolAnimation.start(25, this);
                     ui->cmdSpindle->setChecked(true);

@@ -325,9 +325,6 @@ private:
     bool m_absoluteCoordinates;
     bool m_storedKeyboardControl;
 
-    // Spindle
-    bool m_spindleCW;
-
     // Jog
     QVector3D m_jogVector;
 

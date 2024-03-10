@@ -20,6 +20,7 @@ Communicator::Communicator(
     m_resetCompleted = true;
     m_aborting = false;
     m_statusReceived = false;
+    m_spindleCW = true;
 
     m_deviceState = DeviceUnknown;
     m_senderState = SenderUnknown;

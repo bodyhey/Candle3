@@ -41,19 +41,29 @@ private:
 
     Connection *m_connection;
     frmSettings *m_settings;
+    Ui::frmMain *ui;
+
+    // Queues
     QList<CommandAttributes> m_commands;
     QList<CommandQueue> m_queue;
+
+    // States
     SenderState m_senderState;
     DeviceState m_deviceState;
+
     QTime m_startTime;
+
+    // Coordinates
     QVector3D m_machinePos;
     QVector3D m_workPos;
+
+    // Flags
     bool m_reseting;
     bool m_resetCompleted;
     bool m_aborting;
     bool m_statusReceived;
     bool m_homing;
-    Ui::frmMain *ui;
+    bool m_spindleCW; // Spindle is rotating clockwise
 
     void onSerialPortReadyRead(QString);
     void setSenderState(SenderState);

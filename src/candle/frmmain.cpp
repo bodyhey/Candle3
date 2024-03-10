@@ -121,8 +121,6 @@ frmMain::frmMain(QWidget *parent) :
     // m_deviceState = DeviceUnknown;
     // m_communicator->m_senderState = SenderUnknown;
 
-    m_spindleCW = true;
-
     // Loading settings
     m_settingsFileName = qApp->applicationDirPath() + "/settings.ini";
     preloadSettings();
@@ -283,7 +281,8 @@ frmMain::frmMain(QWidget *parent) :
     connect(this, &frmMain::responseReceived, &m_scriptFunctions, &ScriptFunctions::responseReceived);
     connect(this, &frmMain::statusReceived, &m_scriptFunctions, &ScriptFunctions::statusReceived);
     connect(this, &frmMain::senderStateChanged, &m_scriptFunctions, &ScriptFunctions::senderStateChanged);
-    connect(this, &frmMain::deviceStateChanged, &m_scriptFunctions, &ScriptFunctions::deviceStateChanged);
+    // @TODO scripting, what values to use for device state?
+    //connect(this, &frmMain::deviceStateChanged, &m_scriptFunctions, &ScriptFunctions::deviceStateChanged);
     connect(this, &frmMain::settingsAboutToLoad, &m_scriptFunctions, &ScriptFunctions::settingsAboutToLoad);
     connect(this, &frmMain::settingsLoaded, &m_scriptFunctions, &ScriptFunctions::settingsLoaded);
     connect(this, &frmMain::settingsAboutToSave, &m_scriptFunctions, &ScriptFunctions::settingsAboutToSave);
@@ -407,7 +406,7 @@ void frmMain::resizeEvent(QResizeEvent *re)
 void frmMain::timerEvent(QTimerEvent *te)
 {
     if (te->timerId() == m_timerToolAnimation.timerId()) {
-        m_toolDrawer.rotate((m_spindleCW ? -40 : 40) * (double)(ui->slbSpindle->currentValue())
+        m_toolDrawer.rotate((m_communicator->m_spindleCW ? -40 : 40) * (double)(ui->slbSpindle->currentValue())
                             / (ui->slbSpindle->maximum()));
     } else {
         QMainWindow::timerEvent(te);
