@@ -54,7 +54,8 @@ SOURCES += main.cpp\
     form_partial/main/override.cpp \
     form_partial/main/state.cpp \
     frmgrblconfigurator.cpp \
-        frmmain.cpp \
+    frmmain.cpp \
+    linereceived.cpp \
     frmsettings.cpp \
     frmabout.cpp \
     drawers/gcodedrawer.cpp \
