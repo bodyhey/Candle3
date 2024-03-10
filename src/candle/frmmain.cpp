@@ -29,9 +29,11 @@
 
 frmMain::frmMain(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::frmMain)
+    ui(new Ui::frmMain ),
+    m_scripting(&m_configuration)
 {
     m_connection = new SerialConnection(this);
+    m_communicator = new Communicator(m_connection, ui, this);
 
     // Initializing variables
     m_deviceStatuses[DeviceUnknown] = "Unknown";
@@ -1588,6 +1590,7 @@ void frmMain::on_dockVisualizer_visibilityChanged(bool visible)
 
 void frmMain::onConnectionLineReceived(QString data)
 {
+/*
     // Filter prereset responses
     if (m_reseting) {
         if (!dataIsReset(data)) return;
@@ -1629,7 +1632,7 @@ void frmMain::onConnectionLineReceived(QString data)
 
             // Update status
             if (state != m_deviceState) {
-                this->m_partState->setStatus(m_statusCaptions[state], m_statusBackColors[state], m_statusForeColors[state]);
+                this->m_partState->setStatusText(m_statusCaptions[state], m_statusBackColors[state], m_statusForeColors[state]);
                 ui->txtStatus->setText(m_statusCaptions[state]);
                 ui->txtStatus->setStyleSheet(QString("background-color: %1; color: %2;")
                                              .arg(m_statusBackColors[state]).arg(m_statusForeColors[state]));
@@ -2246,6 +2249,7 @@ void frmMain::onConnectionLineReceived(QString data)
     } else {
         // Blank response
     }
+*/
 }
 
 void frmMain::onConnectionError(QString error)
@@ -3257,7 +3261,7 @@ void frmMain::loadPlugins()
 void frmMain::openPort()
 {
     if (m_connection->openConnection()) {
-        this->m_partState->setStatus(tr("Port opened"), "palette(button)", "palette(text)");
+        this->m_partState->setStatusText(tr("Port opened"), "palette(button)", "palette(text)");
         ui->txtStatus->setText(tr("Port opened"));
         ui->txtStatus->setStyleSheet(QString("background-color: palette(button); color: palette(text);"));
         grblReset();
@@ -3970,7 +3974,7 @@ void frmMain::updateControlsState() {
         QAbstractItemView::EditKeyPressed | QAbstractItemView::AnyKeyPressed);
 
     if (!portOpened) {
-        this->m_partState->setStatus(tr("Not connected"), "palette(button)", "palette(text)");
+        this->m_partState->setStatusText(tr("Not connected"), "palette(button)", "palette(text)");
         ui->txtStatus->setText(tr("Not connected"));
         ui->txtStatus->setStyleSheet(QString("background-color: palette(button); color: palette(text);"));
         emit deviceStateChanged(-1);

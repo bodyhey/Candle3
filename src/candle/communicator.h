@@ -1,86 +1,33 @@
 #ifndef COMMUNICATOR_H
 #define COMMUNICATOR_H
 
+#include <QScrollBar>
+//#include "frmmain.h"
+#include "globals.h"
 #include "connection/connection.h"
 #include "machine/settings.h"
+#include "ui_frmmain.h"
 
 #ifdef WINDOWS
     #include <QtWinExtras/QtWinExtras>
 #endif
 
-struct CommandAttributes {
-    int length;
-    int consoleIndex;
-    int tableIndex;
-    QString command;
-
-    CommandAttributes() {
-    }
-
-    CommandAttributes(int len, int consoleIdx, int tableIdx, QString cmd) {
-        length = len;
-        consoleIndex = consoleIdx;
-        tableIndex = tableIdx;
-        command = cmd;
-    }
-};
-
-struct CommandQueue {
-    QString command;
-    int tableIndex;
-    bool showInConsole;
-
-    CommandQueue() {
-    }
-
-    CommandQueue(QString cmd, int idx, bool show) {
-        command = cmd;
-        tableIndex = idx;
-        showInConsole = show;
-    }
-};
-
-enum SenderState {
-    SenderUnknown = -1,
-    SenderTransferring = 0,
-    SenderPausing = 1,
-    SenderPaused = 2,
-    SenderStopping = 3,
-    SenderStopped = 4,
-    SenderChangingTool = 5,
-    SenderPausing2 = 6
-};
-
-enum DeviceState {
-    DeviceUnknown = -1,
-    DeviceIdle = 1,
-    DeviceAlarm = 2,
-    DeviceRun = 3,
-    DeviceHome = 4,
-    DeviceHold0 = 5,
-    DeviceHold1 = 6,
-    DeviceQueue = 7,
-    DeviceCheck = 8,
-    DeviceDoor0 = 9,
-    DeviceDoor1 = 10,
-    DeviceDoor2 = 11,
-    DeviceDoor3 = 12,
-    DeviceJog = 13,
-    DeviceSleep =14
-};
-
-enum SendCommandResult {
-    SendDone = 0,
-    SendEmpty = 1,
-    SendQueue = 2
-};
+namespace Ui {
+class frmMain;
+}
 
 class Communicator : public QObject
 {
+    friend class frmMain;
+
     Q_OBJECT
 
 public:
-    Communicator(Connection *connection);    
+    Communicator(
+        Connection *connection,
+        Ui::frmMain *ui,
+        //frmMain *form,
+        QObject *parent);
     SendCommandResult sendCommand(QString command, int tableIndex = -1, bool showInConsole = true, bool wait = false);
     void sendRealtimeCommand(QString command);
     void sendCommands(QString commands, int tableIndex = -1);
@@ -92,11 +39,15 @@ private:
     QList<CommandQueue> m_queue;
     SenderState m_senderState;
     DeviceState m_deviceState;
+    QTime m_startTime;
 
     bool m_reseting;
     bool m_resetCompleted;
     bool m_aborting;
     bool m_statusReceived;
+    bool m_homing;
+    Ui::frmMain *ui;
+    //frmMain *form;
     QMap<DeviceState, QString> m_deviceStatuses;
     QMap<DeviceState, QString> m_statusCaptions;
     QMap<DeviceState, QString> m_statusBackColors;

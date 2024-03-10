@@ -13,11 +13,17 @@ partMainState::~partMainState()
     delete ui;
 }
 
-void partMainState::setStatus(QString status, QString bgColor, QString fgColor)
+void partMainState::setStatusText(QString status, QString bgColor, QString fgColor)
 {
     ui->txtStatus->setText(status);
-    ui->txtStatus->setStyleSheet(QString("background-color: %1; color: %2;").arg(bgColor).arg(fgColor));
+    ui->txtStatus->setStyleSheet(QString("background-color: %1; color: %2;")
+                                     .arg(bgColor, fgColor));
 
+}
+
+void partMainState::setState(DeviceState state)
+{
+    // @TODO
 }
 
 void partMainState::setWorldCoordinates(QVector3D pos)

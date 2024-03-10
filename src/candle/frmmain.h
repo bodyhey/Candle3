@@ -20,6 +20,7 @@
 #include <QGroupBox>
 #include <exception>
 
+#include "communicator.h"
 #include "globals.h"
 
 #include "connection/connection.h"
@@ -38,6 +39,7 @@
 #include "drawers/selectiondrawer.h"
 #include "drawers/machineboundsdrawer.h"
 
+#include "scripting/scripting.h"
 #include "tables/gcodetablemodel.h"
 #include "tables/heightmaptablemodel.h"
 
@@ -80,6 +82,7 @@ class frmMain : public QMainWindow
     Q_OBJECT
 
     friend class ScriptFunctions;
+    friend class Communicator;
 
 public:
     explicit frmMain(QWidget *parent = 0);
@@ -274,6 +277,7 @@ private:
 
     // Connection
     Connection *m_connection;
+    Communicator *m_communicator;
 
     // Queues
     QList<CommandAttributes> m_commands;
@@ -341,6 +345,8 @@ private:
     QVector3D m_jogVector;
 
     // Script
+    Configuration m_configuration;
+    Scripting m_scripting;
     QScriptEngine m_scriptEngine;
     ScriptVars m_storedVars;
     ScriptFunctions m_scriptFunctions;

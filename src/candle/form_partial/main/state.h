@@ -16,7 +16,8 @@ class partMainState : public QWidget
 public:
     explicit partMainState(QWidget *parent = nullptr);
     ~partMainState();
-    void setStatus(QString, QString bgColor, QString fgColor);
+    void setStatusText(QString, QString bgColor, QString fgColor);
+    void setState(DeviceState);
     void setWorldCoordinates(QVector3D);
     void setMachineCoordinates(QVector3D);
 

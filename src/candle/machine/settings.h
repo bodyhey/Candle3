@@ -16,6 +16,10 @@ public:
     bool referenceZPlus();
     bool referenceYPlus();
     void setMachineBounds(QVector3D);
+    bool toolChangePause();
+    bool ignoreErrors();
+    QString beforePauseCommands();
+    QString toolChangeCommands();
 };
 
 #endif // SETTINGS_H
