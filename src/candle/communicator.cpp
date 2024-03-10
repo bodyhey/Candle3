@@ -941,3 +941,13 @@ bool Communicator::compareCoordinates(double x, double y, double z)
 {
     return m_machinePos.x() == x && m_machinePos.y() == y && m_machinePos.z() == z;
 }
+
+double Communicator::toMetric(double value)
+{
+    return m_settings->units() == 0 ? value : value * 25.4;
+}
+
+double Communicator::toInches(double value)
+{
+    return m_settings->units() == 0 ? value : value / 25.4;
+}

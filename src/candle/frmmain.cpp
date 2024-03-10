@@ -825,7 +825,7 @@ void frmMain::on_cmdFileReset_clicked()
     m_fileCommandIndex = 0;
     m_fileProcessedCommandIndex = 0;
     m_lastDrawnLineIndex = 0;
-    m_probeIndex = -1;
+    m_communicator->m_probeIndex = -1;
 
     if (!m_heightMapMode) {
         QList<LineSegment*> list = m_viewParser.getLineSegmentList();
@@ -1868,7 +1868,7 @@ void frmMain::onActSendFromLineTriggered()
     m_fileCommandIndex = commandIndex;
     m_fileProcessedCommandIndex = commandIndex;
     m_lastDrawnLineIndex = 0;
-    m_probeIndex = -1;
+    m_communicator->m_probeIndex = -1;
 
     QList<LineSegment*> list = m_viewParser.getLineSegmentList();
 
@@ -3806,7 +3806,7 @@ void frmMain::jogContinuous()
             // Bounds
             QVector3D b = m_settings->machineBounds();
             // Current machine coords
-            QVector3D m(toMetric(m_storedVars.Mx()), toMetric(m_storedVars.My()), toMetric(m_storedVars.Mz()));
+            QVector3D m(m_communicator->toMetric(m_storedVars.Mx()), m_communicator->toMetric(m_storedVars.My()), m_communicator->toMetric(m_storedVars.Mz()));
             // Distance to bounds
             QVector3D t;
             // Minimum distance to bounds
@@ -3817,13 +3817,13 @@ void frmMain::jogContinuous()
                               j.z() * b.z() < 0 ? 0 - m.z() : b.z() - m.z());
                 for (int i = 0; i < 3; i++) if ((j[i] && (qAbs(t[i]) < d)) || (j[i] && !d)) d = qAbs(t[i]);
                 // Coords not aligned, add some bounds offset
-                d -= m_settings->units() ? toMetric(0.0005) : 0.005;
+                d -= m_settings->units() ? m_communicator->toMetric(0.0005) : 0.005;
             } else {
                 for (int i = 0; i < 3; i++) if (j[i] && (qAbs(b[i]) > d)) d = qAbs(b[i]);
             }
 
             // Jog vector
-            QVector3D vec = j * toInches(d);
+            QVector3D vec = j * m_communicator->toInches(d);
 
             if (vec.length()) {
                 m_communicator->sendCommand(QString("$J=%5G91X%1Y%2Z%3F%4")
@@ -3837,16 +3837,6 @@ void frmMain::jogContinuous()
             v = j;
         }
     }
-}
-
-double frmMain::toMetric(double value)
-{
-    return m_settings->units() == 0 ? value : value * 25.4;
-}
-
-double frmMain::toInches(double value)
-{
-    return m_settings->units() == 0 ? value : value / 25.4;
 }
 
 bool frmMain::isGCodeFile(QString fileName)

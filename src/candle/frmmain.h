@@ -317,7 +317,6 @@ private:
     // Indices
     int m_fileCommandIndex;
     int m_fileProcessedCommandIndex;
-    int m_probeIndex;
 
     // Current values
     int m_lastDrawnLineIndex;
@@ -395,9 +394,6 @@ private:
     QList<LineSegment *> subdivideSegment(LineSegment *segment);
     void jogStep();
     void jogContinuous();
-    double toMetric(double value);
-    double toInches(double value);
-    //bool compareCoordinates(double x, double y, double z);
     bool isGCodeFile(QString fileName);
     bool isHeightmapFile(QString fileName);
     int buttonSize();

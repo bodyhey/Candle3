@@ -1,5 +1,57 @@
 #include "frmmain.h"
 
+/*
+ *to be refactored/replaced by signals and slots
+ *
+ *
+updateControlsState()
+m_fileProcessedCommandIndex
+m_currentModel
+m_settings OK
+m_timerStateQuery
+m_deviceStatuses
+m_toolDrawer
+m_codeDrawer
+m_lastDrawnLineIndex
+m_currentDrawer
+m_fileCommandIndex
+m_updateParserStatus
+m_connection
+m_timerToolAnimation
+m_storedVars
+m_heightMapMode
+m_taskBarProgress
+m_senderErrorBox
+m_machineBoundsDrawer
+m_absoluteCoordinates
+
+completeTransfer();
+restoreParserState();
+updateOverride(ui->slbFeedOverride, ov.cap(1).toInt(), '\x91');
+parser
+list ???
+jogContinuous();
+storeOffsetsVars(response)
+setupCoordsTextboxes
+updateHeightMapInterpolationDrawer
+sendNextFileCommands
+
+ui->slbFeedOverride
+ui->slbSpindleOverride
+ui->slbSpindle
+ui->slbRapidOverride->isChecked() ? ui->slbRapidOverride
+ui->cmdSpindle
+ui->cmdFlood
+ui->glwVisualizer
+ui->txtConsole
+ui->chkKeyboardControl
+ui->tblHeightMap
+ui->chkAutoScroll
+ui->tblProgram
+ui->cmdFileAbort
+
+*/
+
 void frmMain::onConnectionLineReceived(QString data)
 {
     // Filter prereset responses
@@ -164,7 +216,7 @@ void frmMain::onConnectionLineReceived(QString data)
             }
         }
 
-        // Get overridings
+        // Get overrides
         static QRegExp ov("Ov:([^,]*),([^,]*),([^,^>^|]*)");
         if (ov.indexIn(data) != -1)
         {
@@ -258,8 +310,8 @@ void frmMain::onConnectionLineReceived(QString data)
                     static QRegExp g("G5[4-9]");
                     if (g.indexIn(response) != -1) {
                         m_storedVars.setCS(g.cap(0));
-                        m_machineBoundsDrawer.setOffset(QPointF(toMetric(m_storedVars.x()), toMetric(m_storedVars.y())) +
-                                                        QPointF(toMetric(m_storedVars.G92x()), toMetric(m_storedVars.G92y())));
+                        m_machineBoundsDrawer.setOffset(QPointF(m_communicator->toMetric(m_storedVars.x()), m_communicator->toMetric(m_storedVars.y())) +
+                                                        QPointF(m_communicator->toMetric(m_storedVars.G92x()), m_communicator->toMetric(m_storedVars.G92y())));
                     }
                     static QRegExp t("T(\\d+)(?!\\d)");
                     if (t.indexIn(response) != -1) {
@@ -387,11 +439,11 @@ void frmMain::onConnectionLineReceived(QString data)
                     QRegExp rx(".*PRB:([^,]*),([^,]*),([^,:]*)");
                     double z = qQNaN();
                     if (rx.indexIn(response) != -1) {
-                        z = toMetric(rx.cap(3).toDouble());
+                        z = m_communicator->toMetric(rx.cap(3).toDouble());
                     }
 
                     static double firstZ;
-                    if (m_probeIndex == -1) {
+                    if (m_communicator->m_probeIndex == -1) {
                         firstZ = z;
                         z = 0;
                     } else {
@@ -399,8 +451,8 @@ void frmMain::onConnectionLineReceived(QString data)
                         z -= firstZ;
 
                         // Calculate table indexes
-                        int row = (m_probeIndex / m_heightMapModel.columnCount());
-                        int column = m_probeIndex - row * m_heightMapModel.columnCount();
+                        int row = (m_communicator->m_probeIndex / m_heightMapModel.columnCount());
+                        int column = m_communicator->m_probeIndex - row * m_heightMapModel.columnCount();
                         if (row % 2) column = m_heightMapModel.columnCount() - 1 - column;
 
                         // Store Z in table
@@ -409,7 +461,7 @@ void frmMain::onConnectionLineReceived(QString data)
                         updateHeightMapInterpolationDrawer();
                     }
 
-                    m_probeIndex++;
+                    m_communicator->m_probeIndex++;
                 }
 
                 // Change state query time on check mode on
@@ -483,8 +535,7 @@ void frmMain::onConnectionLineReceived(QString data)
                     static QString errors;
 
                     if (ca.tableIndex > -1 && response.toUpper().contains("ERROR") && !m_settings->ignoreErrors()) {
-                        errors.append(QString::number(ca.tableIndex + 1) + ": " + ca.command
-                                      + " < " + response + "\n");
+                        errors.append(QString::number(ca.tableIndex + 1) + ": " + ca.command + " < " + response + "\n");
 
                         m_senderErrorBox->setText(tr("Error message(s) received:\n") + errors);
 
@@ -511,9 +562,7 @@ void frmMain::onConnectionLineReceived(QString data)
                     }
 
                     // Check transfer complete (last row always blank, last command row = rowcount - 2)
-                    if ((m_fileProcessedCommandIndex == m_currentModel->rowCount() - 2) ||
-                        uncomment.contains(QRegExp("(M0*2|M30)(?!\\d)")))
-                    {
+                    if ((m_fileProcessedCommandIndex == m_currentModel->rowCount() - 2) || uncomment.contains(QRegExp("(M0*2|M30)(?!\\d)"))) {
                         if (m_communicator->m_deviceState == DeviceRun) {
                             m_communicator->setSenderState(SenderStopping);
                         } else {
@@ -640,8 +689,7 @@ void frmMain::onConnectionLineReceived(QString data)
                 m_updateParserStatus = true;
                 m_communicator->m_statusReceived = true;
 
-                m_communicator->m_commands.clear();
-                m_communicator->m_queue.clear();
+                m_communicator->clearCommandsAndQueue();
 
                 updateControlsState();
             }

@@ -65,6 +65,9 @@ private:
     bool m_homing;
     bool m_spindleCW; // Spindle is rotating clockwise
 
+    // Indices
+    int m_probeIndex;
+
     void onSerialPortReadyRead(QString);
     void setSenderState(SenderState);
     void setDeviceState(DeviceState);
@@ -75,7 +78,8 @@ private:
     bool dataIsEnd(QString data);
     bool dataIsReset(QString data);
     bool compareCoordinates(double x, double y, double z);
-
+    double toMetric(double value);
+    double toInches(double value);
 signals:
     void responseReceived(QString command, int tableIndex, QString response);
     void statusReceived(QString status);
