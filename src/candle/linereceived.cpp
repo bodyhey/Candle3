@@ -85,9 +85,10 @@ void frmMain::onConnectionLineReceived(QString data)
                         z = sNan;
                         grblReset();
                     } else {
-                        x = ui->txtMPosX->value();
-                        y = ui->txtMPosY->value();
-                        z = ui->txtMPosZ->value();
+                        const QVector3D pos = m_communicator->m_machinePos;
+                        x = pos.x();
+                        y = pos.y();
+                        z = pos.z();
                     }
                     break;
                 case DeviceUnknown:
@@ -124,25 +125,12 @@ void frmMain::onConnectionLineReceived(QString data)
         m_communicator->m_workPos = pos;
         emit workPosChanged(pos);
 
-        // ui->txtWPosX->setValue(ui->txtMPosX->value() - workOffset.x());
-        // ui->txtWPosY->setValue(ui->txtMPosY->value() - workOffset.y());
-        // ui->txtWPosZ->setValue(ui->txtMPosZ->value() - workOffset.z());
-
-        // // Update stored vars
-        // m_storedVars.setCoords("W", QVector3D(
-        //         ui->txtWPosX->value(),
-        //         ui->txtWPosY->value(),
-        //         ui->txtWPosZ->value()));
-
         // Update tool position
         QVector3D toolPosition;
         if (!(state == DeviceCheck && m_fileProcessedCommandIndex < m_currentModel->rowCount() - 1)) {
-            toolPosition = QVector3D(toMetric(ui->txtWPosX->value()),
-                                     toMetric(ui->txtWPosY->value()),
-                                     toMetric(ui->txtWPosZ->value()));
+            toolPosition = m_communicator->m_machinePos;
             m_toolDrawer.setToolPosition(m_codeDrawer->getIgnoreZ() ? QVector3D(toolPosition.x(), toolPosition.y(), 0) : toolPosition);
         }
-
 
         // Toolpath shadowing
         if (((m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping)
