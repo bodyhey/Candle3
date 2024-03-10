@@ -20,7 +20,12 @@
 #include <QGroupBox>
 #include <exception>
 
+#include "communicator.h"
+#include "globals.h"
+
 #include "connection/connection.h"
+#include "form_partial/main/jog.h"
+#include "form_partial/main/state.h"
 #include "frmgrblconfigurator.h"
 #include "parser/gcodeviewparse.h"
 
@@ -34,6 +39,7 @@
 #include "drawers/selectiondrawer.h"
 #include "drawers/machineboundsdrawer.h"
 
+#include "scripting/scripting.h"
 #include "tables/gcodetablemodel.h"
 #include "tables/heightmaptablemodel.h"
 
@@ -57,38 +63,6 @@ namespace Ui {
 class frmMain;
 class frmProgram;
 }
-
-struct CommandAttributes {
-    int length;
-    int consoleIndex;
-    int tableIndex;
-    QString command;
-
-    CommandAttributes() {
-    }
-
-    CommandAttributes(int len, int consoleIdx, int tableIdx, QString cmd) {
-        length = len;
-        consoleIndex = consoleIdx;
-        tableIndex = tableIdx;
-        command = cmd;
-    }
-};
-
-struct CommandQueue {
-    QString command;
-    int tableIndex;
-    bool showInConsole;
-
-    CommandQueue() {
-    }
-
-    CommandQueue(QString cmd, int idx, bool show) {
-        command = cmd;
-        tableIndex = idx;
-        showInConsole = show;
-    }
-};
 
 class CancelException : public std::exception {
 public:
@@ -139,7 +113,7 @@ private slots:
     void on_actRecentClear_triggered();
     void on_actFileExit_triggered();
     void on_actServiceSettings_triggered();
-    void on_actConfigureGRBL_triggered();
+    void onActConfigureGRBLTriggered();
     void on_actAbout_triggered();
     void on_actJogStepNext_triggered();
     void on_actJogStepPrevious_triggered();
@@ -217,10 +191,11 @@ private slots:
     void on_mnuViewPanels_aboutToShow();
     void on_dockVisualizer_visibilityChanged(bool visible);
 
-    // void onSerialPortReadyRead();
-    // void onSerialPortError(QSerialPort::SerialPortError);
     void onConnectionLineReceived(QString);
     void onConnectionError(QString);
+
+    void onMachinePosChanged(QVector3D pos);
+    void onWorkPosChanged(QVector3D pos);
 
     void onTimerConnection();
     void onTimerStateQuery();
@@ -257,41 +232,6 @@ private:
     static const int PROGRESSMINLINES = 10000;
     static const int PROGRESSSTEP = 1000;    
 
-    enum SenderState {
-        SenderUnknown = -1,
-        SenderTransferring = 0,
-        SenderPausing = 1,
-        SenderPaused = 2,
-        SenderStopping = 3,
-        SenderStopped = 4,
-        SenderChangingTool = 5,
-        SenderPausing2 = 6
-    };
-
-    enum DeviceState {
-        DeviceUnknown = -1,
-        DeviceIdle = 1,
-        DeviceAlarm = 2,
-        DeviceRun = 3,
-        DeviceHome = 4,
-        DeviceHold0 = 5,
-        DeviceHold1 = 6,
-        DeviceQueue = 7,
-        DeviceCheck = 8,
-        DeviceDoor0 = 9,
-        DeviceDoor1 = 10,
-        DeviceDoor2 = 11,
-        DeviceDoor3 = 12,
-        DeviceJog = 13,
-        DeviceSleep =14
-    };
-
-    enum SendCommandResult {
-        SendDone = 0,
-        SendEmpty = 1,
-        SendQueue = 2
-    };
-
     // Ui
     Ui::frmMain *ui;
 
@@ -310,10 +250,6 @@ private:
     // Parsers
     GcodeViewParse m_viewParser;
     GcodeViewParse m_probeParser;
-
-    // State
-    SenderState m_senderState;
-    DeviceState m_deviceState;
 
     // Visualizer drawers
     // TODO: Add machine table visualizer
@@ -337,15 +273,16 @@ private:
 
     // Connection
     Connection *m_connection;
-
-    // Queues
-    QList<CommandAttributes> m_commands;
-    QList<CommandQueue> m_queue;    
+    Communicator *m_communicator;
 
     // Forms
     frmSettings *m_settings;
     frmAbout m_frmAbout;
     frmGrblConfigurator m_grblConfigurator;
+
+    // Partials
+    partMainJog *m_partJog;
+    partMainState *m_partState;
 
     // Filenames
     QString m_settingsFileName;
@@ -370,14 +307,8 @@ private:
     bool m_fileChanged;
     bool m_heightMapChanged;
 
-    bool m_homing;
     bool m_updateSpindleSpeed;
     bool m_updateParserStatus;
-
-    bool m_reseting;
-    bool m_resetCompleted;
-    bool m_aborting;
-    bool m_statusReceived;
 
     bool m_heightMapMode;
 
@@ -400,6 +331,8 @@ private:
     QVector3D m_jogVector;
 
     // Script
+    Configuration m_configuration;
+    Scripting m_scripting;
     QScriptEngine m_scriptEngine;
     ScriptVars m_storedVars;
     ScriptFunctions m_scriptFunctions;
@@ -419,9 +352,6 @@ private:
     // Communication
     void openPort();
     void grblReset();
-    SendCommandResult sendCommand(QString command, int tableIndex = -1, bool showInConsole = true, bool wait = false);
-    void sendRealtimeCommand(QString command);
-    void sendCommands(QString commands, int tableIndex = -1);
     void sendNextFileCommands();
     QString evaluateCommand(QString command);
 
@@ -429,7 +359,6 @@ private:
     void updateParser();
     void storeParserState();
     void restoreParserState();
-    void restoreOffsets();
     void storeOffsetsVars(QString response);
 
     // Files/models
@@ -459,31 +388,31 @@ private:
     bool updateHeightMapGrid();
     void updateHeightMapGrid(double arg1);
     void resizeTableHeightMapSections();
-    bool eventFilter(QObject *obj, QEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
     // Utility
     int bufferLength();
-    bool dataIsFloating(QString data);
-    bool dataIsEnd(QString data);
-    bool dataIsReset(QString data);
     QTime updateProgramEstimatedTime(QList<LineSegment *> lines);
     QList<LineSegment *> subdivideSegment(LineSegment *segment);
     void jogStep();
     void jogContinuous();
     double toMetric(double value);
     double toInches(double value);
-    bool compareCoordinates(double x, double y, double z);
+    //bool compareCoordinates(double x, double y, double z);
     bool isGCodeFile(QString fileName);
     bool isHeightmapFile(QString fileName);
     int buttonSize();
-    void setSenderState(SenderState state);
-    void setDeviceState(DeviceState state);
     void completeTransfer();
     QString getLineInitCommands(int row);
 
     static bool actionLessThan(const QAction *a1, const QAction *a2);
     static bool actionTextLessThan(const QAction *a1, const QAction *a2);
     static QScriptValue importExtension(QScriptContext *context, QScriptEngine *engine);
+
+signals:
+    void machinePosChanged(QVector3D pos);
+    void workPosChanged(QVector3D pos);
+
 };
 
 typedef QMap<QString, QList<QKeySequence>> ShortcutsMap;

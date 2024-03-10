@@ -26,9 +26,10 @@ contains(QT_CONFIG, opengles.) {
     target.path = /home/pi
 }
 
-TARGET = Candle
+TARGET = GPilot
 TEMPLATE = app
-RC_ICONS += images/gpilot.ico
+
+RC_ICONS = images/gpilot.ico
 
 DEFINES += sNan=\"65536\"
 
@@ -46,6 +47,7 @@ SOURCES += main.cpp\
     config/persister.cpp \
     config/provider.cpp \
     connection/connection.cpp \
+    connection/rawtcpconnection.cpp \
     connection/serialconnection.cpp \
     form_partial/main/control.cpp \
     form_partial/main/jog.cpp \
@@ -88,6 +90,7 @@ HEADERS  += frmmain.h \
     config/persister.h \
     config/provider.h \
     connection/connection.h \
+    connection/rawtcpconnection.h \
     connection/serialconnection.h \
     form_partial/main/control.h \
     form_partial/main/jog.h \
@@ -104,6 +107,7 @@ HEADERS  += frmmain.h \
     drawers/shaderdrawable.h \
     drawers/tooldrawer.h \
     drawers/machineboundsdrawer.h \
+    globals.h \
     machine/settings.h \
     parser/arcproperties.h \
     parser/gcodeparser.h \
@@ -146,14 +150,15 @@ INCLUDEPATH += ../vendor/PropertyEditor
 LIBS += -L../designerplugins/customwidgetsplugin/release -lcustomwidgets
 LIBS += -L../vendor/PropertyEditor\release -lPropertyEditor
 
-qtPrepareTool(LRELEASE, lrelease)
-for(tsfile, TRANSLATIONS) {
-    qmfile = $$tsfile
-    qmfile ~= s,.ts$,.qm,
-    qmdir = $$dirname(qmfile)
-    !exists($$qmdir) {
-        mkpath($$qmdir)|error("Aborting.")
-    }
-    command = $$LRELEASE -removeidentical $$tsfile -qm $$qmfile
-    system($$command)|error("Failed to run: $$command")
-}
+# qtPrepareTool(LRELEASE, lrelease)
+# for(tsfile, TRANSLATIONS) {
+#     qmfile = $$tsfile
+#     qmfile ~= s,.ts$,.qm,
+#     qmdir = $$dirname(qmfile)
+#     !exists($$qmdir) {
+#         mkpath($$qmdir)|error("Aborting.")
+#     }
+#     command = $$LRELEASE -removeidentical $$tsfile -qm $$qmfile
+#     system($$command)|error("Failed to run: $$command")
+# }
+

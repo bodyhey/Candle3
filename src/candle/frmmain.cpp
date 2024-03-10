@@ -19,6 +19,7 @@
 #include <QScriptValueIterator>
 #include "frmmain.h"
 #include "form_partial/main/jog.h"
+#include "form_partial/main/control.h"
 #include "ui_frmmain.h"
 #include "ui_frmsettings.h"
 #include "widgets/widgetmimedata.h"
@@ -28,9 +29,14 @@
 
 frmMain::frmMain(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::frmMain)
+    ui(new Ui::frmMain ),
+    m_scripting(&m_configuration)
 {
     m_connection = new SerialConnection(this);
+    m_communicator = new Communicator(m_connection, ui, m_settings, this);
+
+    connect(this, SIGNAL(machinePosChanged(QVector3D)), this, SLOT(onMachinePosChanged(QVector3D)));
+    connect(this, SIGNAL(workPosChanged(QVector3D)), this, SLOT(onWorkPosChanged(QVector3D)));
 
     // Initializing variables
     m_deviceStatuses[DeviceUnknown] = "Unknown";
@@ -99,18 +105,21 @@ frmMain::frmMain(QWidget *parent) :
 
     m_fileChanged = false;
     m_heightMapChanged = false;
-   
-    m_homing = false;
+
+    // to communicator
+    // m_communicator->m_homing = false;
     m_updateSpindleSpeed = false;
     m_updateParserStatus = false;
 
-    m_reseting = false;
-    m_resetCompleted = true;
-    m_aborting = false;
-    m_statusReceived = false;
+    // to communicator
+    // m_reseting = false;
+    // m_communicator->m_resetCompleted = true;
+    // m_aborting = false;
+    // m_statusReceived = false;
 
-    m_deviceState = DeviceUnknown;
-    m_senderState = SenderUnknown;
+    // to communicator
+    // m_deviceState = DeviceUnknown;
+    // m_communicator->m_senderState = SenderUnknown;
 
     m_spindleCW = true;
 
@@ -122,15 +131,18 @@ frmMain::frmMain(QWidget *parent) :
     ui->setupUi(this);
 
     ui->widgetJog->setParent(nullptr);
-    ui->widgetJog->deleteLater();
+    static_cast<QVBoxLayout*>(ui->grpJog->layout())->removeWidget(ui->widgetJog);
 
     ui->widgetJog = new partMainJog(this);
-    // ui->widgetJog->setParent(ui->grpJog);
-    // ui->widgetJog->setLayout(lay);
-    ui->widgetJog->show();
-    // ui->widgetJog->parentWidget()->adjustSize();
-
     static_cast<QVBoxLayout*>(ui->grpJog->layout())->insertWidget(0, ui->widgetJog);
+    ui->widgetJog->show();
+
+    QWidget *widgetControl = new partMainControl(this);
+    static_cast<QVBoxLayout*>(ui->grpControl->layout())->insertWidget(0, widgetControl);
+    widgetControl->show();
+
+    this->m_partState = new partMainState(this);
+    static_cast<QVBoxLayout*>(ui->grpState->layout())->insertWidget(0, this->m_partState);
 
     // Drag&drop placeholders
     ui->fraDropDevice->setVisible(false);
@@ -287,7 +299,8 @@ frmMain::frmMain(QWidget *parent) :
     ui->tblProgram->hideColumn(4);
     ui->tblProgram->hideColumn(5);
 
-    setSenderState(SenderStopped);
+    // to communicator
+    //setSenderState(SenderStopped);
     updateControlsState();
 
     // Prepare jog buttons
@@ -354,7 +367,9 @@ frmMain::frmMain(QWidget *parent) :
 }
 
 frmMain::~frmMain()
-{    
+{
+    delete m_communicator;
+    delete m_connection;
     delete m_senderErrorBox;
     delete ui;
 }
@@ -410,7 +425,7 @@ void frmMain::closeEvent(QCloseEvent *ce)
         return;
     }
 
-    if ((m_senderState != SenderStopped) && 
+    if ((m_communicator->m_senderState != SenderStopped) &&
         QMessageBox::warning(this, this->windowTitle(), tr("File sending in progress. Terminate and exit?"),
         QMessageBox::Yes | QMessageBox::No) == QMessageBox::No) 
     {    
@@ -422,17 +437,19 @@ void frmMain::closeEvent(QCloseEvent *ce)
     m_timerConnection.stop();
     m_connection->closeConnection();
     
-    if (m_queue.length() > 0) {
-        m_commands.clear();
-        m_queue.clear();
-    }
+    m_communicator->clearCommandsAndQueue();
+    // moved to communicator
+    // if (m_communicator->m_queue.length() > 0) {
+    //     m_communicator->m_commands.clear();
+    //     m_communicator->m_queue.clear();
+    // }
 
     saveSettings();
 }
 
 void frmMain::dragEnterEvent(QDragEnterEvent *dee)
 {
-    if (m_senderState != SenderStopped) return;
+    if (m_communicator->m_senderState != SenderStopped) return;
 
     if (dee->mimeData()->hasFormat("application/widget")) return;
 
@@ -626,7 +643,7 @@ void frmMain::on_actServiceSettings_triggered()
     }
 }
 
-void frmMain::on_actConfigureGRBL_triggered()
+void frmMain::onActConfigureGRBLTriggered()
 {
     m_grblConfigurator.exec();
 }
@@ -742,7 +759,7 @@ void frmMain::on_cmdFileSend_clicked()
 
     m_startTime.start();
 
-    setSenderState(SenderTransferring);
+    m_communicator->setSenderState(SenderTransferring);
 
     m_storedKeyboardControl = ui->chkKeyboardControl->isChecked();
     ui->chkKeyboardControl->setChecked(false);
@@ -762,7 +779,7 @@ void frmMain::on_cmdFileSend_clicked()
     updateControlsState();
     ui->cmdFilePause->setFocus();
 
-    if (m_settings->useStartCommands()) sendCommands(m_settings->startCommands());
+    if (m_settings->useStartCommands()) m_communicator->sendCommands(m_settings->startCommands());
     sendNextFileCommands();
 }
 
@@ -772,20 +789,20 @@ void frmMain::on_cmdFilePause_clicked(bool checked)
 
     if (checked) {
         //PAUSE
-        s = m_senderState;
+        s = m_communicator->m_senderState;
         // setSenderState(SenderPaused);
-        setSenderState(SenderPausing);
+        m_communicator->setSenderState(SenderPausing);
         ui->cmdFilePause->setText(tr("Pausing..."));
         ui->cmdFilePause->setEnabled(false);
     } else {
         //RESUME
-        if (m_senderState == SenderChangingTool) {
-            setSenderState(SenderTransferring);
+        if (m_communicator->m_senderState == SenderChangingTool) {
+            m_communicator->setSenderState(SenderTransferring);
         } else {
             if (m_settings->usePauseCommands()) {
-                sendCommands(m_settings->afterPauseCommands());
+                m_communicator->sendCommands(m_settings->afterPauseCommands());
             }
-            setSenderState(s);
+            m_communicator->setSenderState(s);
         }
         updateControlsState();
     }
@@ -795,10 +812,10 @@ void frmMain::on_cmdFileAbort_clicked()
 {
     ui->cmdFileAbort->setEnabled(false);
 
-    if ((m_senderState == SenderPaused) || (m_senderState == SenderChangingTool)) {
-        sendCommand("M2", -1, m_settings->showUICommands(), false);
+    if ((m_communicator->m_senderState == SenderPaused) || (m_communicator->m_senderState == SenderChangingTool)) {
+        m_communicator->sendCommand("M2", -1, m_settings->showUICommands(), false);
     } else {
-        sendCommand("M2", -1, m_settings->showUICommands(), true);
+        m_communicator->sendCommand("M2", -1, m_settings->showUICommands(), true);
     }
 }
 
@@ -853,7 +870,7 @@ void frmMain::on_cmdCommandSend_clicked()
 
     ui->cboCommand->storeText();
     ui->cboCommand->setCurrentText("");
-    sendCommand(command, -1);
+    m_communicator->sendCommand(command, -1);
 }
 
 void frmMain::on_cmdClearConsole_clicked()
@@ -863,18 +880,18 @@ void frmMain::on_cmdClearConsole_clicked()
 
 void frmMain::on_cmdHome_clicked()
 {
-    m_homing = true;
+    m_communicator->m_homing = true;
     m_updateSpindleSpeed = true;
-    sendCommand("$H", -1, m_settings->showUICommands());
+    m_communicator->sendCommand("$H", -1, m_settings->showUICommands());
 }
 
 void frmMain::on_cmdCheck_clicked(bool checked)
 {
     if (checked) {
         storeParserState();
-        sendCommand("$C", -1, m_settings->showUICommands());
+        m_communicator->sendCommand("$C", -1, m_settings->showUICommands());
     } else {
-        m_aborting = true;
+        m_communicator->m_aborting = true;
         grblReset();
     };
 }
@@ -887,7 +904,7 @@ void frmMain::on_cmdReset_clicked()
 void frmMain::on_cmdUnlock_clicked()
 {
     m_updateSpindleSpeed = true;
-    sendCommand("$X", -1, m_settings->showUICommands());
+    m_communicator->sendCommand("$X", -1, m_settings->showUICommands());
 }
 
 void frmMain::on_cmdHold_clicked(bool checked)
@@ -897,7 +914,7 @@ void frmMain::on_cmdHold_clicked(bool checked)
 
 void frmMain::on_cmdSleep_clicked()
 {
-    sendCommand("$SLP", -1, m_settings->showUICommands());
+    m_communicator->sendCommand("$SLP", -1, m_settings->showUICommands());
 }
 
 void frmMain::on_cmdDoor_clicked()
@@ -928,7 +945,7 @@ void frmMain::on_cmdSpindle_clicked(bool checked)
     if (ui->cmdHold->isChecked()) {
         m_connection->sendByteArray(QByteArray(1, char(0x9e)));
     } else {
-        sendCommand(checked ? QString("M3 S%1").arg(ui->slbSpindle->value()) : "M5", -1, m_settings->showUICommands());
+        m_communicator->sendCommand(checked ? QString("M3 S%1").arg(ui->slbSpindle->value()) : "M5", -1, m_settings->showUICommands());
     }
 }
 
@@ -1006,12 +1023,12 @@ void frmMain::on_chkKeyboardControl_toggled(bool checked)
 
     // Store/restore coordinate system
     if (checked) {
-        sendCommand("$G", -2, m_settings->showUICommands());
+        m_communicator->sendCommand("$G", -2, m_settings->showUICommands());
     } else {
-        if (m_absoluteCoordinates) sendCommand("G90", -1, m_settings->showUICommands());
+        if (m_absoluteCoordinates) m_communicator->sendCommand("G90", -1, m_settings->showUICommands());
     }
 
-    if ((m_senderState != SenderTransferring) && (m_senderState != SenderStopping)) 
+    if ((m_communicator->m_senderState != SenderTransferring) && (m_communicator->m_senderState != SenderStopping))
         m_storedKeyboardControl = checked;
 
     updateJogTitle();
@@ -1514,13 +1531,13 @@ void frmMain::on_cmdZMinus_released()
 void frmMain::on_cmdStop_clicked()
 {
     m_jogVector = QVector3D(0, 0, 0);
-    m_queue.clear();
+    m_communicator->clearQueue();
     m_connection->sendByteArray(QByteArray(1, char(0x85)));
 }
 
 void frmMain::on_tblProgram_customContextMenuRequested(const QPoint &pos)
 {
-    if (m_senderState != SenderStopped) return;
+    if (m_communicator->m_senderState != SenderStopped) return;
 
     if (ui->tblProgram->selectionModel()->selectedRows().count() > 0) {
         m_tableMenu->actions().at(0)->setEnabled(true);
@@ -1585,10 +1602,10 @@ void frmMain::on_dockVisualizer_visibilityChanged(bool visible)
 void frmMain::onConnectionLineReceived(QString data)
 {
     // Filter prereset responses
-    if (m_reseting) {
-        if (!dataIsReset(data)) return;
+    if (m_communicator->m_reseting) {
+        if (!m_communicator->dataIsReset(data)) return;
         else {
-            m_reseting = false;
+            m_communicator->m_reseting = false;
             m_timerStateQuery.setInterval(m_settings->queryStateTime());
         }
     }
@@ -1597,20 +1614,18 @@ void frmMain::onConnectionLineReceived(QString data)
     if (data[0] == '<') {
         DeviceState state = DeviceUnknown;
 
-        m_statusReceived = true;
+        m_communicator->m_statusReceived = true;
 
         // Update machine coordinates
         static QRegExp mpx("MPos:([^,]*),([^,]*),([^,^>^|]*)");
         if (mpx.indexIn(data) != -1) {
-            ui->txtMPosX->setValue(mpx.cap(1).toDouble());
-            ui->txtMPosY->setValue(mpx.cap(2).toDouble());
-            ui->txtMPosZ->setValue(mpx.cap(3).toDouble());
-
-            // Update stored vars
-            m_storedVars.setCoords("M", QVector3D(
-                ui->txtMPosX->value(),
-                ui->txtMPosY->value(),
-                ui->txtMPosZ->value()));
+            QVector3D pos(
+                mpx.cap(1).toDouble(),
+                mpx.cap(2).toDouble(),
+                mpx.cap(3).toDouble()
+            );
+            m_communicator->m_machinePos = pos;
+            emit machinePosChanged(pos);
         }
 
         // Status
@@ -1619,29 +1634,30 @@ void frmMain::onConnectionLineReceived(QString data)
             state = m_deviceStatuses.key(stx.cap(1), DeviceUnknown);
 
             // Update status
-            if (state != m_deviceState) {
+            if (state != m_communicator->m_deviceState) {
+                this->m_partState->setStatusText(m_statusCaptions[state], m_statusBackColors[state], m_statusForeColors[state]);
                 ui->txtStatus->setText(m_statusCaptions[state]);
                 ui->txtStatus->setStyleSheet(QString("background-color: %1; color: %2;")
                                              .arg(m_statusBackColors[state]).arg(m_statusForeColors[state]));
             }
 
             // Update controls
-            ui->cmdCheck->setEnabled(state != DeviceRun && (m_senderState == SenderStopped));
+            ui->cmdCheck->setEnabled(state != DeviceRun && (m_communicator->m_senderState == SenderStopped));
             ui->cmdCheck->setChecked(state == DeviceCheck);
             ui->cmdHold->setChecked(state == DeviceHold0 || state == DeviceHold1 || state == DeviceQueue);
-            ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_senderState != SenderTransferring) &&
-                (m_senderState != SenderStopping)));
+            ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_communicator->m_senderState != SenderTransferring) &&
+                (m_communicator->m_senderState != SenderStopping)));
 
             // Update "elapsed time" timer
-            if ((m_senderState == SenderTransferring) || (m_senderState == SenderStopping)) {
+            if ((m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping)) {
                 QTime time(0, 0, 0);
                 int elapsed = m_startTime.elapsed();
                 ui->glwVisualizer->setSpendTime(time.addMSecs(elapsed));
             }
 
             // Test for job complete
-            if ((m_senderState == SenderStopping) &&
-                    ((state == DeviceIdle && m_deviceState == DeviceRun) || state == DeviceCheck))
+            if ((m_communicator->m_senderState == SenderStopping) &&
+                    ((state == DeviceIdle && m_communicator->m_deviceState == DeviceRun) || state == DeviceCheck))
             {
                 completeTransfer();
             }
@@ -1651,20 +1667,20 @@ void frmMain::onConnectionLineReceived(QString data)
             static double y = sNan;
             static double z = sNan;
 
-            if (m_aborting) {
+            if (m_communicator->m_aborting) {
                 switch (state) {
                 case DeviceIdle: // Idle
-                    if ((m_senderState == SenderStopped) && m_resetCompleted) {
-                        m_aborting = false;
+                    if ((m_communicator->m_senderState == SenderStopped) && m_communicator->m_resetCompleted) {
+                        m_communicator->m_aborting = false;
                         restoreParserState();
-                        restoreOffsets();
+                        m_communicator->restoreOffsets();
                         return;
                     }
                     break;
                 case DeviceHold0: // Hold
                 case DeviceHold1:
                 case DeviceQueue:
-                    if (!m_reseting && compareCoordinates(x, y, z)) {
+                    if (!m_communicator->m_reseting && m_communicator->compareCoordinates(x, y, z)) {
                         x = sNan;
                         y = sNan;
                         z = sNan;
@@ -1701,15 +1717,23 @@ void frmMain::onConnectionLineReceived(QString data)
         }
 
         // Update work coordinates
-        ui->txtWPosX->setValue(ui->txtMPosX->value() - workOffset.x());
-        ui->txtWPosY->setValue(ui->txtMPosY->value() - workOffset.y());
-        ui->txtWPosZ->setValue(ui->txtMPosZ->value() - workOffset.z());
+        QVector3D pos(
+            m_communicator->m_machinePos.x() - workOffset.x(),
+            m_communicator->m_machinePos.y() - workOffset.y(),
+            m_communicator->m_machinePos.z() - workOffset.z()
+        );
+        m_communicator->m_workPos = pos;
+        emit workPosChanged(pos);
 
-        // Update stored vars
-        m_storedVars.setCoords("W", QVector3D(
-                ui->txtWPosX->value(),
-                ui->txtWPosY->value(),
-                ui->txtWPosZ->value()));
+        // ui->txtWPosX->setValue(ui->txtMPosX->value() - workOffset.x());
+        // ui->txtWPosY->setValue(ui->txtMPosY->value() - workOffset.y());
+        // ui->txtWPosZ->setValue(ui->txtMPosZ->value() - workOffset.z());
+
+        // // Update stored vars
+        // m_storedVars.setCoords("W", QVector3D(
+        //         ui->txtWPosX->value(),
+        //         ui->txtWPosY->value(),
+        //         ui->txtWPosZ->value()));
 
         // Update tool position
         QVector3D toolPosition;
@@ -1722,8 +1746,8 @@ void frmMain::onConnectionLineReceived(QString data)
 
 
         // Toolpath shadowing
-        if (((m_senderState == SenderTransferring) || (m_senderState == SenderStopping)
-            || (m_senderState == SenderPausing) || (m_senderState == SenderPausing2) || (m_senderState == SenderPaused)) && state != DeviceCheck) {
+        if (((m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping)
+            || (m_communicator->m_senderState == SenderPausing) || (m_communicator->m_senderState == SenderPausing2) || (m_communicator->m_senderState == SenderPaused)) && state != DeviceCheck) {
             GcodeViewParse *parser = m_currentDrawer->viewParser();
 
             bool toolOntoolpath = false;
@@ -1811,7 +1835,7 @@ void frmMain::onConnectionLineReceived(QString data)
         }
 
         // Store device state
-        setDeviceState(state);
+        m_communicator->setDeviceState(state);
 
         // Update continuous jog
         jogContinuous();
@@ -1822,18 +1846,18 @@ void frmMain::onConnectionLineReceived(QString data)
     // Command response
     } else if (data.length() > 0) {
 
-        if (m_commands.length() > 0 && !dataIsFloating(data)
-                && !(m_commands[0].command != "[CTRL+X]" && dataIsReset(data))) {
+        if (m_communicator->m_commands.length() > 0 && !m_communicator->dataIsFloating(data)
+                && !(m_communicator->m_commands[0].command != "[CTRL+X]" && m_communicator->dataIsReset(data))) {
 
             static QString response; // Full response string
 
-            if ((m_commands[0].command != "[CTRL+X]" && dataIsEnd(data))
-                    || (m_commands[0].command == "[CTRL+X]" && dataIsReset(data))) {
+            if ((m_communicator->m_commands[0].command != "[CTRL+X]" && m_communicator->dataIsEnd(data))
+                    || (m_communicator->m_commands[0].command == "[CTRL+X]" && m_communicator->dataIsReset(data))) {
 
                 response.append(data);
 
                 // Take command from buffer
-                CommandAttributes ca = m_commands.takeFirst();
+                CommandAttributes ca = m_communicator->m_commands.takeFirst();
                 QTextBlock tb = ui->txtConsole->document()->findBlockByNumber(ca.consoleIndex);
                 QTextCursor tc(tb);
 
@@ -1860,7 +1884,7 @@ void frmMain::onConnectionLineReceived(QString data)
                 // Restore absolute/relative coordinate system after jog
                 if (uncomment == "$G" && ca.tableIndex == -2) {
                     if (ui->chkKeyboardControl->isChecked()) m_absoluteCoordinates = response.contains("G90");
-                    else if (response.contains("G90")) sendCommand("G90", -1, m_settings->showUICommands());
+                    else if (response.contains("G90")) m_communicator->sendCommand("G90", -1, m_settings->showUICommands());
                 }
 
                 // Process parser status
@@ -1869,7 +1893,7 @@ void frmMain::onConnectionLineReceived(QString data)
                     ui->glwVisualizer->setParserStatus(response.left(response.indexOf("; ")));
 
                     // Store parser status
-                    if ((m_senderState == SenderTransferring) || (m_senderState == SenderStopping)) storeParserState();
+                    if ((m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping)) storeParserState();
 
                     // Spindle speed
                     QRegExp rx(".*S([\\d\\.]+)");
@@ -1934,23 +1958,23 @@ void frmMain::onConnectionLineReceived(QString data)
                 }
 
                 // Homing response
-                if ((uncomment == "$H" || uncomment == "$T") && m_homing) m_homing = false;
+                if ((uncomment == "$H" || uncomment == "$T") && m_communicator->m_homing) m_communicator->m_homing = false;
 
                 // Reset complete response
                 if (uncomment == "[CTRL+X]") {
-                    m_resetCompleted = true;
+                    m_communicator->m_resetCompleted = true;
                     m_updateParserStatus = true;
 
                     // Query grbl settings
-                    sendCommand("$$", -2, false);
-                    sendCommand("$#", -2, false, true);
+                    m_communicator->sendCommand("$$", -2, false);
+                    m_communicator->sendCommand("$#", -2, false, true);
                 }
 
                 // Clear command buffer on "M2" & "M30" command (old firmwares)
                 static QRegExp M230("(M0*2|M30)(?!\\d)");
                 if (uncomment.contains(M230) && response.contains("ok") && !response.contains("Pgm End")) {
-                    m_commands.clear();
-                    m_queue.clear();
+                    m_communicator->m_commands.clear();
+                    m_communicator->m_queue.clear();
                 }
 
                 // Update probe coords on user commands
@@ -2012,8 +2036,8 @@ void frmMain::onConnectionLineReceived(QString data)
                     // Update text block numbers
                     int blocksAdded = response.count("; ");
 
-                    if (blocksAdded > 0) for (int i = 0; i < m_commands.count(); i++) {
-                        if (m_commands[i].consoleIndex != -1) m_commands[i].consoleIndex += blocksAdded;
+                    if (blocksAdded > 0) for (int i = 0; i < m_communicator->m_commands.count(); i++) {
+                        if (m_communicator->m_commands[i].consoleIndex != -1) m_communicator->m_commands[i].consoleIndex += blocksAdded;
                     }
 
                     tc.beginEditBlock();
@@ -2028,15 +2052,15 @@ void frmMain::onConnectionLineReceived(QString data)
 
                 // Check queue
                 static bool processingQueue = false;
-                if (m_queue.length() > 0 && !processingQueue) {
+                if (m_communicator->m_queue.length() > 0 && !processingQueue) {
                     processingQueue = true;
-                    while (m_queue.length() > 0) {
-                        CommandQueue cq = m_queue.takeFirst();
-                        SendCommandResult r = sendCommand(cq.command, cq.tableIndex, cq.showInConsole);
+                    while (m_communicator->m_queue.length() > 0) {
+                        CommandQueue cq = m_communicator->m_queue.takeFirst();
+                        SendCommandResult r = m_communicator->sendCommand(cq.command, cq.tableIndex, cq.showInConsole);
                         if (r == SendDone) {
                             break;
                         } else if (r == SendQueue) {
-                            m_queue.prepend(m_queue.takeLast());
+                            m_communicator->m_queue.prepend(m_communicator->m_queue.takeLast());
                             break;
                         }
                     }
@@ -2044,7 +2068,7 @@ void frmMain::onConnectionLineReceived(QString data)
                 }
 
                 // Add response to table, send next program commands
-                if (m_senderState != SenderStopped) {
+                if (m_communicator->m_senderState != SenderStopped) {
                     // Only if command from table
                     if (ca.tableIndex > -1) {
                         m_currentModel->setData(m_currentModel->index(ca.tableIndex, 2), GCodeItem::Processed);
@@ -2100,13 +2124,13 @@ void frmMain::onConnectionLineReceived(QString data)
                     if ((m_fileProcessedCommandIndex == m_currentModel->rowCount() - 2) ||
                         uncomment.contains(QRegExp("(M0*2|M30)(?!\\d)")))
                     {
-                        if (m_deviceState == DeviceRun) {
-                            setSenderState(SenderStopping);
+                        if (m_communicator->m_deviceState == DeviceRun) {
+                            m_communicator->setSenderState(SenderStopping);
                         } else {
                             completeTransfer();
                         }
                     } else if ((m_fileCommandIndex < m_currentModel->rowCount())
-                        && (m_senderState == SenderTransferring)
+                        && (m_communicator->m_senderState == SenderTransferring)
                         && !holding)
                     {
                         // Send next program commands
@@ -2116,7 +2140,7 @@ void frmMain::onConnectionLineReceived(QString data)
 
                 // Tool change mode
                 static QRegExp M6("(M0*6)(?!\\d)");
-                if ((m_senderState == SenderPausing) && uncomment.contains(M6)) {
+                if ((m_communicator->m_senderState == SenderPausing) && uncomment.contains(M6)) {
                     response.clear();
 
                     if (m_settings->toolChangePause()) {
@@ -2135,33 +2159,33 @@ void frmMain::onConnectionLineReceived(QString data)
                             int res = box.exec();
                             if (box.checkBox()->isChecked()) m_settings->setToolChangeUseCommandsConfirm(false);
                             if (res == QMessageBox::Yes) {
-                                sendCommands(m_settings->toolChangeCommands());
+                                m_communicator->sendCommands(m_settings->toolChangeCommands());
                             }
                         } else {
-                            sendCommands(m_settings->toolChangeCommands());
+                            m_communicator->sendCommands(m_settings->toolChangeCommands());
                         }
                     }
 
-                    setSenderState(SenderChangingTool);
+                    m_communicator->setSenderState(SenderChangingTool);
                     updateControlsState();
                 }
                 // Pausing on button?
-                if ((m_senderState == SenderPausing) && !uncomment.contains(M6)) {
+                if ((m_communicator->m_senderState == SenderPausing) && !uncomment.contains(M6)) {
                     if (m_settings->usePauseCommands()) {
-                        sendCommands(m_settings->beforePauseCommands());
-                        setSenderState(SenderPausing2);
+                        m_communicator->sendCommands(m_settings->beforePauseCommands());
+                        m_communicator->setSenderState(SenderPausing2);
                         updateControlsState();
                     }
                 }
-                if ((m_senderState == SenderChangingTool) && !m_settings->toolChangePause()
-                    && m_commands.isEmpty())
+                if ((m_communicator->m_senderState == SenderChangingTool) && !m_settings->toolChangePause()
+                    && m_communicator->m_commands.isEmpty())
                 {
-                    setSenderState(SenderTransferring);
+                    m_communicator->setSenderState(SenderTransferring);
                 }
 
                 // Switch to pause mode
-                if ((m_senderState == SenderPausing || m_senderState == SenderPausing2) && m_commands.isEmpty()) {
-                    setSenderState(SenderPaused);
+                if ((m_communicator->m_senderState == SenderPausing || m_communicator->m_senderState == SenderPausing2) && m_communicator->m_commands.isEmpty()) {
+                    m_communicator->setSenderState(SenderPaused);
                     updateControlsState();
                 }
 
@@ -2169,11 +2193,11 @@ void frmMain::onConnectionLineReceived(QString data)
                 if (uncomment.contains("M30")) ui->tblProgram->setCurrentIndex(m_currentModel->index(0, 1));
 
                 // Toolpath shadowing on check mode
-                if (m_deviceState == DeviceCheck) {
+                if (m_communicator->m_deviceState == DeviceCheck) {
                     GcodeViewParse *parser = m_currentDrawer->viewParser();
                     QList<LineSegment*> list = parser->getLineSegmentList();
 
-                    if ((m_senderState != SenderStopping) && m_fileProcessedCommandIndex < m_currentModel->rowCount() - 1) {
+                    if ((m_communicator->m_senderState != SenderStopping) && m_fileProcessedCommandIndex < m_currentModel->rowCount() - 1) {
                         int i;
                         QList<int> drawnLines;
 
@@ -2214,20 +2238,20 @@ void frmMain::onConnectionLineReceived(QString data)
         } else {
             // Unprocessed responses
             // Handle hardware reset
-            if (dataIsReset(data)) {
-                setSenderState(SenderStopped);
-                setDeviceState(DeviceUnknown);
+            if (m_communicator->dataIsReset(data)) {
+                m_communicator->setSenderState(SenderStopped);
+                m_communicator->setDeviceState(DeviceUnknown);
 
                 m_fileCommandIndex = 0;
 
-                m_reseting = false;
-                m_homing = false;
+                m_communicator->m_reseting = false;
+                m_communicator->m_homing = false;
 
                 m_updateParserStatus = true;
-                m_statusReceived = true;
+                m_communicator->m_statusReceived = true;
 
-                m_commands.clear();
-                m_queue.clear();
+                m_communicator->m_commands.clear();
+                m_communicator->m_queue.clear();
 
                 updateControlsState();
             }
@@ -2253,36 +2277,58 @@ void frmMain::onConnectionError(QString error)
     updateControlsState();
 }
 
+void frmMain::onMachinePosChanged(QVector3D pos)
+{
+    this->m_partState->setMachineCoordinates(pos);
+
+    ui->txtMPosX->setValue(pos.x());
+    ui->txtMPosY->setValue(pos.y());
+    ui->txtMPosZ->setValue(pos.z());
+
+    m_storedVars.setCoords("M", pos);
+}
+
+void frmMain::onWorkPosChanged(QVector3D pos)
+{
+    this->m_partState->setWorkCoordinates(pos);
+
+    ui->txtWPosX->setValue(pos.x());
+    ui->txtWPosY->setValue(pos.y());
+    ui->txtWPosZ->setValue(pos.z());
+
+    m_storedVars.setCoords("W", pos);
+}
+
 void frmMain::onTimerConnection()
 {
     if (!m_connection->isConnected()) {
         openPort();
-    } else if (!m_homing/* && !m_reseting*/ && !ui->cmdHold->isChecked() && m_queue.length() == 0) {
+    } else if (!m_communicator->m_homing/* && !m_reseting*/ && !ui->cmdHold->isChecked() && m_communicator->m_queue.length() == 0) {
         if (m_updateSpindleSpeed) {
             m_updateSpindleSpeed = false;
-            sendCommand(QString("S%1").arg(ui->slbSpindle->value()), -2, m_settings->showUICommands());
+            m_communicator->sendCommand(QString("S%1").arg(ui->slbSpindle->value()), -2, m_settings->showUICommands());
         }
         if (m_updateParserStatus) {
             m_updateParserStatus = false;
-            sendCommand("$G", -3, false);
+            m_communicator->sendCommand("$G", -3, false);
         }
     }
 }
 
 void frmMain::onTimerStateQuery()
 {
-    if (m_connection->isConnected() && m_resetCompleted && m_statusReceived) {
+    if (m_connection->isConnected() && m_communicator->m_resetCompleted && m_communicator->m_statusReceived) {
         m_connection->sendByteArray(QByteArray(1, '?'));
-        m_statusReceived = false;
+        m_communicator->m_statusReceived = false;
     }
 
-    ui->glwVisualizer->setBufferState(QString(tr("Buffer: %1 / %2 / %3")).arg(bufferLength()).arg(m_commands.length()).arg(m_queue.length()));
+    ui->glwVisualizer->setBufferState(QString(tr("Buffer: %1 / %2 / %3")).arg(bufferLength()).arg(m_communicator->m_commands.length()).arg(m_communicator->m_queue.length()));
 }
 
 void frmMain::onTableInsertLine()
 {
     if (ui->tblProgram->selectionModel()->selectedRows().count() == 0 || 
-        (m_senderState == SenderTransferring) || (m_senderState == SenderStopping)) return;
+        (m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping)) return;
 
     int row = ui->tblProgram->selectionModel()->selectedRows()[0].row();
 
@@ -2297,7 +2343,7 @@ void frmMain::onTableInsertLine()
 void frmMain::onTableDeleteLines()
 {
     if (ui->tblProgram->selectionModel()->selectedRows().count() == 0 || 
-        (m_senderState == SenderTransferring) || (m_senderState == SenderStopping) ||
+        (m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping) ||
         QMessageBox::warning(this, this->windowTitle(), tr("Delete lines?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::No) return;
 
     QModelIndex firstRow = ui->tblProgram->selectionModel()->selectedRows()[0];
@@ -2331,7 +2377,6 @@ void frmMain::onTableCellChanged(QModelIndex i1, QModelIndex i2)
     }
 
     if (!m_programLoading) {
-
         // Clear cached args
         model->setData(model->index(i1.row(), 5), QVariant());
 
@@ -2448,7 +2493,7 @@ void frmMain::onActSendFromLineTriggered()
             // foreach (QString command, commands) {
             //     sendCommand(command, -1, m_settings->showUICommands());
             // }
-            sendCommands(commands, -1);
+            m_communicator->sendCommands(commands, -1);
         }
     }
 
@@ -2477,7 +2522,7 @@ void frmMain::onActSendFromLineTriggered()
 
     m_startTime.start();
 
-    setSenderState(SenderTransferring);
+    m_communicator->setSenderState(SenderTransferring);
 
     m_storedKeyboardControl = ui->chkKeyboardControl->isChecked();
     ui->chkKeyboardControl->setChecked(false);
@@ -2519,7 +2564,7 @@ void frmMain::onCboCommandReturnPressed()
     if (command.isEmpty()) return;
 
     ui->cboCommand->setCurrentText("");
-    sendCommand(command, -1);
+    m_communicator->sendCommand(command, -1);
 }
 
 void frmMain::onDockTopLevelChanged(bool topLevel)
@@ -2532,7 +2577,7 @@ void frmMain::onScroolBarAction(int action)
 {
     Q_UNUSED(action)
 
-    if ((m_senderState == SenderTransferring) || (m_senderState == SenderStopping)) 
+    if ((m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping))
         ui->chkAutoScroll->setChecked(false);
 }
 
@@ -2763,11 +2808,11 @@ void frmMain::loadSettings()
     foreach (QDockWidget *w, findChildren<QDockWidget*>()) w->setStyleSheet("");
 
     // Restore docks
-        // Signals/slots
+    // Signals/slots
     foreach (QDockWidget *w, findChildren<QDockWidget*>())
         connect(w, &QDockWidget::topLevelChanged, this, &frmMain::onDockTopLevelChanged);
 
-        // Panels
+    // Panels
     ui->scrollContentsDevice->restoreState(this, set.value("panelsDevice").toStringList());
     ui->scrollContentsModification->restoreState(this, set.value("panelsModification").toStringList());
     ui->scrollContentsUser->restoreState(this, set.value("panelsUser").toStringList());
@@ -3248,6 +3293,7 @@ void frmMain::loadPlugins()
 void frmMain::openPort()
 {
     if (m_connection->openConnection()) {
+        this->m_partState->setStatusText(tr("Port opened"), "palette(button)", "palette(text)");
         ui->txtStatus->setText(tr("Port opened"));
         ui->txtStatus->setStyleSheet(QString("background-color: palette(button); color: palette(text);"));
         grblReset();
@@ -3256,31 +3302,9 @@ void frmMain::openPort()
 
 void frmMain::grblReset()
 {
-    m_connection->sendByteArray(QByteArray(1, (char)24));
-
-    setSenderState(SenderStopped);
-    setDeviceState(DeviceUnknown);
+    m_communicator->reset();
     m_fileCommandIndex = 0;
-
-    m_reseting = true;
-    m_homing = false;
-    m_resetCompleted = false;
     m_updateSpindleSpeed = true;
-    m_statusReceived = true;
-
-    // Drop all remaining commands in buffer
-    m_commands.clear();
-    m_queue.clear();
-
-    // Prepare reset response catch
-    CommandAttributes ca;
-    ca.command = "[CTRL+X]";
-    if (m_settings->showUICommands()) ui->txtConsole->appendPlainText(ca.command);
-    ca.consoleIndex = m_settings->showUICommands() ? ui->txtConsole->blockCount() - 1 : -1;
-    ca.tableIndex = -1;
-    ca.length = ca.command.length() + 1;
-    m_commands.append(ca);
-
     updateControlsState();
 }
 
@@ -3289,112 +3313,112 @@ void frmMain::writeConsole(QString command)
     ui->txtConsole->appendPlainText(command);
 }
 
-frmMain::SendCommandResult frmMain::sendCommand(QString command, int tableIndex, bool showInConsole, bool wait)
-{
-    // tableIndex:
-    // 0...n - commands from g-code program
-    // -1 - ui commands
-    // -2 - utility commands
-    // -3 - utility commands
+// SendCommandResult frmMain::sendCommand(QString command, int tableIndex, bool showInConsole, bool wait)
+// {
+//     // tableIndex:
+//     // 0...n - commands from g-code program
+//     // -1 - ui commands
+//     // -2 - utility commands
+//     // -3 - utility commands
 
-    if (!m_connection->isConnected() || !m_resetCompleted) return SendDone;
+//     if (!m_connection->isConnected() || !m_communicator->m_resetCompleted) return SendDone;
 
-    // Check command
-    if (command.isEmpty()) return SendEmpty;
+//     // Check command
+//     if (command.isEmpty()) return SendEmpty;
 
-    // Place to queue on 'wait' flag
-    if (wait) {
-        m_queue.append(CommandQueue(command, tableIndex, showInConsole));
-        return SendQueue;
-    }
+//     // Place to queue on 'wait' flag
+//     if (wait) {
+//         m_communicator->m_queue.append(CommandQueue(command, tableIndex, showInConsole));
+//         return SendQueue;
+//     }
     
-    // Evaluate scripts in command
-    if (tableIndex < 0) command = evaluateCommand(command);
+//     // Evaluate scripts in command
+//     if (tableIndex < 0) command = evaluateCommand(command);
 
-    // Check evaluated command
-    if (command.isEmpty()) return SendEmpty;
+//     // Check evaluated command
+//     if (command.isEmpty()) return SendEmpty;
 
-    // Place to queue if command buffer is full
-    if ((bufferLength() + command.length() + 1) > BUFFERLENGTH) {
-        m_queue.append(CommandQueue(command, tableIndex, showInConsole));
-        return SendQueue;
-    }
+//     // Place to queue if command buffer is full
+//     if ((bufferLength() + command.length() + 1) > BUFFERLENGTH) {
+//         m_communicator->m_queue.append(CommandQueue(command, tableIndex, showInConsole));
+//         return SendQueue;
+//     }
 
-    command = command.toUpper();
+//     command = command.toUpper();
 
-    CommandAttributes ca;
-    if (showInConsole) {
-        writeConsole(command);
-        ca.consoleIndex = ui->txtConsole->blockCount() - 1;
-    } else {
-        ca.consoleIndex = -1;
-    }
+//     CommandAttributes ca;
+//     if (showInConsole) {
+//         writeConsole(command);
+//         ca.consoleIndex = ui->txtConsole->blockCount() - 1;
+//     } else {
+//         ca.consoleIndex = -1;
+//     }
 
-    ca.command = command;
-    ca.length = command.length() + 1;
-    ca.tableIndex = tableIndex;
+//     ca.command = command;
+//     ca.length = command.length() + 1;
+//     ca.tableIndex = tableIndex;
 
-    m_commands.append(ca);
+//     m_communicator->m_commands.append(ca);
 
-    QString uncomment = GcodePreprocessorUtils::removeComment(command);
+//     QString uncomment = GcodePreprocessorUtils::removeComment(command);
 
-    // Processing spindle speed only from g-code program
-    static QRegExp s("[Ss]0*(\\d+)");
-    if (s.indexIn(uncomment) != -1 && ca.tableIndex > -2) {
-        int speed = s.cap(1).toInt();
-        if (ui->slbSpindle->value() != speed) {
-            ui->slbSpindle->setValue(speed);
-        }
-    }
+//     // Processing spindle speed only from g-code program
+//     static QRegExp s("[Ss]0*(\\d+)");
+//     if (s.indexIn(uncomment) != -1 && ca.tableIndex > -2) {
+//         int speed = s.cap(1).toInt();
+//         if (ui->slbSpindle->value() != speed) {
+//             ui->slbSpindle->setValue(speed);
+//         }
+//     }
 
-    // Set M2 & M30 commands sent flag
-    static QRegExp M230("(M0*2|M30|M0*6|M25)(?!\\d)");
-    static QRegExp M6("(M0*6)(?!\\d)");
-    if ((m_senderState == SenderTransferring) && uncomment.contains(M230)) {
-        if (!uncomment.contains(M6) || m_settings->toolChangeUseCommands() || m_settings->toolChangePause()) setSenderState(SenderPausing);
-    }
+//     // Set M2 & M30 commands sent flag
+//     static QRegExp M230("(M0*2|M30|M0*6|M25)(?!\\d)");
+//     static QRegExp M6("(M0*6)(?!\\d)");
+//     if ((m_communicator->m_senderState == SenderTransferring) && uncomment.contains(M230)) {
+//         if (!uncomment.contains(M6) || m_settings->toolChangeUseCommands() || m_settings->toolChangePause()) m_communicator->setSenderState(SenderPausing);
+//     }
 
-    // Queue offsets request on G92, G10 commands
-    static QRegExp G92("(G92|G10)(?!\\d)");
-    if (uncomment.contains(G92)) sendCommand("$#", -3, showInConsole, true);
+//     // Queue offsets request on G92, G10 commands
+//     static QRegExp G92("(G92|G10)(?!\\d)");
+//     if (uncomment.contains(G92)) sendCommand("$#", -3, showInConsole, true);
 
-    m_connection->sendLine(command);
+//     m_connection->sendLine(command);
 
-    return SendDone;
-}
+//     return SendDone;
+// }
 
-void frmMain::sendRealtimeCommand(QString command)
-{
-    if (command.length() != 1) return;
-    if (!m_connection->isConnected() || !m_resetCompleted) return;
+// void frmMain::sendRealtimeCommand(QString command)
+// {
+//     if (command.length() != 1) return;
+//     if (!m_connection->isConnected() || !m_communicator->m_resetCompleted) return;
 
-    m_connection->sendByteArray(QByteArray(command.toLatin1(), 1));
-}
+//     m_connection->sendByteArray(QByteArray(command.toLatin1(), 1));
+// }
 
-void frmMain::sendCommands(QString commands, int tableIndex)
-{
-    QStringList list = commands.split("\n");
+// void frmMain::sendCommands(QString commands, int tableIndex)
+// {
+//     QStringList list = commands.split("\n");
 
-    bool q = false;
-    foreach (QString cmd, list) {
-        SendCommandResult r = sendCommand(cmd.trimmed(), tableIndex, m_settings->showUICommands(), q);
-        if (r == SendDone || r == SendQueue) q = true;
-    }
-}
+//     bool q = false;
+//     foreach (QString cmd, list) {
+//         SendCommandResult r = sendCommand(cmd.trimmed(), tableIndex, m_settings->showUICommands(), q);
+//         if (r == SendDone || r == SendQueue) q = true;
+//     }
+// }
 
 void frmMain::sendNextFileCommands() {
-    if (m_queue.length() > 0) return;
+    if (m_communicator->m_queue.length() > 0) return;
 
     QString command = m_currentModel->data(m_currentModel->index(m_fileCommandIndex, 1)).toString();
     static QRegExp M230("(M0*2|M30|M0*6)(?!\\d)");
 
     while ((bufferLength() + command.length() + 1) <= BUFFERLENGTH
         && m_fileCommandIndex < m_currentModel->rowCount() - 1
-        && !(!m_commands.isEmpty() && GcodePreprocessorUtils::removeComment(m_commands.last().command).contains(M230))
+        && !(!m_communicator->m_commands.isEmpty() && GcodePreprocessorUtils::removeComment(m_communicator->m_commands.last().command).contains(M230))
         ) 
     {
         m_currentModel->setData(m_currentModel->index(m_fileCommandIndex, 2), GCodeItem::Sent);
-        sendCommand(command, m_fileCommandIndex, m_settings->showProgramCommands());
+        m_communicator->sendCommand(command, m_fileCommandIndex, m_settings->showProgramCommands());
         m_fileCommandIndex++;
         command = m_currentModel->data(m_currentModel->index(m_fileCommandIndex, 1)).toString();
     }
@@ -3486,23 +3510,7 @@ void frmMain::storeParserState()
 
 void frmMain::restoreParserState()
 {
-    if (!m_storedParserStatus.isEmpty()) sendCommand(m_storedParserStatus, -1, m_settings->showUICommands());
-}
-
-void frmMain::restoreOffsets()
-{
-    // Still have pre-reset working position
-    sendCommand(QString("%4G53G90X%1Y%2Z%3").arg(ui->txtMPosX->value())
-                                       .arg(ui->txtMPosY->value())
-                                       .arg(ui->txtMPosZ->value())
-                                       .arg(m_settings->units() ? "G20" : "G21"), 
-                                       -2, m_settings->showUICommands());
-
-    sendCommand(QString("%4G92X%1Y%2Z%3").arg(ui->txtWPosX->value())
-                                       .arg(ui->txtWPosY->value())
-                                       .arg(ui->txtWPosZ->value())
-                                       .arg(m_settings->units() ? "G20" : "G21"),
-                                       -2, m_settings->showUICommands());
+    if (!m_storedParserStatus.isEmpty()) m_communicator->sendCommand(m_storedParserStatus, -1, m_settings->showUICommands());
 }
 
 void frmMain::storeOffsetsVars(QString response)
@@ -3911,14 +3919,14 @@ void frmMain::setupCoordsTextboxes()
 
 void frmMain::updateControlsState() {
     bool portOpened = m_connection->isConnected();
-    bool process = (m_senderState == SenderTransferring) || (m_senderState == SenderStopping);
-    bool paused = (m_senderState == SenderPausing) || (m_senderState == SenderPausing2) || (m_senderState == SenderPaused) || (m_senderState == SenderChangingTool);
+    bool process = (m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping);
+    bool paused = (m_communicator->m_senderState == SenderPausing) || (m_communicator->m_senderState == SenderPausing2) || (m_communicator->m_senderState == SenderPaused) || (m_communicator->m_senderState == SenderChangingTool);
 
     ui->grpState->setEnabled(portOpened);
     ui->grpControl->setEnabled(portOpened);
     ui->widgetSpindle->setEnabled(portOpened);
-    ui->widgetJog->setEnabled(portOpened && ((m_senderState == SenderStopped) 
-        || (m_senderState == SenderChangingTool)));
+    ui->widgetJog->setEnabled(portOpened && ((m_communicator->m_senderState == SenderStopped)
+        || (m_communicator->m_senderState == SenderChangingTool)));
     ui->cboCommand->setEnabled(portOpened && (!ui->chkKeyboardControl->isChecked()));
     ui->cmdCommandSend->setEnabled(portOpened);
 
@@ -3929,12 +3937,12 @@ void frmMain::updateControlsState() {
     ui->cmdSpindle->setEnabled(!process);
     ui->cmdSleep->setEnabled(!process);
 
-    ui->actFileNew->setEnabled(m_senderState == SenderStopped);
-    ui->actFileOpen->setEnabled(m_senderState == SenderStopped);
-    ui->cmdFileOpen->setEnabled(m_senderState == SenderStopped);
-    ui->cmdFileReset->setEnabled((m_senderState == SenderStopped) && m_programModel.rowCount() > 1);
-    ui->cmdFileSend->setEnabled(portOpened && (m_senderState == SenderStopped) && m_programModel.rowCount() > 1);
-    switch (m_senderState) {
+    ui->actFileNew->setEnabled(m_communicator->m_senderState == SenderStopped);
+    ui->actFileOpen->setEnabled(m_communicator->m_senderState == SenderStopped);
+    ui->cmdFileOpen->setEnabled(m_communicator->m_senderState == SenderStopped);
+    ui->cmdFileReset->setEnabled((m_communicator->m_senderState == SenderStopped) && m_programModel.rowCount() > 1);
+    ui->cmdFileSend->setEnabled(portOpened && (m_communicator->m_senderState == SenderStopped) && m_programModel.rowCount() > 1);
+    switch (m_communicator->m_senderState) {
         case SenderPausing:
         case SenderPausing2:
             ui->cmdFilePause->setText(tr("Pausing..."));
@@ -3947,19 +3955,20 @@ void frmMain::updateControlsState() {
             ui->cmdFilePause->setText(tr("Pause"));
             break;
     }
-    ui->cmdFilePause->setEnabled(portOpened && (process || paused) && (m_senderState != SenderPausing) && (m_senderState != SenderPausing2));
+    ui->cmdFilePause->setEnabled(portOpened && (process || paused) && (m_communicator->m_senderState != SenderPausing) && (m_communicator->m_senderState != SenderPausing2));
     ui->cmdFilePause->setChecked(paused);
-    ui->cmdFileAbort->setEnabled(m_senderState != SenderStopped && m_senderState != SenderStopping);
-    ui->mnuRecent->setEnabled((m_senderState == SenderStopped) && ((m_recentFiles.count() > 0 && !m_heightMapMode)
+    ui->cmdFileAbort->setEnabled(m_communicator->m_senderState != SenderStopped && m_communicator->m_senderState != SenderStopping);
+    ui->mnuRecent->setEnabled((m_communicator->m_senderState == SenderStopped) && ((m_recentFiles.count() > 0 && !m_heightMapMode)
                                                       || (m_recentHeightmaps.count() > 0 && m_heightMapMode)));
     ui->actFileSave->setEnabled(m_programModel.rowCount() > 1);
     ui->actFileSaveAs->setEnabled(m_programModel.rowCount() > 1);
 
-    ui->tblProgram->setEditTriggers((m_senderState != SenderStopped) ? QAbstractItemView::NoEditTriggers :
+    ui->tblProgram->setEditTriggers((m_communicator->m_senderState != SenderStopped) ? QAbstractItemView::NoEditTriggers :
         QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked | 
         QAbstractItemView::EditKeyPressed | QAbstractItemView::AnyKeyPressed);
 
     if (!portOpened) {
+        this->m_partState->setStatusText(tr("Not connected"), "palette(button)", "palette(text)");
         ui->txtStatus->setText(tr("Not connected"));
         ui->txtStatus->setStyleSheet(QString("background-color: palette(button); color: palette(text);"));
         emit deviceStateChanged(-1);
@@ -3973,7 +3982,7 @@ void frmMain::updateControlsState() {
 #ifdef WINDOWS
     if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7 && m_taskBarProgress) {
         m_taskBarProgress->setPaused(paused);
-        if (m_senderState == SenderStopped) m_taskBarProgress->hide();
+        if (m_communicator->m_senderState == SenderStopped) m_taskBarProgress->hide();
     }
 #endif
 
@@ -4225,7 +4234,7 @@ bool frmMain::eventFilter(QObject *obj, QEvent *event)
             }
         }
 
-        if ((m_senderState != SenderTransferring) && (m_senderState != SenderStopping) 
+        if ((m_communicator->m_senderState != SenderTransferring) && (m_communicator->m_senderState != SenderStopping)
             && ui->chkKeyboardControl->isChecked() && !ev->isAutoRepeat()) 
         {
             static QList<QAction*> acts;
@@ -4256,7 +4265,7 @@ bool frmMain::eventFilter(QObject *obj, QEvent *event)
                 }
             }
         }
-    } else if (obj == ui->tblProgram && ((m_senderState == SenderTransferring) || (m_senderState == SenderStopping))) {
+    } else if (obj == ui->tblProgram && ((m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping))) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
         if (keyEvent->key() == Qt::Key_PageDown || keyEvent->key() == Qt::Key_PageUp
                     || keyEvent->key() == Qt::Key_Down || keyEvent->key() == Qt::Key_Up) {
@@ -4309,44 +4318,11 @@ int frmMain::bufferLength()
 {
     int length = 0;
 
-    foreach (CommandAttributes ca, m_commands) {
+    foreach (CommandAttributes ca, m_communicator->m_commands) {
         length += ca.length;
     }
 
     return length;
-}
-
-bool frmMain::dataIsFloating(QString data) {
-    QStringList ends;
-
-    ends << "Reset to continue";
-    ends << "'$H'|'$X' to unlock";
-    ends << "ALARM: Soft limit";
-    ends << "ALARM: Hard limit";
-    ends << "Check Door";
-
-    foreach (QString str, ends) {
-        if (data.contains(str)) return true;
-    }
-
-    return false;
-}
-
-bool frmMain::dataIsEnd(QString data) {
-    QStringList ends;
-
-    ends << "ok";
-    ends << "error";
-
-    foreach (QString str, ends) {
-        if (data.contains(str)) return true;
-    }
-
-    return false;
-}
-
-bool frmMain::dataIsReset(QString data) {
-    return QRegExp("^GRBL|GCARVIN\\s\\d\\.\\d.").indexIn(data.toUpper()) != -1;
 }
 
 QTime frmMain::updateProgramEstimatedTime(QList<LineSegment*> lines)
@@ -4430,7 +4406,7 @@ void frmMain::jogStep()
         QVector3D vec = m_jogVector * ui->cboJogStep->currentText().toDouble();
 
         if (vec.length()) {
-            sendCommand(QString("$J=%5G91X%1Y%2Z%3F%4")
+            m_communicator->sendCommand(QString("$J=%5G91X%1Y%2Z%3F%4")
                         .arg(vec.x(), 0, 'f', m_settings->units() ? 4 : 3)
                         .arg(vec.y(), 0, 'f', m_settings->units() ? 4 : 3)
                         .arg(vec.z(), 0, 'f', m_settings->units() ? 4 : 3)
@@ -4455,7 +4431,7 @@ void frmMain::jogContinuous()
             if (v.length()) {
                 block = true;
                 m_connection->sendByteArray(QByteArray(1, char(0x85)));
-                while (m_deviceState == DeviceJog) qApp->processEvents();
+                while (m_communicator->m_deviceState == DeviceJog) qApp->processEvents();
                 block = false;
             }
             
@@ -4482,7 +4458,7 @@ void frmMain::jogContinuous()
             QVector3D vec = j * toInches(d);
 
             if (vec.length()) {
-                sendCommand(QString("$J=%5G91X%1Y%2Z%3F%4")
+                m_communicator->sendCommand(QString("$J=%5G91X%1Y%2Z%3F%4")
                             .arg(vec.x(), 0, 'f', m_settings->units() ? 4 : 3)
                             .arg(vec.y(), 0, 'f', m_settings->units() ? 4 : 3)
                             .arg(vec.z(), 0, 'f', m_settings->units() ? 4 : 3)
@@ -4503,11 +4479,6 @@ double frmMain::toMetric(double value)
 double frmMain::toInches(double value)
 {
     return m_settings->units() == 0 ? value : value / 25.4;
-}
-
-bool frmMain::compareCoordinates(double x, double y, double z)
-{
-    return ui->txtMPosX->value() == x && ui->txtMPosY->value() == y && ui->txtMPosZ->value() == z;
 }
 
 bool frmMain::isGCodeFile(QString fileName)
@@ -4531,22 +4502,6 @@ int frmMain::buttonSize()
     return ui->cmdHome->minimumWidth();
 }
 
-void frmMain::setSenderState(SenderState state)
-{
-    if (m_senderState != state) {
-        m_senderState = state;
-        emit senderStateChanged(state);
-    }
-}
-
-void frmMain::setDeviceState(DeviceState state)
-{
-    if (m_deviceState != state) {
-        m_deviceState = state;
-        emit deviceStateChanged(state);
-    }
-}
-
 void frmMain::completeTransfer()
 {
     // Shadow last segment
@@ -4558,7 +4513,7 @@ void frmMain::completeTransfer()
     }
 
     // Update state
-    setSenderState(SenderStopped);
+    m_communicator->setSenderState(SenderStopped);
     m_fileProcessedCommandIndex = 0;
     m_lastDrawnLineIndex = 0;
     m_storedParserStatus.clear();
@@ -4566,7 +4521,7 @@ void frmMain::completeTransfer()
     updateControlsState();
 
     // Send end commands
-    if (m_settings->useEndCommands()) sendCommands(m_settings->endCommands());
+    if (m_settings->useEndCommands()) m_communicator->sendCommands(m_settings->endCommands());
 
     // Show message box
     qApp->beep();

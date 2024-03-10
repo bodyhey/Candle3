@@ -18,17 +18,18 @@ frmMain* ScriptFunctions::getFrmMain()
 
 void ScriptFunctions::sendCommands(QString commands, int index)
 {
-    m_frmMain->sendCommands(commands, index);
+    // @todo scripting
+    //m_frmMain->sendCommands(commands, index);
 }
 
 int ScriptFunctions::sendCommand(QString command, int index, bool showInConsole)
 {
-    return m_frmMain->sendCommand(command, index, showInConsole);
+    //return m_frmMain->sendCommand(command, index, showInConsole);
 }
 
 void ScriptFunctions::sendRealtimeCommand(QChar command)
 {
-    m_frmMain->sendRealtimeCommand(command);
+    //m_frmMain->sendRealtimeCommand(command);
 }
 
 void ScriptFunctions::newFile()
@@ -83,12 +84,14 @@ int ScriptFunctions::bufferLength()
 
 int ScriptFunctions::commandsLength()
 {
-    return m_frmMain->m_commands.length();
+    // @todo
+    return 0;// m_frmMain->m_commands.length();
 }
 
 int ScriptFunctions::queueLength()
 {
-    return m_frmMain->m_queue.length();
+    // @todo
+    return 0;// m_frmMain->m_queue.length();
 }
 
 void ScriptFunctions::testDebug()

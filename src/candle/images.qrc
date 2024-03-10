@@ -41,5 +41,6 @@
         <file>images/brake.png</file>
         <file>images/gpilot_256.png</file>
         <file>images/gpilot_icon.png</file>
+        <file>images/gpilot.ico</file>
     </qresource>
 </RCC>

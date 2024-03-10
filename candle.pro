@@ -9,7 +9,7 @@ SUBDIRS =   src/designerplugins \
 system(qmake src/candleplugins/candleplugins.pro)
 
 install_main.path = bin
-install_main.files += $$OUT_PWD/src/candle/release/Candle.exe
+install_main.files += $$OUT_PWD/src/candle/release/GPilot.exe
 
 install_plugins.path = bin/plugins
 install_plugins.files = src/candleplugins/camera src/candleplugins/emergencybutton src/candleplugins/usercommands src/candleplugins/coordinatesystem

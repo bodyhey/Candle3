@@ -129,5 +129,42 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>cmdOk</sender>
+   <signal>clicked()</signal>
+   <receiver>frmAbout</receiver>
+   <slot>onCmdOkClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>599</x>
+     <y>621</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>637</x>
+     <y>617</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lblAbout</sender>
+   <signal>linkActivated(QString)</signal>
+   <receiver>frmAbout</receiver>
+   <slot>onLblAboutLinkActivated(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>380</x>
+     <y>37</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>637</x>
+     <y>194</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onCmdOkClicked()</slot>
+  <slot>onLblAboutLinkActivated(QString)</slot>
+ </slots>
 </ui>

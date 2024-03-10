@@ -11,6 +11,7 @@ public:
     virtual ~Connection() {}
 
     virtual bool openConnection() = 0;
+    //virtual void sendChar(QChar) = 0;
     virtual void sendByteArray(QByteArray) = 0;
     virtual bool isConnected() = 0;
     virtual void sendLine(QString) = 0;

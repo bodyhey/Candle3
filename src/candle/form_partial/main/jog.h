@@ -1,6 +1,7 @@
 #ifndef JOG_H
 #define JOG_H
 
+#include "globals.h"
 #include <QWidget>
 
 namespace Ui {
@@ -17,6 +18,28 @@ public:
 
 private:
     Ui::widgetJog *ui;
+
+private slots:
+    void onCmdYPlusPressed();
+    void onCmdYPlusReleased();
+    void onCmdYMinusPressed();
+    void onCmdYMinusReleased();
+    void onCmdXPlusPressed();
+    void onCmdXPlusReleased();
+    void onCmdXMinusPressed();
+    void onCmdXMinusReleased();
+    void onCmdZPlusPressed();
+    void onCmdZPlusRleased();
+    void onCmdZMinusPressed();
+    void onCmdZMinusReleased();
+    void onCmdStopClicked();
+    void onChkKeyboardControlToggled(bool checked);
+
+signals:
+    void jog(JoggindDir dir);
+    void command(GRBLCommand command);
+    void stop();
+
 };
 
 #endif // JOG_H
