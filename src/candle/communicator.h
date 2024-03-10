@@ -3,6 +3,7 @@
 
 #include <QScrollBar>
 //#include "frmmain.h"
+#include "frmsettings.h"
 #include "globals.h"
 #include "connection/connection.h"
 #include "machine/settings.h"
@@ -26,6 +27,7 @@ public:
     Communicator(
         Connection *connection,
         Ui::frmMain *ui,
+        frmSettings *frmSettings,
         //frmMain *form,
         QObject *parent);
     SendCommandResult sendCommand(QString command, int tableIndex = -1, bool showInConsole = true, bool wait = false);
@@ -35,8 +37,10 @@ public:
     void clearQueue();
     void reset();
 private:
+    static const int BUFFERLENGTH = 127;
+
     Connection *m_connection;
-    Settings *m_settings;
+    frmSettings *m_settings;
     QList<CommandAttributes> m_commands;
     QList<CommandQueue> m_queue;
     SenderState m_senderState;
@@ -51,9 +55,14 @@ private:
     Ui::frmMain *ui;
 
     void onSerialPortReadyRead(QString);
-    bool dataIsReset(QString);
     void setSenderState(SenderState);
     void setDeviceState(DeviceState);
+    void restoreOffsets();
+    int bufferLength();
+    void storeOffsetsVars(QString response);
+    bool dataIsFloating(QString data);
+    bool dataIsEnd(QString data);
+    bool dataIsReset(QString data);
 signals:
     void responseReceived(QString command, int tableIndex, QString response);
     void statusReceived(QString status);

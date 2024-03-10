@@ -9,8 +9,9 @@
 Communicator::Communicator(
     Connection *connection,
     Ui::frmMain *ui,
+    frmSettings *frmSettings,
     QObject *parent = nullptr
-) : QObject(parent), m_connection(connection), ui(ui) {
+    ) : QObject(parent), m_connection(connection), m_settings(frmSettings), ui(ui) {
     m_reseting = false;
     m_resetCompleted = true;
     m_aborting = false;
@@ -23,6 +24,101 @@ Communicator::Communicator(
     this->connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));
 
     setSenderState(SenderStopped);
+}
+
+SendCommandResult Communicator::sendCommand(QString command, int tableIndex, bool showInConsole, bool wait)
+{
+    // tableIndex:
+    // 0...n - commands from g-code program
+    // -1 - ui commands
+    // -2 - utility commands
+    // -3 - utility commands
+
+    if (!m_connection->isConnected() || !m_resetCompleted) return SendDone;
+
+    // Check command
+    if (command.isEmpty()) return SendEmpty;
+
+    // Place to queue on 'wait' flag
+    if (wait) {
+        m_queue.append(CommandQueue(command, tableIndex, showInConsole));
+        return SendQueue;
+    }
+
+    // Evaluate scripts in command
+    // @todo scripting??
+    //if (tableIndex < 0) command = evaluateCommand(command);
+
+    // Check evaluated command
+    if (command.isEmpty()) return SendEmpty;
+
+    // Place to queue if command buffer is full
+    if ((bufferLength() + command.length() + 1) > BUFFERLENGTH) {
+        m_queue.append(CommandQueue(command, tableIndex, showInConsole));
+        return SendQueue;
+    }
+
+    command = command.toUpper();
+
+    CommandAttributes ca;
+    if (showInConsole) {
+        // @todo ui
+        // writeConsole(command);
+        ca.consoleIndex = ui->txtConsole->blockCount() - 1;
+    } else {
+        ca.consoleIndex = -1;
+    }
+
+    ca.command = command;
+    ca.length = command.length() + 1;
+    ca.tableIndex = tableIndex;
+
+    m_commands.append(ca);
+
+    QString uncomment = GcodePreprocessorUtils::removeComment(command);
+
+    // Processing spindle speed only from g-code program
+    static QRegExp s("[Ss]0*(\\d+)");
+    if (s.indexIn(uncomment) != -1 && ca.tableIndex > -2) {
+        int speed = s.cap(1).toInt();
+        if (ui->slbSpindle->value() != speed) {
+            ui->slbSpindle->setValue(speed);
+        }
+    }
+
+    // Set M2 & M30 commands sent flag
+    static QRegExp M230("(M0*2|M30|M0*6|M25)(?!\\d)");
+    static QRegExp M6("(M0*6)(?!\\d)");
+    if ((m_senderState == SenderTransferring) && uncomment.contains(M230)) {
+        if (!uncomment.contains(M6) || m_settings->toolChangeUseCommands() || m_settings->toolChangePause()) setSenderState(SenderPausing);
+    }
+
+    // Queue offsets request on G92, G10 commands
+    static QRegExp G92("(G92|G10)(?!\\d)");
+    if (uncomment.contains(G92)) sendCommand("$#", -3, showInConsole, true);
+
+    m_connection->sendLine(command);
+
+    return SendDone;
+}
+
+void Communicator::sendRealtimeCommand(QString command)
+{
+    if (command.length() != 1) return;
+    if (!m_connection->isConnected() || !m_resetCompleted) return;
+
+    m_connection->sendByteArray(QByteArray(command.toLatin1(), 1));
+}
+
+void Communicator::sendCommands(QString commands, int tableIndex)
+{
+    QStringList list = commands.split("\n");
+
+    bool q = false;
+    foreach (QString cmd, list) {
+        SendCommandResult r = sendCommand(cmd.trimmed(), tableIndex, m_settings->showUICommands(), q);
+        if (r == SendDone || r == SendQueue) q = true;
+    }
 }
 
 void Communicator::clearCommandsAndQueue()
@@ -729,6 +825,22 @@ void Communicator::reset()
     m_commands.append(ca);
 }
 
+void Communicator::restoreOffsets()
+{
+    // Still have pre-reset working position
+    sendCommand(QString("%4G53G90X%1Y%2Z%3").arg(ui->txtMPosX->value())
+                    .arg(ui->txtMPosY->value())
+                    .arg(ui->txtMPosZ->value())
+                    .arg(m_settings->units() ? "G20" : "G21"),
+                -2, m_settings->showUICommands());
+
+    sendCommand(QString("%4G92X%1Y%2Z%3").arg(ui->txtWPosX->value())
+                    .arg(ui->txtWPosY->value())
+                    .arg(ui->txtWPosZ->value())
+                    .arg(m_settings->units() ? "G20" : "G21"),
+                -2, m_settings->showUICommands());
+}
+
 void Communicator::setSenderState(SenderState state)
 {
     if (m_senderState != state) {
@@ -745,6 +857,73 @@ void Communicator::setDeviceState(DeviceState state)
     }
 }
 
+int Communicator::bufferLength()
+{
+    int length = 0;
+
+    foreach (CommandAttributes ca, m_commands) {
+        length += ca.length;
+    }
+
+    return length;
+}
+
+/* used by scripting engine only?? emit signal and do not use m_storedVars directly */
+void Communicator::storeOffsetsVars(QString response)
+{
+    static QRegExp gx("\\[(G5[4-9]|G28|G30|G92|PRB):([\\d\\.\\-]+),([\\d\\.\\-]+),([\\d\\.\\-]+)");
+    static QRegExp tx("\\[(TLO):([\\d\\.\\-]+)");
+
+    // int p = 0;
+    // while ((p = gx.indexIn(response, p)) != -1) {
+    //     m_storedVars.setCoords(gx.cap(1), QVector3D(
+    //                                           gx.cap(2).toDouble(),
+    //                                           gx.cap(3).toDouble(),
+    //                                           gx.cap(4).toDouble()
+    //                                           ));
+
+    //     p += gx.matchedLength();
+    // }
+
+    // if (tx.indexIn(response) != -1) {
+    //     m_storedVars.setCoords(tx.cap(1), QVector3D(
+    //                                           0,
+    //                                           0,
+    //                                           tx.cap(2).toDouble()
+    //                                           ));
+    // }
+}
+
+bool Communicator::dataIsFloating(QString data) {
+    QStringList ends;
+
+    ends << "Reset to continue";
+    ends << "'$H'|'$X' to unlock";
+    ends << "ALARM: Soft limit";
+    ends << "ALARM: Hard limit";
+    ends << "Check Door";
+
+    foreach (QString str, ends) {
+        if (data.contains(str)) return true;
+    }
+
+    return false;
+}
+
+bool Communicator::dataIsEnd(QString data) {
+    QStringList ends;
+
+    ends << "ok";
+    ends << "error";
+
+    foreach (QString str, ends) {
+        if (data.contains(str)) return true;
+    }
+
+    return false;
+}
+
+// detects first line of communication?
 bool Communicator::dataIsReset(QString data)
 {
     return QRegExp("^GRBL|GCARVIN\\s\\d\\.\\d.").indexIn(data.toUpper()) != -1;

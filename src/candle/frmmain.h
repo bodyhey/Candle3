@@ -250,10 +250,6 @@ private:
     GcodeViewParse m_viewParser;
     GcodeViewParse m_probeParser;
 
-    // State
-    // SenderState m_senderState;
-    // DeviceState m_deviceState;
-
     // Visualizer drawers
     // TODO: Add machine table visualizer
     OriginDrawer *m_originDrawer;
@@ -277,10 +273,6 @@ private:
     // Connection
     Connection *m_connection;
     Communicator *m_communicator;
-
-    // Queues
-    // QList<CommandAttributes> m_commands;
-    // QList<CommandQueue> m_queue;
 
     // Forms
     frmSettings *m_settings;
@@ -314,14 +306,8 @@ private:
     bool m_fileChanged;
     bool m_heightMapChanged;
 
-    // bool m_homing;
     bool m_updateSpindleSpeed;
     bool m_updateParserStatus;
-
-    // bool m_reseting;
-    // bool m_resetCompleted;
-    // bool m_aborting;
-    // bool m_statusReceived;
 
     bool m_heightMapMode;
 
@@ -365,9 +351,6 @@ private:
     // Communication
     void openPort();
     void grblReset();
-    SendCommandResult sendCommand(QString command, int tableIndex = -1, bool showInConsole = true, bool wait = false);
-    void sendRealtimeCommand(QString command);
-    void sendCommands(QString commands, int tableIndex = -1);
     void sendNextFileCommands();
     QString evaluateCommand(QString command);
 
@@ -375,7 +358,6 @@ private:
     void updateParser();
     void storeParserState();
     void restoreParserState();
-    void restoreOffsets();
     void storeOffsetsVars(QString response);
 
     // Files/models
@@ -409,9 +391,6 @@ private:
 
     // Utility
     int bufferLength();
-    bool dataIsFloating(QString data);
-    bool dataIsEnd(QString data);
-    bool dataIsReset(QString data);
     QTime updateProgramEstimatedTime(QList<LineSegment *> lines);
     QList<LineSegment *> subdivideSegment(LineSegment *segment);
     void jogStep();
@@ -422,9 +401,6 @@ private:
     bool isGCodeFile(QString fileName);
     bool isHeightmapFile(QString fileName);
     int buttonSize();
-    // to communicator
-    // void setSenderState(SenderState state);
-    // void setDeviceState(DeviceState state);
     void completeTransfer();
     QString getLineInitCommands(int row);
 
