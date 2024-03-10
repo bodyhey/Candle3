@@ -75,6 +75,7 @@ private:
     bool dataIsEnd(QString data);
     bool dataIsReset(QString data);
     bool compareCoordinates(double x, double y, double z);
+
 signals:
     void responseReceived(QString command, int tableIndex, QString response);
     void statusReceived(QString status);

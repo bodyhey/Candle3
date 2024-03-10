@@ -178,13 +178,13 @@ void frmMain::onConnectionLineReceived(QString data)
 
             if (rapid != target) switch (target) {
                 case 25:
-                    m_connection->sendByteArray(QByteArray(1, char(0x97)));
+                    m_connection->sendByteArray(QByteArray(1, char(GRBL_LIVE_RAPID_FULL_RATE)));
                     break;
                 case 50:
-                    m_connection->sendByteArray(QByteArray(1, char(0x96)));
+                    m_connection->sendByteArray(QByteArray(1, char(GRBL_LIVE_RAPID_HALF_RATE)));
                     break;
                 case 100:
-                    m_connection->sendByteArray(QByteArray(1, char(0x95)));
+                    m_connection->sendByteArray(QByteArray(1, char(GRBL_LIVE_RAPID_QUARTER_RATE)));
                     break;
                 }
 
