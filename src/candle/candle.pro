@@ -26,9 +26,10 @@ contains(QT_CONFIG, opengles.) {
     target.path = /home/pi
 }
 
-TARGET = Candle
+TARGET = GPilot
 TEMPLATE = app
-RC_ICONS += images/gpilot.ico
+
+RC_ICONS = images/gpilot.ico
 
 DEFINES += sNan=\"65536\"
 
@@ -160,3 +161,4 @@ LIBS += -L../vendor/PropertyEditor\release -lPropertyEditor
 #     command = $$LRELEASE -removeidentical $$tsfile -qm $$qmfile
 #     system($$command)|error("Failed to run: $$command")
 # }
+
