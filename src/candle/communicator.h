@@ -31,7 +31,9 @@ public:
     SendCommandResult sendCommand(QString command, int tableIndex = -1, bool showInConsole = true, bool wait = false);
     void sendRealtimeCommand(QString command);
     void sendCommands(QString commands, int tableIndex = -1);
-
+    void clearCommandsAndQueue();
+    void clearQueue();
+    void reset();
 private:
     Connection *m_connection;
     Settings *m_settings;
@@ -47,16 +49,11 @@ private:
     bool m_statusReceived;
     bool m_homing;
     Ui::frmMain *ui;
-    //frmMain *form;
-    QMap<DeviceState, QString> m_deviceStatuses;
-    QMap<DeviceState, QString> m_statusCaptions;
-    QMap<DeviceState, QString> m_statusBackColors;
-    QMap<DeviceState, QString> m_statusForeColors;
 
     void onSerialPortReadyRead(QString);
-    void setSenderState(int);
-    void setDeviceState(int);
     bool dataIsReset(QString);
+    void setSenderState(SenderState);
+    void setDeviceState(DeviceState);
 signals:
     void responseReceived(QString command, int tableIndex, QString response);
     void statusReceived(QString status);

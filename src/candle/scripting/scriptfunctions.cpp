@@ -83,12 +83,14 @@ int ScriptFunctions::bufferLength()
 
 int ScriptFunctions::commandsLength()
 {
-    return m_frmMain->m_commands.length();
+    // @todo
+    return 0;// m_frmMain->m_commands.length();
 }
 
 int ScriptFunctions::queueLength()
 {
-    return m_frmMain->m_queue.length();
+    // @todo
+    return 0;// m_frmMain->m_queue.length();
 }
 
 void ScriptFunctions::testDebug()

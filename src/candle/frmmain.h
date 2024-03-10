@@ -82,7 +82,6 @@ class frmMain : public QMainWindow
     Q_OBJECT
 
     friend class ScriptFunctions;
-    friend class Communicator;
 
 public:
     explicit frmMain(QWidget *parent = 0);
@@ -252,8 +251,8 @@ private:
     GcodeViewParse m_probeParser;
 
     // State
-    SenderState m_senderState;
-    DeviceState m_deviceState;
+    // SenderState m_senderState;
+    // DeviceState m_deviceState;
 
     // Visualizer drawers
     // TODO: Add machine table visualizer
@@ -280,8 +279,8 @@ private:
     Communicator *m_communicator;
 
     // Queues
-    QList<CommandAttributes> m_commands;
-    QList<CommandQueue> m_queue;    
+    // QList<CommandAttributes> m_commands;
+    // QList<CommandQueue> m_queue;
 
     // Forms
     frmSettings *m_settings;
@@ -315,14 +314,14 @@ private:
     bool m_fileChanged;
     bool m_heightMapChanged;
 
-    bool m_homing;
+    // bool m_homing;
     bool m_updateSpindleSpeed;
     bool m_updateParserStatus;
 
-    bool m_reseting;
-    bool m_resetCompleted;
-    bool m_aborting;
-    bool m_statusReceived;
+    // bool m_reseting;
+    // bool m_resetCompleted;
+    // bool m_aborting;
+    // bool m_statusReceived;
 
     bool m_heightMapMode;
 
@@ -423,8 +422,9 @@ private:
     bool isGCodeFile(QString fileName);
     bool isHeightmapFile(QString fileName);
     int buttonSize();
-    void setSenderState(SenderState state);
-    void setDeviceState(DeviceState state);
+    // to communicator
+    // void setSenderState(SenderState state);
+    // void setDeviceState(DeviceState state);
     void completeTransfer();
     QString getLineInitCommands(int row);
 

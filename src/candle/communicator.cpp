@@ -19,73 +19,21 @@ Communicator::Communicator(
     m_deviceState = DeviceUnknown;
     m_senderState = SenderUnknown;
 
-    // Initializing variables
-    m_deviceStatuses[DeviceUnknown] = "Unknown";
-    m_deviceStatuses[DeviceIdle] = "Idle";
-    m_deviceStatuses[DeviceAlarm] = "Alarm";
-    m_deviceStatuses[DeviceRun] = "Run";
-    m_deviceStatuses[DeviceHome] = "Home";
-    m_deviceStatuses[DeviceHold0] = "Hold:0";
-    m_deviceStatuses[DeviceHold1] = "Hold:1";
-    m_deviceStatuses[DeviceQueue] = "Queue";
-    m_deviceStatuses[DeviceCheck] = "Check";
-    m_deviceStatuses[DeviceDoor0] = "Door:0";
-    m_deviceStatuses[DeviceDoor1] = "Door:1";
-    m_deviceStatuses[DeviceDoor2] = "Door:2";
-    m_deviceStatuses[DeviceDoor3] = "Door:3";
-    m_deviceStatuses[DeviceJog] = "Jog";
-    m_deviceStatuses[DeviceSleep] = "Sleep";
-
-    m_statusCaptions[DeviceUnknown] = tr("Unknown");
-    m_statusCaptions[DeviceIdle] = tr("Idle");
-    m_statusCaptions[DeviceAlarm] = tr("Alarm");
-    m_statusCaptions[DeviceRun] = tr("Run");
-    m_statusCaptions[DeviceHome] = tr("Home");
-    m_statusCaptions[DeviceHold0] = tr("Hold") + " (0)";
-    m_statusCaptions[DeviceHold1] = tr("Hold") + " (1)";
-    m_statusCaptions[DeviceQueue] = tr("Queue");
-    m_statusCaptions[DeviceCheck] = tr("Check");
-    m_statusCaptions[DeviceDoor0] = tr("Door") + " (0)";
-    m_statusCaptions[DeviceDoor1] = tr("Door") + " (1)";
-    m_statusCaptions[DeviceDoor2] = tr("Door") + " (2)";
-    m_statusCaptions[DeviceDoor3] = tr("Door") + " (3)";
-    m_statusCaptions[DeviceJog] = tr("Jog");
-    m_statusCaptions[DeviceSleep] = tr("Sleep");
-
-    m_statusBackColors[DeviceUnknown] = "red";
-    m_statusBackColors[DeviceIdle] = "palette(button)";
-    m_statusBackColors[DeviceAlarm] = "red";
-    m_statusBackColors[DeviceRun] = "lime";
-    m_statusBackColors[DeviceHome] = "lime";
-    m_statusBackColors[DeviceHold0] = "yellow";
-    m_statusBackColors[DeviceHold1] = "yellow";
-    m_statusBackColors[DeviceQueue] = "yellow";
-    m_statusBackColors[DeviceCheck] = "palette(button)";
-    m_statusBackColors[DeviceDoor0] = "red";
-    m_statusBackColors[DeviceDoor1] = "red";
-    m_statusBackColors[DeviceDoor2] = "red";
-    m_statusBackColors[DeviceDoor3] = "red";
-    m_statusBackColors[DeviceJog] = "lime";
-    m_statusBackColors[DeviceSleep] = "blue";
-
-    m_statusForeColors[DeviceUnknown] = "white";
-    m_statusForeColors[DeviceIdle] = "palette(text)";
-    m_statusForeColors[DeviceAlarm] = "white";
-    m_statusForeColors[DeviceRun] = "black";
-    m_statusForeColors[DeviceHome] = "black";
-    m_statusForeColors[DeviceHold0] = "black";
-    m_statusForeColors[DeviceHold1] = "black";
-    m_statusForeColors[DeviceQueue] = "black";
-    m_statusForeColors[DeviceCheck] = "palette(text)";
-    m_statusForeColors[DeviceDoor0] = "white";
-    m_statusForeColors[DeviceDoor1] = "white";
-    m_statusForeColors[DeviceDoor2] = "white";
-    m_statusForeColors[DeviceDoor3] = "white";
-    m_statusForeColors[DeviceJog] = "black";
-    m_statusForeColors[DeviceSleep] = "white";
-
     this->connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
     this->connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));
+
+    setSenderState(SenderStopped);
+}
+
+void Communicator::clearCommandsAndQueue()
+{
+    m_commands.clear();
+    clearQueue();
+}
+
+void Communicator::clearQueue()
+{
+    m_queue.clear();
 }
 
 void Communicator::onSerialPortReadyRead(QString data)
@@ -747,6 +695,54 @@ void Communicator::onSerialPortReadyRead(QString data)
         // Blank response
     }
 */
+}
+
+void Communicator::reset()
+{
+    m_connection->sendByteArray(QByteArray(1, (char)24));
+
+    setSenderState(SenderStopped);
+    setDeviceState(DeviceUnknown);
+    // in main form
+    //m_fileCommandIndex = 0;
+
+    m_reseting = true;
+    m_homing = false;
+    m_resetCompleted = false;
+    // in main form
+//    m_updateSpindleSpeed = true;
+    m_statusReceived = true;
+
+    // Drop all remaining commands in buffer
+    clearCommandsAndQueue();
+    // m_commands.clear();
+    // m_queue.clear();
+
+    // Prepare reset response catch
+    CommandAttributes ca;
+    ca.command = "[CTRL+X]";
+    // @todo ui
+    // if (m_settings->showUICommands()) ui->txtConsole->appendPlainText(ca.command);
+    // ca.consoleIndex = m_settings->showUICommands() ? ui->txtConsole->blockCount() - 1 : -1;
+    ca.tableIndex = -1;
+    ca.length = ca.command.length() + 1;
+    m_commands.append(ca);
+}
+
+void Communicator::setSenderState(SenderState state)
+{
+    if (m_senderState != state) {
+        m_senderState = state;
+        emit senderStateChanged(state);
+    }
+}
+
+void Communicator::setDeviceState(DeviceState state)
+{
+    if (m_deviceState != state) {
+        m_deviceState = state;
+        emit deviceStateChanged(state);
+    }
 }
 
 bool Communicator::dataIsReset(QString data)
