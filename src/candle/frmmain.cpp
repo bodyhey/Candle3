@@ -37,6 +37,8 @@ frmMain::frmMain(QWidget *parent) :
 
     connect(this, SIGNAL(machinePosChanged(QVector3D)), this, SLOT(onMachinePosChanged(QVector3D)));
     connect(this, SIGNAL(workPosChanged(QVector3D)), this, SLOT(onWorkPosChanged(QVector3D)));
+    connect(this, SIGNAL(deviceStateReceived(DeviceState)), this, SLOT(onDeviceStateReceived(DeviceState)));
+    connect(this, SIGNAL(deviceStateChanged(DeviceState)), this, SLOT(onDeviceStateChanged(DeviceState)));
 
     // Initializing variables
     m_deviceStatuses[DeviceUnknown] = "Unknown";
@@ -1641,6 +1643,28 @@ void frmMain::onDeviceStateChanged(DeviceState state)
     ui->txtStatus->setText(m_statusCaptions[state]);
     ui->txtStatus->setStyleSheet(QString("background-color: %1; color: %2;")
                                      .arg(m_statusBackColors[state]).arg(m_statusForeColors[state]));
+
+    ui->cmdCheck->setEnabled(state != DeviceRun && (m_communicator->m_senderState == SenderStopped));
+    ui->cmdCheck->setChecked(state == DeviceCheck);
+    ui->cmdHold->setChecked(state == DeviceHold0 || state == DeviceHold1 || state == DeviceQueue);
+    ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_communicator->m_senderState != SenderTransferring) &&
+                                                        (m_communicator->m_senderState != SenderStopping)));
+}
+
+void frmMain::onDeviceStateReceived(DeviceState state)
+{
+    // Update controls state
+    ui->cmdCheck->setEnabled(state != DeviceRun && (m_communicator->m_senderState == SenderStopped));
+    ui->cmdCheck->setChecked(state == DeviceCheck);
+    ui->cmdHold->setChecked(state == DeviceHold0 || state == DeviceHold1 || state == DeviceQueue);
+    ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_communicator->m_senderState != SenderTransferring) &&
+                                                        (m_communicator->m_senderState != SenderStopping)));
+    // Update "elapsed time" timer
+    if ((m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping)) {
+        QTime time(0, 0, 0);
+        int elapsed = m_startTime.elapsed();
+        ui->glwVisualizer->setSpendTime(time.addMSecs(elapsed));
+    }
 }
 
 void frmMain::onTimerConnection()

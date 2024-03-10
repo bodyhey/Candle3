@@ -39,20 +39,23 @@ void frmMain::onConnectionLineReceived(QString data)
                 emit deviceStateChanged(state);
             }
 
-            // Update controls
-            // @TODO should i move it do deviceStateChanged handler??
-            ui->cmdCheck->setEnabled(state != DeviceRun && (m_communicator->m_senderState == SenderStopped));
-            ui->cmdCheck->setChecked(state == DeviceCheck);
-            ui->cmdHold->setChecked(state == DeviceHold0 || state == DeviceHold1 || state == DeviceQueue);
-            ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_communicator->m_senderState != SenderTransferring) &&
-                                                                (m_communicator->m_senderState != SenderStopping)));
+            emit deviceStateReceived(state);
 
-            // Update "elapsed time" timer
-            if ((m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping)) {
-                QTime time(0, 0, 0);
-                int elapsed = m_startTime.elapsed();
-                ui->glwVisualizer->setSpendTime(time.addMSecs(elapsed));
-            }
+            // Update controls
+            // moved to deviceStateReceived handler
+            // ui->cmdCheck->setEnabled(state != DeviceRun && (m_communicator->m_senderState == SenderStopped));
+            // ui->cmdCheck->setChecked(state == DeviceCheck);
+            // ui->cmdHold->setChecked(state == DeviceHold0 || state == DeviceHold1 || state == DeviceQueue);
+            // ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_communicator->m_senderState != SenderTransferring) &&
+            //                                                     (m_communicator->m_senderState != SenderStopping)));
+
+            // // Update "elapsed time" timer
+            // // moved to deviceStateReceived handler
+            // if ((m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping)) {
+            //     QTime time(0, 0, 0);
+            //     int elapsed = m_startTime.elapsed();
+            //     ui->glwVisualizer->setSpendTime(time.addMSecs(elapsed));
+            // }
 
             // Test for job complete
             if ((m_communicator->m_senderState == SenderStopping) &&
