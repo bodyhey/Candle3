@@ -198,6 +198,7 @@ private slots:
     void onWorkPosChanged(QVector3D pos);
     void onDeviceStateChanged(DeviceState state);
     void onDeviceStateReceived(DeviceState state);
+    void onSpindleStateReceived(bool state);
 
     void onTimerConnection();
     void onTimerStateQuery();
@@ -411,6 +412,7 @@ signals:
     void deviceStateChanged(DeviceState state);
     // may be emitted together with deviceStateChanged!
     void deviceStateReceived(DeviceState state);
+    void spindleStateReceived(bool state);
 };
 
 typedef QMap<QString, QList<QKeySequence>> ShortcutsMap;

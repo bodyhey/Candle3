@@ -1667,6 +1667,20 @@ void frmMain::onDeviceStateReceived(DeviceState state)
     }
 }
 
+void frmMain::onSpindleStateReceived(bool state)
+{
+    switch (state) {
+        case true:
+            m_timerToolAnimation.start(25, this);
+            ui->cmdSpindle->setChecked(true);
+            break;
+        default:
+            m_timerToolAnimation.stop();
+            ui->cmdSpindle->setChecked(false);
+            break;
+    }
+}
+
 void frmMain::onTimerConnection()
 {
     if (!m_connection->isConnected()) {

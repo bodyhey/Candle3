@@ -1,9 +1,8 @@
 #include "frmmain.h"
 
 /*
- *to be refactored/replaced by signals and slots
- *
- *
+to be refactored/replaced by signals and slots
+
 updateControlsState()
 m_fileProcessedCommandIndex
 m_currentModel
@@ -17,7 +16,6 @@ m_currentDrawer
 m_fileCommandIndex
 m_updateParserStatus
 m_connection
-m_timerToolAnimation
 m_storedVars
 m_heightMapMode
 m_taskBarProgress
@@ -40,7 +38,6 @@ ui->slbFeedOverride
 ui->slbSpindleOverride
 ui->slbSpindle
 ui->slbRapidOverride->isChecked() ? ui->slbRapidOverride
-ui->cmdSpindle
 ui->cmdFlood
 ui->glwVisualizer
 ui->txtConsole
@@ -253,19 +250,25 @@ void frmMain::onConnectionLineReceived(QString data)
                 QString q = as.cap(1);
                 m_communicator->m_spindleCW = q.contains("S");
                 if (q.contains("S") || q.contains("C")) {
-                    m_timerToolAnimation.start(25, this);
-                    ui->cmdSpindle->setChecked(true);
+                    emit spindleStateReceived(true);
+                    // to spindleStateReceived handler
+                    // m_timerToolAnimation.start(25, this);
+                    // ui->cmdSpindle->setChecked(true);
                 } else {
-                    m_timerToolAnimation.stop();
-                    ui->cmdSpindle->setChecked(false);
+                    emit spindleStateReceived(false);
+                    // to spindleStateReceived handler
+                    // m_timerToolAnimation.stop();
+                    // ui->cmdSpindle->setChecked(false);
                 }
                 ui->cmdFlood->setChecked(q.contains("F"));
 
                 if (!pinState.isEmpty()) pinState.append(" / ");
                 pinState.append(QString(tr("AS: %1")).arg(as.cap(1)));
             } else {
-                m_timerToolAnimation.stop();
-                ui->cmdSpindle->setChecked(false);
+                emit spindleStateReceived(false);
+                // to spindleStateReceived handler
+                // m_timerToolAnimation.stop();
+                // ui->cmdSpindle->setChecked(false);
             }
             ui->glwVisualizer->setPinState(pinState);
         }
