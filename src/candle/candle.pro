@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT       = core gui opengl serialport script uitools
-equals(QT_MAJOR_VERSION, 5): QT += widgets
+equals(QT_MAJOR_VERSION, 5): QT += widgets network
 
 win32: {
     QT += winextras
