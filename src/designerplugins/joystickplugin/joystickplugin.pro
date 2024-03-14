@@ -3,8 +3,6 @@ CONFIG -= debug_and_release
 TEMPLATE = lib
 QT += widgets uiplugin
 
-TARGET = joystickplugin
-
 SUBDIRS = SFML
 
 HEADERS +=  \

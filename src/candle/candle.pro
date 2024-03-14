@@ -153,8 +153,8 @@ RESOURCES += \
 INCLUDEPATH += ../designerplugins/customwidgetsplugin
 INCLUDEPATH += ../vendor/PropertyEditor
 
-LIBS += -L../vendor/PropertyEditor\release -lPropertyEditor
 LIBS += -L../designerplugins/customwidgetsplugin -lcustomwidgets
+LIBS += -L../vendor/PropertyEditor -lPropertyEditor
 
 # qtPrepareTool(LRELEASE, lrelease)
 # for(tsfile, TRANSLATIONS) {
@@ -168,12 +168,11 @@ LIBS += -L../designerplugins/customwidgetsplugin -lcustomwidgets
 #     system($$command)|error("Failed to run: $$command")
 # }
 
-
-LIBS += -L$$PWD/../vendor/uCNC/build -luCNC
+LIBS += -L../vendor/uCNC -luCNC
 
 INCLUDEPATH += $$PWD/../vendor/uCNC/build
 INCLUDEPATH += $$PWD/../vendor/uCNC/makefiles/virtual
-DEPENDPATH += $$PWD/../vendor/uCNC/build
+DEPENDPATH += ../vendor/uCNC
 
 # win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../vendor/uCNC/release/libuCNC.a
 # else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../vendor/uCNC/release/uCNC.lib

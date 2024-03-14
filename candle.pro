@@ -24,12 +24,23 @@ install_license.files = LICENSE
 install_scriptbindings.path = bin/script
 install_scriptbindings.files = src/scriptbindings/plugins/script/*.dll
 
-INSTALLS += install_main install_plugins install_translations install_license install_scriptbindings
+install_propertyeditor.path = bin
+install_propertyeditor.files = src/vendor/PropertyEditor/PropertyEditor.dll
+
 install_ucnc.path = bin
-install_ucnc.files = src/vendor/uCNC/build/*.dll
+install_ucnc.files = src/vendor/uCNC/uCNC.dll
+
+INSTALLS += install_propertyeditor install_ucnc
 
 
-INSTALLS += install_main install_ucnc
+# install_ucnc.path = bin
+# install_ucnc.files = src/vendor/uCNC/build/*.dll
+
+INSTALLS += install_main
+# install_ucnc
+# install_plugins
+# install_translations install_license
+# install_scriptbindings
 
 CONFIG += c++14
 QMAKE_CXXFLAGS += -std=c++14
