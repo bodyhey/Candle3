@@ -696,9 +696,6 @@ QLabel[overrided=&quot;false&quot;] {
                           <verstretch>0</verstretch>
                          </sizepolicy>
                         </property>
-                        <property name="locale">
-                         <locale language="C" country="AnyCountry"/>
-                        </property>
                         <property name="alignment">
                          <set>Qt::AlignCenter</set>
                         </property>
@@ -720,9 +717,6 @@ QLabel[overrided=&quot;false&quot;] {
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
-                        </property>
-                        <property name="locale">
-                         <locale language="C" country="AnyCountry"/>
                         </property>
                         <property name="alignment">
                          <set>Qt::AlignCenter</set>
@@ -755,9 +749,6 @@ QLabel[overrided=&quot;false&quot;] {
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
-                        </property>
-                        <property name="locale">
-                         <locale language="C" country="AnyCountry"/>
                         </property>
                         <property name="alignment">
                          <set>Qt::AlignCenter</set>
@@ -794,9 +785,6 @@ QLabel[overrided=&quot;false&quot;] {
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
-                        </property>
-                        <property name="locale">
-                         <locale language="C" country="AnyCountry"/>
                         </property>
                         <property name="alignment">
                          <set>Qt::AlignCenter</set>
@@ -879,9 +867,6 @@ QLabel[overrided=&quot;false&quot;] {
                           <verstretch>0</verstretch>
                          </sizepolicy>
                         </property>
-                        <property name="locale">
-                         <locale language="C" country="AnyCountry"/>
-                        </property>
                         <property name="alignment">
                          <set>Qt::AlignCenter</set>
                         </property>
@@ -910,9 +895,6 @@ QLabel[overrided=&quot;false&quot;] {
                           <verstretch>0</verstretch>
                          </sizepolicy>
                         </property>
-                        <property name="locale">
-                         <locale language="C" country="AnyCountry"/>
-                        </property>
                         <property name="alignment">
                          <set>Qt::AlignCenter</set>
                         </property>
@@ -937,9 +919,6 @@ QLabel[overrided=&quot;false&quot;] {
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
-                        </property>
-                        <property name="locale">
-                         <locale language="C" country="AnyCountry"/>
                         </property>
                         <property name="alignment">
                          <set>Qt::AlignCenter</set>
@@ -980,9 +959,6 @@ QLabel[overrided=&quot;false&quot;] {
                           <verstretch>0</verstretch>
                          </sizepolicy>
                         </property>
-                        <property name="locale">
-                         <locale language="C" country="AnyCountry"/>
-                        </property>
                         <property name="alignment">
                          <set>Qt::AlignCenter</set>
                         </property>
@@ -1017,9 +993,6 @@ QLabel[overrided=&quot;false&quot;] {
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
-                        </property>
-                        <property name="locale">
-                         <locale language="C" country="AnyCountry"/>
                         </property>
                         <property name="alignment">
                          <set>Qt::AlignCenter</set>
@@ -1105,9 +1078,6 @@ QLabel[overrided=&quot;false&quot;] {
                           <verstretch>0</verstretch>
                          </sizepolicy>
                         </property>
-                        <property name="locale">
-                         <locale language="C" country="AnyCountry"/>
-                        </property>
                         <property name="alignment">
                          <set>Qt::AlignCenter</set>
                         </property>
@@ -1135,9 +1105,6 @@ QLabel[overrided=&quot;false&quot;] {
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
-                        </property>
-                        <property name="locale">
-                         <locale language="C" country="AnyCountry"/>
                         </property>
                         <property name="alignment">
                          <set>Qt::AlignCenter</set>
@@ -1336,9 +1303,6 @@ QLabel[overrided=&quot;false&quot;] {
                   <property name="toolTip">
                    <string>X</string>
                   </property>
-                  <property name="locale">
-                   <locale language="C" country="AnyCountry"/>
-                  </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
                   </property>
@@ -1373,9 +1337,6 @@ QLabel[overrided=&quot;false&quot;] {
                   <property name="toolTip">
                    <string>Y</string>
                   </property>
-                  <property name="locale">
-                   <locale language="C" country="AnyCountry"/>
-                  </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
                   </property>
@@ -1409,9 +1370,6 @@ QLabel[overrided=&quot;false&quot;] {
                   </property>
                   <property name="toolTip">
                    <string>Z</string>
-                  </property>
-                  <property name="locale">
-                   <locale language="C" country="AnyCountry"/>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
@@ -1466,9 +1424,6 @@ QLabel[overrided=&quot;false&quot;] {
                   <property name="toolTip">
                    <string>X</string>
                   </property>
-                  <property name="locale">
-                   <locale language="C" country="AnyCountry"/>
-                  </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
                   </property>
@@ -1503,9 +1458,6 @@ QLabel[overrided=&quot;false&quot;] {
                   <property name="toolTip">
                    <string>Y</string>
                   </property>
-                  <property name="locale">
-                   <locale language="C" country="AnyCountry"/>
-                  </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
                   </property>
@@ -1539,9 +1491,6 @@ QLabel[overrided=&quot;false&quot;] {
                   </property>
                   <property name="toolTip">
                    <string>Z</string>
-                  </property>
-                  <property name="locale">
-                   <locale language="C" country="AnyCountry"/>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
