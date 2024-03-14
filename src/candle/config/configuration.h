@@ -14,6 +14,9 @@ public:
 private:
     QString m_language;
 
+signals:
+    void configurationChanged();
+
 };
 
 #endif // CONFIGURATION_H

@@ -15,7 +15,10 @@ Communicator::Communicator(
         m_connection(connection),
         m_settings(frmSettings),
         ui(ui)
-    {
+{
+    assert(m_connection != nullptr);
+    assert(m_settings != nullptr);
+
     m_reseting = false;
     m_resetCompleted = true;
     m_aborting = false;
@@ -28,8 +31,8 @@ Communicator::Communicator(
     m_machinePos = QVector3D(0, 0, 0);
     m_workPos = QVector3D(0, 0, 0);
 
-    this->connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
-    this->connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));
+    // this->connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
+    // this->connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));
 
     setSenderState(SenderStopped);
 }

@@ -51,7 +51,8 @@ ui->cmdFileAbort
 
 void frmMain::onConnectionLineReceived(QString data)
 {
-    // Filter prereset responses
+    assert(QThread::currentThread() == QCoreApplication::instance()->thread());
+
     if (m_communicator->m_reseting) {
         if (!m_communicator->dataIsReset(data)) return;
         else {

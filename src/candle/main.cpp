@@ -44,9 +44,16 @@ void messageHandler(QtMsgType type, const QMessageLogContext &, const QString & 
     QTextStream(stdout) << txt << endl;
 }
 
+void initAppInfo()
+{
+    QCoreApplication::setApplicationName("G-Pilot");
+    QCoreApplication::setOrganizationName("BTS");
+}
+
 int main(int argc, char *argv[])
 {
     qInstallMessageHandler(messageHandler);
+    initAppInfo();
 
 #ifdef UNIX
     bool styleOverrided = false;
