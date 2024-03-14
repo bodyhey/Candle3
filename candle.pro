@@ -4,6 +4,7 @@ SUBDIRS =   src/designerplugins \
             src/candle \
             src/candleplugins \
             src/vendor/PropertyEditor
+            src/vendor/uCNC \
             
 # Make plugins translations
 system(qmake src/candleplugins/candleplugins.pro)
@@ -24,6 +25,11 @@ install_scriptbindings.path = bin/script
 install_scriptbindings.files = src/scriptbindings/plugins/script/*.dll
 
 INSTALLS += install_main install_plugins install_translations install_license install_scriptbindings
+install_ucnc.path = bin
+install_ucnc.files = src/vendor/uCNC/build/*.dll
+
+
+INSTALLS += install_main install_ucnc
 
 CONFIG += c++14
 QMAKE_CXXFLAGS += -std=c++14
