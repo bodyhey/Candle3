@@ -394,7 +394,7 @@ QLabel[overrided=&quot;false&quot;] {
      <string>&amp;Service</string>
     </property>
     <addaction name="actServiceSettings"/>
-    <addaction name="actConfigureGRBL"/>
+    <addaction name="actServiceConfigureGRBL"/>
    </widget>
    <widget class="QMenu" name="mnuHelp">
     <property name="title">
@@ -3129,7 +3129,7 @@ padding-right: 8;</string>
     <string>Flood</string>
    </property>
   </action>
-  <action name="actConfigureGRBL">
+  <action name="actServiceConfigureGRBL">
    <property name="text">
     <string>Configure GRBL</string>
    </property>

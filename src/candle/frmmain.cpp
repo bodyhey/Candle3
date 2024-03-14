@@ -647,7 +647,7 @@ void frmMain::on_actServiceSettings_triggered()
     }
 }
 
-void frmMain::onActConfigureGRBLTriggered()
+void frmMain::on_actServiceConfigureGRBL_triggered()
 {
     m_grblConfigurator.exec();
 }
