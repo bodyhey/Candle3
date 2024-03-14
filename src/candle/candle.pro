@@ -49,6 +49,7 @@ SOURCES += main.cpp\
     connection/connection.cpp \
     connection/rawtcpconnection.cpp \
     connection/serialconnection.cpp \
+    connection/virtualucncconnection.cpp \
     form_partial/main/control.cpp \
     form_partial/main/jog.cpp \
     form_partial/main/override.cpp \
@@ -93,6 +94,7 @@ HEADERS  += frmmain.h \
     connection/connection.h \
     connection/rawtcpconnection.h \
     connection/serialconnection.h \
+    connection/virtualucncconnection.h \
     form_partial/main/control.h \
     form_partial/main/jog.h \
     form_partial/main/override.h \
@@ -163,3 +165,25 @@ LIBS += -L../vendor/PropertyEditor\release -lPropertyEditor
 #     system($$command)|error("Failed to run: $$command")
 # }
 
+
+LIBS += -L$$PWD/../vendor/uCNC/build -luCNC
+
+INCLUDEPATH += $$PWD/../vendor/uCNC/build
+INCLUDEPATH += $$PWD/../vendor/uCNC/makefiles/virtual
+DEPENDPATH += $$PWD/../vendor/uCNC/build
+
+# win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../vendor/uCNC/release/libuCNC.a
+# else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../vendor/uCNC/release/uCNC.lib
+
+# win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../vendor/uCNC/release/ -luCNC
+# else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../vendor/uCNC/debug/ -luCNC
+
+# INCLUDEPATH += $$PWD/../vendor/uCNC/build
+# DEPENDPATH += $$PWD/../vendor/uCNC/build
+
+# win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../vendor/uCNC/release/libuCNC.a
+# else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../vendor/uCNC/debug/libuCNC.a
+# else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../vendor/uCNC/release/uCNC.lib
+# else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../vendor/uCNC/debug/uCNC.lib
+
+win32: LIBS += -luCNC

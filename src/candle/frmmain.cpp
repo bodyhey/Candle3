@@ -24,6 +24,7 @@
 #include "ui_frmsettings.h"
 #include "widgets/widgetmimedata.h"
 #include "connection/serialconnection.h"
+#include "connection/virtualucncconnection.h"
 
 #define FILE_FILTER_TEXT "G-Code files (*.nc *.ncc *.ngc *.tap *.gc *.gcode *.txt)"
 
@@ -32,7 +33,14 @@ frmMain::frmMain(QWidget *parent) :
     ui(new Ui::frmMain ),
     m_scripting(&m_configuration)
 {
-    m_connection = new SerialConnection(this);
+    // Loading settings
+    m_settingsFileName = qApp->applicationDirPath() + "/settings.ini";
+    preloadSettings();
+
+    m_settings = new frmSettings(this);
+
+    //m_connection = new SerialConnection(this);
+    m_connection = new VirtualUCNCConnection(this);
     m_communicator = new Communicator(m_connection, ui, m_settings, this);
 
     connect(this, SIGNAL(machinePosChanged(QVector3D)), this, SLOT(onMachinePosChanged(QVector3D)));
@@ -123,11 +131,6 @@ frmMain::frmMain(QWidget *parent) :
     // m_deviceState = DeviceUnknown;
     // m_communicator->m_senderState = SenderUnknown;
 
-    // Loading settings
-    m_settingsFileName = qApp->applicationDirPath() + "/settings.ini";
-    preloadSettings();
-
-    m_settings = new frmSettings(this);
     ui->setupUi(this);
 
     ui->widgetJog->setParent(nullptr);
