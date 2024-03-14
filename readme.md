@@ -16,7 +16,7 @@ What G stands for?
 What is G-Pilot?
 -----------
 
-GRBL controller application with G-Code visualizer written in Qt.
+GRBL/uCNC controller application with G-Code visualizer written in Qt.
 
 Supported functions:
 * Controlling GRBL-based cnc-machine via console commands, buttons on form, numpad.
@@ -24,6 +24,8 @@ Supported functions:
 * Loading, editing, saving and sending of G-code files to cnc-machine.
 * Visualizing G-code files.
 * Joystick/Joypad/Controller support.
+* Customizable interface.
+* uCNC virtual mode (cnc machine simulator).
 
 System requirements for running "G-Pilot":
 -------------------
@@ -31,6 +33,12 @@ System requirements for running "G-Pilot":
 * CPU with SSE2 instruction set support
 * Graphics card with OpenGL 2.0 support
 * 120 MB free storage space
+
+Usefull links:
+
+* https://github.com/Paciente8159/uCNC (modern firmware, inspired by Grbl and LinuxCNC)
+* https://github.com/grbl/grbl (original GRBL firmware)
+* https://github.com/grblHAL (modular, mostly compatible with GRBL)
 
 Build requirements:
 ------------------
