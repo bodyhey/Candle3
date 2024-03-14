@@ -1,4 +1,5 @@
 CONFIG += plugin
+CONFIG -= debug_and_release
 TEMPLATE = lib
 QT += widgets uiplugin multimedia multimediawidgets
 

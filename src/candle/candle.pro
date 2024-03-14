@@ -38,6 +38,9 @@ TRANSLATIONS += translations/candle_en.ts translations/candle_ru.ts translations
 CONFIG += c++14
 QMAKE_CXXFLAGS += -std=c++14
 
+# don't create both debug and release folders
+CONFIG -= debug_and_release
+
 SUBDIRS += vendor/PropertyEditor
 
 SOURCES += main.cpp\
@@ -150,8 +153,8 @@ RESOURCES += \
 INCLUDEPATH += ../designerplugins/customwidgetsplugin
 INCLUDEPATH += ../vendor/PropertyEditor
 
-LIBS += -L../designerplugins/customwidgetsplugin/release -lcustomwidgets
 LIBS += -L../vendor/PropertyEditor\release -lPropertyEditor
+LIBS += -L../designerplugins/customwidgetsplugin -lcustomwidgets
 
 # qtPrepareTool(LRELEASE, lrelease)
 # for(tsfile, TRANSLATIONS) {
