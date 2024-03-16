@@ -121,6 +121,13 @@ void Communicator::sendRealtimeCommand(QString command)
     m_connection->sendByteArray(QByteArray(command.toLatin1(), 1));
 }
 
+void Communicator::sendRealtimeCommand(int command)
+{
+    QByteArray data;
+    data.append(char(command));
+    m_connection->sendByteArray(data);
+}
+
 void Communicator::sendCommands(QString commands, int tableIndex)
 {
     QStringList list = commands.split("\n");

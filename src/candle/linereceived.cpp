@@ -228,13 +228,13 @@ void frmMain::onConnectionLineReceived(QString data)
 
             if (rapid != target) switch (target) {
                 case 25:
-                    m_connection->sendByteArray(QByteArray(1, char(GRBL_LIVE_RAPID_FULL_RATE)));
+                    m_communicator->sendRealtimeCommand(GRBL_LIVE_RAPID_FULL_RATE);
                     break;
                 case 50:
-                    m_connection->sendByteArray(QByteArray(1, char(GRBL_LIVE_RAPID_HALF_RATE)));
+                    m_communicator->sendRealtimeCommand(GRBL_LIVE_RAPID_HALF_RATE);
                     break;
                 case 100:
-                    m_connection->sendByteArray(QByteArray(1, char(GRBL_LIVE_RAPID_QUARTER_RATE)));
+                    m_communicator->sendRealtimeCommand(GRBL_LIVE_RAPID_QUARTER_RATE);
                     break;
                 }
 
@@ -547,8 +547,7 @@ void frmMain::onConnectionLineReceived(QString data)
                             holding = true;         // Hold transmit while messagebox is visible
                             response.clear();
 
-                            m_connection->sendByteArray(QByteArray("!"));
-                            //m_serialPort.write("!");11001
+                            m_communicator->sendRealtimeCommand("!");
                             m_senderErrorBox->checkBox()->setChecked(false);
                             qApp->beep();
                             int result = m_senderErrorBox->exec();
@@ -557,9 +556,9 @@ void frmMain::onConnectionLineReceived(QString data)
                             errors.clear();
                             if (m_senderErrorBox->checkBox()->isChecked()) m_settings->setIgnoreErrors(true);
                             if (result == QMessageBox::Ignore) {
-                                m_connection->sendByteArray(QByteArray("~"));
+                                m_communicator->sendRealtimeCommand("~");
                             } else {
-                                m_connection->sendByteArray(QByteArray("~"));
+                                m_communicator->sendRealtimeCommand("~");
                                 ui->cmdFileAbort->click();
                             }
                         }

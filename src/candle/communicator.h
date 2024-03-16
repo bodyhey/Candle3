@@ -32,6 +32,7 @@ public:
         QObject *parent);
     SendCommandResult sendCommand(QString command, int tableIndex = -1, bool showInConsole = true, bool wait = false);
     void sendRealtimeCommand(QString command);
+    void sendRealtimeCommand(int command);
     void sendCommands(QString commands, int tableIndex = -1);
     void clearCommandsAndQueue();
     void clearQueue();
