@@ -5,8 +5,6 @@ to be refactored/replaced by signals and slots
 
 updateControlsState()
 
-m_settings OK
-m_timerStateQuery
 m_deviceStatuses // dist, move to UI
 m_toolDrawer // emit toolPositionChanged
 m_codeDrawer // getIgnoreZ??
@@ -63,7 +61,8 @@ void frmMain::onConnectionLineReceived(QString data)
         if (!m_communicator->dataIsReset(data)) return;
         else {
             m_communicator->m_reseting = false;
-            m_timerStateQuery.setInterval(m_settings->queryStateTime());
+            m_communicator->stopUpdatingState();
+            m_communicator->startUpdatingState(m_settings->queryStateTime());
         }
     }
 
@@ -476,7 +475,7 @@ void frmMain::onConnectionLineReceived(QString data)
 
                 // Change state query time on check mode on
                 if (uncomment.contains(QRegExp("$[cC]"))) {
-                    m_timerStateQuery.setInterval(response.contains("Enable") ? 1000 : m_settings->queryStateTime());
+                    m_communicator->m_timerStateQuery.setInterval(response.contains("Enable") ? 1000 : m_settings->queryStateTime());
                 }
 
                 // Add response to console

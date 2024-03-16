@@ -23,9 +23,7 @@
 #include "ui_frmmain.h"
 #include "ui_frmsettings.h"
 #include "widgets/widgetmimedata.h"
-#include "connection/serialconnection.h"
-#include "connection/rawtcpconnection.h"
-#include "connection/virtualucncconnection.h"
+#include "connection/connectionmanager.h"
 
 #define FILE_FILTER_TEXT "G-Code files (*.nc *.ncc *.ngc *.tap *.gc *.gcode *.txt)"
 
@@ -357,7 +355,6 @@ frmMain::frmMain(QWidget *parent) :
 
     // Signals/slots
     connect(&m_timerConnection, SIGNAL(timeout()), this, SLOT(onTimerConnection()));
-    connect(&m_timerStateQuery, SIGNAL(timeout()), this, SLOT(onTimerStateQuery()));
     connect(&m_scriptEngine, &QScriptEngine::signalHandlerException, this, &frmMain::onScriptException);
 
     // Event filter
@@ -365,7 +362,6 @@ frmMain::frmMain(QWidget *parent) :
 
     // Start timers
     m_timerConnection.start(1000);
-    m_timerStateQuery.start();
 }
 
 frmMain::~frmMain()
@@ -1704,15 +1700,16 @@ void frmMain::onTimerConnection()
     }
 }
 
-void frmMain::onTimerStateQuery()
-{
-    if (m_connection->isConnected() && m_communicator->m_resetCompleted && m_communicator->m_statusReceived) {
-        m_connection->sendByteArray(QByteArray(1, '?'));
-        m_communicator->m_statusReceived = false;
-    }
+// @todo another way to update visualizer??
+// void frmMain::onTimerStateQuery()
+// {
+//     if (m_connection->isConnected() && m_communicator->m_resetCompleted && m_communicator->m_statusReceived) {
+//         m_connection->sendByteArray(QByteArray(1, '?'));
+//         m_communicator->m_statusReceived = false;
+//     }
 
-    ui->glwVisualizer->setBufferState(QString(tr("Buffer: %1 / %2 / %3")).arg(bufferLength()).arg(m_communicator->m_commands.length()).arg(m_communicator->m_queue.length()));
-}
+//     ui->glwVisualizer->setBufferState(QString(tr("Buffer: %1 / %2 / %3")).arg(bufferLength()).arg(m_communicator->m_commands.length()).arg(m_communicator->m_queue.length()));
+// }
 
 void frmMain::onTableInsertLine()
 {
@@ -2465,7 +2462,8 @@ void frmMain::applySettings() {
     m_heightMapGridDrawer.setLineWidth(0.1);
     m_heightMapInterpolationDrawer.setLineWidth(m_settings->lineWidth());
     ui->glwVisualizer->setLineWidth(m_settings->lineWidth());
-    m_timerStateQuery.setInterval(m_settings->queryStateTime());
+    m_communicator->stopUpdatingState();
+    m_communicator->startUpdatingState(m_settings->queryStateTime());
 
     m_toolDrawer.setToolAngle(m_settings->toolType() == 0 ? 180 : m_settings->toolAngle());
     m_toolDrawer.setColor(m_settings->colors("Tool"));
@@ -3937,15 +3935,14 @@ void frmMain::completeTransfer()
 
     // Show message box
     qApp->beep();
-    m_timerStateQuery.stop();
+    m_communicator->stopUpdatingState();
     m_timerConnection.stop();
 
     QMessageBox::information(this, qApp->applicationDisplayName(), tr("Job done.\nTime elapsed: %1")
                                 .arg(ui->glwVisualizer->spendTime().toString("hh:mm:ss")));
 
-    m_timerStateQuery.setInterval(m_settings->queryStateTime());
     m_timerConnection.start();
-    m_timerStateQuery.start();
+    m_communicator->startUpdatingState(m_settings->queryStateTime());
 }
 
 QString frmMain::getLineInitCommands(int row)

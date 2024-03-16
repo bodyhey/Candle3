@@ -39,6 +39,9 @@ public:
     void reset();
     // disconnect, dispose and delete old connection, connect new connection
     void replaceConnection(Connection *);
+    void stopUpdatingState();
+    void startUpdatingState();
+    void startUpdatingState(int interval);
 private:
     static const int BUFFERLENGTH = 127;
 
@@ -71,6 +74,9 @@ private:
     // Indices
     int m_probeIndex;
 
+    // Timers
+    QTimer m_timerStateQuery;
+
     void onSerialPortReadyRead(QString);
     void setSenderState(SenderState);
     void setDeviceState(DeviceState);
@@ -83,7 +89,8 @@ private:
     bool compareCoordinates(double x, double y, double z);
     double toMetric(double value);
     double toInches(double value);
-signals:
+    void onTimerStateQuery();
+    signals:
     void responseReceived(QString command, int tableIndex, QString response);
     void statusReceived(QString status);
     void senderStateChanged(int state);

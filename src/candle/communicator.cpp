@@ -35,6 +35,10 @@ Communicator::Communicator(
     // this->connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));
 
     setSenderState(SenderStopped);
+
+    // Update state timer
+    connect(&m_timerStateQuery, SIGNAL(timeout()), this, SLOT(onTimerStateQuery()));
+    m_timerStateQuery.start();
 }
 
 SendCommandResult Communicator::sendCommand(QString command, int tableIndex, bool showInConsole, bool wait)
@@ -852,6 +856,24 @@ void Communicator::replaceConnection(Connection *newConnection)
     m_connection = newConnection;
 }
 
+void Communicator::stopUpdatingState()
+{
+    m_timerStateQuery.stop();
+}
+
+void Communicator::startUpdatingState()
+{
+    m_timerStateQuery.start();
+}
+
+void Communicator::startUpdatingState(int interval)
+{
+    if (interval > 0) {
+        m_timerStateQuery.setInterval(interval);
+    }
+    startUpdatingState();
+}
+
 void Communicator::restoreOffsets()
 {
     // Still have pre-reset working position
@@ -948,6 +970,17 @@ bool Communicator::dataIsEnd(QString data) {
     }
 
     return false;
+}
+
+void Communicator::onTimerStateQuery()
+{
+    if (m_connection->isConnected() && m_resetCompleted && m_statusReceived) {
+        m_connection->sendByteArray(QByteArray(1, '?'));
+        m_statusReceived = false;
+    }
+
+    // @todo find some other way to update buffer state
+    //ui->glwVisualizer->setBufferState(QString(tr("Buffer: %1 / %2 / %3")).arg(bufferLength()).arg(m_communicator->m_commands.length()).arg(m_communicator->m_queue.length()));
 }
 
 // detects first line of communication?

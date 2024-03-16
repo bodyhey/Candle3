@@ -5,7 +5,6 @@
 #define FRMMAIN_H
 
 #include <QMainWindow>
-//#include <QtSerialPort/QSerialPort>
 #include <QSettings>
 #include <QTimer>
 #include <QBasicTimer>
@@ -202,7 +201,6 @@ private slots:
     void onFloodStateReceived(bool state);
 
     void onTimerConnection();
-    void onTimerStateQuery();
     void onTableInsertLine();
     void onTableDeleteLines();
     void onTableCellChanged(QModelIndex i1, QModelIndex i2);
@@ -298,7 +296,6 @@ private:
 
     // Timers
     QTimer m_timerConnection;
-    QTimer m_timerStateQuery;
     QBasicTimer m_timerToolAnimation;
     QTime m_startTime;
 
