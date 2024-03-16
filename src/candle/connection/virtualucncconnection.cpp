@@ -125,9 +125,10 @@ void VirtualUCNCConnection::processIncomingData()
         if (pos == -1) {
             return;
         }
+
         QString line = m_incoming.left(pos).trimmed();
-        emit this->lineReceived(line);
         m_incoming.remove(0, pos + 1);
-        qDebug() << QString("'%1','%2'").arg(line, m_incoming);
+
+        emit this->lineReceived(line);
     }
 }

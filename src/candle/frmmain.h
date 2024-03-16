@@ -405,6 +405,8 @@ private:
     static bool actionTextLessThan(const QAction *a1, const QAction *a2);
     static QScriptValue importExtension(QScriptContext *context, QScriptEngine *engine);
 
+    void initializeConnection(ConnectionMode mode);
+
 signals:
     void machinePosChanged(QVector3D pos);
     void workPosChanged(QVector3D pos);

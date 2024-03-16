@@ -10,6 +10,7 @@
 #include <QSettings>
 #include <QGroupBox>
 #include <QVector3D>
+#include "globals.h"
 #include "colorpicker.h"
 
 namespace Ui {
@@ -21,6 +22,7 @@ class frmSettings : public QDialog
 {
     Q_OBJECT
     Q_PROPERTY(QString port READ port WRITE setPort)
+    Q_PROPERTY(ConnectionMode connectionMode READ connectionMode WRITE setConnectionMode)
     Q_PROPERTY(int baud READ baud WRITE setBaud)
     Q_PROPERTY(double toolDiameter READ toolDiameter WRITE setToolDiameter)
     Q_PROPERTY(double toolLength READ toolLength WRITE setToolLength)
@@ -81,6 +83,8 @@ public:
 
     void addCustomSettings(QGroupBox *box);
 
+    ConnectionMode connectionMode();
+    void setConnectionMode(ConnectionMode mode);
     QString port();
     void setPort(QString port);
     int baud();
@@ -208,6 +212,7 @@ private slots:
     void on_radDrawModeRaster_toggled(bool checked);
     void on_radGrayscaleS_toggled(bool checked);
     void on_radGrayscaleZ_toggled(bool checked);
+    void onConnectionModeChanged(int);
 
 private:
     void searchPorts();

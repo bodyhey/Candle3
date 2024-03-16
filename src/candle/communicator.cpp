@@ -836,6 +836,15 @@ void Communicator::reset()
     m_commands.append(ca);
 }
 
+/*
+* @todo make sure we can replace connection at this point!!
+*/
+void Communicator::replaceConnection(Connection *newConnection)
+{
+    m_connection->disconnect();
+    m_connection = newConnection;
+}
+
 void Communicator::restoreOffsets()
 {
     // Still have pre-reset working position

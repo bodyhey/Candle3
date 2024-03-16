@@ -22,6 +22,7 @@ public:
     bool isConnected() override;
     void sendLine(QString) override;
     void closeConnection() override;
+    ConnectionMode getSupportedMode() override { return ConnectionMode::VIRTUAL; }
 
 private:
     QLocalSocket* m_socket;

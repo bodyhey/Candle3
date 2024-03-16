@@ -50,6 +50,7 @@ SOURCES += main.cpp\
     config/persister.cpp \
     config/provider.cpp \
     connection/connection.cpp \
+    connection/connectionmanager.cpp \
     connection/rawtcpconnection.cpp \
     connection/serialconnection.cpp \
     connection/virtualucncconnection.cpp \
@@ -95,6 +96,7 @@ HEADERS  += frmmain.h \
     config/persister.h \
     config/provider.h \
     connection/connection.h \
+    connection/connectionmanager.h \
     connection/rawtcpconnection.h \
     connection/serialconnection.h \
     connection/virtualucncconnection.h \

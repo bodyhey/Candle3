@@ -101,6 +101,11 @@ frmSettings::frmSettings(QWidget *parent) :
             ui->cboLanguage->addItem(l.nativeLanguageName(), l.name().left(2));
         }
     }
+
+    // Connection mode
+    ui->frameConnectionRawSocket->hide();
+    ui->frameConnectionSimulator->hide();
+    connect(ui->cboConnectionMode, SIGNAL(currentIndexChanged(int)), this, SLOT(onConnectionModeChanged(int)));
 }
 
 frmSettings::~frmSettings()
@@ -168,6 +173,16 @@ void frmSettings::addCustomSettings(QGroupBox *box)
     ui->listCategories->item(ui->listCategories->count() - 1)->setData(Qt::UserRole, box->objectName());
 
     m_customSettings.append(box);
+}
+
+ConnectionMode frmSettings::connectionMode()
+{
+    return static_cast<ConnectionMode>(ui->cboConnectionMode->currentIndex());
+}
+
+void frmSettings::setConnectionMode(ConnectionMode mode)
+{
+    ui->cboConnectionMode->setCurrentIndex(mode);
 }
 
 void frmSettings::on_listCategories_currentRowChanged(int currentRow)
@@ -893,4 +908,27 @@ void frmSettings::on_radGrayscaleS_toggled(bool checked)
 void frmSettings::on_radGrayscaleZ_toggled(bool checked)
 {
     ui->radGrayscaleS->setChecked(!checked);
+}
+
+void frmSettings::onConnectionModeChanged(int mod)
+{
+    ui->frameConnectionRawSocket->hide();
+    ui->frameConnectionSerial->hide();
+    ui->frameConnectionSimulator->hide();
+    switch (mod) {
+        // serial
+        case 0:
+            ui->frameConnectionSerial->show();
+            break;
+        // tcp
+        case 1:
+            ui->frameConnectionRawSocket->show();
+            break;
+        // virtual uCNC
+        case 2:
+            ui->frameConnectionSimulator->show();
+            break;
+    }
+//    qDebug() << "Connection mode changed to" << mod;
+    //->frameConnectionRawSocket->setVisible(ui->cboConnectionMode->currentIndex() == 1);
 }

@@ -39,8 +39,7 @@ frmMain::frmMain(QWidget *parent) :
 
     m_settings = new frmSettings(this);
 
-    //m_connection = new SerialConnection(this);
-    m_connection = new VirtualUCNCConnection(this);
+    initializeConnection(ConnectionMode::VIRTUAL);
     m_communicator = new Communicator(m_connection, ui, m_settings, this);
 
     connect(this, SIGNAL(machinePosChanged(QVector3D)), this, SLOT(onMachinePosChanged(QVector3D)));
@@ -356,8 +355,6 @@ frmMain::frmMain(QWidget *parent) :
     m_scriptEngine.globalObject().setProperty("script", sv);
 
     // Signals/slots
-    connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));//, Qt::QueuedConnection);
-    // connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));
     connect(&m_timerConnection, SIGNAL(timeout()), this, SLOT(onTimerConnection()));
     connect(&m_timerStateQuery, SIGNAL(timeout()), this, SLOT(onTimerStateQuery()));
     connect(&m_scriptEngine, &QScriptEngine::signalHandlerException, this, &frmMain::onScriptException);
@@ -2044,9 +2041,10 @@ void frmMain::loadSettings()
 
     emit settingsAboutToLoad();
 
+    m_settings->setConnectionMode(static_cast<ConnectionMode>(set.value("connectionMode").toInt()));
     m_settings->setFontSize(set.value("fontSize", 8).toInt());
-    m_settings->setPort(set.value("port").toString());
-    m_settings->setBaud(set.value("baud").toInt());
+    m_settings->setPort(set.value("serialPort").toString());
+    m_settings->setBaud(set.value("serialBaud").toInt());
     m_settings->setIgnoreErrors(set.value("ignoreErrors", false).toBool());
     m_settings->setAutoLine(set.value("autoLine", true).toBool());
     m_settings->setToolDiameter(set.value("toolDiameter", 3).toDouble());
@@ -2270,8 +2268,9 @@ void frmMain::saveSettings()
 
     emit settingsAboutToSave();
 
-    set.setValue("port", m_settings->port());
-    set.setValue("baud", m_settings->baud());
+    set.setValue("connectionMode", m_settings->connectionMode());
+    set.setValue("serialPort", m_settings->port());
+    set.setValue("serialBaud", m_settings->baud());
     set.setValue("ignoreErrors", m_settings->ignoreErrors());
     set.setValue("autoLine", m_settings->autoLine());
     set.setValue("toolDiameter", m_settings->toolDiameter());
@@ -2431,6 +2430,24 @@ void frmMain::saveSettings()
     emit settingsSaved();
 }
 
+void frmMain::initializeConnection(ConnectionMode mode)
+{
+    switch (mode) {
+        case ConnectionMode::SERIAL:
+            m_connection = new SerialConnection(this);
+            break;
+        case ConnectionMode::RAW_TCP:
+            m_connection = new RawTcpConnection(this);
+            break;
+        case ConnectionMode::VIRTUAL:
+            m_connection = new VirtualUCNCConnection(this);
+            break;
+    }
+
+    connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
+    connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));
+}
+
 void frmMain::applySettings() {
     m_originDrawer->setLineWidth(m_settings->lineWidth());
     m_toolDrawer.setToolDiameter(m_settings->toolDiameter());
@@ -2515,6 +2532,11 @@ void frmMain::applySettings() {
     ui->cboCommand->setMinimumHeight(h);
     ui->cmdClearConsole->setFixedSize(s);
     ui->cmdCommandSend->setFixedSize(s);
+
+    if (m_connection->getSupportedMode() != m_settings->connectionMode()) {
+        initializeConnection(m_settings->connectionMode());
+        m_communicator->replaceConnection(m_connection);
+    }
 }
 
 void frmMain::loadPlugins()

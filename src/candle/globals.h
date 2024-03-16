@@ -104,4 +104,10 @@ struct CommandQueue {
     }
 };
 
+enum ConnectionMode {
+    SERIAL = 0,
+    RAW_TCP = 1,
+    VIRTUAL = 2
+};
+
 #endif // GLOBALS_H

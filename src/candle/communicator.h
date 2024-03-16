@@ -36,6 +36,8 @@ public:
     void clearCommandsAndQueue();
     void clearQueue();
     void reset();
+    // disconnect, dispose and delete old connection, connect new connection
+    void replaceConnection(Connection *);
 private:
     static const int BUFFERLENGTH = 127;
 
