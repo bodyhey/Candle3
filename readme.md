@@ -41,12 +41,35 @@ Usefull links:
 * https://github.com/grblHAL (modular, mostly compatible with GRBL)
 
 Build requirements:
-------------------
+-------------------
 Qt 5.12.12 with MinGW/GCC 64bit compiler
 
 Start with:
 
 git clone --recurse-submodules https://github.com/etet100/G-Pilot-Formerly-Candle
+
+Connection modes:
+-----------------
+
+G-Pilot supports the following connection modes:
+* Serial port
+* Raw TCP, uses exactly the same protocol as serial port mode, no additional handshaking is performed
+* uCNC virtual mode, no real hardware needed
+
+![screenshot](/screenshots/screenshot_connection_modes.png)
+
+Architecture:
+-------------
+
+The original Candle was built in a way that was not transparent and difficult to modify. My version will be built modularly, in a way that is tentatively presented in the diagram below. One of the changes is the complete separation of the interface from the machine control logic. This has the following advantages:
+
+* General transparency and manageability of the code
+* The ability to quickly change the UI, even with the possibility of creating it in a * different technology
+* Easier handling of new communication methods
+* Much easier addition of new features
+* Easier testing
+
+![screenshot](/screenshots/arch1.png)
 
 Downloads:
 ----------
