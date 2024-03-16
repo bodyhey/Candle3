@@ -4,26 +4,22 @@
 to be refactored/replaced by signals and slots
 
 updateControlsState()
-m_fileProcessedCommandIndex
-m_currentModel
+
 m_settings OK
 m_timerStateQuery
-m_deviceStatuses
-m_toolDrawer
-m_codeDrawer
+m_deviceStatuses // dist, move to UI
+m_toolDrawer // emit toolPositionChanged
+m_codeDrawer // getIgnoreZ??
 m_lastDrawnLineIndex
-m_currentDrawer
+m_currentDrawer // code drawer/probe drawer ??
 m_fileCommandIndex
 m_updateParserStatus
-m_connection
 m_storedVars
-m_heightMapMode
 m_taskBarProgress
 m_senderErrorBox
 m_machineBoundsDrawer
 m_absoluteCoordinates
 
-completeTransfer();
 restoreParserState();
 updateOverride(ui->slbFeedOverride, ov.cap(1).toInt(), '\x91');
 parser
@@ -31,8 +27,7 @@ list ???
 jogContinuous();
 storeOffsetsVars(response)
 setupCoordsTextboxes
-updateHeightMapInterpolationDrawer
-sendNextFileCommands
+
 
 ui->slbFeedOverride
 ui->slbSpindleOverride
@@ -42,10 +37,21 @@ ui->cmdFlood
 ui->glwVisualizer
 ui->txtConsole
 ui->chkKeyboardControl
-ui->tblHeightMap
 ui->chkAutoScroll
 ui->tblProgram
+qApp->beep()
+
+// transfering file, streamer class?
+m_fileProcessedCommandIndex
+m_currentModel
+completeTransfer();
 ui->cmdFileAbort
+sendNextFileCommands
+
+// height map
+m_heightMapMode
+updateHeightMapInterpolationDrawer
+ui->tblHeightMap
 
 */
 
@@ -261,7 +267,7 @@ void frmMain::onConnectionLineReceived(QString data)
                     // m_timerToolAnimation.stop();
                     // ui->cmdSpindle->setChecked(false);
                 }
-                ui->cmdFlood->setChecked(q.contains("F"));
+                emit floodStateReceived(q.contains("F"));
 
                 if (!pinState.isEmpty()) pinState.append(" / ");
                 pinState.append(QString(tr("AS: %1")).arg(as.cap(1)));

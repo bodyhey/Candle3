@@ -199,6 +199,7 @@ private slots:
     void onDeviceStateChanged(DeviceState state);
     void onDeviceStateReceived(DeviceState state);
     void onSpindleStateReceived(bool state);
+    void onFloodStateReceived(bool state);
 
     void onTimerConnection();
     void onTimerStateQuery();
@@ -415,6 +416,7 @@ signals:
     // may be emitted together with deviceStateChanged!
     void deviceStateReceived(DeviceState state);
     void spindleStateReceived(bool state);
+    void floodStateReceived(bool state);
 };
 
 typedef QMap<QString, QList<QKeySequence>> ShortcutsMap;

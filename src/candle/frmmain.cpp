@@ -1683,6 +1683,11 @@ void frmMain::onSpindleStateReceived(bool state)
     }
 }
 
+void frmMain::onFloodStateReceived(bool state)
+{
+    ui->cmdFlood->setChecked(state);
+}
+
 void frmMain::onTimerConnection()
 {
     if (!m_connection->isConnected()) {
