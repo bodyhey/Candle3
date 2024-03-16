@@ -13,6 +13,33 @@
 #include "../tables/gcodetablemodel.h"
 
 /**
+* std::string utils
+*/
+
+inline bool is_not_space(int ch)
+{
+    if (ch == 32 || ch == 160 || ch == '\n' || ch == '\r' || ch == '\t') return false;
+    return true;
+}
+
+// trim from start
+static inline std::string &ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), is_not_space));
+    return s;
+}
+
+// trim from end
+static inline std::string &rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), is_not_space).base(), s.end());
+    return s;
+}
+
+// trim from both ends
+static inline std::string &trim(std::string &s) {
+    return ltrim(rtrim(s));
+}
+
+/**
 * Searches the command string for an 'f' and replaces the speed value
 * between the 'f' and the next space with a percentage of that speed.
 * In that way all speed values become a ratio of the provided speed
@@ -31,6 +58,16 @@ QString GcodePreprocessorUtils::overrideSpeed(QString command, double speed, dou
     return command;
 }
 
+QString GcodePreprocessorUtils::trimCommand(QString command)
+{
+    return command.trimmed();
+}
+
+std::string GcodePreprocessorUtils::trimCommand(std::string command)
+{
+    return trim(command);
+}
+
 /**
 * Removes any comments within parentheses or beginning with a semi-colon.
 */
@@ -46,6 +83,29 @@ QString GcodePreprocessorUtils::removeComment(QString command)
     if (command.contains(';')) command.remove(rx2);
 
     return command.trimmed();
+}
+
+/**
+* Removes any comments within parentheses or beginning with a semi-colon.
+*/
+std::string GcodePreprocessorUtils::removeComment(std::string command)
+{
+    size_t pos, pos2;
+
+    // Remove any comment beginning with ';'
+    pos = command.find(";");
+    if (pos != std::string::npos) {
+        command.erase(pos);
+    }
+
+    // Remove any comments within ( parentheses )
+    pos = command.find("(");
+    pos2 = command.find(")");
+    if (pos != std::string::npos && pos2 != std::string::npos && pos2 > pos) {
+        command.erase(pos, pos2 - pos + 1);
+    }
+
+    return trim(command);
 }
 
 /**
@@ -271,6 +331,8 @@ QStringList GcodePreprocessorUtils::splitCommand(const QString &command) {
 
     if (sb.length() > 0) l.append(sb);
 
+    qDebug() << l;
+
 //    QChar c;
 
 //    for (int i = 0; i < command.length(); i++) {
@@ -292,6 +354,31 @@ QStringList GcodePreprocessorUtils::splitCommand(const QString &command) {
     return l;
 }
 
+QStringList GcodePreprocessorUtils::splitCommand(const std::string &command)
+{
+    bool readNumeric = false;
+    char* c_ = (char*)command.c_str();
+    std::string sb;
+    QStringList l;
+
+    while (*c_) {
+        char c = *c_++;
+        if (readNumeric && !isDigit(c) && c != '.') {
+            readNumeric = false;
+            l.append(QString::fromStdString(sb));
+            sb.clear();
+            if (isLetter(c)) sb.append(1, c);
+        } else if (isDigit(c) || c == '.' || c == '-') {
+            sb.append(1, c);
+            readNumeric = true;
+        } else if (isLetter(c)) sb.append(1, c);
+    }
+
+    if (sb.length() > 0) l.append(QString::fromStdString(sb));
+
+    return l;
+}
+
 // TODO: Replace everything that uses this with a loop that loops through
 // the string and creates a hash with all the values.
 double GcodePreprocessorUtils::parseCoord(QStringList argList, char c)
@@ -304,8 +391,9 @@ double GcodePreprocessorUtils::parseCoord(QStringList argList, char c)
 
     foreach (QString t, argList)
     {
-        if (t.length() > 0 && t[0].toUpper() == c) return t.mid(1).toDouble();
+        if (!t.isEmpty() && t[0].toUpper() == c) return t.mid(1).toDouble();
     }
+
     return qQNaN();
 }
 
@@ -526,17 +614,17 @@ QList<QVector3D> GcodePreprocessorUtils::generatePointsAlongArcBDring(PointSegme
     return segments;
 }
 
-bool GcodePreprocessorUtils::isDigit(char c)
+inline bool GcodePreprocessorUtils::isDigit(char c)
 {
     return c > 47 && c < 58;
 }
 
-bool GcodePreprocessorUtils::isLetter(char c)
+inline bool GcodePreprocessorUtils::isLetter(char c)
 {
     return (c > 64 && c < 91) || (c > 96 && c < 123);
 }
 
-char GcodePreprocessorUtils::toUpper(char c)
+inline char GcodePreprocessorUtils::toUpper(char c)
 {
     return (c > 96 && c < 123) ? c - 32 : c;
 }

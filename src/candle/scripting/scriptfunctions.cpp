@@ -46,7 +46,8 @@ void ScriptFunctions::loadFile(QVariantList data)
 {
     QList<QString> l;
     foreach (QVariant v, data) l << v.toString();
-    m_frmMain->loadFile(l);
+    //@todo fixed after refactoring loadFile
+    //m_frmMain->loadFile(l);
 }
 
 bool ScriptFunctions::saveFile()

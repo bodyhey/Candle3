@@ -362,7 +362,7 @@ private:
 
     // Files/models
     void loadFile(QString fileName);
-    void loadFile(QList<QString> data);
+    void loadFile(QList<std::string> data);
     bool saveChanges(bool heightMapMode);
     bool saveProgramToFile(QString fileName, GCodeTableModel *model);
     void loadHeightMap(QString fileName);

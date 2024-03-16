@@ -24,6 +24,7 @@
 #include "ui_frmsettings.h"
 #include "widgets/widgetmimedata.h"
 #include "connection/serialconnection.h"
+#include "connection/rawtcpconnection.h"
 #include "connection/virtualucncconnection.h"
 
 #define FILE_FILTER_TEXT "G-Code files (*.nc *.ncc *.ngc *.tap *.gc *.gcode *.txt)"
@@ -480,7 +481,8 @@ void frmMain::dropEvent(QDropEvent *de)
         } else {
             m_programFileName.clear();
             m_fileChanged = true;
-            loadFile(de->mimeData()->text().split("\n"));
+            //@todo fix after refactoring loadFile to be faster
+            //loadFile(de->mimeData()->text().split("\n"));
         }
     } else {
         if (!saveChanges(true)) return;
@@ -2961,14 +2963,16 @@ void frmMain::loadFile(QString fileName)
     QTextStream textStream(&file);
 
     // Read lines
-    QList<QString> data;
-    while (!textStream.atEnd()) data.append(textStream.readLine());
+    QList<std::string> data;
+    while (!textStream.atEnd()) data.append(textStream.readLine().toStdString());
+
+    qDebug() << "Lines: " << data.count();
 
     // Load lines
     loadFile(data);
 }
 
-void frmMain::loadFile(QList<QString> data)
+void frmMain::loadFile(QList<std::string> data)
 {
     // Reset tables
     clearTable();
@@ -3004,12 +3008,6 @@ void frmMain::loadFile(QList<QString> data)
     // Block parser updates on table changes
     m_programLoading = true;
 
-    QString command;
-    QString stripped;
-    QString trimmed;
-    QList<QString> args;
-    GCodeItem item;
-
     // Prepare model
     m_programModel.data().clear();
     m_programModel.data().reserve(data.count());
@@ -3022,21 +3020,30 @@ void frmMain::loadFile(QList<QString> data)
         progress.setStyleSheet("QProgressBar {text-align: center; qproperty-format: \"\"}");
     }
 
-    while (!data.isEmpty())
+    std::string command;
+    std::string stripped;
+    std::string trimmed;
+    QList<QString> args;
+    GCodeItem item;
+
+    QList<std::string>::iterator dataIterator = data.begin();
+    int remaining = data.count();
+    for (dataIterator = data.begin(); dataIterator != data.end(); ++dataIterator)
     {
-        command = data.takeFirst();
+        command = *dataIterator; // data.takeFirst
 
         // Trim command
-        trimmed = command.trimmed();
 
-        if (!trimmed.isEmpty()) {
+        trimmed = GcodePreprocessorUtils::trimCommand(command);
+
+        if (!trimmed.empty()) {
             // Split command
             stripped = GcodePreprocessorUtils::removeComment(command);
             args = GcodePreprocessorUtils::splitCommand(stripped);
 
             gp.addCommand(args);
 
-            item.command = trimmed;
+            item.command = QString::fromStdString(trimmed);
             item.state = GCodeItem::InQueue;
             item.line = gp.getCommandNumber();
             item.args = args;
@@ -3044,13 +3051,16 @@ void frmMain::loadFile(QList<QString> data)
             m_programModel.data().append(item);
         }
 
-        if (progress.isVisible() && (data.count() % PROGRESSSTEP == 0)) {
-            progress.setValue(progress.maximum() - data.count());
+        remaining--;
+
+        if (progress.isVisible() && (remaining % PROGRESSSTEP == 0)) {
+            progress.setValue(progress.maximum() - remaining);
             qApp->processEvents();
             if (progress.wasCanceled()) break;
         }
     }
     progress.close();
+    qApp->processEvents();
 
     m_programModel.insertRow(m_programModel.rowCount());
 

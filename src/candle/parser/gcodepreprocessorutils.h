@@ -18,7 +18,10 @@ class GcodePreprocessorUtils : public QObject
     Q_OBJECT
 public:
     static QString overrideSpeed(QString command, double speed, double *original = NULL);
+    static QString trimCommand(QString command);
+    static std::string trimCommand(std::string command);
     static QString removeComment(QString command);
+    static std::string removeComment(std::string command);
     static QString parseComment(QString command);
     static QString truncateDecimals(int length, QString command);
     static QString removeAllWhitespace(QString command);
@@ -26,6 +29,7 @@ public:
     static QList<int> parseGCodes(QString command);
     static QList<int> parseMCodes(QString command);
     static QStringList splitCommand(const QString &command);
+    static QStringList splitCommand(const std::string &command);
     static double parseCoord(QStringList argList, char c);
     static QVector3D updatePointWithCommand(const QVector3D &initial, double x, double y, double z, bool absoluteMode);
     static QVector3D updatePointWithCommand(const QStringList &commandArgs, const QVector3D &initial, bool absoluteMode);
