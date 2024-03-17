@@ -8,15 +8,18 @@
 #include <QObject>
 #include "module.h"
 
-class ConfigurationVisualizer : public QObject, ConfigurationModule
+class ConfigurationVisualizer : public ConfigurationModule
 {
     Q_OBJECT;
 
     public:
         ConfigurationVisualizer(QObject *parent);
         ConfigurationVisualizer& operator=(const ConfigurationVisualizer&) { return *this; }
-        void load() override;
-        void save() override;
+
+        QVariant customGet(QString) override;
+        void customSet(QString, QVariant) override;
+        QString getName() override { return "visualizer"; }
+
 };
 
 #endif // CONFIGURATION_VISUALIZER_H

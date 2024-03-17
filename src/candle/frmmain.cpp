@@ -33,6 +33,8 @@ frmMain::frmMain(QWidget *parent) :
     m_configuration(this),
     m_scripting(&m_configuration)
 {
+    m_configuration.load();
+    m_configuration.save();
     // Loading settings
     m_settingsFileName = qApp->applicationDirPath() + "/settings.ini";
     preloadSettings();

@@ -4,46 +4,27 @@
 
 #include "configurationconnection.h"
 
-ConfigurationConnection::ConfigurationConnection(QObject *parent) : QObject(parent)
+const QMap<QString,QVariant> DEFAULTS = {
+    {"queryStateInterval", 100},
+    {"connectionMode", ConnectionMode::VIRTUAL},
+    {"serialPort", ""},
+    {"serialBaud", 115200},
+    {"rawTcpHost", "localhost"},
+    {"rawTcpPort", 8080},
+};
+
+ConfigurationConnection::ConfigurationConnection(QObject *parent) : ConfigurationModule(parent, DEFAULTS)
 {
 }
 
-void ConfigurationConnection::load()
+QVariant ConfigurationConnection::customGet(QString param)
 {
-    
+    if (param == "connectionMode") return (int) m_connectionMode;
+
+    return QVariant::Type::Invalid;
 }
 
-void ConfigurationConnection::save()
+void ConfigurationConnection::customSet(QString param, QVariant)
 {
-    
-}
-
-void ConfigurationConnection::setSerialPort(QString port)
-{
-    m_SerialPort = port;
-}
-
-void ConfigurationConnection::setConnectionMode(ConnectionMode connectionMode)
-{
-    m_connectionMode = connectionMode;
-}
-
-void ConfigurationConnection::setSerialBaud(int baud)
-{
-    m_SerialBaud = baud;
-}
-
-QString ConfigurationConnection::serialPort()
-{
-    return m_SerialPort;
-}
-
-ConnectionMode ConfigurationConnection::connectionMode()
-{
-    return m_connectionMode;
-}
-
-int ConfigurationConnection::serialBaud()
-{
-    return m_SerialBaud;
+    if (param == "connectionMode") m_connectionMode = (ConnectionMode) param.toInt();
 }

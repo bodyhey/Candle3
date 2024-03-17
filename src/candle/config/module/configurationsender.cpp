@@ -4,15 +4,21 @@
 
 #include "configurationsender.h"
 
-ConfigurationSender::ConfigurationSender(QObject *parent) : QObject{parent}
-{}
+const QMap<QString, QVariant> DEFAULTS = {
+    {"test", "ahugu"},
+    {"test2", 421412111},
+};
 
-void ConfigurationSender::load()
+ConfigurationSender::ConfigurationSender(QObject *parent) : ConfigurationModule(parent, DEFAULTS)
 {
-    
 }
 
-void ConfigurationSender::save()
+QVariant ConfigurationSender::customGet(QString)
 {
-    
+
+}
+
+void ConfigurationSender::customSet(QString, QVariant)
+{
+
 }

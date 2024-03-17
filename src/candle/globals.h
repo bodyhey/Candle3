@@ -1,6 +1,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#include <QObject>
 #include <QString>
 
 #define GRBL_LIVE_RAPID_FULL_RATE 0x95
@@ -20,6 +21,8 @@
 #define GRBL_LIVE_SPINDLE_DECREASE_1 0x9D
 
 #define GRBL_LIVE_JOG_CANCEL 0x85
+
+#define CONFIGURATION_FILE "settings_.ini"
 
 enum GRBLCommand {
     Reset,

@@ -4,17 +4,22 @@
 
 #include "configurationvisualizer.h"
 
-ConfigurationVisualizer::ConfigurationVisualizer(QObject *parent) : QObject(parent)
+const QMap<QString, QVariant> DEFAULTS = {
+    {"test", "ahugu"},
+    {"test2", 421412111},
+};
+
+ConfigurationVisualizer::ConfigurationVisualizer(QObject *parent) : ConfigurationModule(parent, DEFAULTS)
 {
     
 }
 
-void ConfigurationVisualizer::load()
+QVariant ConfigurationVisualizer::customGet(QString)
 {
-    
+
 }
 
-void ConfigurationVisualizer::save()
+void ConfigurationVisualizer::customSet(QString, QVariant)
 {
-    
+
 }

@@ -6,32 +6,48 @@
 #define CONFIGURATION_CONNECTION_H
 
 #include <QObject>
+#include <QVariant>
 #include "../../globals.h"
 #include "module.h"
 
-class ConfigurationConnection : public QObject, ConfigurationModule
-{
+class ConfigurationConnection : public ConfigurationModule
+{    
     Q_OBJECT
-    Q_PROPERTY(QString port READ serialPort WRITE setSerialPort)
-    Q_PROPERTY(ConnectionMode connectionMode READ connectionMode WRITE setConnectionMode)
-    Q_PROPERTY(int baud READ serialBaud WRITE setSerialBaud)
+    Q_PROPERTY(QString serialPort MEMBER m_serialPort NOTIFY changed)
+    Q_PROPERTY(QString rawTcpHost MEMBER m_rawTcpHost NOTIFY changed)
+    Q_PROPERTY(int rawTcpPort MEMBER m_rawTcpPort NOTIFY changed)
+    Q_PROPERTY(int queryStateInterval MEMBER m_queryStateInterval NOTIFY changed)
+    Q_PROPERTY(ConnectionMode connectionMode MEMBER m_connectionMode NOTIFY changed)
+    Q_PROPERTY(int serialBaud MEMBER m_serialBaud NOTIFY changed)
 
     public:
         ConfigurationConnection(QObject *parent);
         ConfigurationConnection& operator=(const ConfigurationConnection&) { return *this; }
-        void load() override;
-        void save() override;
 
-    private:
-        QString m_SerialPort;
+        QVariant customGet(QString) override;
+        void customSet(QString, QVariant) override;
+        QString getName() override { return "connection"; }
+
+    private:       
+        // General
+
         ConnectionMode m_connectionMode;
-        int m_SerialBaud;
-        void setSerialPort(QString);
-        void setConnectionMode(ConnectionMode);
-        void setSerialBaud(int);
-        QString serialPort();
-        ConnectionMode connectionMode();
-        int serialBaud();
+        int m_queryStateInterval;
+
+        // Serial
+
+        QString m_serialPort;
+        int m_serialBaud;
+
+        // Raw TCP
+
+        QString m_rawTcpHost;
+        int m_rawTcpPort;
+
+        // Virtual uCNC
+
+    signals:
+        void changed();
 };
 
 #endif // CONFIGURATION_CONNECTION_H

@@ -5,11 +5,24 @@
 #ifndef CONFIGURATION_MODULE_H
 #define CONFIGURATION_MODULE_H
 
-class ConfigurationModule
+#include <QObject>
+#include <QVariant>
+
+class ConfigurationModule : public QObject
 {
+    Q_OBJECT
+
     public:
-        virtual void load() = 0;
-        virtual void save() = 0;
+        ConfigurationModule(QObject *parent, QMap<QString, QVariant> defaults) : QObject(parent), m_defaults(defaults) {}
+
+        QMap<QString, QVariant> getDefaults() { return m_defaults; }
+        virtual QVariant customGet(QString) = 0;
+        virtual void customSet(QString, QVariant) = 0;
+        virtual QString getName() = 0;
+
+    private:
+        QMap<QString, QVariant> m_defaults;
+
 };
 
 #endif // CONFIGURATION_MODULE_H
