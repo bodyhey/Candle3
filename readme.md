@@ -71,6 +71,13 @@ The original Candle was built in a way that was not transparent and difficult to
 
 ![screenshot](/screenshots/arch1.png)
 
+Configurations:
+---------------
+
+Another module begging for a rewrite is the configuration storage mechanism. Of course, it will be detached into a separate module. Settings sets will be wrapped in separate classes. The reading and writing of fields will be partially automated.
+
+![screenshot](/screenshots/arch2.png)
+
 Downloads:
 ----------
 No new releases yet. Sorry!
