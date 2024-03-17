@@ -986,7 +986,15 @@ void Communicator::onTimerStateQuery()
 // detects first line of communication?
 bool Communicator::dataIsReset(QString data)
 {
-    return QRegExp("^GRBL|GCARVIN\\s\\d\\.\\d.").indexIn(data.toUpper()) != -1;
+    // "GRBL" in either case, optionally followed by a number of non-whitespace characters,
+    // followed by a version number in the format x.y.
+    // This matches e.g.
+    // Grbl 1.1h ['$' for help]
+    // GrblHAL 1.1f ['$' or '' for help]
+    // Grbl 1.8 [uCNC v1.8.8 '$' for help]
+    // Gcarvin ?? https://github.com/inventables/gCarvin
+
+    return QRegExp("^(GRBL|GCARVIN)\\s\\d\\.\\d.").indexIn(data.toUpper()) != -1;
 }
 
 bool Communicator::compareCoordinates(double x, double y, double z)
