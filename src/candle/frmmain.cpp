@@ -181,6 +181,7 @@ frmMain::frmMain(QWidget *parent) :
     ui->cmdYMinus->setBackColor(ui->cmdXMinus->backColor());
     ui->cmdYPlus->setBackColor(ui->cmdXMinus->backColor());
 
+    ui->cmdToggleProjection->setParent(ui->glwVisualizer);
     ui->cmdFit->setParent(ui->glwVisualizer);
     ui->cmdIsometric->setParent(ui->glwVisualizer);
     ui->cmdTop->setParent(ui->glwVisualizer);
@@ -966,6 +967,11 @@ void frmMain::on_cmdLeft_clicked()
 void frmMain::on_cmdIsometric_clicked()
 {
     ui->glwVisualizer->setIsometricView();
+}
+
+void frmMain::on_cmdToggleProjection_clicked()
+{
+    ui->glwVisualizer->toggleProjectionType();
 }
 
 void frmMain::on_cmdFit_clicked()
@@ -2021,6 +2027,7 @@ void frmMain::placeVisualizerButtons()
     ui->cmdLeft->move(ui->glwVisualizer->width() - ui->cmdLeft->width() - 8, ui->cmdIsometric->geometry().bottom() + 8);
     ui->cmdFront->move(ui->cmdLeft->geometry().left() - ui->cmdFront->width() - 8, ui->cmdIsometric->geometry().bottom() + 8);
     ui->cmdFit->move(ui->glwVisualizer->width() - ui->cmdFit->width() - 8, ui->cmdLeft->geometry().bottom() + 8);
+    ui->cmdToggleProjection->move(ui->cmdFit->geometry().left() - ui->cmdToggleProjection->width() - 8, ui->cmdLeft->geometry().bottom() + 8);
 }
 
 void frmMain::preloadSettings()
@@ -2057,6 +2064,9 @@ void frmMain::loadSettings()
     m_settings->setMsaa(set.value("msaa", true).toBool());
     m_settings->setVsync(set.value("vsync", false).toBool());
     m_settings->setZBuffer(set.value("zBuffer", false).toBool());
+    m_settings->setFov(set.value("fov", 60).toDouble());
+    m_settings->setNearPlane(set.value("nearPlane", 0.5).toDouble());
+    m_settings->setFarPlane(set.value("farPlane", 10000.0).toDouble());
     m_settings->setSimplify(set.value("simplify", false).toBool());
     m_settings->setSimplifyPrecision(set.value("simplifyPrecision", 0).toDouble());
     m_settings->setGrayscaleSegments(set.value("grayscaleSegments", false).toBool());
@@ -2283,6 +2293,9 @@ void frmMain::saveSettings()
     set.setValue("msaa", m_settings->msaa());
     set.setValue("vsync", m_settings->vsync());
     set.setValue("zBuffer", m_settings->zBuffer());
+    set.setValue("fov", m_settings->fov());
+    set.setValue("nearPlane", m_settings->nearPlane());
+    set.setValue("farPlane", m_settings->farPlane());
     set.setValue("simplify", m_settings->simplify());
     set.setValue("simplifyPrecision", m_settings->simplifyPrecision());
     set.setValue("grayscaleSegments", m_settings->grayscaleSegments());
@@ -2472,6 +2485,9 @@ void frmMain::applySettings() {
     ui->glwVisualizer->setAntialiasing(m_settings->antialiasing());
     ui->glwVisualizer->setMsaa(m_settings->msaa());
     ui->glwVisualizer->setZBuffer(m_settings->zBuffer());
+    ui->glwVisualizer->setFov(m_settings->fov());
+    ui->glwVisualizer->setNearPlane(m_settings->nearPlane());
+    ui->glwVisualizer->setFarPlane(m_settings->farPlane());
     ui->glwVisualizer->setVsync(m_settings->vsync());
     ui->glwVisualizer->setFps(m_settings->fps());
     ui->glwVisualizer->setColorBackground(m_settings->colors("VisualizerBackground"));
@@ -2518,6 +2534,7 @@ void frmMain::applySettings() {
                 .arg(normal.name()).arg(highlight.name())
                 .arg(base.name()));
 
+    ui->cmdToggleProjection->setIcon(QIcon(":/images/toggle.png"));
     ui->cmdFit->setIcon(QIcon(":/images/fit_1.png"));
     ui->cmdIsometric->setIcon(QIcon(":/images/cube.png"));
     ui->cmdFront->setIcon(QIcon(":/images/cubeFront.png"));
@@ -2525,6 +2542,7 @@ void frmMain::applySettings() {
     ui->cmdTop->setIcon(QIcon(":/images/cubeTop.png"));
 
     if (!light) {
+        Util::invertButtonIconColors(ui->cmdToggleProjection);
         Util::invertButtonIconColors(ui->cmdFit);
         Util::invertButtonIconColors(ui->cmdIsometric);
         Util::invertButtonIconColors(ui->cmdFront);

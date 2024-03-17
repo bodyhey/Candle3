@@ -42,5 +42,6 @@
         <file>images/gpilot_256.png</file>
         <file>images/gpilot_icon.png</file>
         <file>images/gpilot.ico</file>
+        <file>images/toggle.png</file>
     </qresource>
 </RCC>
