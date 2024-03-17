@@ -2,14 +2,17 @@
 #define PERSISTER_H
 
 #include <QSettings>
+#include <QObject>
 
-class Persister
+class Persister : public QObject
 {
-public:
-    Persister();
+    Q_OBJECT
 
-private:
-    QSettings* open();
+    public:
+        Persister(QObject *parent);
+        bool open();
+    private:
+        QSettings *m_settings;
 };
 
 #endif // PERSISTER_H

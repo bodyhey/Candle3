@@ -19,6 +19,7 @@
 #include <QGroupBox>
 #include <exception>
 
+#include "connection/connection.h"
 #include "communicator.h"
 #include "globals.h"
 

@@ -1,10 +1,12 @@
 #include "persister.h"
 #include "qguiapplication.h"
 
-Persister::Persister() {
+Persister::Persister(QObject *parent) : QObject(parent)
+{
 }
 
-QSettings *Persister::open()
+bool Persister::open()
 {
-    return new QSettings(qApp->applicationDirPath() + "/settings.ini", QSettings::IniFormat);
+    //return new QSettings(qApp->applicationDirPath() + "/settings.ini", QSettings::IniFormat);
+    return true;
 }

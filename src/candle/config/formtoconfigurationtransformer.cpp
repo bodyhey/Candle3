@@ -7,11 +7,13 @@ FormToConfigurationTransformer::FormToConfigurationTransformer() {
 
 Configuration* FormToConfigurationTransformer::transformToConfiguration(frmSettings *form)
 {
-    Configuration *configuration = new Configuration();
+    // Configuration *configuration = new Configuration(this);
 
-    Ui_frmSettings *ui = form->ui;
+    // Ui_frmSettings *ui = form->ui;
 
-    configuration->setLanguage(ui->cboLanguage->currentText());
+    // configuration->setLanguage(ui->cboLanguage->currentText());
 
-    return configuration;
+    // return configuration;
+
+    return nullptr;
 }

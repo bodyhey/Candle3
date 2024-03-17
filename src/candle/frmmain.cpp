@@ -30,6 +30,7 @@
 frmMain::frmMain(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::frmMain ),
+    m_configuration(this),
     m_scripting(&m_configuration)
 {
     // Loading settings

@@ -1,7 +1,8 @@
 #include "provider.h"
 #include "qguiapplication.h"
 
-Provider::Provider() {
+Provider::Provider(QObject *parent) : QObject(parent)
+{
 }
 
 QSettings *Provider::open()

@@ -2,11 +2,14 @@
 #define PROVIDER_H
 
 #include <QSettings>
+#include <QObject>
 
-class Provider
+class Provider : public QObject
 {
+    Q_OBJECT
+
 public:
-    Provider();
+    Provider(QObject *parent);
 
 private:
     QSettings* open();

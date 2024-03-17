@@ -47,6 +47,9 @@ SOURCES += main.cpp\
     communicator.cpp \
     config/configuration.cpp \
     config/formtoconfigurationtransformer.cpp \
+    config/module/configurationconnection.cpp \
+    config/module/configurationsender.cpp \
+    config/module/configurationvisualizer.cpp \
     config/persister.cpp \
     config/provider.cpp \
     connection/connection.cpp \
@@ -93,6 +96,10 @@ HEADERS  += frmmain.h \
     communicator.h \
     config/configuration.h \
     config/formtoconfigurationtransformer.h \
+    config/module/configurationconnection.h \
+    config/module/configurationsender.h \
+    config/module/configurationvisualizer.h \
+    config/module/module.h \
     config/persister.h \
     config/provider.h \
     connection/connection.h \

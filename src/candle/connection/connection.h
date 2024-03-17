@@ -29,4 +29,8 @@ class Connection : public QObject
         void error(const QString &text);
 };
 
+#include "serialconnection.h"
+#include "rawtcpconnection.h"
+#include "virtualucncconnection.h"
+
 #endif
