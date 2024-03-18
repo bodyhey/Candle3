@@ -5,10 +5,23 @@
 #ifndef CONNECTIONMANAGER_H
 #define CONNECTIONMANAGER_H
 
-class ConnectionManager
+#include <QObject>
+#include "connection.h"
+
+class ConnectionManager : public QObject
 {
+    Q_OBJECT
+
     public:
-        ConnectionManager();
+        ConnectionManager(QObject *parent = nullptr);
+        //~ConnectionManager();
+
+        Connection* getConnection();
+
+    private:
+        Connection* initializeSerialConnection();
+        Connection* initializeVirtualConnection();
+        Connection* initializeRawTcpConnection();
 };
 
 #endif // CONNECTIONMANAGER_H

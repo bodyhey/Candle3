@@ -14,12 +14,12 @@ bool RawTcpConnection::openConnection()
 
 }
 
-void RawTcpConnection::setPortName(QString)
+void RawTcpConnection::setHost(QString)
 {
 
 }
 
-void RawTcpConnection::setBaudRate(int)
+void RawTcpConnection::setPort(int)
 {
 
 }
