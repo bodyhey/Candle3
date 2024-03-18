@@ -94,10 +94,10 @@ private:
         void onTimerStateQuery();
 
     signals:
-    void responseReceived(QString command, int tableIndex, QString response);
-    void statusReceived(QString status);
-    void senderStateChanged(int state);
-    void deviceStateChanged(DeviceState state);
+        void responseReceived(QString command, int tableIndex, QString response);
+        void statusReceived(QString status);
+        void senderStateChanged(int state);
+        void deviceStateChanged(DeviceState state);
 };
 
 #endif // COMMUNICATOR_H
