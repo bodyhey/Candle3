@@ -14,7 +14,8 @@ Communicator::Communicator(
     ) : QObject(parent),
         m_connection(connection),
         m_settings(frmSettings),
-        ui(ui)
+        ui(ui),
+        m_timerStateQuery(this)
 {
     assert(m_connection != nullptr);
     assert(m_settings != nullptr);

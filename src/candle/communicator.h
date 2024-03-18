@@ -89,7 +89,10 @@ private:
     bool compareCoordinates(double x, double y, double z);
     double toMetric(double value);
     double toInches(double value);
-    void onTimerStateQuery();
+
+    private slots:
+        void onTimerStateQuery();
+
     signals:
     void responseReceived(QString command, int tableIndex, QString response);
     void statusReceived(QString status);
