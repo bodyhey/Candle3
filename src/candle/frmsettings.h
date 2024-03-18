@@ -229,6 +229,8 @@ private:
     QList<QColor> m_storedColors;
     QList<QString> m_storedTextBoxes;
     QList<QString> m_storedPlainTexts;
+    bool m_animatingScrollBox;
+    bool m_scrollingManuallyScrollBox;
 
     QIntValidator m_intValidator;
 

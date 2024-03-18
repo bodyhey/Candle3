@@ -9,6 +9,8 @@
 #include <QScrollBar>
 #include <QColorDialog>
 #include <QStyledItemDelegate>
+#include <QPropertyAnimation>
+#include <QEasingCurve>
 #include <QKeySequenceEdit>
 #include <QKeyEvent>
 #include <QLineEdit>
@@ -109,6 +111,9 @@ frmSettings::frmSettings(QWidget *parent) :
     ui->frameConnectionRawSocket->hide();
     ui->frameConnectionSimulator->hide();
     connect(ui->cboConnectionMode, SIGNAL(currentIndexChanged(int)), this, SLOT(onConnectionModeChanged(int)));
+
+    m_animatingScrollBox = false;
+    m_scrollingManuallyScrollBox = false;
 }
 
 frmSettings::~frmSettings()
@@ -190,24 +195,57 @@ void frmSettings::setConnectionMode(ConnectionMode mode)
 
 void frmSettings::on_listCategories_currentRowChanged(int currentRow)
 {
+    static QPropertyAnimation *animation;
+
+    if (animation) {
+        animation->stop();
+        animation = nullptr;
+    }
+
+    if (m_scrollingManuallyScrollBox) {
+        return;
+    }
+
     // Scroll to selected groupbox
     QGroupBox *box = this->findChild<QGroupBox*>(ui->listCategories->item(currentRow)->data(Qt::UserRole).toString());
-    if (box) {
-        ui->scrollSettings->ensureWidgetVisible(box);
+    if (!box) {
+        return;
     }
+
+    QPoint labelPos = box->mapToParent(QPoint(0, 0));
+    animation = new QPropertyAnimation(ui->scrollSettings->verticalScrollBar(), "value");
+    animation->setDuration(200);
+    animation->setEasingCurve(QEasingCurve::OutCubic);
+    animation->setEndValue(labelPos.y() - 5);
+
+
+    QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
+        animation = nullptr;
+        m_animatingScrollBox = false;
+    });
+
+    m_animatingScrollBox = true;
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void frmSettings::onScrollBarValueChanged(int value)
 {
     Q_UNUSED(value)
 
+    if (m_animatingScrollBox) {
+        return;
+    }
+
     // Search for first full visible groupbox
     for (int i = 0; i < ui->listCategories->count(); i++) {
         QGroupBox *box = this->findChild<QGroupBox*>(ui->listCategories->item(i)->data(Qt::UserRole).toString());
         if (box) {
             if (!box->visibleRegion().isEmpty() && box->visibleRegion().boundingRect().y() == 0) {
+                m_scrollingManuallyScrollBox = true; // stop on_listCategories_currentRowChanged animations
                 // Select corresponding item in categories list
                 ui->listCategories->setCurrentRow(i);
+                qApp->processEvents();
+                m_scrollingManuallyScrollBox = false;
                 return;
             }
         }
