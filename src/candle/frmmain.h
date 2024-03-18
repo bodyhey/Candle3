@@ -282,7 +282,7 @@ private:
     // Forms
     frmSettings *m_settings;
     frmAbout m_frmAbout;
-    frmGrblConfigurator m_grblConfigurator;
+    frmGrblConfigurator *m_grblConfigurator;
 
     // Partials
     partMainJog *m_partJog;
@@ -407,15 +407,19 @@ private:
 
     void initializeConnection(ConnectionMode mode);
 
-signals:
-    void machinePosChanged(QVector3D pos);
-    void workPosChanged(QVector3D pos);
-    // emitted after status response received, if state changed
-    void deviceStateChanged(DeviceState state);
-    // may be emitted together with deviceStateChanged!
-    void deviceStateReceived(DeviceState state);
-    void spindleStateReceived(bool state);
-    void floodStateReceived(bool state);
+        void processStatus(QString data);
+        void processCommandResponse(QString data);
+        void unhandledResponse(QString data);
+        void processMessage(QString data);
+    signals:
+        void machinePosChanged(QVector3D pos);
+        void workPosChanged(QVector3D pos);
+        // emitted after status response received, if state changed
+        void deviceStateChanged(DeviceState state);
+        // may be emitted together with deviceStateChanged!
+        void deviceStateReceived(DeviceState state);
+        void spindleStateReceived(bool state);
+        void floodStateReceived(bool state);
 };
 
 typedef QMap<QString, QList<QKeySequence>> ShortcutsMap;

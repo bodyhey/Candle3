@@ -98,6 +98,8 @@ private:
         void statusReceived(QString status);
         void senderStateChanged(int state);
         void deviceStateChanged(DeviceState state);
+        void settingsReceived(QMap<int, double> settings);
+
 };
 
 #endif // COMMUNICATOR_H

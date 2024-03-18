@@ -12,9 +12,10 @@
 #include <CListProperty.h>
 #include <CFontProperty.h>
 
-frmGrblConfigurator::frmGrblConfigurator(QWidget *parent)
+frmGrblConfigurator::frmGrblConfigurator(QWidget *parent, Communicator *communicator)
     : QDialog(parent)
     , ui(new Ui::frmGrblConfigurator)
+    , m_communicator(communicator)
 {
     ui->setupUi(this);
 
@@ -144,9 +145,18 @@ frmGrblConfigurator::frmGrblConfigurator(QWidget *parent)
     ui->editor->add(f2);
 
     ui->editor->adjustToContents();
+
+    connect(m_communicator, SIGNAL(settingsReceived(QMap<int, double>)), this, SLOT(setSettings(QMap<int, double>)));
+    m_communicator->sendCommand("$$");
+
 }
 
 frmGrblConfigurator::~frmGrblConfigurator()
 {
     delete ui;
+}
+
+void frmGrblConfigurator::setSettings(QMap<int, double> settings)
+{
+    qDebug() << "Settings received" << settings;
 }

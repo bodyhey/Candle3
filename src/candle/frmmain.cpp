@@ -648,7 +648,9 @@ void frmMain::on_actServiceSettings_triggered()
 
 void frmMain::on_actServiceConfigureGRBL_triggered()
 {
-    m_grblConfigurator.exec();
+    m_grblConfigurator = new frmGrblConfigurator(this, m_communicator);
+    m_grblConfigurator->exec();
+    m_grblConfigurator->deleteLater();
 }
 
 void frmMain::on_actAbout_triggered()

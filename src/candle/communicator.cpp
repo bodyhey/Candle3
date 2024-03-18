@@ -849,6 +849,7 @@ void Communicator::reset()
     // @todo ui
     // if (m_settings->showUICommands()) ui->txtConsole->appendPlainText(ca.command);
     // ca.consoleIndex = m_settings->showUICommands() ? ui->txtConsole->blockCount() - 1 : -1;
+    ca.consoleIndex = -1;
     ca.tableIndex = -1;
     ca.length = ca.command.length() + 1;
     m_commands.append(ca);
