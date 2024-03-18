@@ -1,4 +1,5 @@
 #include "communicator.h"
+#include "globals.h"
 #include <QVector3D>
 #include <QDebug>
 #include <QCheckBox>
@@ -42,6 +43,9 @@ Communicator::Communicator(
     m_timerStateQuery.start();
 }
 
+/**
+ * @param tableIndex -1 - ui commands, -2 - utility commands, -3 - utility commands
+ */
 SendCommandResult Communicator::sendCommand(QString command, int tableIndex, bool showInConsole, bool wait)
 {
     // tableIndex:
@@ -58,6 +62,7 @@ SendCommandResult Communicator::sendCommand(QString command, int tableIndex, boo
     // Place to queue on 'wait' flag
     if (wait) {
         m_queue.append(CommandQueue(command, tableIndex, showInConsole));
+
         return SendQueue;
     }
 
@@ -71,6 +76,7 @@ SendCommandResult Communicator::sendCommand(QString command, int tableIndex, boo
     // Place to queue if command buffer is full
     if ((bufferLength() + command.length() + 1) > BUFFERLENGTH) {
         m_queue.append(CommandQueue(command, tableIndex, showInConsole));
+
         return SendQueue;
     }
 
@@ -111,7 +117,7 @@ SendCommandResult Communicator::sendCommand(QString command, int tableIndex, boo
 
     // Queue offsets request on G92, G10 commands
     static QRegExp G92("(G92|G10)(?!\\d)");
-    if (uncomment.contains(G92)) sendCommand("$#", -3, showInConsole, true);
+    if (uncomment.contains(G92)) sendCommand("$#", COMMAND_TI_UTIL2, showInConsole, true);
 
     m_connection->sendLine(command);
 
@@ -818,7 +824,7 @@ void Communicator::onSerialPortReadyRead(QString data)
 
 void Communicator::reset()
 {
-    m_connection->sendByteArray(QByteArray(1, (char)24));
+    m_connection->sendByteArray(QByteArray(1, GRBL_LIVE_SOFT_RESET));
 
     setSenderState(SenderStopped);
     setDeviceState(DeviceUnknown);
@@ -882,13 +888,13 @@ void Communicator::restoreOffsets()
                     .arg(ui->txtMPosY->value())
                     .arg(ui->txtMPosZ->value())
                     .arg(m_settings->units() ? "G20" : "G21"),
-                -2, m_settings->showUICommands());
+                COMMAND_TI_UTIL1, m_settings->showUICommands());
 
     sendCommand(QString("%4G92X%1Y%2Z%3").arg(ui->txtWPosX->value())
                     .arg(ui->txtWPosY->value())
                     .arg(ui->txtWPosZ->value())
                     .arg(m_settings->units() ? "G20" : "G21"),
-                -2, m_settings->showUICommands());
+                COMMAND_TI_UTIL1, m_settings->showUICommands());
 }
 
 void Communicator::setSenderState(SenderState state)

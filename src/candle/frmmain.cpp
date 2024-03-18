@@ -816,9 +816,9 @@ void frmMain::on_cmdFileAbort_clicked()
     ui->cmdFileAbort->setEnabled(false);
 
     if ((m_communicator->m_senderState == SenderPaused) || (m_communicator->m_senderState == SenderChangingTool)) {
-        m_communicator->sendCommand("M2", -1, m_settings->showUICommands(), false);
+        m_communicator->sendCommand("M2", COMMAND_TI_UI, m_settings->showUICommands(), false);
     } else {
-        m_communicator->sendCommand("M2", -1, m_settings->showUICommands(), true);
+        m_communicator->sendCommand("M2", COMMAND_TI_UI, m_settings->showUICommands(), true);
     }
 }
 
@@ -873,7 +873,7 @@ void frmMain::on_cmdCommandSend_clicked()
 
     ui->cboCommand->storeText();
     ui->cboCommand->setCurrentText("");
-    m_communicator->sendCommand(command, -1);
+    m_communicator->sendCommand(command, COMMAND_TI_UI);
 }
 
 void frmMain::on_cmdClearConsole_clicked()
@@ -885,14 +885,14 @@ void frmMain::on_cmdHome_clicked()
 {
     m_communicator->m_homing = true;
     m_updateSpindleSpeed = true;
-    m_communicator->sendCommand("$H", -1, m_settings->showUICommands());
+    m_communicator->sendCommand("$H", COMMAND_TI_UI, m_settings->showUICommands());
 }
 
 void frmMain::on_cmdCheck_clicked(bool checked)
 {
     if (checked) {
         storeParserState();
-        m_communicator->sendCommand("$C", -1, m_settings->showUICommands());
+        m_communicator->sendCommand("$C", COMMAND_TI_UI, m_settings->showUICommands());
     } else {
         m_communicator->m_aborting = true;
         grblReset();
@@ -907,7 +907,7 @@ void frmMain::on_cmdReset_clicked()
 void frmMain::on_cmdUnlock_clicked()
 {
     m_updateSpindleSpeed = true;
-    m_communicator->sendCommand("$X", -1, m_settings->showUICommands());
+    m_communicator->sendCommand("$X", COMMAND_TI_UI, m_settings->showUICommands());
 }
 
 void frmMain::on_cmdHold_clicked(bool checked)
@@ -917,7 +917,7 @@ void frmMain::on_cmdHold_clicked(bool checked)
 
 void frmMain::on_cmdSleep_clicked()
 {
-    m_communicator->sendCommand("$SLP", -1, m_settings->showUICommands());
+    m_communicator->sendCommand("$SLP", COMMAND_TI_UI, m_settings->showUICommands());
 }
 
 void frmMain::on_cmdDoor_clicked()
@@ -948,7 +948,7 @@ void frmMain::on_cmdSpindle_clicked(bool checked)
     if (ui->cmdHold->isChecked()) {
         m_connection->sendByteArray(QByteArray(1, char(0x9e)));
     } else {
-        m_communicator->sendCommand(checked ? QString("M3 S%1").arg(ui->slbSpindle->value()) : "M5", -1, m_settings->showUICommands());
+        m_communicator->sendCommand(checked ? QString("M3 S%1").arg(ui->slbSpindle->value()) : "M5", COMMAND_TI_UI, m_settings->showUICommands());
     }
 }
 
@@ -1031,9 +1031,9 @@ void frmMain::on_chkKeyboardControl_toggled(bool checked)
 
     // Store/restore coordinate system
     if (checked) {
-        m_communicator->sendCommand("$G", -2, m_settings->showUICommands());
+        m_communicator->sendCommand("$G", COMMAND_TI_UTIL1, m_settings->showUICommands());
     } else {
-        if (m_absoluteCoordinates) m_communicator->sendCommand("G90", -1, m_settings->showUICommands());
+        if (m_absoluteCoordinates) m_communicator->sendCommand("G90", COMMAND_TI_UI, m_settings->showUICommands());
     }
 
     if ((m_communicator->m_senderState != SenderTransferring) && (m_communicator->m_senderState != SenderStopping))
@@ -1697,14 +1697,18 @@ void frmMain::onTimerConnection()
 {
     if (!m_connection->isConnected()) {
         openPort();
-    } else if (!m_communicator->m_homing/* && !m_reseting*/ && !ui->cmdHold->isChecked() && m_communicator->m_queue.length() == 0) {
+
+        return;
+    }
+
+    if (!m_communicator->m_homing/* && !m_reseting*/ && !ui->cmdHold->isChecked() && m_communicator->m_queue.length() == 0) {
         if (m_updateSpindleSpeed) {
             m_updateSpindleSpeed = false;
-            m_communicator->sendCommand(QString("S%1").arg(ui->slbSpindle->value()), -2, m_settings->showUICommands());
+            m_communicator->sendCommand(QString("S%1").arg(ui->slbSpindle->value()), COMMAND_TI_UTIL1, m_settings->showUICommands());
         }
         if (m_updateParserStatus) {
             m_updateParserStatus = false;
-            m_communicator->sendCommand("$G", -3, false);
+            m_communicator->sendCommand("$G", COMMAND_TI_UTIL2, false);
         }
     }
 }
@@ -1886,9 +1890,9 @@ void frmMain::onActSendFromLineTriggered()
         if (res == QMessageBox::Cancel) return;
         else if (res == QMessageBox::Ok) {
             // foreach (QString command, commands) {
-            //     sendCommand(command, -1, m_settings->showUICommands());
+            //     sendCommand(command, COMMAND_TI_UI, m_settings->showUICommands());
             // }
-            m_communicator->sendCommands(commands, -1);
+            m_communicator->sendCommands(commands, COMMAND_TI_UI);
         }
     }
 
@@ -1959,7 +1963,7 @@ void frmMain::onCboCommandReturnPressed()
     if (command.isEmpty()) return;
 
     ui->cboCommand->setCurrentText("");
-    m_communicator->sendCommand(command, -1);
+    m_communicator->sendCommand(command, COMMAND_TI_UI);
 }
 
 void frmMain::onDockTopLevelChanged(bool topLevel)

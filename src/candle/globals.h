@@ -4,6 +4,11 @@
 #include <QObject>
 #include <QString>
 
+#define GRBL_LIVE_SOFT_RESET 0x18
+#define GRBL_LIVE_STATUS_REPORT '?'
+#define GRBL_LIVE_CYCLE_START '~'
+#define GRBL_LIVE_FEED_HOLD '!'
+
 #define GRBL_LIVE_RAPID_FULL_RATE 0x95
 #define GRBL_LIVE_RAPID_HALF_RATE 0x96
 #define GRBL_LIVE_RAPID_QUARTER_RATE 0x97
@@ -23,6 +28,16 @@
 #define GRBL_LIVE_JOG_CANCEL 0x85
 
 #define CONFIGURATION_FILE "settings_.ini"
+
+// tableIndex:
+// 0...n - commands from g-code program
+// -1 - ui commands
+// -2 - utility commands
+// -3 - utility commands
+#define COMMAND_TI_MIN_GCODE 0
+#define COMMAND_TI_UI -1
+#define COMMAND_TI_UTIL1 -2
+#define COMMAND_TI_UTIL2 -3
 
 enum GRBLCommand {
     Reset,
