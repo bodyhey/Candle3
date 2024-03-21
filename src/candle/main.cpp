@@ -64,9 +64,9 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    QApplication a(argc, argv);
-    a.setApplicationDisplayName("G-Pilot");
-    a.setApplicationVersion("1.3");
+    QApplication app(argc, argv);
+    app.setApplicationDisplayName("G-Pilot");
+    app.setOrganizationName("G-Pilot");
 
 #ifdef GLES
     QFontDatabase::addApplicationFont(":/fonts/Ubuntu-R.ttf");
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
     glf.setSamples(8);
     QGLFormat::setDefaultFormat(glf);
 
-    QSettings set(a.applicationDirPath() + "/settings.ini", QSettings::IniFormat);
+    QSettings set(app.applicationDirPath() + "/settings.ini", QSettings::IniFormat);
     set.setIniCodec("UTF-8");
     QString loc = set.value("language", "en").toString();
 
@@ -85,14 +85,14 @@ int main(int argc, char *argv[])
 
     if(QFile::exists(translationFileName)) {
         QTranslator* translator = new QTranslator();
-        if (translator->load(translationFileName)) a.installTranslator(translator); else delete translator;
+        if (translator->load(translationFileName)) app.installTranslator(translator); else delete translator;
     }
 
     QString baseTranslationFileName = translationsFolder + "qt_" + loc + ".qm";
 
     if(QFile::exists(translationFileName)) {
         QTranslator* baseTranslator = new QTranslator();
-        if (baseTranslator->load(baseTranslationFileName)) a.installTranslator(baseTranslator); else delete baseTranslator;
+        if (baseTranslator->load(baseTranslationFileName)) app.installTranslator(baseTranslator); else delete baseTranslator;
     }
 
 #ifdef UNIX
@@ -120,10 +120,10 @@ int main(int argc, char *argv[])
                     QDialog {border: 1px solid palette(mid);}");
 #endif
 
-    a.setStyleSheet(a.styleSheet() + "QWidget {font-size: 8pt}");
+    app.setStyleSheet(app.styleSheet() + "QWidget {font-size: 8pt}");
 
     frmMain w;
     w.show();
 
-    return a.exec();
+    return app.exec();
 }
