@@ -39,9 +39,15 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="lblInfo">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="styleSheet">
-        <string notr="true">color: red;</string>
+        <string notr="true"/>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
        </property>
        <property name="text">
         <string>Loading...</string>
@@ -87,8 +93,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>402</x>
+     <y>500</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -103,8 +109,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>470</x>
+     <y>500</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -112,5 +118,24 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>frmGrblConfigurator</receiver>
+   <slot>onUpdateClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>35</x>
+     <y>493</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>2</x>
+     <y>486</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>onUpdateClicked()</slot>
+ </slots>
 </ui>
