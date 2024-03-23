@@ -1,3 +1,7 @@
+// This file is a part of "G-Pilot (formerly Candle)" application.
+// Copyright 2015-2021 Hayrullin Denis Ravilevich
+// Copyright 2024 BTS
+
 #ifndef CONTROL_H
 #define CONTROL_H
 
@@ -37,7 +41,7 @@ private slots:
     void onCmdHoldClicked(bool checked);
     void onCmdSleepClicked();
     void onCmdDoorClicked();
-    void onFloodClicked(bool checked);
+    void onCmdFloodClicked(bool checked);
 
 };
 

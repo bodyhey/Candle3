@@ -10,8 +10,8 @@
 
 class SerialConnection : public Connection
 {
-    Q_PROPERTY(QString portName READ portName WRITE setPortName CONSTANT);
-    Q_PROPERTY(int baudRate READ baudRate WRITE setBaudRate CONSTANT);
+    Q_PROPERTY(QString portName READ portName WRITE setPortName);
+    Q_PROPERTY(int baudRate READ baudRate WRITE setBaudRate);
     Q_OBJECT
 
     public:

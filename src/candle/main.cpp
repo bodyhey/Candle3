@@ -11,10 +11,6 @@
 #include <QFontDatabase>
 #include <QMessageBox>
 
-#include "parser/gcodepreprocessorutils.h"
-#include "parser/gcodeparser.h"
-#include "parser/gcodeviewparse.h"
-
 #include "frmmain.h"
 
 void messageHandler(QtMsgType type, const QMessageLogContext &, const QString & msg)

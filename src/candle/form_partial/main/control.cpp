@@ -60,6 +60,6 @@ void partMainControl::onCmdDoorClicked()
 {
 }
 
-void partMainControl::onFloodClicked(bool checked)
+void partMainControl::onCmdFloodClicked(bool checked)
 {
 }

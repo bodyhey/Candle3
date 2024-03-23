@@ -62,7 +62,7 @@ void partMainJog::onCmdZPlusPressed()
     emit this->jog(ZPlus);
 }
 
-void partMainJog::onCmdZPlusRleased()
+void partMainJog::onCmdZPlusReleased()
 {
     emit this->stop();
     emit this->command(GRBLCommand::JogStop);

@@ -29,7 +29,7 @@ private slots:
     void onCmdXMinusPressed();
     void onCmdXMinusReleased();
     void onCmdZPlusPressed();
-    void onCmdZPlusRleased();
+    void onCmdZPlusReleased();
     void onCmdZMinusPressed();
     void onCmdZMinusReleased();
     void onCmdStopClicked();
