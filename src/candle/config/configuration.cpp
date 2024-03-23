@@ -8,6 +8,7 @@ Configuration::Configuration(QObject *parent)
     m_sender(parent),
     m_connection(parent),
     m_visualizer(parent),
+    m_console(parent),
     m_persister(parent),
     m_provider(parent)
 {
@@ -29,6 +30,7 @@ void Configuration::save()
     saveModule(m_connection);
     saveModule(m_visualizer);
     saveModule(m_sender);
+    saveModule(m_console);
     m_persister.close();
 }
 
@@ -97,6 +99,7 @@ void Configuration::load()
     loadModule(m_connection);
     loadModule(m_visualizer);
     loadModule(m_sender);
+    loadModule(m_console);
     m_provider.close();
 }
 
@@ -105,6 +108,7 @@ void Configuration::setDefaults()
     setModuleDefaults(m_connection);
     setModuleDefaults(m_visualizer);
     setModuleDefaults(m_sender);
+    setModuleDefaults(m_console);
 
     emit defaultConfigurationLoaded();
 }
@@ -148,5 +152,10 @@ const ConfigurationVisualizer& Configuration::visualizerModule()
 const ConfigurationSender& Configuration::senderModule()
 {
     return m_sender;
+}
+
+const ConfigurationConsole &Configuration::consoleModule()
+{
+    return m_console;
 }
 

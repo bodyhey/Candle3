@@ -16,13 +16,15 @@ class ConfigurationModule : public QObject
         ConfigurationModule(QObject *parent, QMap<QString, QVariant> defaults) : QObject(parent), m_defaults(defaults) {}
 
         QMap<QString, QVariant> getDefaults() { return m_defaults; }
-        virtual QVariant customGet(QString) = 0;
-        virtual void customSet(QString, QVariant) = 0;
+        virtual QVariant customGet(QString) { return QVariant(); };
+        virtual void customSet(QString, QVariant) {};
         virtual QString getName() = 0;
 
     private:
         QMap<QString, QVariant> m_defaults;
 
+    signals:
+        void changed();
 };
 
 #endif // CONFIGURATION_MODULE_H

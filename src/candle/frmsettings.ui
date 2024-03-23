@@ -1505,6 +1505,13 @@ QSplitter::handle:horizontal {
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QCheckBox" name="chkDarkMode">
+             <property name="text">
+              <string>Dark mode (black background, white letters)</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>

@@ -26,6 +26,7 @@
 #include "connection/connection.h"
 #include "form_partial/main/jog.h"
 #include "form_partial/main/state.h"
+#include "form_partial/main/console.h"
 #include "frmgrblconfigurator.h"
 #include "parser/gcodeviewparse.h"
 
@@ -202,6 +203,8 @@ private slots:
     void onSpindleStateReceived(bool state);
     void onFloodStateReceived(bool state);
 
+    void onConsoleCommand(QString command);
+
     void onTimerConnection();
     void onTableInsertLine();
     void onTableDeleteLines();
@@ -287,6 +290,7 @@ private:
     // Partials
     partMainJog *m_partJog;
     partMainState *m_partState;
+    partMainConsole *m_partConsole;
 
     // Filenames
     QString m_settingsFileName;

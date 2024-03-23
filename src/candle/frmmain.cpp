@@ -148,6 +148,13 @@ frmMain::frmMain(QWidget *parent) :
     this->m_partState = new partMainState(this);
     static_cast<QVBoxLayout*>(ui->grpState->layout())->insertWidget(0, this->m_partState);
 
+    this->m_partConsole = new partMainConsole(this);
+    connect(this->m_partConsole, SIGNAL(newCommand(QString)), this, SLOT(onConsoleCommand(QString)));
+
+    QLayout *layout = ui->dockConsole->widget()->layout();
+    layout->takeAt(0);
+    layout->addWidget(this->m_partConsole);
+
     // Drag&drop placeholders
     ui->fraDropDevice->setVisible(false);
     ui->fraDropModification->setVisible(false);
@@ -1693,6 +1700,11 @@ void frmMain::onSpindleStateReceived(bool state)
 void frmMain::onFloodStateReceived(bool state)
 {
     ui->cmdFlood->setChecked(state);
+}
+
+void frmMain::onConsoleCommand(QString command)
+{
+
 }
 
 void frmMain::onTimerConnection()

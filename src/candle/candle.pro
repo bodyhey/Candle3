@@ -48,15 +48,16 @@ SOURCES += main.cpp\
     config/configuration.cpp \
     config/formtoconfigurationtransformer.cpp \
     config/module/configurationconnection.cpp \
+    config/module/configurationconsole.cpp \
     config/module/configurationsender.cpp \
     config/module/configurationvisualizer.cpp \
-    config/persister.cpp \
     config/provider.cpp \
     connection/connection.cpp \
     connection/connectionmanager.cpp \
     connection/rawtcpconnection.cpp \
     connection/serialconnection.cpp \
     connection/virtualucncconnection.cpp \
+    form_partial/main/console.cpp \
     form_partial/main/control.cpp \
     form_partial/main/jog.cpp \
     form_partial/main/override.cpp \
@@ -97,6 +98,7 @@ HEADERS  += frmmain.h \
     config/configuration.h \
     config/formtoconfigurationtransformer.h \
     config/module/configurationconnection.h \
+    config/module/configurationconsole.h \
     config/module/configurationsender.h \
     config/module/configurationvisualizer.h \
     config/module/module.h \
@@ -107,6 +109,7 @@ HEADERS  += frmmain.h \
     connection/rawtcpconnection.h \
     connection/serialconnection.h \
     connection/virtualucncconnection.h \
+    form_partial/main/console.h \
     form_partial/main/control.h \
     form_partial/main/jog.h \
     form_partial/main/override.h \
@@ -144,6 +147,7 @@ HEADERS  += frmmain.h \
     widgets/dropwidget.h
 
 FORMS    += frmmain.ui \
+    form_partial/main/console.ui \
     form_partial/main/control.ui \
     form_partial/main/jog.ui \
     form_partial/main/override.ui \

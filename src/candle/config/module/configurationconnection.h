@@ -21,7 +21,7 @@ class ConfigurationConnection : public ConfigurationModule
     Q_PROPERTY(int serialBaud MEMBER m_serialBaud NOTIFY changed)
 
     public:
-        ConfigurationConnection(QObject *parent);
+        explicit ConfigurationConnection(QObject *parent);
         ConfigurationConnection& operator=(const ConfigurationConnection&) { return *this; }
 
         QVariant customGet(QString) override;
@@ -44,10 +44,6 @@ class ConfigurationConnection : public ConfigurationModule
         QString m_rawTcpHost;
         int m_rawTcpPort;
 
-        // Virtual uCNC
-
-    signals:
-        void changed();
 };
 
 #endif // CONFIGURATION_CONNECTION_H

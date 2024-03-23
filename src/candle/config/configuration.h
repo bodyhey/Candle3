@@ -5,9 +5,10 @@
 #include "module/configurationconnection.h"
 #include "module/configurationvisualizer.h"
 #include "module/configurationsender.h"
+#include "module/configurationconsole.h"
 #include "../globals.h"
-#include "persister.h"
-#include "provider.h"
+#include "persistence/ini/inipersister.h"
+#include "persistence/ini/iniprovider.h"
 #include <QObject>
 
 class Configuration : public QObject
@@ -16,6 +17,7 @@ class Configuration : public QObject
     Q_PROPERTY(ConfigurationConnection connection READ connectionModule CONSTANT);
     Q_PROPERTY(ConfigurationVisualizer visualizer READ visualizerModule CONSTANT);
     Q_PROPERTY(ConfigurationSender sender READ senderModule CONSTANT);
+    Q_PROPERTY(ConfigurationConsole console READ consoleModule CONSTANT);
 
     public:
         Configuration(QObject *parent);
@@ -32,14 +34,16 @@ class Configuration : public QObject
         ConfigurationSender m_sender;
         ConfigurationConnection m_connection;
         ConfigurationVisualizer m_visualizer;
+        ConfigurationConsole m_console;
 
         const ConfigurationConnection& connectionModule();
         const ConfigurationVisualizer& visualizerModule();
         const ConfigurationSender& senderModule();
+        const ConfigurationConsole& consoleModule();
 
         // Read/Write
-        Persister m_persister;
-        Provider m_provider;
+        IniPersister m_persister;
+        IniProvider m_provider;
 
         void saveModule(ConfigurationModule&);
         void setModuleDefaults(ConfigurationModule&);
