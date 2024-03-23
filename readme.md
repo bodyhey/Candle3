@@ -91,9 +91,20 @@ For GRBL v1.1 firmware
 
 (for GRBL v0.9 and below use Candle 1.0)
 
-"G-Pilot" main window:
+How it looks:
+-------------
 
-![screenshot](/screenshots/screenshot_main.png)
+Main window:
+
+![main](/screenshots/screenshot_main.png)
+
+Settings:
+
+![settings](/screenshots/screenshot_settings.png)
+
+GRBL configurator:
+
+![grbl configurator](/screenshots/screenshot_grbl_configurator.png)
 
 Technical information for my use:
 ---------------------------------

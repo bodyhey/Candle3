@@ -3,11 +3,12 @@
 #include <CPropertyEditor.h>
 #include <CPropertyHeader.h>
 #include <CStringProperty.h>
-#include <CBoolProperty.h>
+#include <CSwitchProperty.h>
 #include <CIntegerProperty.h>
 #include <CColorProperty.h>
 #include <CPropertyHeader.h>
-#include <CBoolProperty.h>
+#include <CSwitchProperty.h>
+#include <CSwitchProperty.h>
 #include <CDoubleProperty.h>
 #include <CListProperty.h>
 #include <CFontProperty.h>
@@ -30,6 +31,7 @@ enum Group {
 
 struct ConfigGroup {
     Group group;
+    QColor color;
     QByteArray name;
     std::vector<ConfigEntry> entries;
     CPropertyHeader* header = nullptr;
@@ -40,9 +42,91 @@ struct ConfigGroup {
 #define REPORT_BUFFER_SETTING_ID 151
 #define REPORT_BUFFER_SETTING_BIT 2
 
+// $0;Step pulse, microseconds; Shortest pulses for stepper drivers to recognize.
+// $1;Step idle delay, milliseconds; Delay before disabling steppers after motion.
+// $2;Step port invert, mask; Inverts the step pulse signa.
+// $3;Direction port invert, mask; Inverts the direction signal for each axis.
+// $4;Step enable invert, boolean; Inverts the stepper enable pin.
+// $5;Limit pins invert, boolean; Inverts the limit pins.
+// $6;Probe pin invert, boolean; Inverts the probe pin.
+// $10;Status report, mask; Determines real-time data reported back.
+// $11;Junction deviation, mm; Determines cornering speed.
+// $12;Arc tolerance, mm; Accuracy of arc tracing.
+// $13;Report inches, boolean; Toggles between mm and inches for reporting.
+// $20;Soft limits, boolean; Prevents machine from traveling beyond limits.
+// $21;Hard limits, boolean; Uses physical switches to prevent over-travel6.
+// $22;Homing cycle, boolean; Locates a consistent position on startup.
+// $23;Homing dir invert, mask; Inverts homing direction for certain axes.
+// $24;Homing feed, mm/min; Feed rate for precise homing location.
+// $25;Homing seek, mm/min; Search rate for homing cycle.
+// $26;Homing debounce, milliseconds; Debounce delay for homing switches.
+// $27;Homing pull-off, mm; Distance to pull off from limit switches after homing.
+// $30;Max spindle speed, RPM; Sets max spindle speed for 5V PWM output.
+// $31;Min spindle speed, RPM; Sets min spindle speed for 0.02V PWM output.
+// $32;Laser mode, boolean; Enables continuous motion for laser cutting.
+// $100, $101, $102;[X,Y,Z] steps/mm; Steps per mm for each axis.
+// $110, $111, $112;[X,Y,Z] Max rate, mm/min; Max rate each axis can move.
+// $120, $121, $122;[X,Y,Z] Acceleration, mm/sec^2; Acceleration parameters for each axis.
+// $130, $131, $132;[X,Y,Z] Max travel, mm; Max travel for each axis
+
+// const std::vector<QColor> COLORS = {
+//     QColor(255, 204, 204), // Różowy pastelowy
+//     QColor(204, 255, 204), // Zielony pastelowy
+//     QColor(204, 204, 255), // Niebieski pastelowy
+//     QColor(255, 255, 204), // Żółty pastelowy
+//     QColor(255, 204, 255), // Fioletowy pastelowy
+//     QColor(204, 255, 255), // Turkusowy pastelowy
+//     QColor(255, 230, 204), // Pomarańczowy pastelowy
+//     QColor(240, 240, 240), // Szary pastelowy
+//     QColor(255, 221, 204), // Brzoskwiniowy pastelowy
+//     QColor(204, 255, 230), // Jasnozielony pastelowy
+//     QColor(230, 204, 255), // Jasnofioletowy pastelowy
+//     QColor(255, 204, 230), // Liliowy pastelowy
+//     QColor(204, 255, 255), // Błękitny pastelowy
+//     QColor(255, 204, 230), // Różowy pastelowy
+//     QColor(255, 255, 255), // Biały
+// };
+
+// const std::vector<QColor> COLORS = {
+//     QColor(255, 187, 187), // Ciemnoróżowy
+//     QColor(187, 255, 187), // Ciemnozielony
+//     QColor(187, 187, 255), // Ciemnoniebieski
+//     QColor(255, 255, 187), // Jasnożółty
+//     QColor(255, 187, 255), // Ciemnofioletowy
+//     QColor(187, 255, 255), // Jasnoturkusowy
+//     QColor(255, 212, 187), // Brązowy
+//     QColor(224, 224, 224), // Jasnoszary
+//     QColor(255, 204, 187), // Brzoskwiniowy
+//     QColor(187, 255, 212), // Jasnyzielony
+//     QColor(212, 187, 255), // Jasnyfioletowy
+//     QColor(255, 187, 212), // Bladyliliowy
+//     QColor(187, 255, 255), // Jasnybłękitny
+//     QColor(255, 187, 212), // Jasnoróżowy
+//     QColor(245, 245, 245), // Jasnobiały
+// };
+
+const std::vector<QColor> COLORS = {
+    QColor(204, 102, 102), // Ciemnoczerwony
+    QColor(102, 204, 102), // Ciemnozielony
+    QColor(102, 102, 204), // Ciemnoniebieski
+    QColor(204, 204, 102), // Jasnożółty
+    QColor(204, 102, 204), // Ciemnofioletowy
+    QColor(102, 204, 204), // Jasnoturkusowy
+    QColor(204, 153, 102), // Brązowy
+    QColor(192, 152, 192), // Jasnoszary (zm.)
+    QColor(102, 204, 153), // Jasnyzielony
+    QColor(153, 102, 204), // Jasnyfioletowy
+    QColor(204, 153, 102), // Brzoskwiniowy
+    QColor(204, 102, 153), // Bladyliliowy
+    QColor(102, 204, 204), // Jasnybłękitny
+    QColor(204, 102, 153), // Jasnoczerwony
+    QColor(230, 230, 230), // Bardzo jasnoszary
+};
+
 std::vector<ConfigGroup> ConfigMap = {
     {
         General,
+        COLORS[0],
         "General settings",
         {
             {0, "Step pulse, microseconds", "Shortest pulses for stepper drivers to recognize.", Integer},
@@ -57,6 +141,7 @@ std::vector<ConfigGroup> ConfigMap = {
     },
     {
         Reporting,
+        COLORS[1],
         "Reporting machine status",
         {
              {REPORT_POS_TYPE_SETTING_ID , "Report position type", "Enabled `MPos`, Disabled `WPos`", Boolean},
@@ -66,6 +151,7 @@ std::vector<ConfigGroup> ConfigMap = {
     },
     {
         Quality,
+        COLORS[2],
         "Quality",
         {
             {11, "Junction deviation, mm", "Determines cornering speed.", Double},
@@ -74,6 +160,7 @@ std::vector<ConfigGroup> ConfigMap = {
     },
     {
         Limits,
+        COLORS[3],
         "Limits",
         {
              {20, "Soft limits", "Prevents machine from traveling beyond limits.", Boolean},
@@ -82,6 +169,7 @@ std::vector<ConfigGroup> ConfigMap = {
     },
     {
         StepInvert,
+        COLORS[4],
         "Step signal polarity",
         {
             {2, "%1 step signal invert", "Inverts the step pulse signal.", Axes},
@@ -89,6 +177,7 @@ std::vector<ConfigGroup> ConfigMap = {
     },
     {
         DirInvert,
+        COLORS[5],
         "Dir signal polarity",
         {
             {3, "%1 direction signal invert", "Inverts the direction signal for each axis.", Axes},
@@ -96,6 +185,7 @@ std::vector<ConfigGroup> ConfigMap = {
     },
     {
         Homing,
+        COLORS[6],
         "Homing settings",
         {
             {22, "Homing cycle", "Locates a consistent position on startup.", Boolean},
@@ -107,6 +197,7 @@ std::vector<ConfigGroup> ConfigMap = {
     },
     {
         HomingInvert,
+        COLORS[7],
         "Homing signal polarity",
         {
             {23, "%1 homing dir invert", "Inverts homing direction for certain axes.", Axes},
@@ -114,6 +205,7 @@ std::vector<ConfigGroup> ConfigMap = {
     },
     {
         Spindle,
+        COLORS[8],
         "Spindle",
         {
             {30, "Max spindle speed, RPM", "Sets max spindle speed for 5V PWM output.", Integer},
@@ -122,6 +214,7 @@ std::vector<ConfigGroup> ConfigMap = {
     },
     {
         Steps,
+        COLORS[9],
         "Steps per mm",
         {
             {100, "X steps/mm", "Steps per mm for X axis.", Integer},
@@ -131,6 +224,7 @@ std::vector<ConfigGroup> ConfigMap = {
     },
     {
         MaxRate,
+        COLORS[10],
         "Max axis rate",
         {
             {110, "X max rate, mm/min", "Max rate X axis can move.", Integer},
@@ -140,6 +234,7 @@ std::vector<ConfigGroup> ConfigMap = {
     },
     {
         Acceleration,
+        COLORS[11],
         "Max axis acceleration",
         {
             {120, "X acceleration, mm/sec^2", "Acceleration parameters for X axis.", Integer},
@@ -149,6 +244,7 @@ std::vector<ConfigGroup> ConfigMap = {
     },
     {
         MaxTravel,
+        COLORS[12],
         "Max axis travel",
         {
             {130, "X max travel, mm", "Max travel for X axis.", Integer},
@@ -168,10 +264,14 @@ frmGrblConfigurator::frmGrblConfigurator(QWidget *parent, Communicator *communic
 
     for (std::vector<ConfigGroup>::iterator it = ConfigMap.begin(); it != ConfigMap.end(); it++) {
         ConfigGroup &group = *it;
-        CPropertyHeader* header = new CPropertyHeader(group.name, group.name);
 
-        group.header = header;
+        CPropertyHeader* header = new CPropertyHeader(group.name, group.name);
         ui->editor->add(header);
+        header->setBackground(group.color);
+
+        QFont font = header->font(0);
+        font.setBold(true);
+        header->setFont(0, font);
 
         for (std::vector<ConfigEntry>::iterator it2 = group.entries.begin(); it2 != group.entries.end(); it2++) {
             ConfigEntry &entry = *it2;
@@ -190,6 +290,8 @@ frmGrblConfigurator::frmGrblConfigurator(QWidget *parent, Communicator *communic
                     break;
             }
         }
+
+        group.header = header;
     }
 
     ui->editor->adjustToContents();
@@ -238,13 +340,13 @@ void frmGrblConfigurator::setSettings(QMap<int, double> settings)
             switch (entry.type) {
                 case Axes:
                     properties = entry.properties;
-                    (dynamic_cast<CBoolProperty*>(properties[X]))->setValue(((int) setting) & 1);
-                    (dynamic_cast<CBoolProperty*>(properties[Y]))->setValue(((int) setting) & 2);
-                    (dynamic_cast<CBoolProperty*>(properties[Z]))->setValue(((int) setting) & 4);
+                    (dynamic_cast<CSwitchProperty*>(properties[X]))->setValue(((int) setting) & 1);
+                    (dynamic_cast<CSwitchProperty*>(properties[Y]))->setValue(((int) setting) & 2);
+                    (dynamic_cast<CSwitchProperty*>(properties[Z]))->setValue(((int) setting) & 4);
                     break;
                 case Boolean:
-                    CBoolProperty *boolProperty;
-                    boolProperty = dynamic_cast<CBoolProperty*>(entry.property);
+                    CSwitchProperty *boolProperty;
+                    boolProperty = dynamic_cast<CSwitchProperty*>(entry.property);
                     boolProperty->setValue((bool) setting);
                     break;
                 case Integer:
@@ -327,7 +429,7 @@ CBaseProperty* frmGrblConfigurator::addAxisProperty(CPropertyHeader *header, Con
         {Z, "Z"},
     };
 
-    CBoolProperty* property = new CBoolProperty(
+    CSwitchProperty* property = new CSwitchProperty(
         header,
         QByteArray::fromStdString(QString("#%1_%2").arg(entry.index).arg(axis).toStdString()),
         entry.description.arg(axisNames[axis]),
@@ -391,7 +493,7 @@ void frmGrblConfigurator::findParametersToBeSaved(QMap<int, double> settings)
 
 CBaseProperty* frmGrblConfigurator::addBooleanProperty(CPropertyHeader *header, ConfigEntry entry)
 {
-    CBoolProperty* property = new CBoolProperty(
+    CSwitchProperty* property = new CSwitchProperty(
         header,
         QByteArray::fromStdString(QString("#%1").arg(entry.index).toStdString()),
         entry.description,
