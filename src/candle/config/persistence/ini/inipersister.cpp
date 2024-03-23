@@ -1,13 +1,13 @@
-#include "persister.h"
-#include "../globals.h"
+#include "inipersister.h"
+#include "../../../globals.h"
 #include "qguiapplication.h"
 
-Persister::Persister(QObject *parent) : QObject(parent)
+IniPersister::IniPersister(QObject *parent) : Persister(parent)
 {
     m_settings = nullptr;
 }
 
-bool Persister::open()
+bool IniPersister::open()
 {
     if (m_settings) {
         return false;
@@ -16,7 +16,7 @@ bool Persister::open()
     m_settings = new QSettings(qApp->applicationDirPath() + "/" + CONFIGURATION_FILE, QSettings::IniFormat);
 }
 
-void Persister::close()
+void IniPersister::close()
 {
     if (!m_settings) {
         return;
@@ -26,7 +26,7 @@ void Persister::close()
     m_settings = nullptr;
 }
 
-bool Persister::setInt(const QString group, const QString key, const int value)
+bool IniPersister::setInt(const QString group, const QString key, const int value)
 {
     if (!m_settings) {
         return false;
@@ -36,7 +36,7 @@ bool Persister::setInt(const QString group, const QString key, const int value)
     return true;
 }
 
-bool Persister::setString(const QString group, const QString key, const QString value)
+bool IniPersister::setString(const QString group, const QString key, const QString value)
 {
     if (!m_settings) {
         return false;
@@ -46,7 +46,7 @@ bool Persister::setString(const QString group, const QString key, const QString 
     return true;
 }
 
-bool Persister::setFloat(const QString group, const QString key, const float value)
+bool IniPersister::setFloat(const QString group, const QString key, const float value)
 {
     if (!m_settings) {
         return false;

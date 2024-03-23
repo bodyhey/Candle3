@@ -51,7 +51,10 @@ SOURCES += main.cpp\
     config/module/configurationconsole.cpp \
     config/module/configurationsender.cpp \
     config/module/configurationvisualizer.cpp \
-    config/provider.cpp \
+    config/persistence/ini/inipersister.cpp \
+    config/persistence/ini/iniprovider.cpp \
+    config/persistence/xml/xmlpersister.cpp \
+    config/persistence/xml/xmlprovider.cpp \
     connection/connection.cpp \
     connection/connectionmanager.cpp \
     connection/rawtcpconnection.cpp \
@@ -102,7 +105,15 @@ HEADERS  += frmmain.h \
     config/module/configurationsender.h \
     config/module/configurationvisualizer.h \
     config/module/module.h \
+    config/persistence/ini/inipersister.h \
+    config/persistence/ini/iniprovider.h \
+    config/persistence/persister.h \
+    config/persistence/provider.h \
+    config/persistence/xml/xmlpersister.h \
+    config/persistence/xml/xmlprovider.h \
     config/persister.h \
+    config/persister.h \
+    config/provider.h \
     config/provider.h \
     connection/connection.h \
     connection/connectionmanager.h \
