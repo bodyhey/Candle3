@@ -17,7 +17,6 @@ class ConfigurationSender : public ConfigurationModule
     public:
         explicit ConfigurationSender(QObject *parent = nullptr);
         ConfigurationSender& operator=(const ConfigurationSender&) { return *this; }
-
         QVariant customGet(QString) override;
         void customSet(QString, QVariant) override;
         QString getName() override { return "sender"; }

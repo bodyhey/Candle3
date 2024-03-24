@@ -46,7 +46,6 @@ SUBDIRS += vendor/PropertyEditor
 SOURCES += main.cpp\
     communicator.cpp \
     config/configuration.cpp \
-    config/formtoconfigurationtransformer.cpp \
     config/module/configurationconnection.cpp \
     config/module/configurationconsole.cpp \
     config/module/configurationsender.cpp \
@@ -99,22 +98,17 @@ SOURCES += main.cpp\
 HEADERS  += frmmain.h \
     communicator.h \
     config/configuration.h \
-    config/formtoconfigurationtransformer.h \
     config/module/configurationconnection.h \
     config/module/configurationconsole.h \
     config/module/configurationsender.h \
     config/module/configurationvisualizer.h \
     config/module/module.h \
-    config/persistence/ini/inipersister.h \
-    config/persistence/ini/iniprovider.h \
     config/persistence/persister.h \
     config/persistence/provider.h \
+    config/persistence/ini/inipersister.h \
+    config/persistence/ini/iniprovider.h \
     config/persistence/xml/xmlpersister.h \
     config/persistence/xml/xmlprovider.h \
-    config/persister.h \
-    config/persister.h \
-    config/provider.h \
-    config/provider.h \
     connection/connection.h \
     connection/connectionmanager.h \
     connection/rawtcpconnection.h \

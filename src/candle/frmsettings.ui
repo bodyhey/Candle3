@@ -84,9 +84,9 @@ QSplitter::handle:horizontal {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
+         <y>-2079</y>
          <width>642</width>
-         <height>2497</height>
+         <height>2627</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1075,100 +1075,96 @@ QSplitter::handle:horizontal {
              </item>
             </layout>
            </item>
-
-            <item row="5" column="0">
-              <layout class="QHBoxLayout" name="horizontalLayout_1">
-                <item>
-                <widget class="QLabel" name="label_1">
-                  <property name="text">
-                  <string>FOV:</string>
-                  </property>
-                </widget>
-                </item>
-                <item>
-                  <widget class="QDoubleSpinBox" name="txtFov">
-                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                    </property>
-                    <property name="buttonSymbols">
-                    <enum>QAbstractSpinBox::NoButtons</enum>
-                    </property>
-                    <property name="decimals">
-                    <number>2</number>
-                    </property>
-                    <property name="minimum">
-                    <double>20</double>
-                    </property>
-                    <property name="maximum">
-                    <double>179</double>
-                    </property>
-                  </widget>
-                </item>
-             </layout>
-            </item>
-            <item row="5" column="3">
-              <layout class="QHBoxLayout" name="horizontalLayout_5">
-                <item>
-                <widget class="QLabel" name="label_8">
-                  <property name="text">
-                  <string>Near plane:</string>
-                  </property>
-                </widget>
-                </item>
-                <item>
-                  <widget class="QDoubleSpinBox" name="txtNear">
-                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                    </property>
-                    <property name="buttonSymbols">
-                    <enum>QAbstractSpinBox::NoButtons</enum>
-                    </property>
-                    <property name="decimals">
-                    <number>2</number>
-                    </property>
-                    <property name="minimum">
-                    <double>0.01</double>
-                    </property>
-                    <property name="maximum">
-                    <double>100000.00</double>
-                    </property>
-                  </widget>
-                </item>
-              </layout>
-            </item>
-            <item row="5" column="4">
-              <layout class="QHBoxLayout" name="horizontalLayout_6">
-                <item>
-                <widget class="QLabel" name="label_9">
-                  <property name="text">
-                  <string>Far plane:</string>
-                  </property>
-                </widget>
-                </item>
-                <item>
-                  <widget class="QDoubleSpinBox" name="txtFar">
-                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                    </property>
-                    <property name="buttonSymbols">
-                    <enum>QAbstractSpinBox::NoButtons</enum>
-                    </property>
-                    <property name="decimals">
-                    <number>2</number>
-                    </property>
-                    <property name="minimum">
-                    <double>0.01</double>
-                    </property>
-                    <property name="maximum">
-                    <double>100000.00</double>
-                    </property>
-                  </widget>
-                </item>
-              </layout>
-            </item>
-
-
-
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_1">
+             <item>
+              <widget class="QLabel" name="label_1">
+               <property name="text">
+                <string>FOV:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="txtFov">
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+               <property name="buttonSymbols">
+                <enum>QAbstractSpinBox::NoButtons</enum>
+               </property>
+               <property name="decimals">
+                <number>2</number>
+               </property>
+               <property name="minimum">
+                <double>20.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>179.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <item>
+              <widget class="QLabel" name="label_8">
+               <property name="text">
+                <string>Near plane:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="txtNear">
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+               <property name="buttonSymbols">
+                <enum>QAbstractSpinBox::NoButtons</enum>
+               </property>
+               <property name="decimals">
+                <number>2</number>
+               </property>
+               <property name="minimum">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100000.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <item>
+              <widget class="QLabel" name="label_9">
+               <property name="text">
+                <string>Far plane:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="txtFar">
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+               <property name="buttonSymbols">
+                <enum>QAbstractSpinBox::NoButtons</enum>
+               </property>
+               <property name="decimals">
+                <number>2</number>
+               </property>
+               <property name="minimum">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100000.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
           </layout>
          </widget>
         </item>
@@ -1485,28 +1481,28 @@ QSplitter::handle:horizontal {
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
-            <widget class="QCheckBox" name="chkShowProgramCommands">
+            <widget class="QCheckBox" name="chkConsoleShowProgramCommands">
              <property name="text">
               <string>Show G-code program commands</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="chkShowUICommands">
+            <widget class="QCheckBox" name="chkConsoleShowUICommands">
              <property name="text">
               <string>Show UI commands</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="chkAutocompletion">
+            <widget class="QCheckBox" name="chkConsoleAutocompletion">
              <property name="text">
               <string>Command auto-completion</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="chkDarkMode">
+            <widget class="QCheckBox" name="chkConsoleDarkMode">
              <property name="text">
               <string>Dark mode (black background, white letters)</string>
              </property>
@@ -1710,9 +1706,9 @@ QSplitter::handle:horizontal {
   <tabstop>txtToolAngle</tabstop>
   <tabstop>txtToolDiameter</tabstop>
   <tabstop>txtToolLength</tabstop>
-  <tabstop>chkShowProgramCommands</tabstop>
-  <tabstop>chkShowUICommands</tabstop>
-  <tabstop>chkAutocompletion</tabstop>
+  <tabstop>chkConsoleShowProgramCommands</tabstop>
+  <tabstop>chkConsoleShowUICommands</tabstop>
+  <tabstop>chkConsoleAutocompletion</tabstop>
   <tabstop>cmdDefaults</tabstop>
   <tabstop>cmdOK</tabstop>
   <tabstop>cmdCancel</tabstop>

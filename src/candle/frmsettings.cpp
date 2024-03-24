@@ -67,9 +67,10 @@ public:
     }
 };
 
-frmSettings::frmSettings(QWidget *parent) :
+frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
     QDialog(parent),
-    ui(new Ui::frmSettings)
+    ui(new Ui::frmSettings),
+    m_configuration(configuration)
 {
     ui->setupUi(this);
 
@@ -383,22 +384,22 @@ void frmSettings::setArcDegreeMode(bool arcDegreeMode)
 
 bool frmSettings::showProgramCommands()
 {
-    return ui->chkShowProgramCommands->isChecked();
+    return ui->chkConsoleShowProgramCommands->isChecked();
 }
 
 void frmSettings::setShowProgramCommands(bool showAllCommands)
 {
-    ui->chkShowProgramCommands->setChecked(showAllCommands);
+    ui->chkConsoleShowProgramCommands->setChecked(showAllCommands);
 }
 
 bool frmSettings::showUICommands()
 {
-    return ui->chkShowUICommands->isChecked();
+    return m_configuration.consoleModule().showUiCommands();
 }
 
 void frmSettings::setShowUICommands(bool showUICommands)
 {
-    ui->chkShowUICommands->setChecked(showUICommands);
+    ui->chkConsoleShowUICommands->setChecked(showUICommands);
 }
 
 int frmSettings::spindleSpeedMin()
@@ -523,12 +524,12 @@ void frmSettings::setMsaa(bool msaa)
 
 bool frmSettings::autoCompletion()
 {
-    return ui->chkAutocompletion->isChecked();
+    return ui->chkConsoleAutocompletion->isChecked();
 }
 
 void frmSettings::setAutoCompletion(bool autoCompletion)
 {
-    ui->chkAutocompletion->setChecked(autoCompletion);
+    ui->chkConsoleAutocompletion->setChecked(autoCompletion);
 }
 
 int frmSettings::units()
@@ -997,6 +998,4 @@ void frmSettings::onConnectionModeChanged(int mod)
             ui->frameConnectionSimulator->show();
             break;
     }
-//    qDebug() << "Connection mode changed to" << mod;
-    //->frameConnectionRawSocket->setVisible(ui->cboConnectionMode->currentIndex() == 1);
 }

@@ -6,7 +6,6 @@
 #include "module/configurationvisualizer.h"
 #include "module/configurationsender.h"
 #include "module/configurationconsole.h"
-#include "../globals.h"
 #include "persistence/ini/inipersister.h"
 #include "persistence/ini/iniprovider.h"
 #include <QObject>
@@ -26,7 +25,10 @@ class Configuration : public QObject
         void save();
         void load();
         void setDefaults();
-
+        const ConfigurationConnection& connectionModule();
+        const ConfigurationVisualizer& visualizerModule();
+        const ConfigurationSender& senderModule();
+        const ConfigurationConsole& consoleModule();
     private:
         QString m_language;
 
@@ -35,11 +37,6 @@ class Configuration : public QObject
         ConfigurationConnection m_connection;
         ConfigurationVisualizer m_visualizer;
         ConfigurationConsole m_console;
-
-        const ConfigurationConnection& connectionModule();
-        const ConfigurationVisualizer& visualizerModule();
-        const ConfigurationSender& senderModule();
-        const ConfigurationConsole& consoleModule();
 
         // Read/Write
         IniPersister m_persister;

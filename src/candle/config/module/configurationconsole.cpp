@@ -5,10 +5,10 @@
 #include "configurationconsole.h"
 
 const QMap<QString, QVariant> DEFAULTS = {
-    {"showProgramCommands", true},
+    {"showProgramCommands", false},
     {"showUiCommands", true},
     {"commandAutoCompletion", true},
-    {"darkBackgroundMode", true},
+    {"darkBackgroundMode", false},
 };
 
 ConfigurationConsole::ConfigurationConsole(QObject *parent) : ConfigurationModule(parent, DEFAULTS)

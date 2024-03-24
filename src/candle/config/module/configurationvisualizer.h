@@ -15,7 +15,6 @@ class ConfigurationVisualizer : public ConfigurationModule
     public:
         ConfigurationVisualizer(QObject *parent);
         ConfigurationVisualizer& operator=(const ConfigurationVisualizer&) { return *this; }
-
         QVariant customGet(QString) override;
         void customSet(QString, QVariant) override;
         QString getName() override { return "visualizer"; }

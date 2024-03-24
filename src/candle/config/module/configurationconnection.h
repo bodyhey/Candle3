@@ -11,7 +11,7 @@
 #include "module.h"
 
 class ConfigurationConnection : public ConfigurationModule
-{    
+{
     Q_OBJECT
     Q_PROPERTY(QString serialPort MEMBER m_serialPort NOTIFY changed)
     Q_PROPERTY(QString rawTcpHost MEMBER m_rawTcpHost NOTIFY changed)
@@ -23,7 +23,6 @@ class ConfigurationConnection : public ConfigurationModule
     public:
         explicit ConfigurationConnection(QObject *parent);
         ConfigurationConnection& operator=(const ConfigurationConnection&) { return *this; }
-
         QVariant customGet(QString) override;
         void customSet(QString, QVariant) override;
         QString getName() override { return "connection"; }

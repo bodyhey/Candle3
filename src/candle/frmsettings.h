@@ -12,6 +12,7 @@
 #include <QVector3D>
 #include "globals.h"
 #include "colorpicker.h"
+#include "config/configuration.h"
 
 namespace Ui {
 class frmSettings;
@@ -32,8 +33,8 @@ class frmSettings : public QDialog
     Q_PROPERTY(double arcLength READ arcLength WRITE setArcLength)
     Q_PROPERTY(double arcDegree READ arcDegree WRITE setArcDegree)
     Q_PROPERTY(bool arcDegreeMode READ arcDegreeMode WRITE setArcDegreeMode)
-    Q_PROPERTY(bool showProgramCommands READ showProgramCommands WRITE setShowProgramCommands)
-    Q_PROPERTY(bool showUICommands READ showUICommands WRITE setShowUICommands)
+    // Q_PROPERTY(bool showProgramCommands READ showProgramCommands WRITE setShowProgramCommands)
+    // Q_PROPERTY(bool showUICommands READ showUICommands WRITE setShowUICommands)
     Q_PROPERTY(int spindleSpeedMin READ spindleSpeedMin WRITE setSpindleSpeedMin)
     Q_PROPERTY(int spindleSpeedMax READ spindleSpeedMax WRITE setSpindleSpeedMax)
     Q_PROPERTY(int laserPowerMin READ laserPowerMin WRITE setLaserPowerMin)
@@ -44,7 +45,7 @@ class frmSettings : public QDialog
     Q_PROPERTY(int fps READ fps WRITE setFps)
     Q_PROPERTY(bool vsync READ vsync WRITE setVsync)
     Q_PROPERTY(bool msaa READ msaa WRITE setMsaa)
-    Q_PROPERTY(bool autoCompletion READ autoCompletion WRITE setAutoCompletion)
+    // Q_PROPERTY(bool autoCompletion READ autoCompletion WRITE setAutoCompletion)
     Q_PROPERTY(bool simplify READ simplify WRITE setSimplify)
     Q_PROPERTY(double simplifyPrecision READ simplifyPrecision WRITE setSimplifyPrecision)
     Q_PROPERTY(int fontSize READ fontSize WRITE setFontSize)
@@ -73,7 +74,7 @@ class frmSettings : public QDialog
     Q_PROPERTY(bool softLimitsEnabled READ softLimitsEnabled WRITE setSoftLimitsEnabled)
 
 public:
-    explicit frmSettings(QWidget *parent = 0);
+    explicit frmSettings(QWidget *parent, Configuration &configuration);
     ~frmSettings();
 
     Ui::frmSettings *ui;
@@ -112,10 +113,6 @@ public:
     double arcPrecision();
     bool arcDegreeMode();
     void setArcDegreeMode(bool arcDegreeMode);
-    bool showProgramCommands();
-    void setShowProgramCommands(bool showProgramCommands);
-    bool showUICommands();
-    void setShowUICommands(bool showUICommands);
     int spindleSpeedMin();
     void setSpindleSpeedMin(int speed);
     int spindleSpeedMax();
@@ -140,8 +137,6 @@ public:
     void setVsync(bool value);
     bool msaa();
     void setMsaa(bool msaa);
-    bool autoCompletion();
-    void setAutoCompletion(bool autoCompletion);
     int units();
     void setUnits(int units);
     bool simplify();
@@ -192,7 +187,9 @@ public:
     void setReferenceYPlus(bool value);
     bool referenceZPlus();
     void setReferenceZPlus(bool value);
-    
+    // @TODO remove!
+    bool showUICommands();
+
     void setUsePauseCommands(bool);
     void setBeforePauseCommands(QString);
     void setAfterPauseCommands(QString);
@@ -221,6 +218,14 @@ private slots:
     void onConnectionModeChanged(int);
 
 private:
+    Configuration &m_configuration;
+
+    bool autoCompletion();
+    void setAutoCompletion(bool autoCompletion);
+    bool showProgramCommands();
+    void setShowProgramCommands(bool showProgramCommands);
+    void setShowUICommands(bool showUICommands);
+
     void searchPorts();
 
     QList<double> m_storedValues;
