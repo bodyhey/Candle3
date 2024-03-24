@@ -48,6 +48,8 @@ frmMain::frmMain(QWidget *parent) :
     connect(this, SIGNAL(workPosChanged(QVector3D)), this, SLOT(onWorkPosChanged(QVector3D)));
     connect(this, SIGNAL(deviceStateReceived(DeviceState)), this, SLOT(onDeviceStateReceived(DeviceState)));
     connect(this, SIGNAL(deviceStateChanged(DeviceState)), this, SLOT(onDeviceStateChanged(DeviceState)));
+    connect(this, SIGNAL(spindleStateReceived(bool)), this, SLOT(onSpindleStateReceived(bool)));
+    connect(this, SIGNAL(floodStateReceived(bool)), this, SLOT(onFloodStateReceived(bool)));
 
     // Initializing variables
     m_deviceStatuses[DeviceUnknown] = "Unknown";
