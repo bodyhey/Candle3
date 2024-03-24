@@ -6,6 +6,7 @@
 #define CONSOLE_H
 
 #include <QWidget>
+#include "../../config/module/configurationconsole.h"
 
 namespace Ui {
 class partMainConsole;
@@ -16,9 +17,10 @@ class partMainConsole : public QWidget
     Q_OBJECT
 
     public:
-        explicit partMainConsole(QWidget *parent = nullptr);
+        explicit partMainConsole(QWidget *parent, const ConfigurationConsole &configurationConsole);
         ~partMainConsole();
-        void append(QString text);
+        int append(QString text);
+        void appendResponse(int consoleIndex, QString command, QString response);
         void clear();
 
     signals:
@@ -27,9 +29,19 @@ class partMainConsole : public QWidget
 
     private:
         Ui::partMainConsole *ui;
+        const ConfigurationConsole &m_configurationConsole;
         void send();
+        bool isScrolledToEnd();
+        void scrollToEnd();
 
-    private slots:
+        int m_commandIndex = 0; // won't be cleared even if the console is cleared
+        // int m_minIndex = 0;
+        // int m_maxIndex = 0;
+
+
+        void applyDarkBackgroundMode();
+
+        private slots:
         void onClearClicked();
         void onSendClicked();
 };

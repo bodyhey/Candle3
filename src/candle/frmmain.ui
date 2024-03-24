@@ -458,8 +458,8 @@ QLabel[overrided=&quot;false&quot;] {
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>209</width>
-          <height>710</height>
+          <width>223</width>
+          <height>815</height>
          </rect>
         </property>
         <property name="acceptDrops">
@@ -2418,31 +2418,31 @@ QLabel[overrided=&quot;false&quot;] {
          </widget>
         </item>
         <item>
-               <widget class="QToolButton" name="cmdToggleProjection">
-                <property name="minimumSize">
-                 <size>
-                  <width>30</width>
-                  <height>30</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Toggle perspective/orthographic projection</string>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="images.qrc">
-                  <normaloff>:/images/toggle.png</normaloff>:/images/toggle.png</iconset>
-                </property>
-                <property name="iconSize">
-                 <size>
-                  <width>20</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
+         <widget class="QToolButton" name="cmdToggleProjection">
+          <property name="minimumSize">
+           <size>
+            <width>30</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Toggle perspective/orthographic projection</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="images.qrc">
+            <normaloff>:/images/toggle.png</normaloff>:/images/toggle.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QToolButton" name="cmdTop">
           <property name="minimumSize">
@@ -2593,81 +2593,7 @@ QLabel[overrided=&quot;false&quot;] {
          <number>0</number>
         </property>
         <item>
-         <widget class="QPlainTextEdit" name="txtConsole">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>1</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>9</pointsize>
-           </font>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,0,0">
-          <item>
-           <widget class="ComboBox" name="cboCommand">
-            <property name="styleSheet">
-             <string notr="true">padding-top: 3;
-padding-bottom: 3;
-padding-right: 8;</string>
-            </property>
-            <property name="editable">
-             <bool>true</bool>
-            </property>
-            <property name="maxVisibleItems">
-             <number>5</number>
-            </property>
-            <property name="maxCount">
-             <number>10</number>
-            </property>
-            <property name="insertPolicy">
-             <enum>QComboBox::InsertAtTop</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="cmdCommandSend">
-            <property name="toolTip">
-             <string>Send command</string>
-            </property>
-            <property name="icon">
-             <iconset resource="images.qrc">
-              <normaloff>:/images/send_1.png</normaloff>:/images/send_1.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>16</width>
-              <height>16</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="cmdClearConsole">
-            <property name="toolTip">
-             <string>Clear console</string>
-            </property>
-            <property name="icon">
-             <iconset resource="images.qrc">
-              <normaloff>:/images/erase_1.png</normaloff>:/images/erase_1.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>16</width>
-              <height>16</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <layout class="QHBoxLayout" name="horizontalLayout_7" stretch=""/>
         </item>
        </layout>
       </widget>
@@ -2764,7 +2690,7 @@ padding-right: 8;</string>
           <x>0</x>
           <y>0</y>
           <width>272</width>
-          <height>130</height>
+          <height>183</height>
          </rect>
         </property>
         <property name="acceptDrops">
@@ -3181,11 +3107,6 @@ padding-right: 8;</string>
    <extends>QWidget</extends>
    <header location="global">widgets/glwidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">widgets/combobox.h</header>
   </customwidget>
   <customwidget>
    <class>ComboBoxKey</class>
@@ -3642,22 +3563,6 @@ padding-right: 8;</string>
     <hint type="destinationlabel">
      <x>1391</x>
      <y>994</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actConsoleClear</sender>
-   <signal>triggered()</signal>
-   <receiver>cmdClearConsole</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1449</x>
-     <y>1247</y>
     </hint>
    </hints>
   </connection>

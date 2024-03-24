@@ -39,7 +39,7 @@ frmMain::frmMain(QWidget *parent) :
     m_settingsFileName = qApp->applicationDirPath() + "/settings.ini";
     preloadSettings();
 
-    m_settings = new frmSettings(this);
+    m_settings = new frmSettings(this, m_configuration);
 
     initializeConnection(ConnectionMode::VIRTUAL);
     m_communicator = new Communicator(m_connection, ui, m_settings, this);
@@ -50,6 +50,7 @@ frmMain::frmMain(QWidget *parent) :
     connect(this, SIGNAL(deviceStateChanged(DeviceState)), this, SLOT(onDeviceStateChanged(DeviceState)));
     connect(this, SIGNAL(spindleStateReceived(bool)), this, SLOT(onSpindleStateReceived(bool)));
     connect(this, SIGNAL(floodStateReceived(bool)), this, SLOT(onFloodStateReceived(bool)));
+    connect(this, SIGNAL(CommandResponseReceived(CommandAttributes, QString)), this, SLOT(onCommandResponseReceived(CommandAttributes, QString)));
 
     // Initializing variables
     m_deviceStatuses[DeviceUnknown] = "Unknown";
@@ -147,11 +148,11 @@ frmMain::frmMain(QWidget *parent) :
     static_cast<QVBoxLayout*>(ui->grpControl->layout())->insertWidget(0, widgetControl);
     widgetControl->show();
 
-    this->m_partState = new partMainState(this);
+    m_partState = new partMainState(this);
     static_cast<QVBoxLayout*>(ui->grpState->layout())->insertWidget(0, this->m_partState);
 
-    this->m_partConsole = new partMainConsole(this);
-    connect(this->m_partConsole, SIGNAL(newCommand(QString)), this, SLOT(onConsoleCommand(QString)));
+    m_partConsole = new partMainConsole(this, m_configuration.consoleModule());
+    connect(this->m_partConsole, SIGNAL(newCommand(QString)), this, SLOT(onConsoleNewCommand(QString)));
 
     QLayout *layout = ui->dockConsole->widget()->layout();
     layout->takeAt(0);
@@ -169,9 +170,6 @@ frmMain::frmMain(QWidget *parent) :
     }
 #endif
 
-#ifndef UNIX
-    ui->cboCommand->setStyleSheet("QComboBox {padding: 2;} QComboBox::drop-down {width: 0; border-style: none;} QComboBox::down-arrow {image: url(noimg);	border-width: 0;}");
-#endif
 //    ui->scrollArea->updateMinimumWidth();
 
     m_heightMapMode = false;
@@ -216,7 +214,7 @@ frmMain::frmMain(QWidget *parent) :
     menuSend->addAction(tr("Send from current line"), this, SLOT(onActSendFromLineTriggered()));
     ui->cmdFileSend->setMenu(menuSend);
 
-    connect(ui->cboCommand, SIGNAL(returnPressed()), this, SLOT(onCboCommandReturnPressed()));
+    // connect(ui->cboCommand, SIGNAL(returnPressed()), this, SLOT(onCboCommandReturnPressed()));
 
     foreach (StyledToolButton* button, this->findChildren<StyledToolButton*>(QRegExp("cmdUser\\d"))) {
         connect(button, SIGNAL(clicked(bool)), this, SLOT(onCmdUserClicked(bool)));
@@ -827,9 +825,9 @@ void frmMain::on_cmdFileAbort_clicked()
     ui->cmdFileAbort->setEnabled(false);
 
     if ((m_communicator->m_senderState == SenderPaused) || (m_communicator->m_senderState == SenderChangingTool)) {
-        m_communicator->sendCommand("M2", COMMAND_TI_UI, m_settings->showUICommands(), false);
+        m_communicator->sendCommand("M2", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands(), false);
     } else {
-        m_communicator->sendCommand("M2", COMMAND_TI_UI, m_settings->showUICommands(), true);
+        m_communicator->sendCommand("M2", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands(), true);
     }
 }
 
@@ -877,33 +875,33 @@ void frmMain::on_cmdFileReset_clicked()
     }
 }
 
-void frmMain::on_cmdCommandSend_clicked()
-{
-    QString command = ui->cboCommand->currentText();
-    if (command.isEmpty()) return;
+// void frmMain::on_cmdCommandSend_clicked()
+// {
+//     QString command = ui->cboCommand->currentText();
+//     if (command.isEmpty()) return;
 
-    ui->cboCommand->storeText();
-    ui->cboCommand->setCurrentText("");
-    m_communicator->sendCommand(command, COMMAND_TI_UI);
-}
+//     ui->cboCommand->storeText();
+//     ui->cboCommand->setCurrentText("");
+//     m_communicator->sendCommand(command, COMMAND_TI_UI);
+// }
 
-void frmMain::on_cmdClearConsole_clicked()
-{
-    ui->txtConsole->clear();
-}
+// void frmMain::on_cmdClearConsole_clicked()
+// {
+//     ui->txtConsole->clear();
+// }
 
 void frmMain::on_cmdHome_clicked()
 {
     m_communicator->m_homing = true;
     m_updateSpindleSpeed = true;
-    m_communicator->sendCommand("$H", COMMAND_TI_UI, m_settings->showUICommands());
+    m_communicator->sendCommand("$H", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
 }
 
 void frmMain::on_cmdCheck_clicked(bool checked)
 {
     if (checked) {
         storeParserState();
-        m_communicator->sendCommand("$C", COMMAND_TI_UI, m_settings->showUICommands());
+        m_communicator->sendCommand("$C", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
     } else {
         m_communicator->m_aborting = true;
         grblReset();
@@ -918,7 +916,7 @@ void frmMain::on_cmdReset_clicked()
 void frmMain::on_cmdUnlock_clicked()
 {
     m_updateSpindleSpeed = true;
-    m_communicator->sendCommand("$X", COMMAND_TI_UI, m_settings->showUICommands());
+    m_communicator->sendCommand("$X", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
 }
 
 void frmMain::on_cmdHold_clicked(bool checked)
@@ -928,7 +926,7 @@ void frmMain::on_cmdHold_clicked(bool checked)
 
 void frmMain::on_cmdSleep_clicked()
 {
-    m_communicator->sendCommand("$SLP", COMMAND_TI_UI, m_settings->showUICommands());
+    m_communicator->sendCommand("$SLP", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
 }
 
 void frmMain::on_cmdDoor_clicked()
@@ -959,7 +957,7 @@ void frmMain::on_cmdSpindle_clicked(bool checked)
     if (ui->cmdHold->isChecked()) {
         m_connection->sendByteArray(QByteArray(1, char(0x9e)));
     } else {
-        m_communicator->sendCommand(checked ? QString("M3 S%1").arg(ui->slbSpindle->value()) : "M5", COMMAND_TI_UI, m_settings->showUICommands());
+        m_communicator->sendCommand(checked ? QString("M3 S%1").arg(ui->slbSpindle->value()) : "M5", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
     }
 }
 
@@ -1042,9 +1040,9 @@ void frmMain::on_chkKeyboardControl_toggled(bool checked)
 
     // Store/restore coordinate system
     if (checked) {
-        m_communicator->sendCommand("$G", COMMAND_TI_UTIL1, m_settings->showUICommands());
+        m_communicator->sendCommand("$G", COMMAND_TI_UTIL1, m_configuration.consoleModule().showUiCommands());
     } else {
-        if (m_absoluteCoordinates) m_communicator->sendCommand("G90", COMMAND_TI_UI, m_settings->showUICommands());
+        if (m_absoluteCoordinates) m_communicator->sendCommand("G90", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
     }
 
     if ((m_communicator->m_senderState != SenderTransferring) && (m_communicator->m_senderState != SenderStopping))
@@ -1629,7 +1627,7 @@ void frmMain::onConnectionError(QString error)
     //         updateControlsState();
     //     }
     // }
-    ui->txtConsole->appendPlainText(tr("Connection error ") + error);
+    m_partConsole->append(tr("Connection error ") + error);
     updateControlsState();
 }
 
@@ -1704,9 +1702,15 @@ void frmMain::onFloodStateReceived(bool state)
     ui->cmdFlood->setChecked(state);
 }
 
-void frmMain::onConsoleCommand(QString command)
+void frmMain::onCommandResponseReceived(CommandAttributes commandAttributes, QString response)
 {
+    m_partConsole->appendResponse(commandAttributes.consoleIndex, commandAttributes.command, response);
+}
 
+void frmMain::onConsoleNewCommand(QString command)
+{
+    qDebug() << "console" << command;
+    m_communicator->sendCommand(command, COMMAND_TI_UI);
 }
 
 void frmMain::onTimerConnection()
@@ -1720,7 +1724,7 @@ void frmMain::onTimerConnection()
     if (!m_communicator->m_homing/* && !m_reseting*/ && !ui->cmdHold->isChecked() && m_communicator->m_queue.length() == 0) {
         if (m_updateSpindleSpeed) {
             m_updateSpindleSpeed = false;
-            m_communicator->sendCommand(QString("S%1").arg(ui->slbSpindle->value()), COMMAND_TI_UTIL1, m_settings->showUICommands());
+            m_communicator->sendCommand(QString("S%1").arg(ui->slbSpindle->value()), COMMAND_TI_UTIL1, m_configuration.consoleModule().showUiCommands());
         }
         if (m_updateParserStatus) {
             m_updateParserStatus = false;
@@ -1973,14 +1977,14 @@ void frmMain::onSlbSpindleValueChanged()
         ui->grpSpindle->setTitle(tr("Spindle") + QString(tr(" (%1)")).arg(ui->slbSpindle->value()));
 }
 
-void frmMain::onCboCommandReturnPressed()
-{
-    QString command = ui->cboCommand->currentText();
-    if (command.isEmpty()) return;
+// void frmMain::onCboCommandReturnPressed()
+// {
+//     QString command = ui->cboCommand->currentText();
+//     if (command.isEmpty()) return;
 
-    ui->cboCommand->setCurrentText("");
-    m_communicator->sendCommand(command, COMMAND_TI_UI);
-}
+//     ui->cboCommand->setCurrentText("");
+//     m_communicator->sendCommand(command, COMMAND_TI_UI);
+// }
 
 void frmMain::onDockTopLevelChanged(bool topLevel)
 {
@@ -2099,8 +2103,8 @@ void frmMain::loadSettings()
     m_settings->setArcLength(set.value("arcLength", 0).toDouble());
     m_settings->setArcDegree(set.value("arcDegree", 0).toDouble());
     m_settings->setArcDegreeMode(set.value("arcDegreeMode", true).toBool());
-    m_settings->setShowProgramCommands(set.value("showProgramCommands", 0).toBool());
-    m_settings->setShowUICommands(set.value("showUICommands", 0).toBool());
+    // m_settings->setShowProgramCommands(set.value("showProgramCommands", 0).toBool());
+    // m_settings->setShowUICommands(set.value("showUICommands", 0).toBool());
     m_settings->setSpindleSpeedMin(set.value("spindleSpeedMin", 0).toInt());
     m_settings->setSpindleSpeedMax(set.value("spindleSpeedMax", 100).toInt());
     m_settings->setLaserPowerMin(set.value("laserPowerMin", 0).toInt());
@@ -2151,13 +2155,13 @@ void frmMain::loadSettings()
 
     this->restoreGeometry(set.value("formGeometry", QByteArray()).toByteArray());
 
-    ui->cboCommand->setMinimumHeight(ui->cboCommand->height());
-    ui->cmdClearConsole->setFixedHeight(ui->cboCommand->height());
-    ui->cmdCommandSend->setFixedHeight(ui->cboCommand->height());
+    // ui->cboCommand->setMinimumHeight(ui->cboCommand->height());
+    // ui->cmdClearConsole->setFixedHeight(ui->cboCommand->height());
+    // ui->cmdCommandSend->setFixedHeight(ui->cboCommand->height());
 
     m_storedKeyboardControl = set.value("keyboardControl", false).toBool();
 
-    m_settings->setAutoCompletion(set.value("autoCompletion", true).toBool());
+    // m_settings->setAutoCompletion(set.value("autoCompletion", true).toBool());
 
     QStringList steps = set.value("jogSteps").toStringList();
     if (steps.count() > 0) {
@@ -2198,8 +2202,8 @@ void frmMain::loadSettings()
     applySettings();
 
     // Restore last commands list
-    ui->cboCommand->addItems(set.value("recentCommands", QStringList()).toStringList());
-    ui->cboCommand->setCurrentIndex(-1);
+    // ui->cboCommand->addItems(set.value("recentCommands", QStringList()).toStringList());
+    // ui->cboCommand->setCurrentIndex(-1);
 
     // Load plugins
     loadPlugins();
@@ -2330,8 +2334,8 @@ void frmMain::saveSettings()
     set.setValue("arcLength", m_settings->arcLength());
     set.setValue("arcDegree", m_settings->arcDegree());
     set.setValue("arcDegreeMode", m_settings->arcDegreeMode());
-    set.setValue("showProgramCommands", m_settings->showProgramCommands());
-    set.setValue("showUICommands", m_settings->showUICommands());
+    // set.setValue("showProgramCommands", m_settings->showProgramCommands());
+    // set.setValue("showUICommands", m_settings->showUICommands());
     set.setValue("spindleSpeedMin", m_settings->spindleSpeedMin());
     set.setValue("spindleSpeedMax", m_settings->spindleSpeedMax());
     set.setValue("laserPowerMin", m_settings->laserPowerMin());
@@ -2348,7 +2352,7 @@ void frmMain::saveSettings()
     set.setValue("formGeometry", this->saveGeometry());
     set.setValue("formSettingsGeometry", m_settings->saveGeometry()); 
 
-    set.setValue("autoCompletion", m_settings->autoCompletion());
+    // set.setValue("autoCompletion", m_settings->autoCompletion());
     set.setValue("units", m_settings->units());
     set.setValue("recentFiles", m_recentFiles);
     set.setValue("recentHeightmaps", m_recentHeightmaps);
@@ -2407,8 +2411,8 @@ void frmMain::saveSettings()
 
     QStringList list;
 
-    for (int i = 0; i < ui->cboCommand->count(); i++) list.append(ui->cboCommand->itemText(i));
-    set.setValue("recentCommands", list);
+    // for (int i = 0; i < ui->cboCommand->count(); i++) list.append(ui->cboCommand->itemText(i));
+    // set.setValue("recentCommands", list);
 
     // Docks
     set.setValue("formMainState", saveState());
@@ -2520,7 +2524,7 @@ void frmMain::applySettings() {
     ui->slbSpindle->setMinimum(m_settings->spindleSpeedMin());
     ui->slbSpindle->setMaximum(m_settings->spindleSpeedMax());
 
-    ui->cboCommand->setAutoCompletion(m_settings->autoCompletion());
+    // ui->cboCommand->setAutoCompletion(m_configuration.consoleModule().commandAutoCompletion());
 
     m_codeDrawer->setSimplify(m_settings->simplify());
     m_codeDrawer->setSimplifyPrecision(m_settings->simplifyPrecision());
@@ -2573,11 +2577,12 @@ void frmMain::applySettings() {
         Util::invertButtonIconColors(ui->cmdTop);
     }
 
-    int h = ui->cmdFileOpen->sizeHint().height();
-    QSize s(h, h);
-    ui->cboCommand->setMinimumHeight(h);
-    ui->cmdClearConsole->setFixedSize(s);
-    ui->cmdCommandSend->setFixedSize(s);
+    // @TODO how to do it in console partial?? Is it important?
+    // int h = ui->cmdFileOpen->sizeHint().height();
+    // QSize s(h, h);
+    // ui->cboCommand->setMinimumHeight(h);
+    // ui->cmdClearConsole->setFixedSize(s);
+    // ui->cmdCommandSend->setFixedSize(s);
 
     if (m_connection->getSupportedMode() != m_settings->connectionMode()) {
         initializeConnection(m_settings->connectionMode());
@@ -2763,7 +2768,8 @@ void frmMain::grblReset()
 
 void frmMain::writeConsole(QString command)
 {
-    ui->txtConsole->appendPlainText(command);
+    m_partConsole->append(command);
+    //ui->txtConsole->appendPlainText(command);
 }
 
 // SendCommandResult frmMain::sendCommand(QString command, int tableIndex, bool showInConsole, bool wait)
@@ -2871,7 +2877,7 @@ void frmMain::sendNextFileCommands() {
         ) 
     {
         m_currentModel->setData(m_currentModel->index(m_fileCommandIndex, 2), GCodeItem::Sent);
-        m_communicator->sendCommand(command, m_fileCommandIndex, m_settings->showProgramCommands());
+        m_communicator->sendCommand(command, m_fileCommandIndex, m_configuration.consoleModule().showProgramCommands());
         m_fileCommandIndex++;
         command = m_currentModel->data(m_currentModel->index(m_fileCommandIndex, 1)).toString();
     }
@@ -2963,7 +2969,7 @@ void frmMain::storeParserState()
 
 void frmMain::restoreParserState()
 {
-    if (!m_storedParserStatus.isEmpty()) m_communicator->sendCommand(m_storedParserStatus, -1, m_settings->showUICommands());
+    if (!m_storedParserStatus.isEmpty()) m_communicator->sendCommand(m_storedParserStatus, -1, m_configuration.consoleModule().showUiCommands());
 }
 
 void frmMain::storeOffsetsVars(QString response)
@@ -3378,7 +3384,8 @@ void frmMain::setupCoordsTextboxes()
     ui->txtWPosZ->setMaximum(bound);    
 }
 
-void frmMain::updateControlsState() {
+void frmMain::updateControlsState()
+{
     bool portOpened = m_connection->isConnected();
     bool process = (m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping);
     bool paused = (m_communicator->m_senderState == SenderPausing) || (m_communicator->m_senderState == SenderPausing2) || (m_communicator->m_senderState == SenderPaused) || (m_communicator->m_senderState == SenderChangingTool);
@@ -3388,8 +3395,9 @@ void frmMain::updateControlsState() {
     ui->widgetSpindle->setEnabled(portOpened);
     ui->widgetJog->setEnabled(portOpened && ((m_communicator->m_senderState == SenderStopped)
         || (m_communicator->m_senderState == SenderChangingTool)));
-    ui->cboCommand->setEnabled(portOpened && (!ui->chkKeyboardControl->isChecked()));
-    ui->cmdCommandSend->setEnabled(portOpened);
+
+    m_partConsole->setEnabled(portOpened && (!ui->chkKeyboardControl->isChecked()));
+    // ui->cmdCommandSend->setEnabled(portOpened);
 
     ui->cmdCheck->setEnabled(portOpened && !process);
     ui->cmdHome->setEnabled(!process);
@@ -3867,13 +3875,14 @@ void frmMain::jogStep()
         QVector3D vec = m_jogVector * ui->cboJogStep->currentText().toDouble();
 
         if (vec.length()) {
-            m_communicator->sendCommand(QString("$J=%5G91X%1Y%2Z%3F%4")
-                        .arg(vec.x(), 0, 'f', m_settings->units() ? 4 : 3)
-                        .arg(vec.y(), 0, 'f', m_settings->units() ? 4 : 3)
-                        .arg(vec.z(), 0, 'f', m_settings->units() ? 4 : 3)
-                        .arg(ui->cboJogFeed->currentText().toDouble())
-                        .arg(m_settings->units() ? "G20" : "G21")
-                        , -3, m_settings->showUICommands());
+            m_communicator->sendCommand(
+                QString("$J=%5G91X%1Y%2Z%3F%4")
+                    .arg(vec.x(), 0, 'f', m_settings->units() ? 4 : 3)
+                    .arg(vec.y(), 0, 'f', m_settings->units() ? 4 : 3)
+                    .arg(vec.z(), 0, 'f', m_settings->units() ? 4 : 3)
+                    .arg(ui->cboJogFeed->currentText().toDouble())
+                    .arg(m_settings->units() ? "G20" : "G21"),
+                -3, m_configuration.consoleModule().showUiCommands());
         }
     }
 }
@@ -3925,7 +3934,7 @@ void frmMain::jogContinuous()
                             .arg(vec.z(), 0, 'f', m_settings->units() ? 4 : 3)
                             .arg(ui->cboJogFeed->currentText().toDouble())
                             .arg(m_settings->units() ? "G20" : "G21")
-                            , -2, m_settings->showUICommands());
+                            , -2, m_configuration.consoleModule().showUiCommands());
             }
             v = j;
         }

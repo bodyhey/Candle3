@@ -86,7 +86,7 @@ SendCommandResult Communicator::sendCommand(QString command, int tableIndex, boo
     if (showInConsole) {
         // @todo ui
         // writeConsole(command);
-        ca.consoleIndex = ui->txtConsole->blockCount() - 1;
+        ca.consoleIndex = -1; //ui->txtConsole->blockCount() - 1;
     } else {
         ca.consoleIndex = -1;
     }

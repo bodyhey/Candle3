@@ -339,8 +339,8 @@ void frmMain::processCommandResponse(QString data)
 
         // Take command from buffer
         CommandAttributes ca = m_communicator->m_commands.takeFirst();
-        QTextBlock tb = ui->txtConsole->document()->findBlockByNumber(ca.consoleIndex);
-        QTextCursor tc(tb);
+        //QTextBlock tb = ui->txtConsole->document()->findBlockByNumber(ca.consoleIndex);
+        //QTextCursor tc(tb);
 
         QString uncomment = GcodePreprocessorUtils::removeComment(ca.command).toUpper();
 
@@ -365,7 +365,7 @@ void frmMain::processCommandResponse(QString data)
         // Restore absolute/relative coordinate system after jog
         if (uncomment == "$G" && ca.tableIndex == -2) {
             if (ui->chkKeyboardControl->isChecked()) m_absoluteCoordinates = response.contains("G90");
-            else if (response.contains("G90")) m_communicator->sendCommand("G90", COMMAND_TI_UI, m_settings->showUICommands());
+            else if (response.contains("G90")) m_communicator->sendCommand("G90", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
         }
 
         // Process parser status
@@ -515,28 +515,31 @@ void frmMain::processCommandResponse(QString data)
             m_communicator->m_timerStateQuery.setInterval(response.contains("Enable") ? 1000 : m_settings->queryStateTime());
         }
 
-        // Add response to console
-        if (tb.isValid() && tb.text() == ca.command) {
+        // emit singal, was `Add response to console`
+        emit commandResponseReceived(ca, response);
+        // if (tb.isValid() && tb.text() == ca.command) {
+            emit commandResponseReceived(ca, response);
 
-            bool scrolledDown = ui->txtConsole->verticalScrollBar()->value()
-                                == ui->txtConsole->verticalScrollBar()->maximum();
+            // bool scrolledDown = ui->txtConsole->verticalScrollBar()->value()
+            //                     == ui->txtConsole->verticalScrollBar()->maximum();
 
-            // Update text block numbers
-            int blocksAdded = response.count("; ");
+            // // Update text block numbers
+            // int blocksAdded = response.count("; ");
 
-            if (blocksAdded > 0) for (int i = 0; i < m_communicator->m_commands.count(); i++) {
-                    if (m_communicator->m_commands[i].consoleIndex != -1) m_communicator->m_commands[i].consoleIndex += blocksAdded;
-                }
+            // if (blocksAdded > 0) for (int i = 0; i < m_communicator->m_commands.count(); i++) {
+            //         if (m_communicator->m_commands[i].consoleIndex != -1) m_communicator->m_commands[i].consoleIndex += blocksAdded;
+            //     }
 
-            tc.beginEditBlock();
-            tc.movePosition(QTextCursor::EndOfBlock);
+            // tc.beginEditBlock();
+            // tc.movePosition(QTextCursor::EndOfBlock);
 
-            tc.insertText(" < " + QString(response).replace("; ", "\r\n"));
-            tc.endEditBlock();
+            // // @TODO response is added as multiple lines, do we have to do this?
+            // tc.insertText(" < " + QString(response).replace("; ", "\r\n"));
+            // tc.endEditBlock();
 
-            if (scrolledDown) ui->txtConsole->verticalScrollBar()->setValue(
-                    ui->txtConsole->verticalScrollBar()->maximum());
-        }
+            // if (scrolledDown) ui->txtConsole->verticalScrollBar()->setValue(
+            //         ui->txtConsole->verticalScrollBar()->maximum());
+        // }
 
         // Check queue
         static bool processingQueue = false;
@@ -740,7 +743,8 @@ void frmMain::unhandledResponse(QString data)
 
         updateControlsState();
     }
-    ui->txtConsole->appendPlainText(data);
+
+    m_partConsole->append(data);
 }
 
 void frmMain::processMessage(QString data)

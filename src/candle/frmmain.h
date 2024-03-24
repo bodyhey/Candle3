@@ -134,8 +134,8 @@ private slots:
     void on_cmdFilePause_clicked(bool checked);
     void on_cmdFileAbort_clicked();
     void on_cmdFileReset_clicked();
-    void on_cmdCommandSend_clicked();
-    void on_cmdClearConsole_clicked();
+//    void on_cmdCommandSend_clicked();
+//    void on_cmdClearConsole_clicked();
     void on_cmdHome_clicked();
     void on_cmdCheck_clicked(bool checked);
     void on_cmdReset_clicked();
@@ -202,8 +202,10 @@ private slots:
     void onDeviceStateReceived(DeviceState state);
     void onSpindleStateReceived(bool state);
     void onFloodStateReceived(bool state);
+    void onCommandResponseReceived(CommandAttributes commandAttributes, QString response);
 
-    void onConsoleCommand(QString command);
+
+    void onConsoleNewCommand(QString command);
 
     void onTimerConnection();
     void onTableInsertLine();
@@ -216,7 +218,7 @@ private slots:
     void onActSendFromLineTriggered();
     void onSlbSpindleValueUserChanged();
     void onSlbSpindleValueChanged();
-    void onCboCommandReturnPressed();
+//    void onCboCommandReturnPressed();
     void onDockTopLevelChanged(bool topLevel);
     void onScroolBarAction(int action);
     void onScriptException(const QScriptValue &exception);
@@ -424,6 +426,7 @@ private:
         void deviceStateReceived(DeviceState state);
         void spindleStateReceived(bool state);
         void floodStateReceived(bool state);
+        void commandResponseReceived(CommandAttributes commandAttributes, QString response);
 };
 
 typedef QMap<QString, QList<QKeySequence>> ShortcutsMap;
