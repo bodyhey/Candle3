@@ -15,7 +15,8 @@ partMainJog::~partMainJog()
 
 void partMainJog::onCmdYPlusPressed()
 {
-    emit this->jog(YPlus);
+    JoggingVector vector(0, 1, 0);
+    emit this->jog(YPlus, vector);
 }
 
 void partMainJog::onCmdYPlusReleased()
@@ -26,7 +27,8 @@ void partMainJog::onCmdYPlusReleased()
 
 void partMainJog::onCmdYMinusPressed()
 {
-    emit this->jog(YMinus);
+    JoggingVector vector(0, -1, 0);
+    emit this->jog(YMinus, vector);
 }
 
 void partMainJog::onCmdYMinusReleased()
@@ -37,7 +39,8 @@ void partMainJog::onCmdYMinusReleased()
 
 void partMainJog::onCmdXPlusPressed()
 {
-    emit this->jog(XPlus);
+    JoggingVector vector(1, 0, 0);
+    emit this->jog(XPlus, vector);
 }
 
 void partMainJog::onCmdXPlusReleased()
@@ -48,7 +51,8 @@ void partMainJog::onCmdXPlusReleased()
 
 void partMainJog::onCmdXMinusPressed()
 {
-    emit this->jog(XMinus);
+    JoggingVector vector(-1, 0, 0);
+    emit this->jog(XMinus, vector);
 }
 
 void partMainJog::onCmdXMinusReleased()
@@ -59,7 +63,8 @@ void partMainJog::onCmdXMinusReleased()
 
 void partMainJog::onCmdZPlusPressed()
 {
-    emit this->jog(ZPlus);
+    JoggingVector vector(0, 0, 1);
+    emit this->jog(ZPlus, vector);
 }
 
 void partMainJog::onCmdZPlusReleased()
@@ -70,7 +75,8 @@ void partMainJog::onCmdZPlusReleased()
 
 void partMainJog::onCmdZMinusPressed()
 {
-    emit this->jog(ZMinus);
+    JoggingVector vector(-1, 0, 0);
+    emit this->jog(ZMinus, vector);
 }
 
 void partMainJog::onCmdZMinusReleased()

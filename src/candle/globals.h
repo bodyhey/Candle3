@@ -2,6 +2,7 @@
 #define GLOBALS_H
 
 #include <QObject>
+#include <QVector3D>
 #include <QString>
 
 #define GRBL_LIVE_SOFT_RESET 0x18
@@ -59,6 +60,8 @@ enum JoggindDir {
     ZPlus,
     ZMinus
 };
+
+typedef QVector3D JoggingVector;
 
 enum SenderState {
     SenderUnknown = -1,

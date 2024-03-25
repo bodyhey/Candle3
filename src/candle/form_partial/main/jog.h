@@ -36,7 +36,7 @@ private slots:
     void onChkKeyboardControlToggled(bool checked);
 
 signals:
-    void jog(JoggindDir dir);
+    void jog(JoggindDir dir, JoggingVector vector);
     void command(GRBLCommand command);
     void stop();
 
