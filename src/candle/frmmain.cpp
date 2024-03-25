@@ -153,6 +153,8 @@ frmMain::frmMain(QWidget *parent) :
 
     m_partConsole = new partMainConsole(this, m_configuration.consoleModule());
     connect(this->m_partConsole, SIGNAL(newCommand(QString)), this, SLOT(onConsoleNewCommand(QString)));
+    m_partConsole->append(QString("G-Candle %1 started").arg( qApp->applicationVersion()));
+    m_partConsole->append("---");
 
     QLayout *layout = ui->dockConsole->widget()->layout();
     layout->takeAt(0);
