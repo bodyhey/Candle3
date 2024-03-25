@@ -2,6 +2,7 @@
 #define STATE_H
 
 #include "globals.h"
+#include "../../config/configuration.h"
 #include <QWidget>
 #include <QVector3D>
 
@@ -13,19 +14,21 @@ class partMainState : public QWidget
 {
     Q_OBJECT
 
-public:
-    explicit partMainState(QWidget *parent = nullptr);
-    ~partMainState();
-    void setStatusText(QString, QString bgColor, QString fgColor);
-    void setState(DeviceState);
-    void setWorkCoordinates(QVector3D);
-    void setMachineCoordinates(QVector3D);
+    public:
+        explicit partMainState(QWidget *parent, const Configuration &configuration);
+        ~partMainState();
+        void setStatusText(QString, QString bgColor, QString fgColor);
+        void setState(DeviceState);
+        void setWorkCoordinates(QVector3D);
+        void setMachineCoordinates(QVector3D);
+        void setUnits(Units units);
 
-private:
-    Ui::State *ui;
+    private:
+        Ui::State *ui;
+        const Configuration &m_configuration;
 
-signals:
-    void grblCommand(GRBLCommand command);
+    signals:
+        void grblCommand(GRBLCommand command);
 
 };
 

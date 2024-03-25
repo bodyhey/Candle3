@@ -885,17 +885,17 @@ void Communicator::startUpdatingState(int interval)
 void Communicator::restoreOffsets()
 {
     // Still have pre-reset working position
-    sendCommand(QString("%4G53G90X%1Y%2Z%3").arg(ui->txtMPosX->value())
-                    .arg(ui->txtMPosY->value())
-                    .arg(ui->txtMPosZ->value())
-                    .arg(m_settings->units() ? "G20" : "G21"),
-                COMMAND_TI_UTIL1, m_settings->showUICommands());
+    // sendCommand(QString("%4G53G90X%1Y%2Z%3").arg(ui->txtMPosX->value())
+    //                 .arg(ui->txtMPosY->value())
+    //                 .arg(ui->txtMPosZ->value())
+    //                 .arg(m_settings->units() ? "G20" : "G21"),
+    //             COMMAND_TI_UTIL1, m_settings->showUICommands());
 
-    sendCommand(QString("%4G92X%1Y%2Z%3").arg(ui->txtWPosX->value())
-                    .arg(ui->txtWPosY->value())
-                    .arg(ui->txtWPosZ->value())
-                    .arg(m_settings->units() ? "G20" : "G21"),
-                COMMAND_TI_UTIL1, m_settings->showUICommands());
+    // sendCommand(QString("%4G92X%1Y%2Z%3").arg(ui->txtWPosX->value())
+    //                 .arg(ui->txtWPosY->value())
+    //                 .arg(ui->txtWPosZ->value())
+    //                 .arg(m_settings->units() ? "G20" : "G21"),
+    //             COMMAND_TI_UTIL1, m_settings->showUICommands());
 }
 
 void Communicator::setSenderState(SenderState state)

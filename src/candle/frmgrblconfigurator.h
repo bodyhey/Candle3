@@ -57,7 +57,7 @@ class frmGrblConfigurator : public QDialog
         void findParametersToBeSaved(QMap<int, double>);
 
     private slots:
-        void setSettings(QMap<int, double>);
+        void onConfigurationReceived(MachineConfiguration, QMap<int, double>);
         void update();
         void onUpdateClicked();
         void itemChanged(QTreeWidgetItem *item, int column);

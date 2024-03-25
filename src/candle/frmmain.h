@@ -203,7 +203,7 @@ private slots:
     void onSpindleStateReceived(bool state);
     void onFloodStateReceived(bool state);
     void onCommandResponseReceived(CommandAttributes commandAttributes, QString response);
-
+    void onConfigurationReceived(MachineConfiguration, QMap<int, double>);
 
     void onConsoleNewCommand(QString command);
 
@@ -379,7 +379,6 @@ private:
     void newHeightmap();
 
     // Ui
-    void setupCoordsTextboxes();
     void updateControlsState();
     void updateLayouts();
     void updateRecentFilesMenu();

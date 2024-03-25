@@ -32,7 +32,6 @@ ui->slbSpindleOverride
 ui->slbSpindle
 ui->slbRapidOverride->isChecked() ? ui->slbRapidOverride
 ui->glwVisualizer
-ui->txtConsole
 ui->chkKeyboardControl
 ui->chkAutoScroll
 ui->tblProgram
@@ -66,11 +65,9 @@ void frmMain::onConnectionLineReceived(QString data)
 
     if (m_communicator->m_reseting) {
         if (!m_communicator->dataIsReset(data)) return;
-        else {
-            m_communicator->m_reseting = false;
-            m_communicator->stopUpdatingState();
-            m_communicator->startUpdatingState(m_settings->queryStateTime());
-        }
+        m_communicator->m_reseting = false;
+        m_communicator->stopUpdatingState();
+        m_communicator->startUpdatingState(m_settings->queryStateTime());
     }
 
     if (data.isEmpty()) {
@@ -392,57 +389,64 @@ void frmMain::processCommandResponse(QString data)
         // Settings response
         if (uncomment == "$$") {
             static QRegExp gs("\\$(\\d+)\\=([^;]+)\\; ");
-            QMap<int, double> settings;
+            QMap<int, double> rawMachineConfiguration;
             int p = 0;
             while ((p = gs.indexIn(response, p)) != -1) {
-                settings[gs.cap(1).toInt()] = gs.cap(2).toDouble();
+                rawMachineConfiguration[gs.cap(1).toInt()] = gs.cap(2).toDouble();
                 p += gs.matchedLength();
             }
-            emit m_communicator->settingsReceived(settings);
+
+            MachineConfiguration machineConfiguration(rawMachineConfiguration);
+
+            emit m_communicator->configurationReceived(
+                machineConfiguration,
+                rawMachineConfiguration
+            );
 
             // Command sent after reset
-            if (ca.tableIndex == -2) {
-                QList<int> keys = settings.keys();
-                if (keys.contains(13)) m_settings->setUnits(settings[13]);
-                if (keys.contains(20)) m_settings->setSoftLimitsEnabled(settings[20]);
-                if (keys.contains(22)) {
-                    m_settings->setHomingEnabled(settings[22]);
-                    m_machineBoundsDrawer.setVisible(settings[22]);
-                }
-                if (keys.contains(110)) m_settings->setRapidSpeed(settings[110]);
-                if (keys.contains(120)) m_settings->setAcceleration(settings[120]);
-                if (keys.contains(130) && keys.contains(131) && keys.contains(132)) {
-                    QVector3D bounds = QVector3D(
-                        m_settings->referenceXPlus() ? -settings[130] : settings[130],
-                        m_settings->referenceYPlus() ? -settings[131] : settings[131],
-                        m_settings->referenceZPlus() ? -settings[132] : settings[132]
-                    );
-                    m_settings->setMachineBounds(bounds);
-                    m_machineBoundsDrawer.setBorderRect(QRectF(0, 0,
-                                                               m_settings->referenceXPlus() ? -settings[130] : settings[130],
-                                                               m_settings->referenceYPlus() ? -settings[131] : settings[131]));
-                    qDebug() << "Machine bounds (3-axis)" << bounds;
-                } else if (keys.contains(130) && keys.contains(131)) {
-                    // 2 axis
-                    QVector3D bounds = QVector3D(
-                        m_settings->referenceXPlus() ? -settings[130] : settings[130],
-                        m_settings->referenceYPlus() ? -settings[131] : settings[131],
-                        0
-                    );
-                    m_settings->setMachineBounds(QVector3D(
-                        m_settings->referenceXPlus() ? -settings[130] : settings[130],
-                        m_settings->referenceYPlus() ? -settings[131] : settings[131],
-                        0
-                    ));
-                    m_machineBoundsDrawer.setBorderRect(QRectF(0, 0,
-                        m_settings->referenceXPlus() ? -settings[130] : settings[130],
-                        m_settings->referenceYPlus() ? -settings[131] : settings[131]
-                    ));
-                    qDebug() << "Machine bounds (2-axis)" << bounds;
-                }
+            // if (ca.tableIndex == -2) {
+            //     QList<int> keys = rawMachineConfiguration.keys();
+            //     if (keys.contains(13)) m_settings->setUnits(rawMachineConfiguration[13]);
+            //     if (keys.contains(20)) m_settings->setSoftLimitsEnabled(rawMachineConfiguration[20]);
+            //     if (keys.contains(22)) {
+            //         m_settings->setHomingEnabled(rawMachineConfiguration[22]);
+            //         m_machineBoundsDrawer.setVisible(rawMachineConfiguration[22]);
+            //     }
+            //     if (keys.contains(110)) m_settings->setRapidSpeed(rawMachineConfiguration[110]);
+            //     if (keys.contains(120)) m_settings->setAcceleration(rawMachineConfiguration[120]);
+            //     if (keys.contains(130) && keys.contains(131) && keys.contains(132)) {
+            //         QVector3D bounds = QVector3D(
+            //             m_settings->referenceXPlus() ? -rawMachineConfiguration[130] : rawMachineConfiguration[130],
+            //             m_settings->referenceYPlus() ? -rawMachineConfiguration[131] : rawMachineConfiguration[131],
+            //             m_settings->referenceZPlus() ? -rawMachineConfiguration[132] : rawMachineConfiguration[132]
+            //         );
+            //         m_settings->setMachineBounds(bounds);
+            //         m_machineBoundsDrawer.setBorderRect(QRectF(0, 0,
+            //                                                    m_settings->referenceXPlus() ? -rawMachineConfiguration[130] : rawMachineConfiguration[130],
+            //                                                    m_settings->referenceYPlus() ? -rawMachineConfiguration[131] : rawMachineConfiguration[131]));
+            //         qDebug() << "Machine bounds (3-axis)" << bounds;
+            //     } else if (keys.contains(130) && keys.contains(131)) {
+            //         // 2 axis
+            //         QVector3D bounds = QVector3D(
+            //             m_settings->referenceXPlus() ? -rawMachineConfiguration[130] : rawMachineConfiguration[130],
+            //             m_settings->referenceYPlus() ? -rawMachineConfiguration[131] : rawMachineConfiguration[131],
+            //             0
+            //         );
+            //         m_settings->setMachineBounds(QVector3D(
+            //             m_settings->referenceXPlus() ? -rawMachineConfiguration[130] : rawMachineConfiguration[130],
+            //             m_settings->referenceYPlus() ? -rawMachineConfiguration[131] : rawMachineConfiguration[131],
+            //             0
+            //         ));
+            //         m_machineBoundsDrawer.setBorderRect(QRectF(0, 0,
+            //             m_settings->referenceXPlus() ? -rawMachineConfiguration[130] : rawMachineConfiguration[130],
+            //             m_settings->referenceYPlus() ? -rawMachineConfiguration[131] : rawMachineConfiguration[131]
+            //         ));
+            //         qDebug() << "Machine bounds (2-axis)" << bounds;
+            //     }
 
-                setupCoordsTextboxes();
-            }
+            //     //moved to settingsReceived signal handler
+            //     //setupCoordsTextboxes();
+            // }
         }
 
         // Homing response

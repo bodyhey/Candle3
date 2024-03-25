@@ -6,7 +6,7 @@
 #include "frmsettings.h"
 #include "globals.h"
 #include "connection/connection.h"
-#include "machine/settings.h"
+#include "machine/machineconfiguration.h"
 #include "ui_frmmain.h"
 
 #ifdef WINDOWS
@@ -98,7 +98,7 @@ private:
         void statusReceived(QString status);
         void senderStateChanged(int state);
         void deviceStateChanged(DeviceState state);
-        void settingsReceived(QMap<int, double> settings);
+        void configurationReceived(MachineConfiguration configuration, QMap<int, double> rawConfiguration);
 
 };
 

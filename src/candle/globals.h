@@ -39,6 +39,11 @@
 #define COMMAND_TI_UTIL1 -2
 #define COMMAND_TI_UTIL2 -3
 
+enum Units {
+    Inches,
+    Millimeters
+};
+
 enum GRBLCommand {
     Reset,
     Home,

@@ -148,7 +148,7 @@ frmMain::frmMain(QWidget *parent) :
     static_cast<QVBoxLayout*>(ui->grpControl->layout())->insertWidget(0, widgetControl);
     widgetControl->show();
 
-    m_partState = new partMainState(this);
+    m_partState = new partMainState(this, &m_configuration);
     static_cast<QVBoxLayout*>(ui->grpState->layout())->insertWidget(0, this->m_partState);
 
     m_partConsole = new partMainConsole(this, m_configuration.consoleModule());
@@ -1634,31 +1634,18 @@ void frmMain::onConnectionError(QString error)
 void frmMain::onMachinePosChanged(QVector3D pos)
 {
     this->m_partState->setMachineCoordinates(pos);
-
-    ui->txtMPosX->setValue(pos.x());
-    ui->txtMPosY->setValue(pos.y());
-    ui->txtMPosZ->setValue(pos.z());
-
     m_storedVars.setCoords("M", pos);
 }
 
 void frmMain::onWorkPosChanged(QVector3D pos)
 {
     this->m_partState->setWorkCoordinates(pos);
-
-    ui->txtWPosX->setValue(pos.x());
-    ui->txtWPosY->setValue(pos.y());
-    ui->txtWPosZ->setValue(pos.z());
-
     m_storedVars.setCoords("W", pos);
 }
 
 void frmMain::onDeviceStateChanged(DeviceState state)
 {
     this->m_partState->setStatusText(m_statusCaptions[state], m_statusBackColors[state], m_statusForeColors[state]);
-    ui->txtStatus->setText(m_statusCaptions[state]);
-    ui->txtStatus->setStyleSheet(QString("background-color: %1; color: %2;")
-                                     .arg(m_statusBackColors[state]).arg(m_statusForeColors[state]));
 
     ui->cmdCheck->setEnabled(state != DeviceRun && (m_communicator->m_senderState == SenderStopped));
     ui->cmdCheck->setChecked(state == DeviceCheck);
@@ -1705,6 +1692,11 @@ void frmMain::onFloodStateReceived(bool state)
 void frmMain::onCommandResponseReceived(CommandAttributes commandAttributes, QString response)
 {
     m_partConsole->appendResponse(commandAttributes.consoleIndex, commandAttributes.command, response);
+}
+
+void frmMain::onConfigurationReceived(MachineConfiguration configuration, QMap<int, double>)
+{
+    m_partState->setUnits(configuration.units());
 }
 
 void frmMain::onConsoleNewCommand(QString command)
@@ -2262,7 +2254,8 @@ void frmMain::loadSettings()
     restoreState(set.value("formMainState").toByteArray());
 
     // Setup coords textboxes
-    setupCoordsTextboxes();
+    // @TODO do we need this here?
+    // setupCoordsTextboxes();
 
     // Settings form geometry
     // m_settings->restoreGeometry(set.value("formSettingsGeometry").toByteArray());
@@ -2752,8 +2745,6 @@ void frmMain::openPort()
 {
     if (m_connection->openConnection()) {
         this->m_partState->setStatusText(tr("Port opened"), "palette(button)", "palette(text)");
-        ui->txtStatus->setText(tr("Port opened"));
-        ui->txtStatus->setStyleSheet(QString("background-color: palette(button); color: palette(text);"));
         grblReset();
     }
 }
@@ -3358,31 +3349,33 @@ void frmMain::newHeightmap()
     updateControlsState();
 }
 
-void frmMain::setupCoordsTextboxes()
-{
-    int prec = m_settings->units() == 0 ? 3 : 4;
-    int bound = m_settings->units() == 0 ? 9999 : 999;
+// void frmMain::setupCoordsTextboxes()
+// {
+//     int prec = m_settings->units() == 0 ? 3 : 4;
+//     int bound = m_settings->units() == 0 ? 9999 : 999;
 
-    ui->txtMPosX->setDecimals(prec);
-    ui->txtMPosX->setMinimum(-bound);
-    ui->txtMPosX->setMaximum(bound);
-    ui->txtMPosY->setDecimals(prec);
-    ui->txtMPosY->setMinimum(-bound);
-    ui->txtMPosY->setMaximum(bound);
-    ui->txtMPosZ->setDecimals(prec);
-    ui->txtMPosZ->setMinimum(-bound);
-    ui->txtMPosZ->setMaximum(bound);
+//     m_partState->updateUnits();
 
-    ui->txtWPosX->setDecimals(prec);
-    ui->txtWPosX->setMinimum(-bound);
-    ui->txtWPosX->setMaximum(bound);
-    ui->txtWPosY->setDecimals(prec);
-    ui->txtWPosY->setMinimum(-bound);
-    ui->txtWPosY->setMaximum(bound);
-    ui->txtWPosZ->setDecimals(prec);
-    ui->txtWPosZ->setMinimum(-bound);
-    ui->txtWPosZ->setMaximum(bound);    
-}
+//     ui->txtMPosX->setDecimals(prec);
+//     ui->txtMPosX->setMinimum(-bound);
+//     ui->txtMPosX->setMaximum(bound);
+//     ui->txtMPosY->setDecimals(prec);
+//     ui->txtMPosY->setMinimum(-bound);
+//     ui->txtMPosY->setMaximum(bound);
+//     ui->txtMPosZ->setDecimals(prec);
+//     ui->txtMPosZ->setMinimum(-bound);
+//     ui->txtMPosZ->setMaximum(bound);
+
+//     ui->txtWPosX->setDecimals(prec);
+//     ui->txtWPosX->setMinimum(-bound);
+//     ui->txtWPosX->setMaximum(bound);
+//     ui->txtWPosY->setDecimals(prec);
+//     ui->txtWPosY->setMinimum(-bound);
+//     ui->txtWPosY->setMaximum(bound);
+//     ui->txtWPosZ->setDecimals(prec);
+//     ui->txtWPosZ->setMinimum(-bound);
+//     ui->txtWPosZ->setMaximum(bound);
+// }
 
 void frmMain::updateControlsState()
 {
@@ -3438,8 +3431,6 @@ void frmMain::updateControlsState()
 
     if (!portOpened) {
         this->m_partState->setStatusText(tr("Not connected"), "palette(button)", "palette(text)");
-        ui->txtStatus->setText(tr("Not connected"));
-        ui->txtStatus->setStyleSheet(QString("background-color: palette(button); color: palette(text);"));
         emit deviceStateChanged(-1);
     }
 

@@ -306,27 +306,33 @@ frmGrblConfigurator::~frmGrblConfigurator()
     delete ui;
 }
 
-void frmGrblConfigurator::setSettings(QMap<int, double> settings)
+void frmGrblConfigurator::onConfigurationReceived(MachineConfiguration configuration, QMap<int, double> rawConfiguration)
 {
-    disconnect(m_communicator, SIGNAL(settingsReceived(QMap<int,double>)), this, SLOT(setSettings(QMap<int,double>)));
+    Q_UNUSED(configuration);
+
+    disconnect(
+        m_communicator,
+        SIGNAL(configurationReceived(MachineConfiguration,QMap<int,double>)),
+        this,
+        SLOT(onConfigurationReceived(MachineConfiguration,QMap<int,double>))
+    );
 
     if (m_isSaving) {
         m_isSaving = false;
-        findParametersToBeSaved(settings);
+        findParametersToBeSaved(rawConfiguration);
 
         return;
     }
 
-
-    m_currentSettings = settings;
+    m_currentSettings = rawConfiguration;
 
     setInfo("Updated", Qt::black);
-    qDebug() << "Settings received" << settings;
+    qDebug() << "Settings received" << rawConfiguration;
 
     // ugly hack! split status report setting into two separate settings
-    int statusReportSetting = settings[10];
-    settings[REPORT_BUFFER_SETTING_ID] = statusReportSetting & REPORT_BUFFER_SETTING_BIT;
-    settings[REPORT_POS_TYPE_SETTING_ID] = statusReportSetting & REPORT_POS_TYPE_SETTING_BIT;
+    int statusReportSetting = rawConfiguration[10];
+    rawConfiguration[REPORT_BUFFER_SETTING_ID] = statusReportSetting & REPORT_BUFFER_SETTING_BIT;
+    rawConfiguration[REPORT_POS_TYPE_SETTING_ID] = statusReportSetting & REPORT_POS_TYPE_SETTING_BIT;
     //
 
     for (std::vector<ConfigGroup>::iterator it = ConfigMap.begin(); it != ConfigMap.end(); it++) {
@@ -334,7 +340,7 @@ void frmGrblConfigurator::setSettings(QMap<int, double> settings)
         for (std::vector<ConfigEntry>::iterator it2 = group.entries.begin(); it2 != group.entries.end(); it2++) {
             ConfigEntry entry = *it2;
 
-            double setting = settings[entry.index];
+            double setting = rawConfiguration[entry.index];
 
             QMap<Axis, CBaseProperty*> properties;
             switch (entry.type) {
@@ -399,7 +405,12 @@ void frmGrblConfigurator::update()
 {
     setInfo("Updating...", Qt::red);
 
-    connect(m_communicator, SIGNAL(settingsReceived(QMap<int,double>)), this, SLOT(setSettings(QMap<int,double>)));
+    connect(
+        m_communicator,
+        SIGNAL(configurationReceived(MachineConfiguration,QMap<int,double>)),
+        this,
+        SLOT(onConfigurationReceived(MachineConfiguration,QMap<int,double>))
+    );
     QTimer::singleShot(200, this, [this]() {
         m_communicator->sendCommand("$$");
     });
