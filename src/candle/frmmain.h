@@ -414,7 +414,7 @@ private:
 
         void processStatus(QString data);
         void processCommandResponse(QString data);
-        void unhandledResponse(QString data);
+        void processUnhandledResponse(QString data);
         void processMessage(QString data);
     signals:
         void machinePosChanged(QVector3D pos);

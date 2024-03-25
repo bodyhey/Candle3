@@ -90,10 +90,13 @@ void frmMain::onConnectionLineReceived(QString data)
         !(m_communicator->m_commands[0].command != "[CTRL+X]" && m_communicator->dataIsReset(data))
     ) {
         processCommandResponse(data);
+
+        return;
     }
 
     // Unprocessed responses
     // Handle hardware reset
+    processUnhandledResponse(data);
 }
 
 void frmMain::processStatus(QString data)
@@ -209,7 +212,7 @@ void frmMain::processStatus(QString data)
         m_communicator->m_machinePos.x() - workOffset.x(),
         m_communicator->m_machinePos.y() - workOffset.y(),
         m_communicator->m_machinePos.z() - workOffset.z()
-        );
+    );
     m_communicator->m_workPos = pos;
     emit workPosChanged(pos);
 
@@ -727,7 +730,7 @@ void frmMain::processCommandResponse(QString data)
     }
 }
 
-void frmMain::unhandledResponse(QString data)
+void frmMain::processUnhandledResponse(QString data)
 {
     // Unprocessed responses
     // Handle hardware reset
