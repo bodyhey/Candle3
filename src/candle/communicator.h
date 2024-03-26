@@ -6,6 +6,7 @@
 #include "frmsettings.h"
 #include "globals.h"
 #include "connection/connection.h"
+#include "tempconnectiontouiproxy.h"
 #include "machine/machineconfiguration.h"
 #include "ui_frmmain.h"
 
@@ -26,6 +27,8 @@ class Communicator : public QObject
 public:
     Communicator(
         Connection *connection,
+        TempConnectionToUiProxy *frmMain,
+        Configuration *configuration,
         Ui::frmMain *ui,
         frmSettings *frmSettings,
         //frmMain *form,
@@ -47,7 +50,10 @@ private:
 
     Connection *m_connection;
     frmSettings *m_settings;
+    Configuration *m_configuration;
     Ui::frmMain *ui;
+    TempConnectionToUiProxy *m_form;
+    Communicator *m_communicator;
 
     // Queues
     QList<CommandAttributes> m_commands;
@@ -90,8 +96,15 @@ private:
     double toMetric(double value);
     double toInches(double value);
 
+        void processStatus(QString data);
+        void processCommandResponse(QString data);
+        void processUnhandledResponse(QString data);
+        void processMessage(QString data);
+
     private slots:
         void onTimerStateQuery();
+        void onConnectionLineReceived(QString);
+        void onConnectionError(QString);
 
     signals:
         void responseReceived(QString command, int tableIndex, QString response);
@@ -99,6 +112,14 @@ private:
         void senderStateChanged(int state);
         void deviceStateChanged(DeviceState state);
         void configurationReceived(MachineConfiguration configuration, QMap<int, double> rawConfiguration);
+        void machinePosChanged(QVector3D pos);
+        void workPosChanged(QVector3D pos);
+        // emitted after status response received, if state changed
+        // may be emitted together with deviceStateChanged!
+        void deviceStateReceived(DeviceState state);
+        void spindleStateReceived(bool state);
+        void floodStateReceived(bool state);
+        void commandResponseReceived(CommandAttributes commandAttributes, QString response);
 
 };
 

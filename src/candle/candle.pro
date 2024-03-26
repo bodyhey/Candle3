@@ -141,6 +141,7 @@ HEADERS  += frmmain.h \
     scripting/scripting.h \
     tables/gcodetablemodel.h \
     tables/heightmaptablemodel.h \
+    tempconnectiontouiproxy.h \
     utils/interpolation.h \
     utils/util.h \
     widgets/combobox.h \

@@ -9,13 +9,17 @@
 
 Communicator::Communicator(
     Connection *connection,
+    TempConnectionToUiProxy *frmMain,
+    Configuration *configuration,
     Ui::frmMain *ui,
     frmSettings *frmSettings,
     QObject *parent = nullptr
     ) : QObject(parent),
         m_connection(connection),
         m_settings(frmSettings),
+        m_configuration(configuration),
         ui(ui),
+        m_form(frmMain),
         m_timerStateQuery(this)
 {
     assert(m_connection != nullptr);
@@ -26,6 +30,8 @@ Communicator::Communicator(
     m_aborting = false;
     m_statusReceived = false;
     m_spindleCW = true;
+    // temporary !!!
+    m_communicator = this;
 
     m_deviceState = DeviceUnknown;
     m_senderState = SenderUnknown;
@@ -33,8 +39,8 @@ Communicator::Communicator(
     m_machinePos = QVector3D(0, 0, 0);
     m_workPos = QVector3D(0, 0, 0);
 
-    // this->connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
     // this->connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));
+    connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
 
     setSenderState(SenderStopped);
 

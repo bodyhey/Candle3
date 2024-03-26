@@ -17,6 +17,7 @@
 #include <QMimeData>
 #include <QTranslator>
 #include <QScriptValueIterator>
+#include <QDockWidget>
 #include "frmmain.h"
 #include "form_partial/main/jog.h"
 #include "form_partial/main/control.h"
@@ -34,7 +35,12 @@ frmMain::frmMain(QWidget *parent) :
     m_scripting(&m_configuration)
 {
     m_configuration.load();
-    m_configuration.save();
+//    setDefaults();
+    // m_configuration.save();
+
+    // qApp->quit();
+    // return;
+
     // Loading settings
     m_settingsFileName = qApp->applicationDirPath() + "/settings.ini";
     preloadSettings();
@@ -42,15 +48,19 @@ frmMain::frmMain(QWidget *parent) :
     m_settings = new frmSettings(this, m_configuration);
 
     initializeConnection(ConnectionMode::VIRTUAL);
-    m_communicator = new Communicator(m_connection, ui, m_settings, this);
+    m_communicator = new Communicator(
+        m_connection,
+        this,
+        &m_configuration,
+        ui, m_settings, this);
 
-    connect(this, SIGNAL(machinePosChanged(QVector3D)), this, SLOT(onMachinePosChanged(QVector3D)));
-    connect(this, SIGNAL(workPosChanged(QVector3D)), this, SLOT(onWorkPosChanged(QVector3D)));
-    connect(this, SIGNAL(deviceStateReceived(DeviceState)), this, SLOT(onDeviceStateReceived(DeviceState)));
-    connect(this, SIGNAL(deviceStateChanged(DeviceState)), this, SLOT(onDeviceStateChanged(DeviceState)));
-    connect(this, SIGNAL(spindleStateReceived(bool)), this, SLOT(onSpindleStateReceived(bool)));
-    connect(this, SIGNAL(floodStateReceived(bool)), this, SLOT(onFloodStateReceived(bool)));
-    connect(this, SIGNAL(CommandResponseReceived(CommandAttributes, QString)), this, SLOT(onCommandResponseReceived(CommandAttributes, QString)));
+    connect(m_communicator, SIGNAL(machinePosChanged(QVector3D)), this, SLOT(onMachinePosChanged(QVector3D)));
+    connect(m_communicator, SIGNAL(workPosChanged(QVector3D)), this, SLOT(onWorkPosChanged(QVector3D)));
+    connect(m_communicator, SIGNAL(deviceStateReceived(DeviceState)), this, SLOT(onDeviceStateReceived(DeviceState)));
+    connect(m_communicator, SIGNAL(deviceStateChanged(DeviceState)), this, SLOT(onDeviceStateChanged(DeviceState)));
+    connect(m_communicator, SIGNAL(spindleStateReceived(bool)), this, SLOT(onSpindleStateReceived(bool)));
+    connect(m_communicator, SIGNAL(floodStateReceived(bool)), this, SLOT(onFloodStateReceived(bool)));
+    connect(m_communicator, SIGNAL(commandResponseReceived(CommandAttributes,QString)), this, SLOT(onCommandResponseReceived(CommandAttributes,QString)));
 
     // Initializing variables
     m_deviceStatuses[DeviceUnknown] = "Unknown";
@@ -638,6 +648,8 @@ void frmMain::on_actServiceSettings_triggered()
         //     openPort();
         // }
 
+        m_configuration.save();
+
         updateControlsState();
         applySettings();
 
@@ -1042,7 +1054,7 @@ void frmMain::on_chkKeyboardControl_toggled(bool checked)
 
     // Store/restore coordinate system
     if (checked) {
-        m_communicator->sendCommand("$G", COMMAND_TI_UTIL1, m_configuration.consoleModule().showUiCommands());
+        //m_communicator->sendCommand("$G", COMMAND_TI_UTIL1, m_configuration.consoleModule().showUiCommands());
     } else {
         if (m_absoluteCoordinates) m_communicator->sendCommand("G90", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
     }
@@ -1722,7 +1734,7 @@ void frmMain::onTimerConnection()
         }
         if (m_updateParserStatus) {
             m_updateParserStatus = false;
-            m_communicator->sendCommand("$G", COMMAND_TI_UTIL2, false);
+            //m_communicator->sendCommand("$G", COMMAND_TI_UTIL2, false);
         }
     }
 }
@@ -2483,7 +2495,7 @@ void frmMain::initializeConnection(ConnectionMode mode)
             break;
     }
 
-    connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
+    //connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
     connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));
 }
 

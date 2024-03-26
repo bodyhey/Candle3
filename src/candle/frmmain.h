@@ -78,7 +78,7 @@ public:
     }
 };
 
-class frmMain : public QMainWindow
+class frmMain : public QMainWindow, TempConnectionToUiProxy
 {
     Q_OBJECT
 
@@ -89,7 +89,29 @@ public:
     ~frmMain();
     
     void writeConsole(QString command);
-    
+
+    // TO BE REMOVED !!!
+    QMap<DeviceState, QString> &deviceStatuses() override { return m_deviceStatuses; };
+    MachineBoundsDrawer &machineBoundsDrawer() override { return m_machineBoundsDrawer; };
+    ScriptVars &storedVars() override { return m_storedVars; };
+    GcodeDrawer &currentDrawer() override { return *m_currentDrawer; };
+    GcodeDrawer &codeDrawer() override { return *m_codeDrawer; };
+    ToolDrawer &toolDrawer() override { return m_toolDrawer; };
+    GCodeTableModel &programModel() override { return m_programModel; };
+    GCodeTableModel &probeModel() override { return m_probeModel; };
+    GCodeTableModel &programHeightmapModel() override { return m_programHeightmapModel; };
+    GCodeTableModel &currentModel() override { return *m_currentModel; };
+    HeightMapTableModel &heightMapModel() override { return m_heightMapModel; };
+    bool &updateParserStatus() override { return m_updateParserStatus; };
+    bool &heightMapMode() override { return m_heightMapMode; };
+    bool &absoluteCoordinates() override { return m_absoluteCoordinates; };
+    int &fileCommandIndex() override { return m_fileCommandIndex; };
+    int &fileProcessedCommandIndex() override { return m_fileProcessedCommandIndex; };
+    int &lastDrawnLineIndex() override { return m_lastDrawnLineIndex; };
+    partMainConsole &partConsole() override { return *m_partConsole; };
+    QMessageBox &senderErrorBox() override { return *m_senderErrorBox; };
+    // TO BE REMOVED !!!
+
 signals:
     void responseReceived(QString command, int tableIndex, QString response);
     void statusReceived(QString status);
@@ -193,9 +215,6 @@ private slots:
     void on_mnuViewPanels_aboutToShow();
     void on_dockVisualizer_visibilityChanged(bool visible);
 
-    void onConnectionLineReceived(QString);
-    void onConnectionError(QString);
-
     void onMachinePosChanged(QVector3D pos);
     void onWorkPosChanged(QVector3D pos);
     void onDeviceStateChanged(DeviceState state);
@@ -204,7 +223,7 @@ private slots:
     void onFloodStateReceived(bool state);
     void onCommandResponseReceived(CommandAttributes commandAttributes, QString response);
     void onConfigurationReceived(MachineConfiguration, QMap<int, double>);
-
+    void onConnectionError(QString error);
     void onConsoleNewCommand(QString command);
 
     void onTimerConnection();
@@ -411,21 +430,6 @@ private:
     static QScriptValue importExtension(QScriptContext *context, QScriptEngine *engine);
 
     void initializeConnection(ConnectionMode mode);
-
-        void processStatus(QString data);
-        void processCommandResponse(QString data);
-        void processUnhandledResponse(QString data);
-        void processMessage(QString data);
-    signals:
-        void machinePosChanged(QVector3D pos);
-        void workPosChanged(QVector3D pos);
-        // emitted after status response received, if state changed
-        void deviceStateChanged(DeviceState state);
-        // may be emitted together with deviceStateChanged!
-        void deviceStateReceived(DeviceState state);
-        void spindleStateReceived(bool state);
-        void floodStateReceived(bool state);
-        void commandResponseReceived(CommandAttributes commandAttributes, QString response);
 };
 
 typedef QMap<QString, QList<QKeySequence>> ShortcutsMap;
