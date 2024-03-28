@@ -107,6 +107,120 @@ void Communicator::onConnectionError(QString)
 {
 }
 
+void Communicator::processFeedSpindleSpeed(QString data)
+{
+    static QRegExp fs("FS:([^,]*),([^,^|^>]*)");
+    if (fs.indexIn(data) != -1) {
+        ui->glwVisualizer->setSpeedState((QString(tr("F/S: %1 / %2")).arg(fs.cap(1)).arg(fs.cap(2))));
+    }
+}
+
+void Communicator::processOverrides(QString data)
+{
+    static QRegExp ov("Ov:([^,]*),([^,]*),([^,^>^|]*)");
+    if (ov.indexIn(data) != -1)
+    {
+        m_form->updateOverride(ui->slbFeedOverride, ov.cap(1).toInt(), '\x91');
+        m_form->updateOverride(ui->slbSpindleOverride, ov.cap(3).toInt(), '\x9a');
+
+        int rapid = ov.cap(2).toInt();
+        ui->slbRapidOverride->setCurrentValue(rapid);
+
+        int target = ui->slbRapidOverride->isChecked() ? ui->slbRapidOverride->value() : 100;
+
+        if (rapid != target) switch (target) {
+                case 25:
+                    m_communicator->sendRealtimeCommand(GRBL_LIVE_RAPID_FULL_RATE);
+                    break;
+                case 50:
+                    m_communicator->sendRealtimeCommand(GRBL_LIVE_RAPID_HALF_RATE);
+                    break;
+                case 100:
+                    m_communicator->sendRealtimeCommand(GRBL_LIVE_RAPID_QUARTER_RATE);
+                    break;
+            }
+
+        // Update pins state
+        QString pinState;
+        static QRegExp pn("Pn:([^|^>]*)");
+        if (pn.indexIn(data) != -1) {
+            pinState.append(QString(tr("PS: %1")).arg(pn.cap(1)));
+        }
+
+        // Process spindle state
+        static QRegExp as("A:([^,^>^|]+)");
+        if (as.indexIn(data) != -1) {
+            QString q = as.cap(1);
+            m_communicator->m_spindleCW = q.contains("S");
+            if (q.contains("S") || q.contains("C")) {
+                emit spindleStateReceived(true);
+                // to spindleStateReceived handler
+                // m_timerToolAnimation.start(25, this);
+                // ui->cmdSpindle->setChecked(true);
+            } else {
+                emit spindleStateReceived(false);
+                // to spindleStateReceived handler
+                // m_timerToolAnimation.stop();
+                // ui->cmdSpindle->setChecked(false);
+            }
+            emit floodStateReceived(q.contains("F"));
+
+            if (!pinState.isEmpty()) pinState.append(" / ");
+            pinState.append(QString(tr("AS: %1")).arg(as.cap(1)));
+        } else {
+            emit spindleStateReceived(false);
+            // to spindleStateReceived handler
+            // m_timerToolAnimation.stop();
+            // ui->cmdSpindle->setChecked(false);
+        }
+        ui->glwVisualizer->setPinState(pinState);
+    }
+}
+
+void Communicator::processToolpathShadowing(DeviceState state, QVector3D toolPosition)
+{
+    if (((m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping)
+         || (m_communicator->m_senderState == SenderPausing) || (m_communicator->m_senderState == SenderPausing2) || (m_communicator->m_senderState == SenderPaused)) && state != DeviceCheck) {
+        GcodeViewParse *parser = m_form->currentDrawer().viewParser();
+
+        bool toolOntoolpath = false;
+
+        QList<int> drawnLines;
+        QList<LineSegment*> list = parser->getLineSegmentList();
+
+        for (int i = m_form->lastDrawnLineIndex(); i < list.count()
+                                                   && list.at(i)->getLineNumber()
+                                                          <= (m_form->currentModel().data(m_form->currentModel().index(m_form->fileProcessedCommandIndex(), 4)).toInt() + 1); i++) {
+            if (list.at(i)->contains(toolPosition)) {
+                toolOntoolpath = true;
+                m_form->lastDrawnLineIndex() = i;
+                break;
+            }
+            drawnLines << i;
+        }
+
+        if (toolOntoolpath) {
+            foreach (int i, drawnLines) {
+                list.at(i)->setDrawn(true);
+            }
+            if (!drawnLines.isEmpty()) m_form->currentDrawer().update(drawnLines);
+        }
+    }
+}
+
+void Communicator::processNewToolPosition(DeviceState state)
+{
+    QVector3D toolPosition;
+    if (!(state == DeviceCheck && m_form->fileProcessedCommandIndex() < m_form->currentModel().rowCount() - 1)) {
+        toolPosition = m_communicator->m_machinePos;
+        m_form->toolDrawer().setToolPosition(m_form->codeDrawer().getIgnoreZ() ? QVector3D(toolPosition.x(), toolPosition.y(), 0) : toolPosition);
+    }
+
+    // Toolpath shadowing
+    // Update tool position
+    processToolpathShadowing(state, toolPosition);
+}
+
 void Communicator::processStatus(QString data)
 {
     DeviceState state = DeviceUnknown;
@@ -224,107 +338,10 @@ void Communicator::processStatus(QString data)
     m_communicator->m_workPos = pos;
     emit workPosChanged(pos);
 
-    // Update tool position
-    QVector3D toolPosition;
-    if (!(state == DeviceCheck && m_form->fileProcessedCommandIndex() < m_form->currentModel().rowCount() - 1)) {
-        toolPosition = m_communicator->m_machinePos;
-        m_form->toolDrawer().setToolPosition(m_form->codeDrawer().getIgnoreZ() ? QVector3D(toolPosition.x(), toolPosition.y(), 0) : toolPosition);
-    }
+    processNewToolPosition(state);
 
-    // Toolpath shadowing
-    if (((m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping)
-         || (m_communicator->m_senderState == SenderPausing) || (m_communicator->m_senderState == SenderPausing2) || (m_communicator->m_senderState == SenderPaused)) && state != DeviceCheck) {
-        GcodeViewParse *parser = m_form->currentDrawer().viewParser();
-
-        bool toolOntoolpath = false;
-
-        QList<int> drawnLines;
-        QList<LineSegment*> list = parser->getLineSegmentList();
-
-        for (int i = m_form->lastDrawnLineIndex(); i < list.count()
-                                           && list.at(i)->getLineNumber()
-                                                          <= (m_form->currentModel().data(m_form->currentModel().index(m_form->fileProcessedCommandIndex(), 4)).toInt() + 1); i++) {
-            if (list.at(i)->contains(toolPosition)) {
-                toolOntoolpath = true;
-                m_form->lastDrawnLineIndex() = i;
-                break;
-            }
-            drawnLines << i;
-        }
-
-        if (toolOntoolpath) {
-            foreach (int i, drawnLines) {
-                list.at(i)->setDrawn(true);
-            }
-            if (!drawnLines.isEmpty()) m_form->currentDrawer().update(drawnLines);
-        }
-    }
-
-    // Get overrides
-    static QRegExp ov("Ov:([^,]*),([^,]*),([^,^>^|]*)");
-    if (ov.indexIn(data) != -1)
-    {
-        m_form->updateOverride(ui->slbFeedOverride, ov.cap(1).toInt(), '\x91');
-        m_form->updateOverride(ui->slbSpindleOverride, ov.cap(3).toInt(), '\x9a');
-
-        int rapid = ov.cap(2).toInt();
-        ui->slbRapidOverride->setCurrentValue(rapid);
-
-        int target = ui->slbRapidOverride->isChecked() ? ui->slbRapidOverride->value() : 100;
-
-        if (rapid != target) switch (target) {
-                case 25:
-                    m_communicator->sendRealtimeCommand(GRBL_LIVE_RAPID_FULL_RATE);
-                    break;
-                case 50:
-                    m_communicator->sendRealtimeCommand(GRBL_LIVE_RAPID_HALF_RATE);
-                    break;
-                case 100:
-                    m_communicator->sendRealtimeCommand(GRBL_LIVE_RAPID_QUARTER_RATE);
-                    break;
-            }
-
-        // Update pins state
-        QString pinState;
-        static QRegExp pn("Pn:([^|^>]*)");
-        if (pn.indexIn(data) != -1) {
-            pinState.append(QString(tr("PS: %1")).arg(pn.cap(1)));
-        }
-
-        // Process spindle state
-        static QRegExp as("A:([^,^>^|]+)");
-        if (as.indexIn(data) != -1) {
-            QString q = as.cap(1);
-            m_communicator->m_spindleCW = q.contains("S");
-            if (q.contains("S") || q.contains("C")) {
-                emit spindleStateReceived(true);
-                // to spindleStateReceived handler
-                // m_timerToolAnimation.start(25, this);
-                // ui->cmdSpindle->setChecked(true);
-            } else {
-                emit spindleStateReceived(false);
-                // to spindleStateReceived handler
-                // m_timerToolAnimation.stop();
-                // ui->cmdSpindle->setChecked(false);
-            }
-            emit floodStateReceived(q.contains("F"));
-
-            if (!pinState.isEmpty()) pinState.append(" / ");
-            pinState.append(QString(tr("AS: %1")).arg(as.cap(1)));
-        } else {
-            emit spindleStateReceived(false);
-            // to spindleStateReceived handler
-            // m_timerToolAnimation.stop();
-            // ui->cmdSpindle->setChecked(false);
-        }
-        ui->glwVisualizer->setPinState(pinState);
-    }
-
-    // Get feed/spindle values
-    static QRegExp fs("FS:([^,]*),([^,^|^>]*)");
-    if (fs.indexIn(data) != -1) {
-        ui->glwVisualizer->setSpeedState((QString(tr("F/S: %1 / %2")).arg(fs.cap(1)).arg(fs.cap(2))));
-    }
+    processOverrides(data);
+    processFeedSpindleSpeed(data);
 
     // Store device state
     m_communicator->setDeviceState(state);
