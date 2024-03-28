@@ -45,6 +45,8 @@ class Communicator : public QObject
         void stopUpdatingState();
         void startUpdatingState();
         void startUpdatingState(int interval);
+        SenderState senderState() const { return m_senderState; }
+        DeviceState deviceState() const { return m_deviceState; }
     
     private:
         static const int BUFFERLENGTH = 127;

@@ -446,7 +446,7 @@ void frmMain::closeEvent(QCloseEvent *ce)
         return;
     }
 
-    if ((m_communicator->m_senderState != SenderStopped) &&
+    if ((m_communicator->senderState() != SenderStopped) &&
         QMessageBox::warning(this, this->windowTitle(), tr("File sending in progress. Terminate and exit?"),
         QMessageBox::Yes | QMessageBox::No) == QMessageBox::No) 
     {    
@@ -470,7 +470,7 @@ void frmMain::closeEvent(QCloseEvent *ce)
 
 void frmMain::dragEnterEvent(QDragEnterEvent *dee)
 {
-    if (m_communicator->m_senderState != SenderStopped) return;
+    if (m_communicator->senderState() != SenderStopped) return;
 
     if (dee->mimeData()->hasFormat("application/widget")) return;
 
@@ -815,14 +815,14 @@ void frmMain::on_cmdFilePause_clicked(bool checked)
 
     if (checked) {
         //PAUSE
-        s = m_communicator->m_senderState;
+        s = m_communicator->senderState();
         // setSenderState(SenderPaused);
         m_communicator->setSenderState(SenderPausing);
         ui->cmdFilePause->setText(tr("Pausing..."));
         ui->cmdFilePause->setEnabled(false);
     } else {
         //RESUME
-        if (m_communicator->m_senderState == SenderChangingTool) {
+        if (m_communicator->senderState() == SenderChangingTool) {
             m_communicator->setSenderState(SenderTransferring);
         } else {
             if (m_settings->usePauseCommands()) {
@@ -838,7 +838,7 @@ void frmMain::on_cmdFileAbort_clicked()
 {
     ui->cmdFileAbort->setEnabled(false);
 
-    if ((m_communicator->m_senderState == SenderPaused) || (m_communicator->m_senderState == SenderChangingTool)) {
+    if ((m_communicator->senderState() == SenderPaused) || (m_communicator->senderState() == SenderChangingTool)) {
         m_communicator->sendCommand("M2", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands(), false);
     } else {
         m_communicator->sendCommand("M2", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands(), true);
@@ -1059,7 +1059,7 @@ void frmMain::on_chkKeyboardControl_toggled(bool checked)
         if (m_absoluteCoordinates) m_communicator->sendCommand("G90", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
     }
 
-    if ((m_communicator->m_senderState != SenderTransferring) && (m_communicator->m_senderState != SenderStopping))
+    if ((m_communicator->senderState() != SenderTransferring) && (m_communicator->senderState() != SenderStopping))
         m_storedKeyboardControl = checked;
 
     updateJogTitle();
@@ -1568,7 +1568,7 @@ void frmMain::on_cmdStop_clicked()
 
 void frmMain::on_tblProgram_customContextMenuRequested(const QPoint &pos)
 {
-    if (m_communicator->m_senderState != SenderStopped) return;
+    if (m_communicator->senderState() != SenderStopped) return;
 
     if (ui->tblProgram->selectionModel()->selectedRows().count() > 0) {
         m_tableMenu->actions().at(0)->setEnabled(true);
@@ -1661,23 +1661,23 @@ void frmMain::onDeviceStateChanged(DeviceState state)
 {
     this->m_partState->setStatusText(m_statusCaptions[state], m_statusBackColors[state], m_statusForeColors[state]);
 
-    ui->cmdCheck->setEnabled(state != DeviceRun && (m_communicator->m_senderState == SenderStopped));
+    ui->cmdCheck->setEnabled(state != DeviceRun && (m_communicator->senderState() == SenderStopped));
     ui->cmdCheck->setChecked(state == DeviceCheck);
     ui->cmdHold->setChecked(state == DeviceHold0 || state == DeviceHold1 || state == DeviceQueue);
-    ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_communicator->m_senderState != SenderTransferring) &&
-                                                        (m_communicator->m_senderState != SenderStopping)));
+    ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_communicator->senderState() != SenderTransferring) &&
+                                                        (m_communicator->senderState() != SenderStopping)));
 }
 
 void frmMain::onDeviceStateReceived(DeviceState state)
 {
     // Update controls state
-    ui->cmdCheck->setEnabled(state != DeviceRun && (m_communicator->m_senderState == SenderStopped));
+    ui->cmdCheck->setEnabled(state != DeviceRun && (m_communicator->senderState() == SenderStopped));
     ui->cmdCheck->setChecked(state == DeviceCheck);
     ui->cmdHold->setChecked(state == DeviceHold0 || state == DeviceHold1 || state == DeviceQueue);
-    ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_communicator->m_senderState != SenderTransferring) &&
-                                                        (m_communicator->m_senderState != SenderStopping)));
+    ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_communicator->senderState() != SenderTransferring) &&
+                                                        (m_communicator->senderState() != SenderStopping)));
     // Update "elapsed time" timer
-    if ((m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping)) {
+    if ((m_communicator->senderState() == SenderTransferring) || (m_communicator->senderState() == SenderStopping)) {
         QTime time(0, 0, 0);
         int elapsed = m_startTime.elapsed();
         ui->glwVisualizer->setSpendTime(time.addMSecs(elapsed));
@@ -1753,7 +1753,7 @@ void frmMain::onTimerConnection()
 void frmMain::onTableInsertLine()
 {
     if (ui->tblProgram->selectionModel()->selectedRows().count() == 0 || 
-        (m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping)) return;
+        (m_communicator->senderState() == SenderTransferring) || (m_communicator->senderState() == SenderStopping)) return;
 
     int row = ui->tblProgram->selectionModel()->selectedRows()[0].row();
 
@@ -1768,7 +1768,7 @@ void frmMain::onTableInsertLine()
 void frmMain::onTableDeleteLines()
 {
     if (ui->tblProgram->selectionModel()->selectedRows().count() == 0 || 
-        (m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping) ||
+        (m_communicator->senderState() == SenderTransferring) || (m_communicator->senderState() == SenderStopping) ||
         QMessageBox::warning(this, this->windowTitle(), tr("Delete lines?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::No) return;
 
     QModelIndex firstRow = ui->tblProgram->selectionModel()->selectedRows()[0];
@@ -2002,7 +2002,7 @@ void frmMain::onScroolBarAction(int action)
 {
     Q_UNUSED(action)
 
-    if ((m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping))
+    if ((m_communicator->senderState() == SenderTransferring) || (m_communicator->senderState() == SenderStopping))
         ui->chkAutoScroll->setChecked(false);
 }
 
@@ -2838,7 +2838,7 @@ void frmMain::writeConsole(QString command)
 //     // Set M2 & M30 commands sent flag
 //     static QRegExp M230("(M0*2|M30|M0*6|M25)(?!\\d)");
 //     static QRegExp M6("(M0*6)(?!\\d)");
-//     if ((m_communicator->m_senderState == SenderTransferring) && uncomment.contains(M230)) {
+//     if ((m_communicator->senderState() == SenderTransferring) && uncomment.contains(M230)) {
 //         if (!uncomment.contains(M6) || m_settings->toolChangeUseCommands() || m_settings->toolChangePause()) m_communicator->setSenderState(SenderPausing);
 //     }
 
@@ -3394,14 +3394,14 @@ void frmMain::newHeightmap()
 void frmMain::updateControlsState()
 {
     bool portOpened = m_connection->isConnected();
-    bool process = (m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping);
-    bool paused = (m_communicator->m_senderState == SenderPausing) || (m_communicator->m_senderState == SenderPausing2) || (m_communicator->m_senderState == SenderPaused) || (m_communicator->m_senderState == SenderChangingTool);
+    bool process = (m_communicator->senderState() == SenderTransferring) || (m_communicator->senderState() == SenderStopping);
+    bool paused = (m_communicator->senderState() == SenderPausing) || (m_communicator->senderState() == SenderPausing2) || (m_communicator->senderState() == SenderPaused) || (m_communicator->senderState() == SenderChangingTool);
 
     ui->grpState->setEnabled(portOpened);
     ui->grpControl->setEnabled(portOpened);
     ui->widgetSpindle->setEnabled(portOpened);
-    ui->widgetJog->setEnabled(portOpened && ((m_communicator->m_senderState == SenderStopped)
-        || (m_communicator->m_senderState == SenderChangingTool)));
+    ui->widgetJog->setEnabled(portOpened && ((m_communicator->senderState() == SenderStopped)
+        || (m_communicator->senderState() == SenderChangingTool)));
 
     m_partConsole->setEnabled(portOpened && (!ui->chkKeyboardControl->isChecked()));
     // ui->cmdCommandSend->setEnabled(portOpened);
@@ -3413,12 +3413,12 @@ void frmMain::updateControlsState()
     ui->cmdSpindle->setEnabled(!process);
     ui->cmdSleep->setEnabled(!process);
 
-    ui->actFileNew->setEnabled(m_communicator->m_senderState == SenderStopped);
-    ui->actFileOpen->setEnabled(m_communicator->m_senderState == SenderStopped);
-    ui->cmdFileOpen->setEnabled(m_communicator->m_senderState == SenderStopped);
-    ui->cmdFileReset->setEnabled((m_communicator->m_senderState == SenderStopped) && m_programModel.rowCount() > 1);
-    ui->cmdFileSend->setEnabled(portOpened && (m_communicator->m_senderState == SenderStopped) && m_programModel.rowCount() > 1);
-    switch (m_communicator->m_senderState) {
+    ui->actFileNew->setEnabled(m_communicator->senderState() == SenderStopped);
+    ui->actFileOpen->setEnabled(m_communicator->senderState() == SenderStopped);
+    ui->cmdFileOpen->setEnabled(m_communicator->senderState() == SenderStopped);
+    ui->cmdFileReset->setEnabled((m_communicator->senderState() == SenderStopped) && m_programModel.rowCount() > 1);
+    ui->cmdFileSend->setEnabled(portOpened && (m_communicator->senderState() == SenderStopped) && m_programModel.rowCount() > 1);
+    switch (m_communicator->senderState()) {
         case SenderPausing:
         case SenderPausing2:
             ui->cmdFilePause->setText(tr("Pausing..."));
@@ -3431,15 +3431,15 @@ void frmMain::updateControlsState()
             ui->cmdFilePause->setText(tr("Pause"));
             break;
     }
-    ui->cmdFilePause->setEnabled(portOpened && (process || paused) && (m_communicator->m_senderState != SenderPausing) && (m_communicator->m_senderState != SenderPausing2));
+    ui->cmdFilePause->setEnabled(portOpened && (process || paused) && (m_communicator->senderState() != SenderPausing) && (m_communicator->senderState() != SenderPausing2));
     ui->cmdFilePause->setChecked(paused);
-    ui->cmdFileAbort->setEnabled(m_communicator->m_senderState != SenderStopped && m_communicator->m_senderState != SenderStopping);
-    ui->mnuRecent->setEnabled((m_communicator->m_senderState == SenderStopped) && ((m_recentFiles.count() > 0 && !m_heightMapMode)
+    ui->cmdFileAbort->setEnabled(m_communicator->senderState() != SenderStopped && m_communicator->senderState() != SenderStopping);
+    ui->mnuRecent->setEnabled((m_communicator->senderState() == SenderStopped) && ((m_recentFiles.count() > 0 && !m_heightMapMode)
                                                       || (m_recentHeightmaps.count() > 0 && m_heightMapMode)));
     ui->actFileSave->setEnabled(m_programModel.rowCount() > 1);
     ui->actFileSaveAs->setEnabled(m_programModel.rowCount() > 1);
 
-    ui->tblProgram->setEditTriggers((m_communicator->m_senderState != SenderStopped) ? QAbstractItemView::NoEditTriggers :
+    ui->tblProgram->setEditTriggers((m_communicator->senderState() != SenderStopped) ? QAbstractItemView::NoEditTriggers :
         QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked | 
         QAbstractItemView::EditKeyPressed | QAbstractItemView::AnyKeyPressed);
 
@@ -3456,7 +3456,7 @@ void frmMain::updateControlsState()
 #ifdef WINDOWS
     if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7 && m_taskBarProgress) {
         m_taskBarProgress->setPaused(paused);
-        if (m_communicator->m_senderState == SenderStopped) m_taskBarProgress->hide();
+        if (m_communicator->senderState() == SenderStopped) m_taskBarProgress->hide();
     }
 #endif
 
@@ -3708,7 +3708,7 @@ bool frmMain::eventFilter(QObject *obj, QEvent *event)
             }
         }
 
-        if ((m_communicator->m_senderState != SenderTransferring) && (m_communicator->m_senderState != SenderStopping)
+        if ((m_communicator->senderState() != SenderTransferring) && (m_communicator->senderState() != SenderStopping)
             && ui->chkKeyboardControl->isChecked() && !ev->isAutoRepeat()) 
         {
             static QList<QAction*> acts;
@@ -3739,7 +3739,7 @@ bool frmMain::eventFilter(QObject *obj, QEvent *event)
                 }
             }
         }
-    } else if (obj == ui->tblProgram && ((m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping))) {
+    } else if (obj == ui->tblProgram && ((m_communicator->senderState() == SenderTransferring) || (m_communicator->senderState() == SenderStopping))) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
         if (keyEvent->key() == Qt::Key_PageDown || keyEvent->key() == Qt::Key_PageUp
                     || keyEvent->key() == Qt::Key_Down || keyEvent->key() == Qt::Key_Up) {
@@ -3906,7 +3906,7 @@ void frmMain::jogContinuous()
             if (v.length()) {
                 block = true;
                 m_connection->sendByteArray(QByteArray(1, char(0x85)));
-                while (m_communicator->m_deviceState == DeviceJog) qApp->processEvents();
+                while (m_communicator->deviceState() == DeviceJog) qApp->processEvents();
                 block = false;
             }
             
