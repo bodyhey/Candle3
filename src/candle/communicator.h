@@ -84,7 +84,6 @@ class Communicator : public QObject
         // Timers
         QTimer m_timerStateQuery;
 
-        void onSerialPortReadyRead(QString);
         void setSenderState(SenderState);
         void setDeviceState(DeviceState);
         void restoreOffsets();
