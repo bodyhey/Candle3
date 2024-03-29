@@ -53,6 +53,7 @@ frmMain::frmMain(QWidget *parent) :
         this,
         &m_configuration,
         ui, m_settings, this);
+    m_streamer = new Streamer();
 
     connect(m_communicator, SIGNAL(machinePosChanged(QVector3D)), this, SLOT(onMachinePosChanged(QVector3D)));
     connect(m_communicator, SIGNAL(workPosChanged(QVector3D)), this, SLOT(onWorkPosChanged(QVector3D)));
@@ -61,6 +62,7 @@ frmMain::frmMain(QWidget *parent) :
     connect(m_communicator, SIGNAL(spindleStateReceived(bool)), this, SLOT(onSpindleStateReceived(bool)));
     connect(m_communicator, SIGNAL(floodStateReceived(bool)), this, SLOT(onFloodStateReceived(bool)));
     connect(m_communicator, SIGNAL(commandResponseReceived(CommandAttributes,QString)), this, SLOT(onCommandResponseReceived(CommandAttributes,QString)));
+    connect(m_communicator, SIGNAL(aborted()), this, SLOT(onAborted()));
 
     // Initializing variables
     m_deviceStatuses[DeviceUnknown] = "Unknown";
@@ -186,7 +188,7 @@ frmMain::frmMain(QWidget *parent) :
 
     m_heightMapMode = false;
     m_lastDrawnLineIndex = 0;
-    m_fileProcessedCommandIndex = 0;
+    m_streamer->resetProcessed();
     m_programLoading = false;
     m_currentModel = &m_programModel;
 
@@ -836,19 +838,12 @@ void frmMain::on_cmdFilePause_clicked(bool checked)
 
 void frmMain::on_cmdFileAbort_clicked()
 {
-    ui->cmdFileAbort->setEnabled(false);
-
-    if ((m_communicator->senderState() == SenderPaused) || (m_communicator->senderState() == SenderChangingTool)) {
-        m_communicator->sendCommand("M2", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands(), false);
-    } else {
-        m_communicator->sendCommand("M2", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands(), true);
-    }
+    m_communicator->abort();
 }
 
 void frmMain::on_cmdFileReset_clicked()
 {
-    m_fileCommandIndex = 0;
-    m_fileProcessedCommandIndex = 0;
+    m_streamer->reset();
     m_lastDrawnLineIndex = 0;
     m_communicator->m_probeIndex = -1;
 
@@ -1395,8 +1390,7 @@ void frmMain::on_cmdHeightMapMode_toggled(bool checked)
     m_heightMapMode = checked;
 
     // Reset file progress
-    m_fileCommandIndex = 0;
-    m_fileProcessedCommandIndex = 0;
+    m_streamer->reset();
     m_lastDrawnLineIndex = 0;
 
     // Reset/restore g-code program modification on edit mode enter/exit
@@ -1703,6 +1697,11 @@ void frmMain::onFloodStateReceived(bool state)
     ui->cmdFlood->setChecked(state);
 }
 
+void frmMain::onAborted()
+{
+    ui->cmdFileAbort->setEnabled(false);
+}
+
 void frmMain::onCommandResponseReceived(CommandAttributes commandAttributes, QString response)
 {
     m_partConsole->appendResponse(commandAttributes.consoleIndex, commandAttributes.command, response);
@@ -1922,8 +1921,7 @@ void frmMain::onActSendFromLineTriggered()
         }
     }
 
-    m_fileCommandIndex = commandIndex;
-    m_fileProcessedCommandIndex = commandIndex;
+    m_streamer->reset(commandIndex);
     m_lastDrawnLineIndex = 0;
     m_communicator->m_probeIndex = -1;
 
@@ -1967,8 +1965,7 @@ void frmMain::onActSendFromLineTriggered()
     updateControlsState();
     ui->cmdFilePause->setFocus();
 
-    m_fileCommandIndex = commandIndex;
-    m_fileProcessedCommandIndex = commandIndex;
+    m_streamer->reset(commandIndex);
     sendNextFileCommands();
 }
 
@@ -2766,7 +2763,7 @@ void frmMain::openPort()
 void frmMain::grblReset()
 {
     m_communicator->reset();
-    m_fileCommandIndex = 0;
+    m_streamer->reset();
     m_updateSpindleSpeed = true;
     updateControlsState();
 }
@@ -2873,18 +2870,18 @@ void frmMain::writeConsole(QString command)
 void frmMain::sendNextFileCommands() {
     if (m_communicator->m_queue.length() > 0) return;
 
-    QString command = m_currentModel->data(m_currentModel->index(m_fileCommandIndex, 1)).toString();
+    QString command = m_currentModel->data(m_currentModel->index(m_streamer->commandIndex(), 1)).toString();
     static QRegExp M230("(M0*2|M30|M0*6)(?!\\d)");
 
     while ((bufferLength() + command.length() + 1) <= BUFFERLENGTH
-        && m_fileCommandIndex < m_currentModel->rowCount() - 1
+        && m_streamer->commandIndex() < m_currentModel->rowCount() - 1
         && !(!m_communicator->m_commands.isEmpty() && GcodePreprocessorUtils::removeComment(m_communicator->m_commands.last().command).contains(M230))
         ) 
     {
-        m_currentModel->setData(m_currentModel->index(m_fileCommandIndex, 2), GCodeItem::Sent);
-        m_communicator->sendCommand(command, m_fileCommandIndex, m_configuration.consoleModule().showProgramCommands());
-        m_fileCommandIndex++;
-        command = m_currentModel->data(m_currentModel->index(m_fileCommandIndex, 1)).toString();
+        m_currentModel->setData(m_currentModel->index(m_streamer->commandIndex(), 2), GCodeItem::Sent);
+        m_communicator->sendCommand(command, m_streamer->commandIndex(), m_configuration.consoleModule().showProgramCommands());
+        m_streamer->advanceCommandIndex();
+        command = m_currentModel->data(m_currentModel->index(m_streamer->commandIndex(), 1)).toString();
     }
 }
 
@@ -3979,7 +3976,7 @@ void frmMain::completeTransfer()
 
     // Update state
     m_communicator->setSenderState(SenderStopped);
-    m_fileProcessedCommandIndex = 0;
+    m_streamer->resetProcessed();
     m_lastDrawnLineIndex = 0;
     m_storedParserStatus.clear();
 

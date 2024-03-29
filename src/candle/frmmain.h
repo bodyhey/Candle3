@@ -21,6 +21,7 @@
 
 #include "connection/connection.h"
 #include "communicator.h"
+#include "streamer.h"
 #include "globals.h"
 
 #include "connection/connection.h"
@@ -105,8 +106,8 @@ public:
     bool &updateParserStatus() override { return m_updateParserStatus; };
     bool &heightMapMode() override { return m_heightMapMode; };
     bool &absoluteCoordinates() override { return m_absoluteCoordinates; };
-    int &fileCommandIndex() override { return m_fileCommandIndex; };
-    int &fileProcessedCommandIndex() override { return m_fileProcessedCommandIndex; };
+    // int &fileCommandIndex() override { return m_fileCommandIndex; };
+    // int &fileProcessedCommandIndex() override { return m_fileProcessedCommandIndex; };
     int &lastDrawnLineIndex() override { return m_lastDrawnLineIndex; };
     partMainConsole &partConsole() override { return *m_partConsole; };
     QMessageBox &senderErrorBox() override { return *m_senderErrorBox; };
@@ -221,6 +222,7 @@ private slots:
     void onDeviceStateReceived(DeviceState state);
     void onSpindleStateReceived(bool state);
     void onFloodStateReceived(bool state);
+    void onAborted();
     void onCommandResponseReceived(CommandAttributes commandAttributes, QString response);
     void onConfigurationReceived(MachineConfiguration, QMap<int, double>);
     void onConnectionError(QString error);
@@ -299,9 +301,10 @@ private:
     GCodeTableModel *m_currentModel;
     HeightMapTableModel m_heightMapModel;
 
-    // Connection
+    // @TODO to be moved to separate core class
     Connection *m_connection;
     Communicator *m_communicator;
+    Streamer *m_streamer;
 
     // Forms
     frmSettings *m_settings;
@@ -339,10 +342,6 @@ private:
     bool m_updateParserStatus;
 
     bool m_heightMapMode;
-
-    // Indices
-    int m_fileCommandIndex;
-    int m_fileProcessedCommandIndex;
 
     // Current values
     int m_lastDrawnLineIndex;

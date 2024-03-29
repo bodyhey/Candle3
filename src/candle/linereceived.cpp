@@ -41,9 +41,9 @@ qApp->beep()
 
 // transfering file, streamer class?
 m_fileProcessedCommandIndex
+fileProcessedCommandIndex
 m_currentModel
 completeTransfer();
-ui->cmdFileAbort
 sendNextFileCommands
 
 // height map
@@ -190,7 +190,7 @@ void Communicator::processToolpathShadowing(DeviceState state, QVector3D toolPos
 
         for (int i = m_form->lastDrawnLineIndex(); i < list.count()
                                                    && list.at(i)->getLineNumber()
-                                                          <= (m_form->currentModel().data(m_form->currentModel().index(m_form->fileProcessedCommandIndex(), 4)).toInt() + 1); i++) {
+                                                          <= (m_form->currentModel().data(m_form->currentModel().index(m_streamer->processedCommandIndex(), 4)).toInt() + 1); i++) {
             if (list.at(i)->contains(toolPosition)) {
                 toolOntoolpath = true;
                 m_form->lastDrawnLineIndex() = i;
@@ -211,7 +211,7 @@ void Communicator::processToolpathShadowing(DeviceState state, QVector3D toolPos
 void Communicator::processNewToolPosition(DeviceState state)
 {
     QVector3D toolPosition;
-    if (!(state == DeviceCheck && m_form->fileProcessedCommandIndex() < m_form->currentModel().rowCount() - 1)) {
+    if (!(state == DeviceCheck && m_streamer->processedCommandIndex() < m_form->currentModel().rowCount() - 1)) {
         toolPosition = m_communicator->m_machinePos;
         m_form->toolDrawer().setToolPosition(m_form->codeDrawer().getIgnoreZ() ? QVector3D(toolPosition.x(), toolPosition.y(), 0) : toolPosition);
     }
@@ -597,7 +597,7 @@ void Communicator::processCommandResponse(QString data)
                 m_form->currentModel().setData(m_form->currentModel().index(ca.tableIndex, 2), GCodeItem::Processed);
                 m_form->currentModel().setData(m_form->currentModel().index(ca.tableIndex, 3), response);
 
-                m_form->fileProcessedCommandIndex() = ca.tableIndex;
+                m_streamer->resetProcessed(ca.tableIndex);
 
                 if (ui->chkAutoScroll->isChecked() && ca.tableIndex != -1) {
                     ui->tblProgram->scrollTo(m_form->currentModel().index(ca.tableIndex + 1, 0));      // TODO: Update by timer
@@ -607,11 +607,12 @@ void Communicator::processCommandResponse(QString data)
 
 // Update taskbar progress
 #ifdef WINDOWS
+            // @TODO move progress to streamer??
             // if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7) {
             //     if (m_taskBarProgress) m_taskBarProgress->setValue(m_fileProcessedCommandIndex);
             // }
 #endif \
-    // Process error messages
+            // Process error messages
             static bool holding = false;
             static QString errors;
 
@@ -636,19 +637,20 @@ void Communicator::processCommandResponse(QString data)
                         m_communicator->sendRealtimeCommand("~");
                     } else {
                         m_communicator->sendRealtimeCommand("~");
-                        ui->cmdFileAbort->click();
+
+                        emit aborted();
                     }
                 }
             }
 
             // Check transfer complete (last row always blank, last command row = rowcount - 2)
-            if ((m_form->fileProcessedCommandIndex() == m_form->currentModel().rowCount() - 2) || uncomment.contains(QRegExp("(M0*2|M30)(?!\\d)"))) {
+            if ((m_streamer->processedCommandIndex() == m_form->currentModel().rowCount() - 2) || uncomment.contains(QRegExp("(M0*2|M30)(?!\\d)"))) {
                 if (m_communicator->m_deviceState == DeviceRun) {
                     m_communicator->setSenderState(SenderStopping);
                 } else {
                     m_form->completeTransfer();
                 }
-            } else if ((m_form->fileCommandIndex() < m_form->currentModel().rowCount())
+            } else if ((m_streamer->commandIndex() < m_form->currentModel().rowCount())
                        && (m_communicator->m_senderState == SenderTransferring)
                        && !holding)
             {
@@ -716,13 +718,13 @@ void Communicator::processCommandResponse(QString data)
             GcodeViewParse *parser = m_form->currentDrawer().viewParser();
             QList<LineSegment*> list = parser->getLineSegmentList();
 
-            if ((m_communicator->m_senderState != SenderStopping) && m_form->fileProcessedCommandIndex() < m_form->currentModel().rowCount() - 1) {
+            if ((m_communicator->m_senderState != SenderStopping) && m_streamer->processedCommandIndex() < m_form->currentModel().rowCount() - 1) {
                 int i;
                 QList<int> drawnLines;
 
                 for (i = m_form->lastDrawnLineIndex(); i < list.count()
                                                && list.at(i)->getLineNumber()
-                                                              <= (m_form->currentModel().data(m_form->currentModel().index(m_form->fileProcessedCommandIndex(), 4)).toInt()); i++) {
+                                                              <= (m_form->currentModel().data(m_form->currentModel().index(m_streamer->processedCommandIndex(), 4)).toInt()); i++) {
                     drawnLines << i;
                 }
 
@@ -763,7 +765,8 @@ void Communicator::processUnhandledResponse(QString data)
         m_communicator->setSenderState(SenderStopped);
         m_communicator->setDeviceState(DeviceUnknown);
 
-        m_form->fileCommandIndex() = 0;
+        m_streamer->reset();
+        //m_form->fileCommandIndex() = 0;
 
         m_communicator->m_reseting = false;
         m_communicator->m_homing = false;

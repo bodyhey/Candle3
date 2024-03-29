@@ -85,6 +85,7 @@ SOURCES += main.cpp\
     parser/linesegment.cpp \
     parser/pointsegment.cpp \
     scripting/scripting.cpp \
+    streamer.cpp \
     tables/gcodetablemodel.cpp \
     tables/heightmaptablemodel.cpp \
     widgets/combobox.cpp \
@@ -139,6 +140,7 @@ HEADERS  += frmmain.h \
     parser/linesegment.h \
     parser/pointsegment.h \
     scripting/scripting.h \
+    streamer.h \
     tables/gcodetablemodel.h \
     tables/heightmaptablemodel.h \
     tempconnectiontouiproxy.h \

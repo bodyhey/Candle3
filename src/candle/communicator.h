@@ -5,6 +5,7 @@
 //#include "frmmain.h"
 #include "frmsettings.h"
 #include "globals.h"
+#include "streamer.h"
 #include "connection/connection.h"
 #include "tempconnectiontouiproxy.h"
 #include "machine/machineconfiguration.h"
@@ -37,9 +38,12 @@ class Communicator : public QObject
         void sendRealtimeCommand(QString command);
         void sendRealtimeCommand(int command);
         void sendCommands(QString commands, int tableIndex = -1);
+        bool streamCommands(Streamer *streamer);
         void clearCommandsAndQueue();
         void clearQueue();
         void reset();
+        // @TODO abort what?? find more self descriptive name, move to streamer??
+        void abort();
         // disconnect, dispose and delete old connection, connect new connection
         void replaceConnection(Connection *);
         void stopUpdatingState();
@@ -57,6 +61,7 @@ class Communicator : public QObject
         Ui::frmMain *ui;
         TempConnectionToUiProxy *m_form;
         Communicator *m_communicator;
+        Streamer *m_streamer = nullptr;
 
         // Queues
         QList<CommandAttributes> m_commands;
@@ -125,7 +130,8 @@ class Communicator : public QObject
         void spindleStateReceived(bool state);
         void floodStateReceived(bool state);
         void commandResponseReceived(CommandAttributes commandAttributes, QString response);
-
+        // @TODO aborted what?? find better name
+        void aborted();
 };
 
 #endif // COMMUNICATOR_H

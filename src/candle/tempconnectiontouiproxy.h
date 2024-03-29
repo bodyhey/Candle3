@@ -41,8 +41,8 @@ class TempConnectionToUiProxy {
         virtual bool &updateParserStatus() = 0;
         virtual bool &heightMapMode() = 0;
         virtual bool &absoluteCoordinates() = 0;
-        virtual int &fileCommandIndex() = 0;
-        virtual int &fileProcessedCommandIndex() = 0;
+        // virtual int &fileCommandIndex() = 0;
+        // virtual int &fileProcessedCommandIndex() = 0;
         virtual int &lastDrawnLineIndex() = 0;
         virtual partMainConsole &partConsole() = 0;
         virtual QMessageBox &senderErrorBox() = 0;

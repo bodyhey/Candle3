@@ -156,6 +156,18 @@ void Communicator::sendCommands(QString commands, int tableIndex)
     }
 }
 
+bool Communicator::streamCommands(Streamer *streamer)
+{
+    // if (cannot be streamed) {
+    //     return false;
+    // }
+
+    m_streamer = streamer;
+    //startStreaming();
+
+    return true;
+}
+
 void Communicator::clearCommandsAndQueue()
 {
     m_commands.clear();
@@ -198,6 +210,15 @@ void Communicator::reset()
     ca.tableIndex = -1;
     ca.length = ca.command.length() + 1;
     m_commands.append(ca);
+}
+
+void Communicator::abort()
+{
+    if ((m_communicator->senderState() == SenderPaused) || (m_communicator->senderState() == SenderChangingTool)) {
+        m_communicator->sendCommand("M2", COMMAND_TI_UI, m_configuration->consoleModule().showUiCommands(), false);
+    } else {
+        m_communicator->sendCommand("M2", COMMAND_TI_UI, m_configuration->consoleModule().showUiCommands(), true);
+    }
 }
 
 /*
