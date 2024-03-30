@@ -344,7 +344,7 @@ void Communicator::processStatus(QString data)
     processFeedSpindleSpeed(data);
 
     // Store device state
-    m_communicator->setDeviceState(state);
+    m_communicator->setDeviceStateAndEmitSignal(state);
 
     // Update continuous jog
     m_form->jogContinuous();
@@ -762,8 +762,8 @@ void Communicator::processUnhandledResponse(QString data)
     // Unprocessed responses
     // Handle hardware reset
     if (m_communicator->dataIsReset(data)) {
-        m_communicator->setSenderState(SenderStopped);
-        m_communicator->setDeviceState(DeviceUnknown);
+        m_communicator->setSenderStateAndEmitSignal(SenderStopped);
+        m_communicator->setDeviceStateAndEmitSignal(DeviceUnknown);
 
         m_streamer->reset();
         //m_form->fileCommandIndex() = 0;

@@ -42,7 +42,7 @@ Communicator::Communicator(
     // this->connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));
     connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
 
-    setSenderState(SenderStopped);
+    setSenderStateAndEmitSignal(SenderStopped);
 
     // Update state timer
     connect(&m_timerStateQuery, SIGNAL(timeout()), this, SLOT(onTimerStateQuery()));
@@ -118,7 +118,7 @@ SendCommandResult Communicator::sendCommand(QString command, int tableIndex, boo
     static QRegExp M230("(M0*2|M30|M0*6|M25)(?!\\d)");
     static QRegExp M6("(M0*6)(?!\\d)");
     if ((m_senderState == SenderTransferring) && uncomment.contains(M230)) {
-        if (!uncomment.contains(M6) || m_settings->toolChangeUseCommands() || m_settings->toolChangePause()) setSenderState(SenderPausing);
+        if (!uncomment.contains(M6) || m_settings->toolChangeUseCommands() || m_settings->toolChangePause()) setSenderStateAndEmitSignal(SenderPausing);
     }
 
     // Queue offsets request on G92, G10 commands
@@ -183,8 +183,8 @@ void Communicator::reset()
 {
     m_connection->sendByteArray(QByteArray(1, GRBL_LIVE_SOFT_RESET));
 
-    setSenderState(SenderStopped);
-    setDeviceState(DeviceUnknown);
+    setSenderStateAndEmitSignal(SenderStopped);
+    setDeviceStateAndEmitSignal(DeviceUnknown);
     // in main form
     //m_fileCommandIndex = 0;
 
@@ -264,7 +264,7 @@ void Communicator::restoreOffsets()
     //             COMMAND_TI_UTIL1, m_settings->showUICommands());
 }
 
-void Communicator::setSenderState(SenderState state)
+void Communicator::setSenderStateAndEmitSignal(SenderState state)
 {
     if (m_senderState != state) {
         m_senderState = state;
@@ -272,7 +272,7 @@ void Communicator::setSenderState(SenderState state)
     }
 }
 
-void Communicator::setDeviceState(DeviceState state)
+void Communicator::setDeviceStateAndEmitSignal(DeviceState state)
 {
     if (m_deviceState != state) {
         m_deviceState = state;

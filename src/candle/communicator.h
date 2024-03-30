@@ -91,8 +91,8 @@ class Communicator : public QObject
         // Timers
         QTimer m_timerStateQuery;
 
-        void setSenderState(SenderState);
-        void setDeviceState(DeviceState);
+        void setSenderStateAndEmitSignal(SenderState);
+        void setDeviceStateAndEmitSignal(DeviceState);
         void restoreOffsets();
         int bufferLength();
         void storeOffsetsVars(QString response);

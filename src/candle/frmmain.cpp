@@ -787,7 +787,7 @@ void frmMain::on_cmdFileSend_clicked()
 
     m_startTime.start();
 
-    m_communicator->setSenderState(SenderTransferring);
+    m_communicator->setSenderStateAndEmitSignal(SenderTransferring);
 
     m_storedKeyboardControl = ui->chkKeyboardControl->isChecked();
     ui->chkKeyboardControl->setChecked(false);
@@ -819,18 +819,18 @@ void frmMain::on_cmdFilePause_clicked(bool checked)
         //PAUSE
         s = m_communicator->senderState();
         // setSenderState(SenderPaused);
-        m_communicator->setSenderState(SenderPausing);
+        m_communicator->setSenderStateAndEmitSignal(SenderPausing);
         ui->cmdFilePause->setText(tr("Pausing..."));
         ui->cmdFilePause->setEnabled(false);
     } else {
         //RESUME
         if (m_communicator->senderState() == SenderChangingTool) {
-            m_communicator->setSenderState(SenderTransferring);
+            m_communicator->setSenderStateAndEmitSignal(SenderTransferring);
         } else {
             if (m_settings->usePauseCommands()) {
                 m_communicator->sendCommands(m_settings->afterPauseCommands());
             }
-            m_communicator->setSenderState(s);
+            m_communicator->setSenderStateAndEmitSignal(s);
         }
         updateControlsState();
     }
@@ -1945,7 +1945,7 @@ void frmMain::onActSendFromLineTriggered()
 
     m_startTime.start();
 
-    m_communicator->setSenderState(SenderTransferring);
+    m_communicator->setSenderStateAndEmitSignal(SenderTransferring);
 
     m_storedKeyboardControl = ui->chkKeyboardControl->isChecked();
     ui->chkKeyboardControl->setChecked(false);
@@ -3975,7 +3975,7 @@ void frmMain::completeTransfer()
     }
 
     // Update state
-    m_communicator->setSenderState(SenderStopped);
+    m_communicator->setSenderStateAndEmitSignal(SenderStopped);
     m_streamer->resetProcessed();
     m_lastDrawnLineIndex = 0;
     m_storedParserStatus.clear();
