@@ -226,8 +226,11 @@ void Communicator::abort()
 */
 void Communicator::replaceConnection(Connection *newConnection)
 {
+    if (m_connection == newConnection) return;
+    disconnect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
     m_connection->disconnect();
     m_connection = newConnection;
+    connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
 }
 
 void Communicator::stopUpdatingState()
