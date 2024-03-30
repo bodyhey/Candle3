@@ -113,6 +113,8 @@ public:
     QMessageBox &senderErrorBox() override { return *m_senderErrorBox; };
     // TO BE REMOVED !!!
 
+    void initializeCommunicator();
+
 signals:
     void responseReceived(QString command, int tableIndex, QString response);
     void statusReceived(QString status);

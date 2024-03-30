@@ -48,21 +48,7 @@ frmMain::frmMain(QWidget *parent) :
     m_settings = new frmSettings(this, m_configuration);
 
     initializeConnection(ConnectionMode::VIRTUAL);
-    m_communicator = new Communicator(
-        m_connection,
-        this,
-        &m_configuration,
-        ui, m_settings, this);
-    m_streamer = new Streamer();
-
-    connect(m_communicator, SIGNAL(machinePosChanged(QVector3D)), this, SLOT(onMachinePosChanged(QVector3D)));
-    connect(m_communicator, SIGNAL(workPosChanged(QVector3D)), this, SLOT(onWorkPosChanged(QVector3D)));
-    connect(m_communicator, SIGNAL(deviceStateReceived(DeviceState)), this, SLOT(onDeviceStateReceived(DeviceState)));
-    connect(m_communicator, SIGNAL(deviceStateChanged(DeviceState)), this, SLOT(onDeviceStateChanged(DeviceState)));
-    connect(m_communicator, SIGNAL(spindleStateReceived(bool)), this, SLOT(onSpindleStateReceived(bool)));
-    connect(m_communicator, SIGNAL(floodStateReceived(bool)), this, SLOT(onFloodStateReceived(bool)));
-    connect(m_communicator, SIGNAL(commandResponseReceived(CommandAttributes,QString)), this, SLOT(onCommandResponseReceived(CommandAttributes,QString)));
-    connect(m_communicator, SIGNAL(aborted()), this, SLOT(onAborted()));
+    initializeCommunicator();
 
     // Initializing variables
     m_deviceStatuses[DeviceUnknown] = "Unknown";
@@ -395,6 +381,27 @@ frmMain::~frmMain()
     delete m_connection;
     delete m_senderErrorBox;
     delete ui;
+}
+
+void frmMain::initializeCommunicator()
+{
+    m_communicator = new Communicator(
+        m_connection,
+        this,
+        &m_configuration,
+        ui, m_settings, this);
+    m_streamer = new Streamer();
+    // @TODO temporary!
+    m_communicator->streamCommands(m_streamer);
+
+    connect(m_communicator, SIGNAL(machinePosChanged(QVector3D)), this, SLOT(onMachinePosChanged(QVector3D)));
+    connect(m_communicator, SIGNAL(workPosChanged(QVector3D)), this, SLOT(onWorkPosChanged(QVector3D)));
+    connect(m_communicator, SIGNAL(deviceStateReceived(DeviceState)), this, SLOT(onDeviceStateReceived(DeviceState)));
+    connect(m_communicator, SIGNAL(deviceStateChanged(DeviceState)), this, SLOT(onDeviceStateChanged(DeviceState)));
+    connect(m_communicator, SIGNAL(spindleStateReceived(bool)), this, SLOT(onSpindleStateReceived(bool)));
+    connect(m_communicator, SIGNAL(floodStateReceived(bool)), this, SLOT(onFloodStateReceived(bool)));
+    connect(m_communicator, SIGNAL(commandResponseReceived(CommandAttributes,QString)), this, SLOT(onCommandResponseReceived(CommandAttributes,QString)));
+    connect(m_communicator, SIGNAL(aborted()), this, SLOT(onAborted()));
 }
 
 void frmMain::showEvent(QShowEvent *se)
