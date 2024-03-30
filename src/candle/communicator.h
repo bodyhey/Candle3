@@ -47,11 +47,11 @@ class Communicator : public QObject
         // disconnect, dispose and delete old connection, connect new connection
         void replaceConnection(Connection *);
         void stopUpdatingState();
-        void startUpdatingState();
-        void startUpdatingState(int interval);
+        void startUpdatingState(int interval = -1);
         SenderState senderState() const { return m_senderState; }
         DeviceState deviceState() const { return m_deviceState; }
-    
+        void processWorkOffset(QString data);
+
     private:
         static const int BUFFERLENGTH = 127;
 

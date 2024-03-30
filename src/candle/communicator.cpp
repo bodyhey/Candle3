@@ -238,17 +238,12 @@ void Communicator::stopUpdatingState()
     m_timerStateQuery.stop();
 }
 
-void Communicator::startUpdatingState()
-{
-    m_timerStateQuery.start();
-}
-
 void Communicator::startUpdatingState(int interval)
 {
     if (interval > 0) {
         m_timerStateQuery.setInterval(interval);
     }
-    startUpdatingState();
+    m_timerStateQuery.start();
 }
 
 void Communicator::restoreOffsets()
@@ -320,7 +315,8 @@ void Communicator::storeOffsetsVars(QString response)
     // }
 }
 
-bool Communicator::dataIsFloating(QString data) {
+bool Communicator::dataIsFloating(QString data)
+{
     QStringList ends;
 
     ends << "Reset to continue";
@@ -336,7 +332,8 @@ bool Communicator::dataIsFloating(QString data) {
     return false;
 }
 
-bool Communicator::dataIsEnd(QString data) {
+bool Communicator::dataIsEnd(QString data)
+{
     QStringList ends;
 
     ends << "ok";
@@ -351,6 +348,7 @@ bool Communicator::dataIsEnd(QString data) {
 
 void Communicator::onTimerStateQuery()
 {
+    // qDebug() << m_connection->isConnected() << m_resetCompleted << m_statusReceived;
     if (m_connection->isConnected() && m_resetCompleted && m_statusReceived) {
         m_connection->sendByteArray(QByteArray(1, '?'));
         m_statusReceived = false;
