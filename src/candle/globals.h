@@ -101,17 +101,20 @@ enum SendCommandResult {
 struct CommandAttributes {
     int length;
     int consoleIndex;
+    int commandIndex;
     int tableIndex;
     QString command;
+    QString response = "";
 
     CommandAttributes() {
     }
 
-    CommandAttributes(int len, int consoleIdx, int tableIdx, QString cmd) {
-        length = len;
-        consoleIndex = consoleIdx;
-        tableIndex = tableIdx;
-        command = cmd;
+    CommandAttributes(int length_, int consoleIndex_, int commandIndex_, int tableIndex_, QString command_) {
+        length = length_;
+        consoleIndex = consoleIndex_;
+        commandIndex = commandIndex_;
+        tableIndex = tableIndex_;
+        command = command_;
     }
 };
 

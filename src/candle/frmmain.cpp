@@ -400,7 +400,8 @@ void frmMain::initializeCommunicator()
     connect(m_communicator, SIGNAL(deviceStateChanged(DeviceState)), this, SLOT(onDeviceStateChanged(DeviceState)));
     connect(m_communicator, SIGNAL(spindleStateReceived(bool)), this, SLOT(onSpindleStateReceived(bool)));
     connect(m_communicator, SIGNAL(floodStateReceived(bool)), this, SLOT(onFloodStateReceived(bool)));
-    connect(m_communicator, SIGNAL(commandResponseReceived(CommandAttributes,QString)), this, SLOT(onCommandResponseReceived(CommandAttributes,QString)));
+    connect(m_communicator, SIGNAL(commandSent(CommandAttributes)), this, SLOT(onCommandSent(CommandAttributes)));
+    connect(m_communicator, SIGNAL(commandResponseReceived(CommandAttributes)), this, SLOT(onCommandResponseReceived(CommandAttributes)));
     connect(m_communicator, SIGNAL(aborted()), this, SLOT(onAborted()));
 }
 
@@ -1710,9 +1711,14 @@ void frmMain::onAborted()
     ui->cmdFileAbort->setEnabled(false);
 }
 
-void frmMain::onCommandResponseReceived(CommandAttributes commandAttributes, QString response)
+void frmMain::onCommandResponseReceived(CommandAttributes commandAttributes)
 {
-    m_partConsole->appendResponse(commandAttributes.consoleIndex, commandAttributes.command, response);
+    m_partConsole->appendResponse(commandAttributes);
+}
+
+void frmMain::onCommandSent(CommandAttributes commandAttributes)
+{
+    m_partConsole->append(commandAttributes);
 }
 
 void frmMain::onConfigurationReceived(MachineConfiguration configuration, QMap<int, double>)
@@ -1722,7 +1728,6 @@ void frmMain::onConfigurationReceived(MachineConfiguration configuration, QMap<i
 
 void frmMain::onConsoleNewCommand(QString command)
 {
-    qDebug() << "console" << command;
     m_communicator->sendCommand(command, COMMAND_TI_UI);
 }
 

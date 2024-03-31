@@ -5,7 +5,6 @@
 #include "console.h"
 #include "ui_console.h"
 #include <QScrollBar>
-#include <QTextBlock>
 
 partMainConsole::partMainConsole(QWidget *parent, const ConfigurationConsole &configurationConsole)
     : QWidget(parent)
@@ -50,6 +49,17 @@ int partMainConsole::append(QString text)
     return ui->txtConsole->document()->blockCount() - 1;
 }
 
+int partMainConsole::append(CommandAttributes commandAttributes)
+{
+    int blockNumber = append(">> " + commandAttributes.command);
+
+    QTextBlock block = lastBlock();
+    BlockData *blockData = new BlockData(block.blockNumber(), commandAttributes.commandIndex);
+    block.setUserData(blockData);
+
+    return blockNumber;
+}
+
 void partMainConsole::appendResponse(int consoleIndex, QString command, QString response)
 {
     bool scrolledDown = this->isScrolledToEnd();
@@ -77,6 +87,37 @@ void partMainConsole::appendResponse(int consoleIndex, QString command, QString 
     if (scrolledDown) this->scrollToEnd();
 }
 
+void partMainConsole::appendResponse(CommandAttributes commandAttributes)
+{
+    QTextDocument *document = ui->txtConsole->document();
+    QTextBlock block = document->lastBlock();
+    int blocksCounter = 0;
+    do {
+        BlockData *blockData = static_cast<BlockData *>(block.userData());
+        if (blockData && blockData->commandIndex() == commandAttributes.commandIndex) {
+            QTextCursor cursor(block);
+
+            cursor.beginEditBlock();
+            cursor.movePosition(QTextCursor::EndOfBlock);
+            // @TODO response was added as multiple lines, do we have to do this?
+            // cursor.insertText(" < " + QString(response).replace("; ", "\r\n"));
+            cursor.insertHtml(QString("&nbsp;<span style='color: gray; font-size: 90%'>(%1)</span> ").arg(commandAttributes.response));
+            cursor.endEditBlock();
+
+            // do we need it anymore?
+            block.setUserData(nullptr);
+
+            return;
+        }
+        // let's check max 50 blocks from the end
+        if (blocksCounter++ > 50) {
+            return;
+        }
+
+        block = block.previous();
+    } while (block.isValid());
+}
+
 void partMainConsole::clear()
 {
     ui->txtConsole->clear();
@@ -101,7 +142,12 @@ bool partMainConsole::isScrolledToEnd()
 void partMainConsole::scrollToEnd()
 {
     ui->txtConsole->verticalScrollBar()->setValue(
-            ui->txtConsole->verticalScrollBar()->maximum());
+        ui->txtConsole->verticalScrollBar()->maximum());
+}
+
+QTextBlock partMainConsole::lastBlock()
+{
+    return ui->txtConsole->document()->lastBlock();
 }
 
 void partMainConsole::onClearClicked()

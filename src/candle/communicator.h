@@ -88,6 +88,7 @@ class Communicator : public QObject
 
         // Indices
         int m_probeIndex;
+        int m_commandIndex = 0;
 
         // Timers
         QTimer m_timerStateQuery;
@@ -129,7 +130,8 @@ class Communicator : public QObject
         void deviceStateReceived(DeviceState state);
         void spindleStateReceived(bool state);
         void floodStateReceived(bool state);
-        void commandResponseReceived(CommandAttributes commandAttributes, QString response);
+        void commandResponseReceived(CommandAttributes commandAttributes);
+        void commandSent(CommandAttributes commandAttributes);
         // @TODO aborted what?? find better name
         void aborted();
 };

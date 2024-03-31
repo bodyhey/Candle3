@@ -88,26 +88,34 @@ SendCommandResult Communicator::sendCommand(QString command, int tableIndex, boo
 
     command = command.toUpper();
 
-    CommandAttributes ca;
-    if (showInConsole) {
-        // @todo ui
-        // writeConsole(command);
-        ca.consoleIndex = -1; //ui->txtConsole->blockCount() - 1;
-    } else {
-        ca.consoleIndex = -1;
-    }
+    //int length_, int consoleIndex_, int commandIndex_, int tableIndex_, QString command_
+    CommandAttributes commandAttributes(
+        command.length() + 1,
+        -1,
+        m_commandIndex++,
+        tableIndex,
+        command
+    );
+    // if (showInConsole) {
+    //     // @todo ui
+    //     // writeConsole(command);
+    //     commandAttributes.consoleIndex = -1; //ui->txtConsole->blockCount() - 1;
+    // } else {
+    //     commandAttributes.consoleIndex = -1;
+    // }
 
-    ca.command = command;
-    ca.length = command.length() + 1;
-    ca.tableIndex = tableIndex;
+    // commandAttributes.command = command;
+    // commandAttributes.commandIndex = m_commandIndex++;
+    // commandAttributes.length = command.length() + 1;
+    // commandAttributes.tableIndex = tableIndex;
 
-    m_commands.append(ca);
+    m_commands.append(commandAttributes);
 
     QString uncomment = GcodePreprocessorUtils::removeComment(command);
 
     // Processing spindle speed only from g-code program
     static QRegExp s("[Ss]0*(\\d+)");
-    if (s.indexIn(uncomment) != -1 && ca.tableIndex > -2) {
+    if (s.indexIn(uncomment) != -1 && commandAttributes.tableIndex > -2) {
         int speed = s.cap(1).toInt();
         if (ui->slbSpindle->value() != speed) {
             ui->slbSpindle->setValue(speed);
@@ -126,6 +134,8 @@ SendCommandResult Communicator::sendCommand(QString command, int tableIndex, boo
     if (uncomment.contains(G92)) sendCommand("$#", COMMAND_TI_UTIL2, showInConsole, true);
 
     m_connection->sendLine(command);
+
+    emit commandSent(commandAttributes);
 
     return SendDone;
 }

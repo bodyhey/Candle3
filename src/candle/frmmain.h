@@ -225,7 +225,8 @@ private slots:
     void onSpindleStateReceived(bool state);
     void onFloodStateReceived(bool state);
     void onAborted();
-    void onCommandResponseReceived(CommandAttributes commandAttributes, QString response);
+    void onCommandResponseReceived(CommandAttributes commandAttributes);
+    void onCommandSent(CommandAttributes commandAttributes);
     void onConfigurationReceived(MachineConfiguration, QMap<int, double>);
     void onConnectionError(QString error);
     void onConsoleNewCommand(QString command);

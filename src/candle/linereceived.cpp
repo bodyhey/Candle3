@@ -380,11 +380,11 @@ void Communicator::processCommandResponse(QString data)
     response.append(data);
 
     // Take command from buffer
-    CommandAttributes ca = m_communicator->m_commands.takeFirst();
+    CommandAttributes commandAttributes = m_communicator->m_commands.takeFirst();
     //QTextBlock tb = ui->txtConsole->document()->findBlockByNumber(ca.consoleIndex);
     //QTextCursor tc(tb);
 
-    QString uncomment = GcodePreprocessorUtils::removeComment(ca.command).toUpper();
+    QString uncomment = GcodePreprocessorUtils::removeComment(commandAttributes.command).toUpper();
 
     // Store current coordinate system
     if (uncomment == "$G") {
@@ -405,13 +405,13 @@ void Communicator::processCommandResponse(QString data)
     // [OPT:VL,15,128]
 
     // Restore absolute/relative coordinate system after jog
-    if (uncomment == "$G" && ca.tableIndex == -2) {
+    if (uncomment == "$G" && commandAttributes.tableIndex == -2) {
         if (ui->chkKeyboardControl->isChecked()) m_form->absoluteCoordinates() = response.contains("G90");
         else if (response.contains("G90")) m_communicator->sendCommand("G90", COMMAND_TI_UI, m_configuration->consoleModule().showUiCommands());
     }
 
     // Process parser status
-    if (uncomment == "$G" && ca.tableIndex == -3) {
+    if (uncomment == "$G" && commandAttributes.tableIndex == -3) {
         // Update status in visualizer window
         ui->glwVisualizer->setParserStatus(response.left(response.indexOf("; ")));
 
@@ -515,7 +515,7 @@ void Communicator::processCommandResponse(QString data)
     }
 
     // Update probe coords on user commands
-    if (uncomment.contains("G38.2") && ca.tableIndex < 0) {
+    if (uncomment.contains("G38.2") && commandAttributes.tableIndex < 0) {
         static QRegExp PRB(".*PRB:([^,]*),([^,]*),([^,:]*)");
         if (PRB.indexIn(response) != -1) {
             m_form->storedVars().setCoords("PRB", QVector3D(
@@ -527,7 +527,7 @@ void Communicator::processCommandResponse(QString data)
     }
 
     // Process probing on heightmap mode only from table commands
-    if (uncomment.contains("G38.2") && m_form->heightMapMode() && ca.tableIndex > -1) {
+    if (uncomment.contains("G38.2") && m_form->heightMapMode() && commandAttributes.tableIndex > -1) {
         // Get probe Z coordinate
         // "[PRB:0.000,0.000,0.000:0];ok"
         // "[PRB:0.000,0.000,0.000,0.000:0];ok"
@@ -564,8 +564,9 @@ void Communicator::processCommandResponse(QString data)
         m_communicator->m_timerStateQuery.setInterval(response.contains("Enable") ? 1000 : m_settings->queryStateTime());
     }
 
-    // emit singal, was `Add response to console`
-    emit commandResponseReceived(ca, response);
+    // emit signal, was `Add response to console`
+    commandAttributes.response = response;
+    emit commandResponseReceived(commandAttributes);
     // if (tb.isValid() && tb.text() == ca.command) {
         //emit commandResponseReceived(ca, response);
 
@@ -610,15 +611,15 @@ void Communicator::processCommandResponse(QString data)
     // Add response to table, send next program commands
     if (m_communicator->m_senderState != SenderStopped) {
         // Only if command from table
-        if (ca.tableIndex > -1) {
-            m_form->currentModel().setData(m_form->currentModel().index(ca.tableIndex, 2), GCodeItem::Processed);
-            m_form->currentModel().setData(m_form->currentModel().index(ca.tableIndex, 3), response);
+        if (commandAttributes.tableIndex > -1) {
+            m_form->currentModel().setData(m_form->currentModel().index(commandAttributes.tableIndex, 2), GCodeItem::Processed);
+            m_form->currentModel().setData(m_form->currentModel().index(commandAttributes.tableIndex, 3), response);
 
-            m_streamer->resetProcessed(ca.tableIndex);
+            m_streamer->resetProcessed(commandAttributes.tableIndex);
 
-            if (ui->chkAutoScroll->isChecked() && ca.tableIndex != -1) {
-                ui->tblProgram->scrollTo(m_form->currentModel().index(ca.tableIndex + 1, 0));      // TODO: Update by timer
-                ui->tblProgram->setCurrentIndex(m_form->currentModel().index(ca.tableIndex, 1));
+            if (ui->chkAutoScroll->isChecked() && commandAttributes.tableIndex != -1) {
+                ui->tblProgram->scrollTo(m_form->currentModel().index(commandAttributes.tableIndex + 1, 0));      // TODO: Update by timer
+                ui->tblProgram->setCurrentIndex(m_form->currentModel().index(commandAttributes.tableIndex, 1));
             }
         }
 
@@ -633,8 +634,8 @@ void Communicator::processCommandResponse(QString data)
         static bool holding = false;
         static QString errors;
 
-        if (ca.tableIndex > -1 && response.toUpper().contains("ERROR") && !m_settings->ignoreErrors()) {
-            errors.append(QString::number(ca.tableIndex + 1) + ": " + ca.command + " < " + response + "\n");
+        if (commandAttributes.tableIndex > -1 && response.toUpper().contains("ERROR") && !m_settings->ignoreErrors()) {
+            errors.append(QString::number(commandAttributes.tableIndex + 1) + ": " + commandAttributes.command + " < " + response + "\n");
 
             m_form->senderErrorBox().setText(tr("Error message(s) received:\n") + errors);
 
@@ -769,7 +770,7 @@ void Communicator::processCommandResponse(QString data)
     }
 
     // Emit response signal
-    emit responseReceived(ca.command, ca.tableIndex, response);
+    emit responseReceived(commandAttributes.command, commandAttributes.tableIndex, response);
 
     response.clear();
 }
