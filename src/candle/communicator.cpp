@@ -289,6 +289,25 @@ int Communicator::bufferLength()
     return length;
 }
 
+// send commands until buffer is full
+void Communicator::sendStreamerCommandsUntilBufferIsFull()
+{
+    if (m_queue.length() > 0) return;
+
+    QString command = m_form->currentModel().data(m_form->currentModel().index(m_streamer->commandIndex(), 1)).toString();
+    static QRegExp M230("(M0*2|M30|M0*6)(?!\\d)");
+
+    while ((bufferLength() + command.length() + 1) <= BUFFERLENGTH
+           && m_streamer->commandIndex() < m_form->currentModel().rowCount() - 1
+           && !(!m_commands.isEmpty() && GcodePreprocessorUtils::removeComment(m_commands.last().command).contains(M230))
+    ) {
+        m_form->currentModel().setData(m_form->currentModel().index(m_streamer->commandIndex(), 2), GCodeItem::Sent);
+        sendCommand(command, m_streamer->commandIndex(), m_configuration->consoleModule().showProgramCommands());
+        m_streamer->advanceCommandIndex();
+        command = m_form->currentModel().data(m_form->currentModel().index(m_streamer->commandIndex(), 1)).toString();
+    }
+}
+
 /* used by scripting engine only?? emit signal and do not use m_storedVars directly */
 void Communicator::storeOffsetsVars(QString response)
 {

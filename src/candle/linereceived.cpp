@@ -672,7 +672,8 @@ void Communicator::processCommandResponse(QString data)
                    && !holding)
         {
             // Send next program commands
-            m_form->sendNextFileCommands();
+            sendStreamerCommandsUntilBufferIsFull();
+            //m_form->sendNextFileCommands();
         }
     }
 

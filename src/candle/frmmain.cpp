@@ -815,7 +815,8 @@ void frmMain::on_cmdFileSend_clicked()
     ui->cmdFilePause->setFocus();
 
     if (m_settings->useStartCommands()) m_communicator->sendCommands(m_settings->startCommands());
-    sendNextFileCommands();
+
+    m_communicator->sendStreamerCommandsUntilBufferIsFull();
 }
 
 void frmMain::on_cmdFilePause_clicked(bool checked)
@@ -1973,7 +1974,7 @@ void frmMain::onActSendFromLineTriggered()
     ui->cmdFilePause->setFocus();
 
     m_streamer->reset(commandIndex);
-    sendNextFileCommands();
+    m_communicator->sendStreamerCommandsUntilBufferIsFull();
 }
 
 void frmMain::onSlbSpindleValueUserChanged()
@@ -2874,23 +2875,24 @@ void frmMain::writeConsole(QString command)
 //     }
 // }
 
-void frmMain::sendNextFileCommands() {
-    if (m_communicator->m_queue.length() > 0) return;
+// void frmMain::sendNextFileCommands()
+// {
+//     if (m_communicator->m_queue.length() > 0) return;
 
-    QString command = m_currentModel->data(m_currentModel->index(m_streamer->commandIndex(), 1)).toString();
-    static QRegExp M230("(M0*2|M30|M0*6)(?!\\d)");
+//     QString command = m_currentModel->data(m_currentModel->index(m_streamer->commandIndex(), 1)).toString();
+//     static QRegExp M230("(M0*2|M30|M0*6)(?!\\d)");
 
-    while ((bufferLength() + command.length() + 1) <= BUFFERLENGTH
-        && m_streamer->commandIndex() < m_currentModel->rowCount() - 1
-        && !(!m_communicator->m_commands.isEmpty() && GcodePreprocessorUtils::removeComment(m_communicator->m_commands.last().command).contains(M230))
-        ) 
-    {
-        m_currentModel->setData(m_currentModel->index(m_streamer->commandIndex(), 2), GCodeItem::Sent);
-        m_communicator->sendCommand(command, m_streamer->commandIndex(), m_configuration.consoleModule().showProgramCommands());
-        m_streamer->advanceCommandIndex();
-        command = m_currentModel->data(m_currentModel->index(m_streamer->commandIndex(), 1)).toString();
-    }
-}
+//     while ((bufferLength() + command.length() + 1) <= BUFFERLENGTH
+//         && m_streamer->commandIndex() < m_currentModel->rowCount() - 1
+//         && !(!m_communicator->m_commands.isEmpty() && GcodePreprocessorUtils::removeComment(m_communicator->m_commands.last().command).contains(M230))
+//         )
+//     {
+//         m_currentModel->setData(m_currentModel->index(m_streamer->commandIndex(), 2), GCodeItem::Sent);
+//         m_communicator->sendCommand(command, m_streamer->commandIndex(), m_configuration.consoleModule().showProgramCommands());
+//         m_streamer->advanceCommandIndex();
+//         command = m_currentModel->data(m_currentModel->index(m_streamer->commandIndex(), 1)).toString();
+//     }
+// }
 
 QString frmMain::evaluateCommand(QString command)
 {

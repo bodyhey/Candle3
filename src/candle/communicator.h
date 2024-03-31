@@ -51,6 +51,7 @@ class Communicator : public QObject
         SenderState senderState() const { return m_senderState; }
         DeviceState deviceState() const { return m_deviceState; }
         void processWorkOffset(QString data);
+        void sendStreamerCommandsUntilBufferIsFull();
 
     private:
         static const int BUFFERLENGTH = 127;
@@ -110,9 +111,8 @@ class Communicator : public QObject
         void processFeedSpindleSpeed(QString data);
         void processOverrides(QString data);
         void processNewToolPosition(DeviceState state);
-        void processToolpathShadowing(DeviceState state, QVector3D toolPosition);
-        
-        private slots:
+        void processToolpathShadowing(DeviceState state, QVector3D toolPosition);        
+    private slots:
         void onTimerStateQuery();
         void onConnectionLineReceived(QString);
         void onConnectionError(QString);
