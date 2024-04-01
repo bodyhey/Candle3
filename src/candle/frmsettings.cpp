@@ -150,6 +150,12 @@ int frmSettings::exec()
     foreach (QPlainTextEdit* o, this->findChildren<QPlainTextEdit*>())
         m_storedPlainTexts.append(o->toPlainText());
 
+    const ConfigurationConsole &console = m_configuration.consoleModule();
+    ui->chkConsoleAutocompletion->setChecked(console.commandAutoCompletion());
+    ui->chkConsoleDarkMode->setChecked(console.darkBackgroundMode());
+    ui->chkConsoleShowProgramCommands->setChecked(console.showProgramCommands());
+    ui->chkConsoleShowUICommands->setChecked(console.showUiCommands());
+
     return QDialog::exec();
 }
 
@@ -392,10 +398,10 @@ void frmSettings::setShowProgramCommands(bool showAllCommands)
     ui->chkConsoleShowProgramCommands->setChecked(showAllCommands);
 }
 
-bool frmSettings::showUICommands()
-{
-    return m_configuration.consoleModule().showUiCommands();
-}
+// bool frmSettings::showUICommands()
+// {
+//     return m_configuration.consoleModule().showUiCommands();
+// }
 
 void frmSettings::setShowUICommands(bool showUICommands)
 {
@@ -837,6 +843,12 @@ void frmSettings::on_cmdRefresh_clicked()
 
 void frmSettings::on_cmdOK_clicked()
 {
+    ConfigurationConsole &console = m_configuration.consoleModule();
+    console.m_commandAutoCompletion = ui->chkConsoleAutocompletion->isChecked();
+    console.m_darkBackgroundMode = ui->chkConsoleDarkMode->isChecked();
+    console.m_showProgramCommands = ui->chkConsoleShowProgramCommands->isChecked();
+    console.m_showUiCommands = ui->chkConsoleShowUICommands->isChecked();
+
     this->accept();
 }
 

@@ -5,10 +5,13 @@
 #ifndef CONFIGURATION_CONSOLE_H
 #define CONFIGURATION_CONSOLE_H
 
+#include <QObject>
 #include "module.h"
 
 class ConfigurationConsole : public ConfigurationModule
 {
+    friend class frmSettings;
+
     Q_OBJECT
     Q_PROPERTY(bool showProgramCommands MEMBER m_showProgramCommands NOTIFY changed)
     Q_PROPERTY(bool showUiCommands MEMBER m_showUiCommands NOTIFY changed)

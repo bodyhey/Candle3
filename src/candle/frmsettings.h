@@ -187,8 +187,6 @@ public:
     void setReferenceYPlus(bool value);
     bool referenceZPlus();
     void setReferenceZPlus(bool value);
-    // @TODO remove!
-    bool showUICommands();
 
     void setUsePauseCommands(bool);
     void setBeforePauseCommands(QString);

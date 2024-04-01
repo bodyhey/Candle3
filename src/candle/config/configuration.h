@@ -28,7 +28,7 @@ class Configuration : public QObject
         const ConfigurationConnection& connectionModule();
         const ConfigurationVisualizer& visualizerModule();
         const ConfigurationSender& senderModule();
-        const ConfigurationConsole& consoleModule();
+        ConfigurationConsole& consoleModule();
     private:
         QString m_language;
 

@@ -1483,7 +1483,7 @@ QSplitter::handle:horizontal {
            <item>
             <widget class="QCheckBox" name="chkConsoleShowProgramCommands">
              <property name="text">
-              <string>Show G-code program commands</string>
+              <string>Show G-code program commands (may impact performance!!)</string>
              </property>
             </widget>
            </item>

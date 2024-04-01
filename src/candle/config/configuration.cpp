@@ -160,7 +160,7 @@ const ConfigurationSender& Configuration::senderModule()
     return m_sender;
 }
 
-const ConfigurationConsole &Configuration::consoleModule()
+ConfigurationConsole &Configuration::consoleModule()
 {
     return m_console;
 }
