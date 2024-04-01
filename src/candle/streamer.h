@@ -7,6 +7,13 @@
 
 #include <QObject>
 
+enum StreamerStartResult
+{
+    Success = 0,
+    UnacceptableCommunicatorState = 1,
+    UnacceptableConnectionState = 2,
+};
+
 class Streamer : public QObject
 {
     Q_OBJECT
@@ -18,6 +25,9 @@ class Streamer : public QObject
         int commandIndex() { return m_commandIndex; }
         int processedCommandIndex() { return m_processedCommandIndex; }
         void advanceCommandIndex();
+        StreamerStartResult start();
+        void stop();
+        void pause();
 
     private:
         int m_commandIndex;
@@ -25,6 +35,9 @@ class Streamer : public QObject
 
     signals:
         void progressChanged(int progress);
+        void finished();
+        void paused();
+        void error();
 };
 
 #endif // STREAMER_H
