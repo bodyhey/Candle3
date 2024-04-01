@@ -12,7 +12,6 @@ m_toolDrawer // emit toolPositionChanged
 m_codeDrawer // getIgnoreZ??
 m_lastDrawnLineIndex
 m_currentDrawer // code drawer/probe drawer ??
-m_fileCommandIndex
 m_updateParserStatus
 m_storedVars
 m_taskBarProgress
@@ -44,7 +43,6 @@ m_fileProcessedCommandIndex
 fileProcessedCommandIndex
 currentModel
 completeTransfer();
-sendNextFileCommands
 
 // height map
 m_heightMapMode

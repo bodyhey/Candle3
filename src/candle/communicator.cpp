@@ -88,15 +88,6 @@ SendCommandResult Communicator::sendCommand(CommandSource source, QString comman
 
     command = command.toUpper();
 
-    //int length_, int consoleIndex_, int commandIndex_, int tableIndex_, QString command_
-    // CommandAttributes commandAttributes;
-    // commandAttributes.source = source;
-    // commandAttributes.commandIndex = m_commandIndex++;
-    // commandAttributes.length = command.length() + 1;
-    // commandAttributes.tableIndex = tableIndex;
-    // commandAttributes.command = command;
-    // commandAttributes.consoleIndex = -1;
-
     CommandAttributes commandAttributes(
         source,
         command.length() + 1,
@@ -105,18 +96,6 @@ SendCommandResult Communicator::sendCommand(CommandSource source, QString comman
         tableIndex,
         command
     );
-    // if (showInConsole) {
-    //     // @todo ui
-    //     // writeConsole(command);
-    //     commandAttributes.consoleIndex = -1; //ui->txtConsole->blockCount() - 1;
-    // } else {
-    //     commandAttributes.consoleIndex = -1;
-    // }
-
-    // commandAttributes.command = command;
-    // commandAttributes.commandIndex = m_commandIndex++;
-    // commandAttributes.length = command.length() + 1;
-    // commandAttributes.tableIndex = tableIndex;
 
     m_commands.append(commandAttributes);
 
@@ -220,14 +199,15 @@ void Communicator::reset()
     // m_queue.clear();
 
     // Prepare reset response catch
-    CommandAttributes ca;
-    ca.command = "[CTRL+X]";
-    // @todo ui
-    // if (m_settings->showUICommands()) ui->txtConsole->appendPlainText(ca.command);
-    // ca.consoleIndex = m_settings->showUICommands() ? ui->txtConsole->blockCount() - 1 : -1;
-    ca.consoleIndex = -1;
-    ca.tableIndex = -1;
-    ca.length = ca.command.length() + 1;
+    QString command = "[CTRL+X]";
+    CommandAttributes ca(
+        CommandSource::System,
+        command.length() + 1,
+        -1,
+        m_commandIndex++,
+        -1,
+        command
+    );
     m_commands.append(ca);
 }
 
