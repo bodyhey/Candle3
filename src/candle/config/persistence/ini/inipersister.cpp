@@ -55,3 +55,13 @@ bool IniPersister::setFloat(const QString group, const QString key, const float 
 
     return true;
 }
+
+bool IniPersister::setBool(const QString group, const QString key, const bool value)
+{
+    if (!m_settings) {
+        return false;
+    }
+    m_settings->setValue(group + '/' + key, value);
+
+    return true;
+}

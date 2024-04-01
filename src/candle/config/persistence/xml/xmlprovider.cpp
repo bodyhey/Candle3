@@ -31,22 +31,21 @@ void XmlProvider::close()
 
 int XmlProvider::getInt(const QString group, const QString key, int defaultValue)
 {
-    qDebug() << "Getting: " << group + '\\' + key << " with default: " << defaultValue << " and value: " << m_settings->value(group + '\\' + key, defaultValue).toInt();
-
     return m_settings->value(group + '\\' + key, defaultValue).toInt();
+}
+
+bool XmlProvider::getBool(const QString group, const QString key, bool defaultValue)
+{
+    return m_settings->value(group + '\\' + key, defaultValue).toBool();
 }
 
 QString XmlProvider::getString(const QString group, const QString key, QString defaultValue)
 {
-    qDebug() << "Getting: " << group + '\\' + key << " with default: " << defaultValue << " and value: " << m_settings->value(group + '\\' + key, defaultValue).toString();
-
     return m_settings->value(group + '\\' + key, defaultValue).toString();
 }
 
 float XmlProvider::getFloat(const QString group, const QString key, float defaultValue)
 {
-    qDebug() << "Getting: " << group + '\\' + key << " with default: " << defaultValue << " and value: " << m_settings->value(group + '\\' + key, defaultValue).toFloat();
-
     return m_settings->value(group + '\\' + key, defaultValue).toFloat();
 }
 

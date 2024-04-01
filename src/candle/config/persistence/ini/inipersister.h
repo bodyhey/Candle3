@@ -14,6 +14,7 @@ class IniPersister : public Persister
         bool setInt(const QString group, const QString key, const int value) override;
         bool setString(const QString group, const QString key, const QString value) override;
         bool setFloat(const QString group, const QString key, const float value) override;
+        bool setBool(const QString group, const QString key, const bool value) override;
 
     private:
         QSettings *m_settings;

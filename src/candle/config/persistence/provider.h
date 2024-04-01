@@ -13,6 +13,7 @@ class Provider : public QObject
         virtual bool open() = 0;
         virtual void close() = 0;
         virtual int getInt(const QString group, const QString key, int defaultValue) = 0;
+        virtual bool getBool(const QString group, const QString key, bool defaultValue) = 0;
         virtual QString getString(const QString group, const QString key, QString defaultValue) = 0;
         virtual float getFloat(const QString group, const QString key, float defaultValue) = 0;
         virtual QVariant get(const QString group, const QString key, QVariant defaultValue) = 0;

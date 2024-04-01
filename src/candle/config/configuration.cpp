@@ -40,6 +40,8 @@ bool Configuration::persistByType(QString module, QString name, QVariant value, 
         m_persister.setString(module, name, value.toString());
     } else if (type == "int") {
         m_persister.setInt(module, name, value.toInt());
+    } else if (type == "bool") {
+        m_persister.setBool(module, name, value.toBool());
     } else if (type == "float") {
         m_persister.setFloat(module, name, value.toFloat());
     } else {
@@ -85,6 +87,8 @@ void Configuration::setModuleDefaults(ConfigurationModule &module)
             prop.write(&module, defaults[prop.name()].toString());
         } else if (type == "int") {
             prop.write(&module, defaults[prop.name()].toInt());
+        } else if (type == "bool") {
+            prop.write(&module, defaults[prop.name()].toBool());
         } else if (type == "float") {
             prop.write(&module, defaults[prop.name()].toFloat());
         } else {
@@ -131,6 +135,8 @@ void Configuration::loadModule(ConfigurationModule& module)
             prop.write(&module, m_provider.getString(module.getName(), QString(prop.name()), defaults[prop.name()].toString()));
         } else if (type == "int") {
             prop.write(&module, m_provider.getInt(module.getName(), QString(prop.name()), defaults[prop.name()].toInt()));
+        } else if (type == "bool") {
+            prop.write(&module, m_provider.getBool(module.getName(), QString(prop.name()), defaults[prop.name()].toBool()));
         } else if (type == "float") {
             prop.write(&module, m_provider.getFloat(module.getName(), QString(prop.name()), defaults[prop.name()].toFloat()));
         } else {

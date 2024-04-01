@@ -12,6 +12,7 @@ class IniProvider : public Provider
         bool open() override;
         void close() override;
         int getInt(const QString group, const QString key, int defaultValue) override;
+        bool getBool(const QString group, const QString key, bool defaultValue) override;
         QString getString(const QString group, const QString key, QString defaultValue) override;
         float getFloat(const QString group, const QString key, float defaultValue) override;
         QVariant get(const QString group, const QString key, QVariant defaultValue) override;
