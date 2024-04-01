@@ -1709,7 +1709,8 @@ void frmMain::onFloodStateReceived(bool state)
 
 void frmMain::onAborted()
 {
-    ui->cmdFileAbort->setEnabled(false);
+    //ui->cmdFileAbort->setEnabled(false);
+    updateControlsState();
 }
 
 void frmMain::onCommandResponseReceived(CommandAttributes commandAttributes)

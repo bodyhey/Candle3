@@ -56,6 +56,7 @@ ui->tblHeightMap
 void Communicator::onConnectionLineReceived(QString data)
 {
     assert(QThread::currentThread() == QCoreApplication::instance()->thread());
+    assert(data.length() < 100);
 
     if (data.startsWith("[MSG:")) {
         processMessage(data);
@@ -82,11 +83,11 @@ void Communicator::onConnectionLineReceived(QString data)
         return;
     }
 
-    qDebug() << "<" << data;
+    // qDebug() << "<" << data;
 
-    if (m_communicator->dataIsReset(data)) {
-        qDebug() << "< RST <" << data;
-    }
+    // if (m_communicator->dataIsReset(data)) {
+    //     qDebug() << "< RST <" << data;
+    // }
 
     if (m_commands.length() > 0 && !dataIsFloating(data) && !(m_commands[0].command != "[CTRL+X]" && dataIsReset(data))) {
         processCommandResponse(data);
@@ -512,6 +513,8 @@ void Communicator::processCommandResponse(QString data)
     if (uncomment.contains(M230) && response.contains("ok") && !response.contains("Pgm End")) {
         m_communicator->m_commands.clear();
         m_communicator->m_queue.clear();
+
+        emit aborted();
     }
 
     // Update probe coords on user commands
