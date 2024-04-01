@@ -412,7 +412,7 @@ void frmGrblConfigurator::update()
         SLOT(onConfigurationReceived(MachineConfiguration,QMap<int,double>))
     );
     QTimer::singleShot(200, this, [this]() {
-        m_communicator->sendCommand("$$");
+        m_communicator->sendCommand(CommandSource::System, "$$");
     });
 }
 
@@ -495,7 +495,7 @@ void frmGrblConfigurator::findParametersToBeSaved(QMap<int, double> settings)
 
     for (QMap<int, double>::iterator it = toBeSaved.begin(); it != toBeSaved.end(); it++) {
         QString command = QString("$%1=%2").arg(it.key()).arg(it.value());
-        qDebug() << m_communicator->sendCommand(command);
+        qDebug() << m_communicator->sendCommand(CommandSource::System, command);
         qDebug() << "Sending command" << command;
     }
 

@@ -52,7 +52,7 @@ Communicator::Communicator(
 /**
  * @param tableIndex -1 - ui commands, -2 - utility commands, -3 - utility commands
  */
-SendCommandResult Communicator::sendCommand(QString command, int tableIndex, bool showInConsole, bool wait)
+SendCommandResult Communicator::sendCommand(CommandSource source, QString command, int tableIndex, bool showInConsole, bool wait)
 {
     // tableIndex:
     // 0...n - commands from g-code program
@@ -67,7 +67,7 @@ SendCommandResult Communicator::sendCommand(QString command, int tableIndex, boo
 
     // Place to queue on 'wait' flag
     if (wait) {
-        m_queue.append(CommandQueue(command, tableIndex, showInConsole));
+        m_queue.append(CommandQueue(source, command, tableIndex, showInConsole));
 
         return SendQueue;
     }
@@ -81,7 +81,7 @@ SendCommandResult Communicator::sendCommand(QString command, int tableIndex, boo
 
     // Place to queue if command buffer is full
     if ((bufferLength() + command.length() + 1) > BUFFERLENGTH) {
-        m_queue.append(CommandQueue(command, tableIndex, showInConsole));
+        m_queue.append(CommandQueue(source, command, tableIndex, showInConsole));
 
         return SendQueue;
     }
@@ -89,7 +89,16 @@ SendCommandResult Communicator::sendCommand(QString command, int tableIndex, boo
     command = command.toUpper();
 
     //int length_, int consoleIndex_, int commandIndex_, int tableIndex_, QString command_
+    // CommandAttributes commandAttributes;
+    // commandAttributes.source = source;
+    // commandAttributes.commandIndex = m_commandIndex++;
+    // commandAttributes.length = command.length() + 1;
+    // commandAttributes.tableIndex = tableIndex;
+    // commandAttributes.command = command;
+    // commandAttributes.consoleIndex = -1;
+
     CommandAttributes commandAttributes(
+        source,
         command.length() + 1,
         -1,
         m_commandIndex++,
@@ -131,8 +140,9 @@ SendCommandResult Communicator::sendCommand(QString command, int tableIndex, boo
 
     // Queue offsets request on G92, G10 commands
     static QRegExp G92("(G92|G10)(?!\\d)");
-    if (uncomment.contains(G92)) sendCommand("$#", COMMAND_TI_UTIL2, showInConsole, true);
+    if (uncomment.contains(G92)) sendCommand(source, "$#", COMMAND_TI_UTIL2, showInConsole, true);
 
+//    m_form->partConsole().append(commandAttributes);
     m_connection->sendLine(command);
 
     emit commandSent(commandAttributes);
@@ -155,14 +165,14 @@ void Communicator::sendRealtimeCommand(int command)
     m_connection->sendByteArray(data);
 }
 
-void Communicator::sendCommands(QString commands, int tableIndex)
+void Communicator::sendCommands(CommandSource source, QString commands, int tableIndex)
 {
     QStringList list = commands.split("\n");
 
-    bool q = false;
+    bool waitFlag = false;
     foreach (QString cmd, list) {
-        SendCommandResult r = sendCommand(cmd.trimmed(), tableIndex, m_settings->showUICommands(), q);
-        if (r == SendDone || r == SendQueue) q = true;
+        SendCommandResult r = sendCommand(source, cmd.trimmed(), tableIndex, m_configuration->consoleModule().showUiCommands(), waitFlag);
+        if (r == SendDone || r == SendQueue) waitFlag = true;
     }
 }
 
@@ -224,10 +234,11 @@ void Communicator::reset()
 
 void Communicator::abort()
 {
+    // @TODO is CommandSource::Program correct here??
     if ((m_communicator->senderState() == SenderPaused) || (m_communicator->senderState() == SenderChangingTool)) {
-        m_communicator->sendCommand("M2", COMMAND_TI_UI, m_configuration->consoleModule().showUiCommands(), false);
+        m_communicator->sendCommand(CommandSource::Program, "M2", COMMAND_TI_UI, m_configuration->consoleModule().showUiCommands(), false);
     } else {
-        m_communicator->sendCommand("M2", COMMAND_TI_UI, m_configuration->consoleModule().showUiCommands(), true);
+        m_communicator->sendCommand(CommandSource::Program, "M2", COMMAND_TI_UI, m_configuration->consoleModule().showUiCommands(), true);
     }
 }
 
@@ -312,7 +323,7 @@ void Communicator::sendStreamerCommandsUntilBufferIsFull()
            && !(!m_commands.isEmpty() && GcodePreprocessorUtils::removeComment(m_commands.last().command).contains(M230))
     ) {
         m_form->currentModel().setData(m_form->currentModel().index(m_streamer->commandIndex(), 2), GCodeItem::Sent);
-        sendCommand(command, m_streamer->commandIndex(), m_configuration->consoleModule().showProgramCommands());
+        sendCommand(CommandSource::Program, command, m_streamer->commandIndex(), m_configuration->consoleModule().showProgramCommands());
         m_streamer->advanceCommandIndex();
         command = m_form->currentModel().data(m_form->currentModel().index(m_streamer->commandIndex(), 1)).toString();
     }

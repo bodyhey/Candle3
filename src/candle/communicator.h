@@ -34,10 +34,10 @@ class Communicator : public QObject
             frmSettings *frmSettings,
             //frmMain *form,
             QObject *parent);
-        SendCommandResult sendCommand(QString command, int tableIndex = -1, bool showInConsole = true, bool wait = false);
+        SendCommandResult sendCommand(CommandSource source, QString command, int tableIndex = -1, bool showInConsole = true, bool wait = false);
         void sendRealtimeCommand(QString command);
         void sendRealtimeCommand(int command);
-        void sendCommands(QString commands, int tableIndex = -1);
+        void sendCommands(CommandSource source, QString commands, int tableIndex = -1);
         bool streamCommands(Streamer *streamer);
         void clearCommandsAndQueue();
         void clearQueue();

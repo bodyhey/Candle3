@@ -407,7 +407,7 @@ void Communicator::processCommandResponse(QString data)
     // Restore absolute/relative coordinate system after jog
     if (uncomment == "$G" && commandAttributes.tableIndex == -2) {
         if (ui->chkKeyboardControl->isChecked()) m_form->absoluteCoordinates() = response.contains("G90");
-        else if (response.contains("G90")) m_communicator->sendCommand("G90", COMMAND_TI_UI, m_configuration->consoleModule().showUiCommands());
+        else if (response.contains("G90")) m_communicator->sendCommand(CommandSource::System, "G90", COMMAND_TI_UI, m_configuration->consoleModule().showUiCommands());
     }
 
     // Process parser status
@@ -503,8 +503,8 @@ void Communicator::processCommandResponse(QString data)
         m_form->updateParserStatus() = true;
 
         // Query grbl settings
-        m_communicator->sendCommand("$$", COMMAND_TI_UTIL1, false);
-        m_communicator->sendCommand("$#", COMMAND_TI_UTIL1, false, true);
+        m_communicator->sendCommand(CommandSource::System, "$$", COMMAND_TI_UTIL1, false);
+        m_communicator->sendCommand(CommandSource::System, "$#", COMMAND_TI_UTIL1, false, true);
     }
 
     // Clear command buffer on "M2" & "M30" command (old firmwares)
@@ -597,7 +597,7 @@ void Communicator::processCommandResponse(QString data)
         processingQueue = true;
         while (m_communicator->m_queue.length() > 0) {
             CommandQueue cq = m_communicator->m_queue.takeFirst();
-            SendCommandResult r = m_communicator->sendCommand(cq.command, cq.tableIndex, cq.showInConsole);
+            SendCommandResult r = m_communicator->sendCommand(cq.source, cq.command, cq.tableIndex, cq.showInConsole);
             if (r == SendDone) {
                 break;
             } else if (r == SendQueue) {
@@ -702,7 +702,7 @@ void Communicator::processCommandResponse(QString data)
                 //     m_communicator->sendCommands(m_settings->toolChangeCommands());
                 // }
             } else {
-                m_communicator->sendCommands(m_settings->toolChangeCommands());
+                m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_settings->toolChangeCommands());
             }
         }
 
@@ -713,7 +713,7 @@ void Communicator::processCommandResponse(QString data)
     // Pausing on button?
     if ((m_communicator->m_senderState == SenderPausing) && !uncomment.contains(M6)) {
         if (m_settings->usePauseCommands()) {
-            m_communicator->sendCommands(m_settings->beforePauseCommands());
+            m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_settings->beforePauseCommands());
             m_communicator->setSenderStateAndEmitSignal(SenderPausing2);
             m_form->updateControlsState();
         }

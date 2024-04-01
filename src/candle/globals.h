@@ -2,6 +2,7 @@
 #define GLOBALS_H
 
 #include <QObject>
+#include <QDebug>
 #include <QVector3D>
 #include <QString>
 
@@ -98,23 +99,48 @@ enum SendCommandResult {
     SendQueue = 2
 };
 
+enum CommandSource : uint8_t {
+    Console,
+    GeneralUI,
+    Program,
+    // Commands like "send before/after pause" confugured by user
+    ProgramAdditionalCommands,
+    System,
+};
+#define isCommandFromUi(source) \
+    ((source == CommandSource::Console) || (source == CommandSource::GeneralUI))
+#define isCommandFromProgram(source) \
+    ((source == Program) || (source == ProgramAdditionalCommands))
+
 struct CommandAttributes {
+    CommandSource source;
     int length;
     int consoleIndex;
     int commandIndex;
     int tableIndex;
     QString command;
-    QString response = "";
+    QString response = "";    
 
     CommandAttributes() {
     }
 
-    CommandAttributes(int length_, int consoleIndex_, int commandIndex_, int tableIndex_, QString command_) {
-        length = length_;
-        consoleIndex = consoleIndex_;
-        commandIndex = commandIndex_;
-        tableIndex = tableIndex_;
-        command = command_;
+    CommandAttributes(const CommandAttributes& other) {
+        source = other.source;
+        length = other.length;
+        consoleIndex = other.consoleIndex;
+        commandIndex = other.commandIndex;
+        tableIndex = other.tableIndex;
+        command = other.command;
+        response = other.response;
+    }
+
+    CommandAttributes(CommandSource source, int length, int consoleIndex, int commandIndex, int tableIndex, QString command) {
+        this->source = source;
+        this->length = length;
+        this->consoleIndex = consoleIndex;
+        this->commandIndex = commandIndex;
+        this->tableIndex = tableIndex;
+        this->command = command;
     }
 };
 
@@ -122,14 +148,16 @@ struct CommandQueue {
     QString command;
     int tableIndex;
     bool showInConsole;
+    CommandSource source;
 
     CommandQueue() {
     }
 
-    CommandQueue(QString cmd, int idx, bool show) {
-        command = cmd;
-        tableIndex = idx;
-        showInConsole = show;
+    CommandQueue(CommandSource source, QString command, int tableIndex, bool showInConsole) {
+        this->command = command;
+        this->tableIndex = tableIndex;
+        this->showInConsole = showInConsole;
+        this->source = source;
     }
 };
 

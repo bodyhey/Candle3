@@ -815,7 +815,8 @@ void frmMain::on_cmdFileSend_clicked()
     updateControlsState();
     ui->cmdFilePause->setFocus();
 
-    if (m_settings->useStartCommands()) m_communicator->sendCommands(m_settings->startCommands());
+    if (m_settings->useStartCommands())
+        m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_settings->startCommands());
 
     m_communicator->sendStreamerCommandsUntilBufferIsFull();
 }
@@ -837,7 +838,7 @@ void frmMain::on_cmdFilePause_clicked(bool checked)
             m_communicator->setSenderStateAndEmitSignal(SenderTransferring);
         } else {
             if (m_settings->usePauseCommands()) {
-                m_communicator->sendCommands(m_settings->afterPauseCommands());
+                m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_settings->afterPauseCommands());
             }
             m_communicator->setSenderStateAndEmitSignal(s);
         }
@@ -912,14 +913,14 @@ void frmMain::on_cmdHome_clicked()
 {
     m_communicator->m_homing = true;
     m_updateSpindleSpeed = true;
-    m_communicator->sendCommand("$H", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
+    m_communicator->sendCommand(CommandSource::GeneralUI, "$H", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
 }
 
 void frmMain::on_cmdCheck_clicked(bool checked)
 {
     if (checked) {
         storeParserState();
-        m_communicator->sendCommand("$C", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
+        m_communicator->sendCommand(CommandSource::GeneralUI, "$C", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
     } else {
         m_communicator->m_aborting = true;
         grblReset();
@@ -934,7 +935,7 @@ void frmMain::on_cmdReset_clicked()
 void frmMain::on_cmdUnlock_clicked()
 {
     m_updateSpindleSpeed = true;
-    m_communicator->sendCommand("$X", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
+    m_communicator->sendCommand(CommandSource::GeneralUI, "$X", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
 }
 
 void frmMain::on_cmdHold_clicked(bool checked)
@@ -944,7 +945,7 @@ void frmMain::on_cmdHold_clicked(bool checked)
 
 void frmMain::on_cmdSleep_clicked()
 {
-    m_communicator->sendCommand("$SLP", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
+    m_communicator->sendCommand(CommandSource::GeneralUI, "$SLP", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
 }
 
 void frmMain::on_cmdDoor_clicked()
@@ -975,7 +976,7 @@ void frmMain::on_cmdSpindle_clicked(bool checked)
     if (ui->cmdHold->isChecked()) {
         m_connection->sendByteArray(QByteArray(1, char(0x9e)));
     } else {
-        m_communicator->sendCommand(checked ? QString("M3 S%1").arg(ui->slbSpindle->value()) : "M5", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
+        m_communicator->sendCommand(CommandSource::GeneralUI, checked ? QString("M3 S%1").arg(ui->slbSpindle->value()) : "M5", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
     }
 }
 
@@ -1060,7 +1061,7 @@ void frmMain::on_chkKeyboardControl_toggled(bool checked)
     if (checked) {
         //m_communicator->sendCommand("$G", COMMAND_TI_UTIL1, m_configuration.consoleModule().showUiCommands());
     } else {
-        if (m_absoluteCoordinates) m_communicator->sendCommand("G90", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
+        if (m_absoluteCoordinates) m_communicator->sendCommand(CommandSource::System, "G90", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
     }
 
     if ((m_communicator->senderState() != SenderTransferring) && (m_communicator->senderState() != SenderStopping))
@@ -1718,6 +1719,8 @@ void frmMain::onCommandResponseReceived(CommandAttributes commandAttributes)
 
 void frmMain::onCommandSent(CommandAttributes commandAttributes)
 {
+    if (isCommandFromUi(commandAttributes.source) && !m_configuration.consoleModule().showUiCommands()) return;
+    if (isCommandFromProgram(commandAttributes.source) && !m_configuration.consoleModule().showProgramCommands()) return;
     m_partConsole->append(commandAttributes);
 }
 
@@ -1728,7 +1731,7 @@ void frmMain::onConfigurationReceived(MachineConfiguration configuration, QMap<i
 
 void frmMain::onConsoleNewCommand(QString command)
 {
-    m_communicator->sendCommand(command, COMMAND_TI_UI);
+    m_communicator->sendCommand(CommandSource::Console, command, COMMAND_TI_UI);
 }
 
 void frmMain::onTimerConnection()
@@ -1742,7 +1745,7 @@ void frmMain::onTimerConnection()
     if (!m_communicator->m_homing/* && !m_reseting*/ && !ui->cmdHold->isChecked() && m_communicator->m_queue.length() == 0) {
         if (m_updateSpindleSpeed) {
             m_updateSpindleSpeed = false;
-            m_communicator->sendCommand(QString("S%1").arg(ui->slbSpindle->value()), COMMAND_TI_UTIL1, m_configuration.consoleModule().showUiCommands());
+            m_communicator->sendCommand(CommandSource::System, QString("S%1").arg(ui->slbSpindle->value()), COMMAND_TI_UTIL1, m_configuration.consoleModule().showUiCommands());
         }
         if (m_updateParserStatus) {
             m_updateParserStatus = false;
@@ -1930,7 +1933,7 @@ void frmMain::onActSendFromLineTriggered()
             // foreach (QString command, commands) {
             //     sendCommand(command, COMMAND_TI_UI, m_settings->showUICommands());
             // }
-            m_communicator->sendCommands(commands, COMMAND_TI_UI);
+            m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, commands, COMMAND_TI_UI);
         }
     }
 
@@ -2985,7 +2988,7 @@ void frmMain::storeParserState()
 
 void frmMain::restoreParserState()
 {
-    if (!m_storedParserStatus.isEmpty()) m_communicator->sendCommand(m_storedParserStatus, -1, m_configuration.consoleModule().showUiCommands());
+    if (!m_storedParserStatus.isEmpty()) m_communicator->sendCommand(CommandSource::System, m_storedParserStatus, -1, m_configuration.consoleModule().showUiCommands());
 }
 
 void frmMain::storeOffsetsVars(QString response)
@@ -3892,6 +3895,7 @@ void frmMain::jogStep()
 
         if (vec.length()) {
             m_communicator->sendCommand(
+                CommandSource::System,
                 QString("$J=%5G91X%1Y%2Z%3F%4")
                     .arg(vec.x(), 0, 'f', m_settings->units() ? 4 : 3)
                     .arg(vec.y(), 0, 'f', m_settings->units() ? 4 : 3)
@@ -3944,7 +3948,7 @@ void frmMain::jogContinuous()
             QVector3D vec = j * m_communicator->toInches(d);
 
             if (vec.length()) {
-                m_communicator->sendCommand(QString("$J=%5G91X%1Y%2Z%3F%4")
+                m_communicator->sendCommand(CommandSource::System, QString("$J=%5G91X%1Y%2Z%3F%4")
                             .arg(vec.x(), 0, 'f', m_settings->units() ? 4 : 3)
                             .arg(vec.y(), 0, 'f', m_settings->units() ? 4 : 3)
                             .arg(vec.z(), 0, 'f', m_settings->units() ? 4 : 3)
@@ -3997,7 +4001,7 @@ void frmMain::completeTransfer()
     updateControlsState();
 
     // Send end commands
-    if (m_settings->useEndCommands()) m_communicator->sendCommands(m_settings->endCommands());
+    if (m_settings->useEndCommands()) m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_settings->endCommands());
 
     // Show message box
     qApp->beep();
