@@ -408,7 +408,7 @@ void Communicator::processCommandResponse(QString data)
     // Restore absolute/relative coordinate system after jog
     if (uncomment == "$G" && commandAttributes.tableIndex == -2) {
         if (ui->chkKeyboardControl->isChecked()) m_form->absoluteCoordinates() = response.contains("G90");
-        else if (response.contains("G90")) m_communicator->sendCommand(CommandSource::System, "G90", COMMAND_TI_UI, m_configuration->consoleModule().showUiCommands());
+        else if (response.contains("G90")) m_communicator->sendCommand(CommandSource::System, "G90", COMMAND_TI_UI);
     }
 
     // Process parser status
@@ -504,8 +504,8 @@ void Communicator::processCommandResponse(QString data)
         m_form->updateParserStatus() = true;
 
         // Query grbl settings
-        m_communicator->sendCommand(CommandSource::System, "$$", COMMAND_TI_UTIL1, false);
-        m_communicator->sendCommand(CommandSource::System, "$#", COMMAND_TI_UTIL1, false, true);
+        m_communicator->sendCommand(CommandSource::System, "$$", COMMAND_TI_UTIL1);
+        m_communicator->sendCommand(CommandSource::System, "$#", COMMAND_TI_UTIL1, true);
     }
 
     // Clear command buffer on "M2" & "M30" command (old firmwares)
@@ -600,7 +600,7 @@ void Communicator::processCommandResponse(QString data)
         processingQueue = true;
         while (m_communicator->m_queue.length() > 0) {
             CommandQueue cq = m_communicator->m_queue.takeFirst();
-            SendCommandResult r = m_communicator->sendCommand(cq.source, cq.command, cq.tableIndex, cq.showInConsole);
+            SendCommandResult r = m_communicator->sendCommand(cq.source, cq.command, cq.tableIndex);
             if (r == SendDone) {
                 break;
             } else if (r == SendQueue) {

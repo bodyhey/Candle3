@@ -913,14 +913,14 @@ void frmMain::on_cmdHome_clicked()
 {
     m_communicator->m_homing = true;
     m_updateSpindleSpeed = true;
-    m_communicator->sendCommand(CommandSource::GeneralUI, "$H", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
+    m_communicator->sendCommand(CommandSource::GeneralUI, "$H", COMMAND_TI_UI);
 }
 
 void frmMain::on_cmdCheck_clicked(bool checked)
 {
     if (checked) {
         storeParserState();
-        m_communicator->sendCommand(CommandSource::GeneralUI, "$C", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
+        m_communicator->sendCommand(CommandSource::GeneralUI, "$C", COMMAND_TI_UI);
     } else {
         m_communicator->m_aborting = true;
         grblReset();
@@ -935,7 +935,7 @@ void frmMain::on_cmdReset_clicked()
 void frmMain::on_cmdUnlock_clicked()
 {
     m_updateSpindleSpeed = true;
-    m_communicator->sendCommand(CommandSource::GeneralUI, "$X", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
+    m_communicator->sendCommand(CommandSource::GeneralUI, "$X", COMMAND_TI_UI);
 }
 
 void frmMain::on_cmdHold_clicked(bool checked)
@@ -945,7 +945,7 @@ void frmMain::on_cmdHold_clicked(bool checked)
 
 void frmMain::on_cmdSleep_clicked()
 {
-    m_communicator->sendCommand(CommandSource::GeneralUI, "$SLP", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
+    m_communicator->sendCommand(CommandSource::GeneralUI, "$SLP", COMMAND_TI_UI);
 }
 
 void frmMain::on_cmdDoor_clicked()
@@ -976,7 +976,7 @@ void frmMain::on_cmdSpindle_clicked(bool checked)
     if (ui->cmdHold->isChecked()) {
         m_connection->sendByteArray(QByteArray(1, char(0x9e)));
     } else {
-        m_communicator->sendCommand(CommandSource::GeneralUI, checked ? QString("M3 S%1").arg(ui->slbSpindle->value()) : "M5", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
+        m_communicator->sendCommand(CommandSource::GeneralUI, checked ? QString("M3 S%1").arg(ui->slbSpindle->value()) : "M5", COMMAND_TI_UI);
     }
 }
 
@@ -1059,9 +1059,9 @@ void frmMain::on_chkKeyboardControl_toggled(bool checked)
 
     // Store/restore coordinate system
     if (checked) {
-        //m_communicator->sendCommand("$G", COMMAND_TI_UTIL1, m_configuration.consoleModule().showUiCommands());
+        //m_communicator->sendCommand(CommandSource::System, "$G", COMMAND_TI_UTIL1);
     } else {
-        if (m_absoluteCoordinates) m_communicator->sendCommand(CommandSource::System, "G90", COMMAND_TI_UI, m_configuration.consoleModule().showUiCommands());
+        if (m_absoluteCoordinates) m_communicator->sendCommand(CommandSource::System, "G90", COMMAND_TI_UI);
     }
 
     if ((m_communicator->senderState() != SenderTransferring) && (m_communicator->senderState() != SenderStopping))
@@ -1746,7 +1746,7 @@ void frmMain::onTimerConnection()
     if (!m_communicator->m_homing/* && !m_reseting*/ && !ui->cmdHold->isChecked() && m_communicator->m_queue.length() == 0) {
         if (m_updateSpindleSpeed) {
             m_updateSpindleSpeed = false;
-            m_communicator->sendCommand(CommandSource::System, QString("S%1").arg(ui->slbSpindle->value()), COMMAND_TI_UTIL1, m_configuration.consoleModule().showUiCommands());
+            m_communicator->sendCommand(CommandSource::System, QString("S%1").arg(ui->slbSpindle->value()), COMMAND_TI_UTIL1);
         }
         if (m_updateParserStatus) {
             m_updateParserStatus = false;
@@ -1932,7 +1932,7 @@ void frmMain::onActSendFromLineTriggered()
         if (res == QMessageBox::Cancel) return;
         else if (res == QMessageBox::Ok) {
             // foreach (QString command, commands) {
-            //     sendCommand(command, COMMAND_TI_UI, m_settings->showUICommands());
+            //     sendCommand(command, COMMAND_TI_UI);
             // }
             m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, commands, COMMAND_TI_UI);
         }
@@ -2355,8 +2355,6 @@ void frmMain::saveSettings()
     set.setValue("arcLength", m_settings->arcLength());
     set.setValue("arcDegree", m_settings->arcDegree());
     set.setValue("arcDegreeMode", m_settings->arcDegreeMode());
-    // set.setValue("showProgramCommands", m_settings->showProgramCommands());
-    // set.setValue("showUICommands", m_settings->showUICommands());
     set.setValue("spindleSpeedMin", m_settings->spindleSpeedMin());
     set.setValue("spindleSpeedMax", m_settings->spindleSpeedMax());
     set.setValue("laserPowerMin", m_settings->laserPowerMin());
@@ -2897,7 +2895,7 @@ void frmMain::writeConsole(QString command)
 //         )
 //     {
 //         m_currentModel->setData(m_currentModel->index(m_streamer->commandIndex(), 2), GCodeItem::Sent);
-//         m_communicator->sendCommand(command, m_streamer->commandIndex(), m_configuration.consoleModule().showProgramCommands());
+//         m_communicator->sendCommand(command, m_streamer->commandIndex());
 //         m_streamer->advanceCommandIndex();
 //         command = m_currentModel->data(m_currentModel->index(m_streamer->commandIndex(), 1)).toString();
 //     }
@@ -2989,7 +2987,7 @@ void frmMain::storeParserState()
 
 void frmMain::restoreParserState()
 {
-    if (!m_storedParserStatus.isEmpty()) m_communicator->sendCommand(CommandSource::System, m_storedParserStatus, -1, m_configuration.consoleModule().showUiCommands());
+    if (!m_storedParserStatus.isEmpty()) m_communicator->sendCommand(CommandSource::System, m_storedParserStatus, -1);
 }
 
 void frmMain::storeOffsetsVars(QString response)
@@ -3903,7 +3901,7 @@ void frmMain::jogStep()
                     .arg(vec.z(), 0, 'f', m_settings->units() ? 4 : 3)
                     .arg(ui->cboJogFeed->currentText().toDouble())
                     .arg(m_settings->units() ? "G20" : "G21"),
-                -3, m_configuration.consoleModule().showUiCommands());
+                -3);
         }
     }
 }
@@ -3955,7 +3953,7 @@ void frmMain::jogContinuous()
                             .arg(vec.z(), 0, 'f', m_settings->units() ? 4 : 3)
                             .arg(ui->cboJogFeed->currentText().toDouble())
                             .arg(m_settings->units() ? "G20" : "G21")
-                            , -2, m_configuration.consoleModule().showUiCommands());
+                            , -2);
             }
             v = j;
         }

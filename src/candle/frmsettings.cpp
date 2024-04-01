@@ -388,20 +388,10 @@ void frmSettings::setArcDegreeMode(bool arcDegreeMode)
     ui->radArcDegreeMode->setChecked(arcDegreeMode);
 }
 
-bool frmSettings::showProgramCommands()
-{
-    return ui->chkConsoleShowProgramCommands->isChecked();
-}
-
 void frmSettings::setShowProgramCommands(bool showAllCommands)
 {
     ui->chkConsoleShowProgramCommands->setChecked(showAllCommands);
 }
-
-// bool frmSettings::showUICommands()
-// {
-//     return m_configuration.consoleModule().showUiCommands();
-// }
 
 void frmSettings::setShowUICommands(bool showUICommands)
 {

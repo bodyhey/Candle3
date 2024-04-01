@@ -147,16 +147,14 @@ struct CommandAttributes {
 struct CommandQueue {
     QString command;
     int tableIndex;
-    bool showInConsole;
     CommandSource source;
 
     CommandQueue() {
     }
 
-    CommandQueue(CommandSource source, QString command, int tableIndex, bool showInConsole) {
+    CommandQueue(CommandSource source, QString command, int tableIndex) {
         this->command = command;
         this->tableIndex = tableIndex;
-        this->showInConsole = showInConsole;
         this->source = source;
     }
 };
