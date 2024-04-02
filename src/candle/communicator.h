@@ -101,7 +101,7 @@ class Communicator : public QObject
         void setDeviceStateAndEmitSignal(DeviceState);
         void restoreOffsets();
         int bufferLength();
-        void storeOffsetsVars(QString response);
+        void processOffsetsVars(QString response);
         bool dataIsFloating(QString data);
         bool dataIsEnd(QString data);
         bool dataIsReset(QString data);

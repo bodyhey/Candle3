@@ -433,7 +433,7 @@ void Communicator::processCommandResponse(QString data)
     }
 
     // Offsets
-    if (uncomment == "$#") storeOffsetsVars(response);
+    if (uncomment == "$#") processOffsetsVars(response);
 
     // Settings response
     if (uncomment == "$$") {

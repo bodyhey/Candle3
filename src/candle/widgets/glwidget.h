@@ -103,7 +103,6 @@ private slots:
 private:
     double m_xRot, m_yRot, m_xLastRot, m_yLastRot;
     QVector3D m_lookAt;
-    QVector3D m_eye;
     bool m_perspective;
     QPoint m_lastPos;
     double m_zoomDistance;

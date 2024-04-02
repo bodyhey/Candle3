@@ -381,7 +381,6 @@ private:
 
     // Parser
     void updateParser();
-    void storeOffsetsVars(QString response);
 
     // Files/models
     void loadFile(QString fileName);

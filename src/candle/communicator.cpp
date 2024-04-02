@@ -309,7 +309,7 @@ void Communicator::sendStreamerCommandsUntilBufferIsFull()
 }
 
 /* used by scripting engine only?? emit signal and do not use m_storedVars directly */
-void Communicator::storeOffsetsVars(QString response)
+void Communicator::processOffsetsVars(QString response)
 {
     static QRegExp gx("\\[(G5[4-9]|G28|G30|G92|PRB):([\\d\\.\\-]+),([\\d\\.\\-]+),([\\d\\.\\-]+)");
     static QRegExp tx("\\[(TLO):([\\d\\.\\-]+)");
