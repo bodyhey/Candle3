@@ -405,3 +405,17 @@ double Communicator::toInches(double value)
 {
     return m_settings->units() == 0 ? value : value / 25.4;
 }
+
+void Communicator::storeParserState()
+{
+    // Remove GC:, Gx Mx, Fx, Sx ??
+    // @TODO do it better
+    m_storedParserState = m_lastParserState.remove(QRegExp("GC:|\\[|\\]|G[01234]\\s|M[0345]+\\s|\\sF[\\d\\.]+|\\sS[\\d\\.]+"));
+}
+
+void Communicator::restoreParserState()
+{
+    if (!m_storedParserState.isEmpty()) {
+        sendCommand(CommandSource::System, m_storedParserState, COMMAND_TI_UI);
+    }
+}

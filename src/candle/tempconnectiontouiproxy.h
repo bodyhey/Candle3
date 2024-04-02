@@ -19,13 +19,11 @@
 class TempConnectionToUiProxy {
     public:
         virtual void completeTransfer() = 0;
-        virtual void restoreParserState() = 0;
         virtual void updateOverride(SliderBox *slider, int value, char command) = 0;
         virtual void updateControlsState() = 0;
         virtual void jogContinuous() = 0;
         virtual void updateHeightMapInterpolationDrawer(bool reset = false) = 0;
         virtual void grblReset() = 0;
-        virtual void storeParserState() = 0;
         virtual QMap<DeviceState, QString> &deviceStatuses() = 0;
         virtual MachineBoundsDrawer &machineBoundsDrawer() = 0;
         virtual ScriptVars &storedVars() = 0;

@@ -402,6 +402,7 @@ void frmMain::initializeCommunicator()
     connect(m_communicator, SIGNAL(floodStateReceived(bool)), this, SLOT(onFloodStateReceived(bool)));
     connect(m_communicator, SIGNAL(commandSent(CommandAttributes)), this, SLOT(onCommandSent(CommandAttributes)));
     connect(m_communicator, SIGNAL(commandResponseReceived(CommandAttributes)), this, SLOT(onCommandResponseReceived(CommandAttributes)));
+    connect(m_communicator, SIGNAL(parserStateReceived(QString)), this, SLOT(onParserStateReceived(QString)));
     connect(m_communicator, SIGNAL(aborted()), this, SLOT(onAborted()));
 }
 
@@ -800,7 +801,7 @@ void frmMain::on_cmdFileSend_clicked()
     m_storedKeyboardControl = ui->chkKeyboardControl->isChecked();
     ui->chkKeyboardControl->setChecked(false);
 
-    storeParserState();
+    m_communicator->storeParserState();
 
 #ifdef WINDOWS
     if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7) {
@@ -919,7 +920,7 @@ void frmMain::on_cmdHome_clicked()
 void frmMain::on_cmdCheck_clicked(bool checked)
 {
     if (checked) {
-        storeParserState();
+        m_communicator->storeParserState();
         m_communicator->sendCommand(CommandSource::GeneralUI, "$C", COMMAND_TI_UI);
     } else {
         m_communicator->m_aborting = true;
@@ -1707,6 +1708,11 @@ void frmMain::onFloodStateReceived(bool state)
     ui->cmdFlood->setChecked(state);
 }
 
+void frmMain::onParserStateReceived(QString state)
+{
+    ui->glwVisualizer->setParserState(state);
+}
+
 void frmMain::onAborted()
 {
     //ui->cmdFileAbort->setEnabled(false);
@@ -1967,7 +1973,7 @@ void frmMain::onActSendFromLineTriggered()
     m_storedKeyboardControl = ui->chkKeyboardControl->isChecked();
     ui->chkKeyboardControl->setChecked(false);
 
-    storeParserState();
+    m_communicator->storeParserState();
 
 #ifdef WINDOWS
     if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7) {
@@ -2979,16 +2985,6 @@ void frmMain::updateParser()
     if (m_currentModel == &m_programModel) m_fileChanged = true;
 }
 
-void frmMain::storeParserState()
-{    
-    m_storedParserStatus = ui->glwVisualizer->parserStatus().remove(
-                QRegExp("GC:|\\[|\\]|G[01234]\\s|M[0345]+\\s|\\sF[\\d\\.]+|\\sS[\\d\\.]+"));
-}
-
-void frmMain::restoreParserState()
-{
-    if (!m_storedParserStatus.isEmpty()) m_communicator->sendCommand(CommandSource::System, m_storedParserStatus, -1);
-}
 
 void frmMain::storeOffsetsVars(QString response)
 {
@@ -3995,7 +3991,7 @@ void frmMain::completeTransfer()
     m_communicator->setSenderStateAndEmitSignal(SenderStopped);
     m_streamer->resetProcessed();
     m_lastDrawnLineIndex = 0;
-    m_storedParserStatus.clear();
+    m_communicator->m_storedParserState.clear();
 
     updateControlsState();
 

@@ -90,6 +90,10 @@ class Communicator : public QObject
         int m_probeIndex;
         int m_commandIndex = 0;
 
+        // Stored parser params
+        QString m_lastParserState; // response to $G
+        QString m_storedParserState; // saved by storeParserState
+
         // Timers
         QTimer m_timerStateQuery;
 
@@ -112,7 +116,9 @@ class Communicator : public QObject
         void processFeedSpindleSpeed(QString data);
         void processOverrides(QString data);
         void processNewToolPosition(DeviceState state);
-        void processToolpathShadowing(DeviceState state, QVector3D toolPosition);        
+        void processToolpathShadowing(DeviceState state, QVector3D toolPosition);
+        void storeParserState();
+        void restoreParserState();
     private slots:
         void onTimerStateQuery();
         void onConnectionLineReceived(QString);
@@ -129,6 +135,7 @@ class Communicator : public QObject
         // emitted after status response received, if state changed, may be emitted together with deviceStateChanged!
         void deviceStateReceived(DeviceState state);
         void spindleStateReceived(bool state);
+        void parserStateReceived(QString state);
         void floodStateReceived(bool state);
         void commandResponseReceived(CommandAttributes commandAttributes);
         void commandSent(CommandAttributes commandAttributes);

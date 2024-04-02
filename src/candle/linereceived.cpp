@@ -312,7 +312,7 @@ void Communicator::processStatus(QString data)
                 case DeviceIdle: // Idle
                     if ((m_communicator->m_senderState == SenderStopped) && m_communicator->m_resetCompleted) {
                         m_communicator->m_aborting = false;
-                        m_form->restoreParserState();
+                        restoreParserState();
                         m_communicator->restoreOffsets();
                         return;
                     }
@@ -409,13 +409,18 @@ void Communicator::processCommandResponse(QString data)
         else if (response.contains("G90")) m_communicator->sendCommand(CommandSource::System, "G90", COMMAND_TI_UI);
     }
 
-    // Process parser status
+    // Process GCore parser state
     if (uncomment == "$G" && commandAttributes.tableIndex == -3) {
+        // @TODO what is this ; for? is it '; ok'?
+        m_lastParserState = response.left(response.indexOf("; "));
+
         // Update status in visualizer window
-        ui->glwVisualizer->setParserStatus(response.left(response.indexOf("; ")));
+        emit parserStateReceived(m_lastParserState);
 
         // Store parser status
-        if ((m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping)) m_form->storeParserState();
+        if ((m_senderState == SenderTransferring) || (m_senderState == SenderStopping)) {
+            storeParserState();
+        }
 
         // Spindle speed
         QRegExp rx(".*S([\\d\\.]+)");

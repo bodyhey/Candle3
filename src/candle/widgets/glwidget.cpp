@@ -272,14 +272,14 @@ void GLWidget::setBufferState(const QString &bufferState)
     m_bufferState = bufferState;
 }
 
-QString GLWidget::parserStatus() const
+QString GLWidget::parserState() const
 {
-    return m_parserStatus;
+    return m_parserState;
 }
 
-void GLWidget::setParserStatus(const QString &parserStatus)
+void GLWidget::setParserState(const QString &parserState)
 {
-    m_parserStatus = parserStatus;
+    m_parserState = parserState;
 }
 
 
@@ -320,14 +320,15 @@ int GLWidget::fps()
 }
 
 void GLWidget::toggleProjectionType() {
-    m_perspective = !m_perspective;
+    m_perspective = true;
+    //!m_perspective;
     updateProjection();
     updateView();
 }
 
 void GLWidget::setIsometricView()
 {
-    m_perspective = false;
+    m_perspective = true; //false;
     updateProjection();
     m_xRotTarget = 35.264;
     m_yRotTarget = m_yRot > 180 ? 405 : 45;
@@ -425,13 +426,8 @@ void GLWidget::updateProjection()
     m_projectionMatrix.setToIdentity();
 
     double asp = (double)width() / height();
-    double orthoSize = m_zoomDistance * tan((m_fov * 0.0174533) / 2.0);
 
-    // perspective / orthographic projection
-    if (m_perspective)
-        m_projectionMatrix.perspective(m_fov, asp, m_near, m_far);
-    else
-        m_projectionMatrix.ortho(-orthoSize * asp, orthoSize * asp, -orthoSize, orthoSize, -m_far/2.0, m_far/2.0);
+    m_projectionMatrix.perspective(m_fov, asp, m_near, m_far);
 }
 
 void GLWidget::updateView()
@@ -526,7 +522,7 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
 
     QFontMetrics fm(painter.font());
 
-    painter.drawText(QPoint(x, fm.height() + 10), m_parserStatus);
+    painter.drawText(QPoint(x, fm.height() + 10), m_parserState);
     painter.drawText(QPoint(x, fm.height() * 2 + 10), m_speedState);
     painter.drawText(QPoint(x, fm.height() * 3 + 10), m_pinState);
 
@@ -557,13 +553,15 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
+    QPoint pos = event->pos();
+
     if ((event->buttons() & Qt::MiddleButton && !(event->modifiers() & Qt::ShiftModifier)) 
         || (event->buttons() & Qt::LeftButton && !(event->modifiers() & Qt::ShiftModifier))) {
 
         stopViewAnimation();
 
-        m_yRot = normalizeAngle(m_yLastRot - (event->pos().x() - m_lastPos.x()) * 0.5);
-        m_xRot = m_xLastRot + (event->pos().y() - m_lastPos.y()) * 0.5;
+        m_yRot = normalizeAngle(m_yLastRot - (pos.x() - m_lastPos.x()) * 0.5);
+        m_xRot = m_xLastRot + (pos.y() - m_lastPos.y()) * 0.5;
 
         if (m_xRot < -90) m_xRot = -90;
         if (m_xRot > 90) m_xRot = 90;
@@ -594,12 +592,15 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
         // Get current mouse XY in clip
         QVector4D currentMouseInWorld(
-            (event->pos().x() / (double)width()) * 2.0 - 1.0,
-            -((event->pos().y() / (double)height()) * 2.0 - 1.0),
-            0, 1.0
-            );
+            (pos.x() / (double)width()) * 2.0 - 1.0,
+            -((pos.y() / (double)height()) * 2.0 - 1.0),
+            0,
+            1.0
+        );
         // Project current mouse pos to world
         currentMouseInWorld = mvpi * currentMouseInWorld * centerVector.w();
+
+        qDebug() << currentMouseInWorld << mvpi * currentMouseInWorld << currentMouseInWorld / currentMouseInWorld.w();
 
         //currentMouseInWorld /= currentMouseInWorld.w();
 
@@ -609,7 +610,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         // Subtract difference from center point
         m_lookAt -= QVector3D(difference.x(), difference.y(), difference.z());
 
-        m_lastPos = event->pos();
+        m_lastPos = pos;
 
         updateView();
     }

@@ -48,8 +48,8 @@ public:
     int fps();
     void setFps(int fps);
 
-    QString parserStatus() const;
-    void setParserStatus(const QString &parserStatus);
+    QString parserState() const;
+    void setParserState(const QString &parserState);
 
     QString bufferState() const;
     void setBufferState(const QString &bufferState);
@@ -125,7 +125,7 @@ private:
     double m_xRotTarget, m_yRotTarget;
     double m_xRotStored, m_yRotStored;
     bool m_animateView;
-    QString m_parserStatus;
+    QString m_parserState;
     QString m_speedState;
     QString m_pinState;
     QString m_bufferState;

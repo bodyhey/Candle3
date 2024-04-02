@@ -224,6 +224,7 @@ private slots:
     void onDeviceStateReceived(DeviceState state);
     void onSpindleStateReceived(bool state);
     void onFloodStateReceived(bool state);
+    void onParserStateReceived(QString state);
     void onAborted();
     void onCommandResponseReceived(CommandAttributes commandAttributes);
     void onCommandSent(CommandAttributes commandAttributes);
@@ -332,9 +333,6 @@ private:
     QBasicTimer m_timerToolAnimation;
     QTime m_startTime;
 
-    // Stored parser params
-    QString m_storedParserStatus;
-
     // Flags
     bool m_programLoading;
     bool m_settingsLoading;
@@ -383,8 +381,6 @@ private:
 
     // Parser
     void updateParser();
-    void storeParserState();
-    void restoreParserState();
     void storeOffsetsVars(QString response);
 
     // Files/models
