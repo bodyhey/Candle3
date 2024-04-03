@@ -168,7 +168,9 @@ void Communicator::processOverrides(QString data)
             // m_timerToolAnimation.stop();
             // ui->cmdSpindle->setChecked(false);
         }
-        ui->glwVisualizer->setPinState(pinState);
+        //ui->glwVisualizer->setPinState(pinState);
+
+        emit pinStateReceived(pinState);
     }
 }
 

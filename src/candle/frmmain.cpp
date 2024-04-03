@@ -403,6 +403,7 @@ void frmMain::initializeCommunicator()
     connect(m_communicator, SIGNAL(commandSent(CommandAttributes)), this, SLOT(onCommandSent(CommandAttributes)));
     connect(m_communicator, SIGNAL(commandResponseReceived(CommandAttributes)), this, SLOT(onCommandResponseReceived(CommandAttributes)));
     connect(m_communicator, SIGNAL(parserStateReceived(QString)), this, SLOT(onParserStateReceived(QString)));
+    connect(m_communicator, SIGNAL(pinStateReceived(QString)), this, SLOT(onPinStateReceived(QString)));
     connect(m_communicator, SIGNAL(aborted()), this, SLOT(onAborted()));
 }
 
@@ -1711,6 +1712,11 @@ void frmMain::onFloodStateReceived(bool state)
 void frmMain::onParserStateReceived(QString state)
 {
     ui->glwVisualizer->setParserState(state);
+}
+
+void frmMain::onPinStateReceived(QString state)
+{
+    ui->glwVisualizer->setPinState(state);
 }
 
 void frmMain::onAborted()

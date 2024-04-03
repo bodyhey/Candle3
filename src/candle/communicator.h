@@ -138,6 +138,7 @@ class Communicator : public QObject
         // emitted after status response received, if state changed, may be emitted together with deviceStateChanged!
         void deviceStateReceived(DeviceState state);
         void spindleStateReceived(bool state);
+        void pinStateReceived(QString state);
         void parserStateReceived(QString state);
         void floodStateReceived(bool state);
         void commandResponseReceived(CommandAttributes commandAttributes);

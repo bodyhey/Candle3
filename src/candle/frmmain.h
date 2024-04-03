@@ -225,6 +225,7 @@ private slots:
     void onSpindleStateReceived(bool state);
     void onFloodStateReceived(bool state);
     void onParserStateReceived(QString state);
+    void onPinStateReceived(QString state);
     void onAborted();
     void onCommandResponseReceived(CommandAttributes commandAttributes);
     void onCommandSent(CommandAttributes commandAttributes);
