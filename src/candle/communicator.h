@@ -97,6 +97,9 @@ class Communicator : public QObject
         // Timers
         QTimer m_timerStateQuery;
 
+        // Dictionary
+        QMap<DeviceState, QString> m_deviceStatesDictionary;
+
         void setSenderStateAndEmitSignal(SenderState);
         void setDeviceStateAndEmitSignal(DeviceState);
         void restoreOffsets();

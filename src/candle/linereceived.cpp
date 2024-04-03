@@ -7,7 +7,6 @@ to be refactored/replaced by signals and slots
 
 updateControlsState()
 
-m_deviceStatuses // dist, move to UI
 m_toolDrawer // emit toolPositionChanged
 m_codeDrawer // getIgnoreZ??
 m_lastDrawnLineIndex
@@ -270,7 +269,7 @@ void Communicator::processStatus(QString data)
     // Status
     static QRegExp stx("<([^,^>^|]*)");
     if (stx.indexIn(data) != -1) {
-        state = m_form->deviceStatuses().key(stx.cap(1), DeviceUnknown);
+        state = m_deviceStatesDictionary.key(stx.cap(1), DeviceUnknown);
 
         // Update status
         if (state != m_communicator->m_deviceState) {

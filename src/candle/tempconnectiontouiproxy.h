@@ -24,7 +24,6 @@ class TempConnectionToUiProxy {
         virtual void jogContinuous() = 0;
         virtual void updateHeightMapInterpolationDrawer(bool reset = false) = 0;
         virtual void grblReset() = 0;
-        virtual QMap<DeviceState, QString> &deviceStatuses() = 0;
         virtual MachineBoundsDrawer &machineBoundsDrawer() = 0;
         virtual ScriptVars &storedVars() = 0;
         virtual GcodeDrawer &currentDrawer() = 0;

@@ -51,21 +51,21 @@ frmMain::frmMain(QWidget *parent) :
     initializeCommunicator();
 
     // Initializing variables
-    m_deviceStatuses[DeviceUnknown] = "Unknown";
-    m_deviceStatuses[DeviceIdle] = "Idle";
-    m_deviceStatuses[DeviceAlarm] = "Alarm";
-    m_deviceStatuses[DeviceRun] = "Run";
-    m_deviceStatuses[DeviceHome] = "Home";
-    m_deviceStatuses[DeviceHold0] = "Hold:0";
-    m_deviceStatuses[DeviceHold1] = "Hold:1";
-    m_deviceStatuses[DeviceQueue] = "Queue";
-    m_deviceStatuses[DeviceCheck] = "Check";
-    m_deviceStatuses[DeviceDoor0] = "Door:0";
-    m_deviceStatuses[DeviceDoor1] = "Door:1";
-    m_deviceStatuses[DeviceDoor2] = "Door:2";
-    m_deviceStatuses[DeviceDoor3] = "Door:3";
-    m_deviceStatuses[DeviceJog] = "Jog";
-    m_deviceStatuses[DeviceSleep] = "Sleep";
+    // m_deviceStatuses[DeviceUnknown] = "Unknown";
+    // m_deviceStatuses[DeviceIdle] = "Idle";
+    // m_deviceStatuses[DeviceAlarm] = "Alarm";
+    // m_deviceStatuses[DeviceRun] = "Run";
+    // m_deviceStatuses[DeviceHome] = "Home";
+    // m_deviceStatuses[DeviceHold0] = "Hold:0";
+    // m_deviceStatuses[DeviceHold1] = "Hold:1";
+    // m_deviceStatuses[DeviceQueue] = "Queue";
+    // m_deviceStatuses[DeviceCheck] = "Check";
+    // m_deviceStatuses[DeviceDoor0] = "Door:0";
+    // m_deviceStatuses[DeviceDoor1] = "Door:1";
+    // m_deviceStatuses[DeviceDoor2] = "Door:2";
+    // m_deviceStatuses[DeviceDoor3] = "Door:3";
+    // m_deviceStatuses[DeviceJog] = "Jog";
+    // m_deviceStatuses[DeviceSleep] = "Sleep";
 
 	m_statusCaptions[DeviceUnknown] = tr("Unknown");
 	m_statusCaptions[DeviceIdle] = tr("Idle");

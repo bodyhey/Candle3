@@ -92,7 +92,7 @@ public:
     void writeConsole(QString command);
 
     // TO BE REMOVED !!!
-    QMap<DeviceState, QString> &deviceStatuses() override { return m_deviceStatuses; };
+    //QMap<DeviceState, QString> &deviceStatuses() override { return m_deviceStatuses; };
     MachineBoundsDrawer &machineBoundsDrawer() override { return m_machineBoundsDrawer; };
     ScriptVars &storedVars() override { return m_storedVars; };
     GcodeDrawer &currentDrawer() override { return *m_currentDrawer; };
@@ -269,7 +269,7 @@ private:
     // Ui
     Ui::frmMain *ui;
 
-    QMap<DeviceState, QString> m_deviceStatuses;
+    //QMap<DeviceState, QString> m_deviceStatuses;
     QMap<DeviceState, QString> m_statusCaptions;
     QMap<DeviceState, QString> m_statusBackColors;
     QMap<DeviceState, QString> m_statusForeColors;

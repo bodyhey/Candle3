@@ -14,13 +14,30 @@ Communicator::Communicator(
     Ui::frmMain *ui,
     frmSettings *frmSettings,
     QObject *parent = nullptr
-    ) : QObject(parent),
-        m_connection(connection),
-        m_settings(frmSettings),
-        m_configuration(configuration),
-        ui(ui),
-        m_form(frmMain),
-        m_timerStateQuery(this)
+) : QObject(parent),
+    m_connection(connection),
+    m_settings(frmSettings),
+    m_configuration(configuration),
+    ui(ui),
+    m_form(frmMain),
+    m_timerStateQuery(this),
+    m_deviceStatesDictionary({
+        {DeviceUnknown, "Unknown"},
+        {DeviceIdle, "Idle"},
+        {DeviceAlarm, "Alarm"},
+        {DeviceRun, "Run"},
+        {DeviceHome, "Home"},
+        {DeviceHold0, "Hold:0"},
+        {DeviceHold1, "Hold:1"},
+        {DeviceQueue, "Queue"},
+        {DeviceCheck, "Check"},
+        {DeviceDoor0, "Door:0"},
+        {DeviceDoor1, "Door:1"},
+        {DeviceDoor2, "Door:2"},
+        {DeviceDoor3, "Door:3"},
+        {DeviceJog, "Jog"},
+        {DeviceSleep, "Sleep"}
+    })
 {
     assert(m_connection != nullptr);
     assert(m_settings != nullptr);
