@@ -135,7 +135,8 @@ class Communicator : public QObject
     signals:
         void responseReceived(QString command, int tableIndex, QString response);
         void statusReceived(QString status);
-        void senderStateChanged(int state);
+        void senderStateReceived(SenderState state);
+        void senderStateChanged(SenderState state);
         void deviceStateChanged(DeviceState state);
         void configurationReceived(MachineConfiguration configuration, QMap<int, double> rawConfiguration);
         void machinePosChanged(QVector3D pos);

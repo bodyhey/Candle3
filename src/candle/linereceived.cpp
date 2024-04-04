@@ -5,7 +5,6 @@
 /*
 to be refactored/replaced by signals and slots
 
-updateControlsState()
 
 m_toolDrawer // emit toolPositionChanged
 m_codeDrawer // getIgnoreZ??
@@ -711,7 +710,6 @@ void Communicator::processCommandResponse(QString data)
         }
 
         m_communicator->setSenderStateAndEmitSignal(SenderChangingTool);
-        m_form->updateControlsState();
     }
 
     // Pausing on button?
@@ -719,7 +717,6 @@ void Communicator::processCommandResponse(QString data)
         if (m_settings->usePauseCommands()) {
             m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_settings->beforePauseCommands());
             m_communicator->setSenderStateAndEmitSignal(SenderPausing2);
-            m_form->updateControlsState();
         }
     }
     if ((m_communicator->m_senderState == SenderChangingTool) && !m_settings->toolChangePause()
@@ -731,7 +728,6 @@ void Communicator::processCommandResponse(QString data)
     // Switch to pause mode
     if ((m_communicator->m_senderState == SenderPausing || m_communicator->m_senderState == SenderPausing2) && m_communicator->m_commands.isEmpty()) {
         m_communicator->setSenderStateAndEmitSignal(SenderPaused);
-        m_form->updateControlsState();
     }
 
     // Same as M2, Program End, turn off spindle/laser and stops the machine.
@@ -798,7 +794,8 @@ void Communicator::processUnhandledResponse(QString data)
 
         m_communicator->clearCommandsAndQueue();
 
-        m_form->updateControlsState();
+        // @TODO moved to senderStateReceived handler, is it too soon??
+        // m_form->updateControlsState();
     }
 
     m_form->partConsole().append(data);

@@ -398,6 +398,7 @@ void frmMain::initializeCommunicator()
     connect(m_communicator, SIGNAL(workPosChanged(QVector3D)), this, SLOT(onWorkPosChanged(QVector3D)));
     connect(m_communicator, SIGNAL(deviceStateReceived(DeviceState)), this, SLOT(onDeviceStateReceived(DeviceState)));
     connect(m_communicator, SIGNAL(deviceStateChanged(DeviceState)), this, SLOT(onDeviceStateChanged(DeviceState)));
+    connect(m_communicator, SIGNAL(senderStateReceived(SenderState)), this, SLOT(onSenderStateReceived(SenderState)));
     connect(m_communicator, SIGNAL(spindleStateReceived(bool)), this, SLOT(onSpindleStateReceived(bool)));
     connect(m_communicator, SIGNAL(floodStateReceived(bool)), this, SLOT(onFloodStateReceived(bool)));
     connect(m_communicator, SIGNAL(commandSent(CommandAttributes)), this, SLOT(onCommandSent(CommandAttributes)));
@@ -1688,6 +1689,13 @@ void frmMain::onDeviceStateReceived(DeviceState state)
         int elapsed = m_startTime.elapsed();
         ui->glwVisualizer->setSpendTime(time.addMSecs(elapsed));
     }
+}
+
+void frmMain::onSenderStateReceived(SenderState state)
+{
+    Q_UNUSED(state);
+
+    updateControlsState();
 }
 
 void frmMain::onSpindleStateReceived(bool state)
