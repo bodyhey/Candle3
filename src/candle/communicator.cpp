@@ -325,6 +325,21 @@ void Communicator::sendStreamerCommandsUntilBufferIsFull()
     }
 }
 
+void Communicator::processConnectionTimer()
+{
+    // @TODO refactor ui->cmdHold->isChecked
+    if (!m_communicator->m_homing && !ui->cmdHold->isChecked() && m_communicator->m_queue.length() == 0) {
+        if (m_updateSpindleSpeed) {
+            m_updateSpindleSpeed = false;
+            sendCommand(CommandSource::System, QString("S%1").arg(ui->slbSpindle->value()), COMMAND_TI_UTIL1);
+        }
+        if (m_updateParserState) {
+            m_updateParserState = false;
+            sendCommand(CommandSource::System, "$G", COMMAND_TI_UTIL2, false);
+        }
+    }
+}
+
 /* used by scripting engine only?? emit signal and do not use m_storedVars directly */
 void Communicator::processOffsetsVars(QString response)
 {

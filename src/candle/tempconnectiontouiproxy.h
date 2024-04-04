@@ -34,7 +34,6 @@ class TempConnectionToUiProxy {
         virtual GCodeTableModel &programHeightmapModel() = 0;
         virtual GCodeTableModel &currentModel() = 0;
         virtual HeightMapTableModel &heightMapModel() = 0;
-        virtual bool &updateParserStatus() = 0;
         virtual bool &heightMapMode() = 0;
         virtual bool &absoluteCoordinates() = 0;
         // virtual int &fileCommandIndex() = 0;

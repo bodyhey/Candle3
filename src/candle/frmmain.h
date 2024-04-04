@@ -103,7 +103,6 @@ public:
     GCodeTableModel &programHeightmapModel() override { return m_programHeightmapModel; };
     GCodeTableModel &currentModel() override { return *m_currentModel; };
     HeightMapTableModel &heightMapModel() override { return m_heightMapModel; };
-    bool &updateParserStatus() override { return m_updateParserStatus; };
     bool &heightMapMode() override { return m_heightMapMode; };
     bool &absoluteCoordinates() override { return m_absoluteCoordinates; };
     // int &fileCommandIndex() override { return m_fileCommandIndex; };
@@ -340,8 +339,8 @@ private:
     bool m_fileChanged;
     bool m_heightMapChanged;
 
-    bool m_updateSpindleSpeed;
-    bool m_updateParserStatus;
+    // bool m_updateSpindleSpeed;
+    // bool m_updateParserStatus;
 
     bool m_heightMapMode;
 

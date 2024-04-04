@@ -11,7 +11,6 @@ m_toolDrawer // emit toolPositionChanged
 m_codeDrawer // getIgnoreZ??
 m_lastDrawnLineIndex
 m_currentDrawer // code drawer/probe drawer ??
-m_updateParserStatus
 m_storedVars
 m_taskBarProgress
 m_senderErrorBox
@@ -430,7 +429,7 @@ void Communicator::processCommandResponse(QString data)
             ui->slbSpindle->setCurrentValue(speed);
         }
 
-        m_form->updateParserStatus() = true;
+        m_updateParserState = true;
     }
 
     // Offsets
@@ -505,7 +504,7 @@ void Communicator::processCommandResponse(QString data)
     // Reset complete response
     if (uncomment == "[CTRL+X]") {
         m_communicator->m_resetCompleted = true;
-        m_form->updateParserStatus() = true;
+        m_updateParserState = true;
 
         // Query grbl settings
         m_communicator->sendCommand(CommandSource::System, "$$", COMMAND_TI_UTIL1);
@@ -796,7 +795,7 @@ void Communicator::processUnhandledResponse(QString data)
         m_communicator->m_reseting = false;
         m_communicator->m_homing = false;
 
-        m_form->updateParserStatus() = true;
+        m_updateParserState = true;
         m_communicator->m_statusReceived = true;
 
         m_communicator->clearCommandsAndQueue();

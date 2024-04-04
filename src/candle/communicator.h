@@ -53,6 +53,9 @@ class Communicator : public QObject
         void processWorkOffset(QString data);
         void sendStreamerCommandsUntilBufferIsFull();
 
+        // @TODO to be removed!! another local timer? how it works??
+        void processConnectionTimer();
+
     private:
         static const int BUFFERLENGTH = 127;
 
@@ -85,6 +88,8 @@ class Communicator : public QObject
         bool m_statusReceived;
         bool m_homing;
         bool m_spindleCW; // Spindle is rotating clockwise
+        bool m_updateSpindleSpeed;
+        bool m_updateParserState;
 
         // Indices
         int m_probeIndex;

@@ -120,8 +120,8 @@ frmMain::frmMain(QWidget *parent) :
 
     // to communicator
     // m_communicator->m_homing = false;
-    m_updateSpindleSpeed = false;
-    m_updateParserStatus = false;
+    // m_updateSpindleSpeed = false;
+    // m_updateParserStatus = false;
 
     // to communicator
     // m_reseting = false;
@@ -914,7 +914,7 @@ void frmMain::on_cmdFileReset_clicked()
 void frmMain::on_cmdHome_clicked()
 {
     m_communicator->m_homing = true;
-    m_updateSpindleSpeed = true;
+    m_communicator->m_updateSpindleSpeed = true;
     m_communicator->sendCommand(CommandSource::GeneralUI, "$H", COMMAND_TI_UI);
 }
 
@@ -936,7 +936,7 @@ void frmMain::on_cmdReset_clicked()
 
 void frmMain::on_cmdUnlock_clicked()
 {
-    m_updateSpindleSpeed = true;
+    m_communicator->m_updateSpindleSpeed = true;
     m_communicator->sendCommand(CommandSource::GeneralUI, "$X", COMMAND_TI_UI);
 }
 
@@ -1755,16 +1755,8 @@ void frmMain::onTimerConnection()
         return;
     }
 
-    if (!m_communicator->m_homing/* && !m_reseting*/ && !ui->cmdHold->isChecked() && m_communicator->m_queue.length() == 0) {
-        if (m_updateSpindleSpeed) {
-            m_updateSpindleSpeed = false;
-            m_communicator->sendCommand(CommandSource::System, QString("S%1").arg(ui->slbSpindle->value()), COMMAND_TI_UTIL1);
-        }
-        if (m_updateParserStatus) {
-            m_updateParserStatus = false;
-            //m_communicator->sendCommand("$G", COMMAND_TI_UTIL2, false);
-        }
-    }
+    // @TODO move it completely to communicator
+    m_communicator->processConnectionTimer();
 }
 
 // @todo another way to update visualizer??
@@ -2000,7 +1992,7 @@ void frmMain::onActSendFromLineTriggered()
 
 void frmMain::onSlbSpindleValueUserChanged()
 {
-    m_updateSpindleSpeed = true;
+    m_communicator->m_updateSpindleSpeed = true;
 }
 
 void frmMain::onSlbSpindleValueChanged()
@@ -2791,7 +2783,7 @@ void frmMain::grblReset()
 {
     m_communicator->reset();
     m_streamer->reset();
-    m_updateSpindleSpeed = true;
+    m_communicator->m_updateSpindleSpeed = true;
     updateControlsState();
 }
 
