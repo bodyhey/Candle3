@@ -92,7 +92,6 @@ public:
     void writeConsole(QString command);
 
     // TO BE REMOVED !!!
-    //QMap<DeviceState, QString> &deviceStatuses() override { return m_deviceStatuses; };
     MachineBoundsDrawer &machineBoundsDrawer() override { return m_machineBoundsDrawer; };
     ScriptVars &storedVars() override { return m_storedVars; };
     GCodeTableModel &programModel() override { return m_programModel; };
@@ -102,8 +101,6 @@ public:
     HeightMapTableModel &heightMapModel() override { return m_heightMapModel; };
     bool &heightMapMode() override { return m_heightMapMode; };
     bool &absoluteCoordinates() override { return m_absoluteCoordinates; };
-    // int &fileCommandIndex() override { return m_fileCommandIndex; };
-    // int &fileProcessedCommandIndex() override { return m_fileProcessedCommandIndex; };
     partMainConsole &partConsole() override { return *m_partConsole; };
     QMessageBox &senderErrorBox() override { return *m_senderErrorBox; };
     // TO BE REMOVED !!!

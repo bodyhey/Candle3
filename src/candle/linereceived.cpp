@@ -28,8 +28,6 @@ ui->glwVisualizer
 qApp->beep()
 
 // transfering file, streamer class?
-m_fileProcessedCommandIndex
-fileProcessedCommandIndex
 currentModel
 completeTransfer();
 
@@ -320,7 +318,8 @@ void Communicator::processStatus(QString data)
     processNewToolPosition();
 
     // Update continuous jog
-    m_form->jogContinuous();
+    // @TODO jogger service??
+    // m_form->jogContinuous();
 
     // Emit status signal
     emit statusReceived(data);

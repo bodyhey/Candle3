@@ -3005,6 +3005,7 @@ void frmMain::updateParser()
     if (m_currentModel == &m_programModel) m_fileChanged = true;
 }
 
+// @TODO scripting only??
 // void frmMain::storeOffsetsVars(QString response)
 // {
 //     static QRegExp gx("\\[(G5[4-9]|G28|G30|G92|PRB):([\\d\\.\\-]+),([\\d\\.\\-]+),([\\d\\.\\-]+)");
