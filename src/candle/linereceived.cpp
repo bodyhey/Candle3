@@ -5,27 +5,26 @@
 /*
 to be refactored/replaced by signals and slots
 
+toolDrawer // emit toolPositionChanged
+lastDrawnLineIndex
+currentDrawer // code drawer/probe drawer ??
+storedVars
+taskBarProgress
+senderErrorBox
+machineBoundsDrawer
+absoluteCoordinates
 
-m_toolDrawer // emit toolPositionChanged
-m_codeDrawer // getIgnoreZ??
-m_lastDrawnLineIndex
-m_currentDrawer // code drawer/probe drawer ??
-m_storedVars
-m_taskBarProgress
-m_senderErrorBox
-m_machineBoundsDrawer
-m_absoluteCoordinates
-
+// overrides
 updateOverride(ui->slbFeedOverride, ov.cap(1).toInt(), '\x91');
-parser
-list ???
-jogContinuous();
-storeOffsetsVars(response)
-
 ui->slbFeedOverride
 ui->slbSpindleOverride
-ui->slbSpindle
 ui->slbRapidOverride->isChecked() ? ui->slbRapidOverride
+
+parser
+list ???
+storeOffsetsVars(response)
+
+ui->slbSpindle
 ui->glwVisualizer
 ui->chkKeyboardControl
 ui->chkAutoScroll
