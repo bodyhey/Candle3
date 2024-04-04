@@ -95,9 +95,6 @@ public:
     //QMap<DeviceState, QString> &deviceStatuses() override { return m_deviceStatuses; };
     MachineBoundsDrawer &machineBoundsDrawer() override { return m_machineBoundsDrawer; };
     ScriptVars &storedVars() override { return m_storedVars; };
-    GcodeDrawer &currentDrawer() override { return *m_currentDrawer; };
-    GcodeDrawer &codeDrawer() override { return *m_codeDrawer; };
-    ToolDrawer &toolDrawer() override { return m_toolDrawer; };
     GCodeTableModel &programModel() override { return m_programModel; };
     GCodeTableModel &probeModel() override { return m_probeModel; };
     GCodeTableModel &programHeightmapModel() override { return m_programHeightmapModel; };
@@ -107,7 +104,6 @@ public:
     bool &absoluteCoordinates() override { return m_absoluteCoordinates; };
     // int &fileCommandIndex() override { return m_fileCommandIndex; };
     // int &fileProcessedCommandIndex() override { return m_fileProcessedCommandIndex; };
-    int &lastDrawnLineIndex() override { return m_lastDrawnLineIndex; };
     partMainConsole &partConsole() override { return *m_partConsole; };
     QMessageBox &senderErrorBox() override { return *m_senderErrorBox; };
     // TO BE REMOVED !!!
@@ -227,6 +223,7 @@ private slots:
     void onParserStateReceived(QString state);
     void onPinStateReceived(QString state);
     void onAborted();
+    void onResponseReceived(QString command, int tableIndex, QString response);
     void onCommandResponseReceived(CommandAttributes commandAttributes);
     void onCommandSent(CommandAttributes commandAttributes);
     void onConfigurationReceived(MachineConfiguration, QMap<int, double>);
@@ -413,6 +410,7 @@ private:
     bool eventFilter(QObject *obj, QEvent *event) override;
 
     void updateToolPositionAndToolpathShadowing(QVector3D toolPosition);
+    void updateToolpathShadowingOnCheckMode();
 
     // Utility
     int bufferLength();

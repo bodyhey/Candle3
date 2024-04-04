@@ -5,9 +5,6 @@
 /*
 to be refactored/replaced by signals and slots
 
-toolDrawer // emit toolPositionChanged
-lastDrawnLineIndex
-currentDrawer // code drawer/probe drawer ??
 storedVars
 taskBarProgress
 senderErrorBox
@@ -20,8 +17,6 @@ ui->slbFeedOverride
 ui->slbSpindleOverride
 ui->slbRapidOverride->isChecked() ? ui->slbRapidOverride
 
-parser
-list ???
 storeOffsetsVars(response)
 
 ui->slbSpindle
@@ -705,41 +700,14 @@ void Communicator::processCommandResponse(QString data)
     // Scroll to first line on "M30" command
     if (uncomment.contains("M30")) ui->tblProgram->setCurrentIndex(m_form->currentModel().index(0, 1));
 
-    // Toolpath shadowing on check mode
-    if (m_communicator->m_deviceState == DeviceCheck) {
-        GcodeViewParse *parser = m_form->currentDrawer().viewParser();
-        QList<LineSegment*> list = parser->getLineSegmentList();
+    // Toolpath shadowing on check mode - moved to responseReceived signal handler
+    // if (m_communicator->m_deviceState == DeviceCheck) {
+    //     GcodeViewParse *parser = m_form->currentDrawer().viewParser();
+    //     QList<LineSegment*> list = parser->getLineSegmentList();
+    //     {...}
+    // }
 
-        if ((m_communicator->m_senderState != SenderStopping) && m_streamer->processedCommandIndex() < m_form->currentModel().rowCount() - 1) {
-            int i;
-            QList<int> drawnLines;
-
-            for (i = m_form->lastDrawnLineIndex(); i < list.count()
-                                           && list.at(i)->getLineNumber()
-                                                          <= (m_form->currentModel().data(m_form->currentModel().index(m_streamer->processedCommandIndex(), 4)).toInt()); i++) {
-                drawnLines << i;
-            }
-
-            if (!drawnLines.isEmpty() && (i < list.count())) {
-                m_form->lastDrawnLineIndex() = i;
-                QVector3D vec = list.at(i)->getEnd();
-                m_form->toolDrawer().setToolPosition(vec);
-            }
-
-            foreach (int i, drawnLines) {
-                list.at(i)->setDrawn(true);
-            }
-            if (!drawnLines.isEmpty()) m_form->currentDrawer().update(drawnLines);
-        } else {
-            foreach (LineSegment* s, list) {
-                if (!qIsNaN(s->getEnd().length())) {
-                    m_form->toolDrawer().setToolPosition(s->getEnd());
-                    break;
-                }
-            }
-        }
-    }
-
+    // @TODO is it necessary?? does it duplicate the commandResponseReceived signal???
     // Emit response signal
     emit responseReceived(commandAttributes.command, commandAttributes.tableIndex, response);
 

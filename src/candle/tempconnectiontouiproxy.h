@@ -25,9 +25,6 @@ class TempConnectionToUiProxy {
         virtual void grblReset() = 0;
         virtual MachineBoundsDrawer &machineBoundsDrawer() = 0;
         virtual ScriptVars &storedVars() = 0;
-        virtual GcodeDrawer &currentDrawer() = 0;
-        virtual GcodeDrawer &codeDrawer() = 0;
-        virtual ToolDrawer &toolDrawer() = 0;
         virtual GCodeTableModel &programModel() = 0;
         virtual GCodeTableModel &probeModel() = 0;
         virtual GCodeTableModel &programHeightmapModel() = 0;
@@ -37,7 +34,6 @@ class TempConnectionToUiProxy {
         virtual bool &absoluteCoordinates() = 0;
         // virtual int &fileCommandIndex() = 0;
         // virtual int &fileProcessedCommandIndex() = 0;
-        virtual int &lastDrawnLineIndex() = 0;
         virtual partMainConsole &partConsole() = 0;
         virtual QMessageBox &senderErrorBox() = 0;
 };

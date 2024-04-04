@@ -1733,6 +1733,15 @@ void frmMain::onAborted()
     updateControlsState();
 }
 
+void frmMain::onResponseReceived(QString command, int tableIndex, QString response)
+{
+    Q_UNUSED(command)
+    Q_UNUSED(tableIndex)
+    Q_UNUSED(response)
+
+    updateToolpathShadowingOnCheckMode();
+}
+
 void frmMain::onCommandResponseReceived(CommandAttributes commandAttributes)
 {
     m_partConsole->appendResponse(commandAttributes);
@@ -3839,10 +3848,47 @@ void frmMain::updateToolPositionAndToolpathShadowing(QVector3D toolPosition)
             foreach (int i, drawnLines) {
                 list.at(i)->setDrawn(true);
             }
-            if (!drawnLines.isEmpty()) currentDrawer().update(drawnLines);
+            if (!drawnLines.isEmpty()) m_currentDrawer->update(drawnLines);
         }
     }
 }
+
+void frmMain::updateToolpathShadowingOnCheckMode()
+{
+    GcodeViewParse *parser = m_currentDrawer->viewParser();
+    QList<LineSegment*> list = parser->getLineSegmentList();
+
+    if ((m_communicator->m_senderState != SenderStopping) && m_streamer->processedCommandIndex() < m_currentModel->rowCount() - 1) {
+        int i;
+        QList<int> drawnLines;
+
+        for (i = m_lastDrawnLineIndex; i < list.count()
+                                               && list.at(i)->getLineNumber()
+                                                <= (m_currentModel->data(m_currentModel->index(m_streamer->processedCommandIndex(), 4)).toInt()); i++) {
+            drawnLines << i;
+        }
+
+        if (!drawnLines.isEmpty() && (i < list.count())) {
+            m_lastDrawnLineIndex = i;
+            QVector3D vec = list.at(i)->getEnd();
+            m_toolDrawer.setToolPosition(vec);
+        }
+
+        foreach (int i, drawnLines) {
+            list.at(i)->setDrawn(true);
+        }
+        if (!drawnLines.isEmpty()) m_currentDrawer->update(drawnLines);
+    } else {
+        foreach (LineSegment* s, list) {
+            if (!qIsNaN(s->getEnd().length())) {
+                m_toolDrawer.setToolPosition(s->getEnd());
+                break;
+            }
+        }
+    }
+}
+
+
 
 int frmMain::bufferLength()
 {
