@@ -1,4 +1,4 @@
-#include "communicator.h"
+                                                                                                                                                                                                                                                                                                                                                                                                                                        #include "communicator.h"
 #include "parser/gcodeviewparse.h"
 #include <QMessageBox>
 
@@ -17,14 +17,11 @@ m_senderErrorBox
 m_machineBoundsDrawer
 m_absoluteCoordinates
 
-restoreParserState();
 updateOverride(ui->slbFeedOverride, ov.cap(1).toInt(), '\x91');
 parser
 list ???
 jogContinuous();
 storeOffsetsVars(response)
-setupCoordsTextboxes
-
 
 ui->slbFeedOverride
 ui->slbSpindleOverride
@@ -34,6 +31,7 @@ ui->glwVisualizer
 ui->chkKeyboardControl
 ui->chkAutoScroll
 ui->tblProgram
+ui->glwVisualizer
 qApp->beep()
 
 // transfering file, streamer class?
