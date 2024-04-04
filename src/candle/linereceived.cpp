@@ -170,48 +170,19 @@ void Communicator::processOverrides(QString data)
     }
 }
 
-void Communicator::processToolpathShadowing(DeviceState state, QVector3D toolPosition)
-{
-    if (((m_communicator->m_senderState == SenderTransferring) || (m_communicator->m_senderState == SenderStopping)
-         || (m_communicator->m_senderState == SenderPausing) || (m_communicator->m_senderState == SenderPausing2) || (m_communicator->m_senderState == SenderPaused)) && state != DeviceCheck) {
-        GcodeViewParse *parser = m_form->currentDrawer().viewParser();
-
-        bool toolOntoolpath = false;
-
-        QList<int> drawnLines;
-        QList<LineSegment*> list = parser->getLineSegmentList();
-
-        for (int i = m_form->lastDrawnLineIndex(); i < list.count()
-                                                   && list.at(i)->getLineNumber()
-                                                          <= (m_form->currentModel().data(m_form->currentModel().index(m_streamer->processedCommandIndex(), 4)).toInt() + 1); i++) {
-            if (list.at(i)->contains(toolPosition)) {
-                toolOntoolpath = true;
-                m_form->lastDrawnLineIndex() = i;
-                break;
-            }
-            drawnLines << i;
-        }
-
-        if (toolOntoolpath) {
-            foreach (int i, drawnLines) {
-                list.at(i)->setDrawn(true);
-            }
-            if (!drawnLines.isEmpty()) m_form->currentDrawer().update(drawnLines);
-        }
-    }
-}
-
-void Communicator::processNewToolPosition(DeviceState state)
+void Communicator::processNewToolPosition()
 {
     QVector3D toolPosition;
-    if (!(state == DeviceCheck && m_streamer->processedCommandIndex() < m_form->currentModel().rowCount() - 1)) {
+    if (!(m_deviceState == DeviceCheck && m_streamer->processedCommandIndex() < m_form->currentModel().rowCount() - 1)) {
         toolPosition = m_communicator->m_machinePos;
-        m_form->toolDrawer().setToolPosition(m_form->codeDrawer().getIgnoreZ() ? QVector3D(toolPosition.x(), toolPosition.y(), 0) : toolPosition);
+        //m_form->toolDrawer().setToolPosition(m_form->codeDrawer().getIgnoreZ() ? QVector3D(toolPosition.x(), toolPosition.y(), 0) : toolPosition);
+
+        emit toolPositionReceived(toolPosition);
     }
 
     // Toolpath shadowing
     // Update tool position
-    processToolpathShadowing(state, toolPosition);
+    // processToolpathShadowing(toolPosition);
 }
 
 void Communicator::processWorkOffset(QString data)
@@ -346,12 +317,13 @@ void Communicator::processStatus(QString data)
     }
 
     processWorkOffset(data);
-    processNewToolPosition(state);
     processOverrides(data);
     processFeedSpindleSpeed(data);
 
     // Store device state
     m_communicator->setDeviceStateAndEmitSignal(state);
+
+    processNewToolPosition();
 
     // Update continuous jog
     m_form->jogContinuous();

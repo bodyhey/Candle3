@@ -123,8 +123,7 @@ class Communicator : public QObject
         void processMessage(QString data);
         void processFeedSpindleSpeed(QString data);
         void processOverrides(QString data);
-        void processNewToolPosition(DeviceState state);
-        void processToolpathShadowing(DeviceState state, QVector3D toolPosition);
+        void processNewToolPosition();
         void storeParserState();
         void restoreParserState();
     private slots:
@@ -146,6 +145,7 @@ class Communicator : public QObject
         void spindleStateReceived(bool state);
         void pinStateReceived(QString state);
         void parserStateReceived(QString state);
+        void toolPositionReceived(QVector3D pos);
         void floodStateReceived(bool state);
         void commandResponseReceived(CommandAttributes commandAttributes);
         void commandSent(CommandAttributes commandAttributes);

@@ -1750,6 +1750,11 @@ void frmMain::onConfigurationReceived(MachineConfiguration configuration, QMap<i
     m_partState->setUnits(configuration.units());
 }
 
+void frmMain::onToolPositionReceived(QVector3D pos)
+{
+    updateToolPositionAndToolpathShadowing(pos);
+}
+
 void frmMain::onConsoleNewCommand(QString command)
 {
     m_communicator->sendCommand(CommandSource::Console, command, COMMAND_TI_UI);
@@ -3800,6 +3805,43 @@ bool frmMain::eventFilter(QObject *obj, QEvent *event)
     }
 
     return QMainWindow::eventFilter(obj, event);
+}
+
+void frmMain::updateToolPositionAndToolpathShadowing(QVector3D toolPosition)
+{
+    m_toolDrawer.setToolPosition(m_codeDrawer->getIgnoreZ() ? QVector3D(toolPosition.x(), toolPosition.y(), 0) : toolPosition);
+
+    SenderState senderState = m_communicator->senderState();
+    DeviceState deviceState = m_communicator->deviceState();
+    if (((senderState == SenderTransferring) || (senderState == SenderStopping)
+         || (senderState == SenderPausing) || (senderState == SenderPausing2) || (senderState == SenderPaused)) && deviceState != DeviceCheck) {
+        GcodeViewParse *parser = m_currentDrawer->viewParser();
+
+        bool toolOntoolpath = false;
+
+        QList<int> drawnLines;
+        QList<LineSegment*> list = parser->getLineSegmentList();
+
+        for (
+            int i = m_lastDrawnLineIndex;
+            i < list.count() && list.at(i)->getLineNumber() <= (m_currentModel->data(m_currentModel->index(m_streamer->processedCommandIndex(), 4)).toInt() + 1);
+            i++
+        ) {
+            if (list.at(i)->contains(toolPosition)) {
+                toolOntoolpath = true;
+                m_lastDrawnLineIndex = i;
+                break;
+            }
+            drawnLines << i;
+        }
+
+        if (toolOntoolpath) {
+            foreach (int i, drawnLines) {
+                list.at(i)->setDrawn(true);
+            }
+            if (!drawnLines.isEmpty()) currentDrawer().update(drawnLines);
+        }
+    }
 }
 
 int frmMain::bufferLength()

@@ -230,6 +230,7 @@ private slots:
     void onCommandResponseReceived(CommandAttributes commandAttributes);
     void onCommandSent(CommandAttributes commandAttributes);
     void onConfigurationReceived(MachineConfiguration, QMap<int, double>);
+    void onToolPositionReceived(QVector3D pos);
     void onConnectionError(QString error);
     void onConsoleNewCommand(QString command);
 
@@ -410,6 +411,8 @@ private:
     void updateHeightMapGrid(double arg1);
     void resizeTableHeightMapSections();
     bool eventFilter(QObject *obj, QEvent *event) override;
+
+    void updateToolPositionAndToolpathShadowing(QVector3D toolPosition);
 
     // Utility
     int bufferLength();
