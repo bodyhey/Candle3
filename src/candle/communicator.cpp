@@ -329,8 +329,12 @@ void Communicator::sendStreamerCommandsUntilBufferIsFull()
 
 void Communicator::processConnectionTimer()
 {
+    if (!m_connection || !m_connection->isConnected()) {
+        return;
+    }
+
     // @TODO refactor ui->cmdHold->isChecked
-    if (!m_communicator->m_homing && !ui->cmdHold->isChecked() && m_communicator->m_queue.length() == 0) {
+    if (!m_homing && !ui->cmdHold->isChecked() && m_queue.empty()) {
         if (m_updateSpindleSpeed) {
             m_updateSpindleSpeed = false;
             sendCommand(CommandSource::System, QString("S%1").arg(ui->slbSpindle->value()), COMMAND_TI_UTIL1);
