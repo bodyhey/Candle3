@@ -1,3 +1,7 @@
+// This file is a part of "G-Pilot (formerly Candle)" application.
+// Copyright 2015-2021 Hayrullin Denis Ravilevich
+// Copyright 2024 BTS
+
 #ifndef MACHINECONFIGURATION_H
 #define MACHINECONFIGURATION_H
 
@@ -12,20 +16,13 @@ class MachineConfiguration
         bool homingEnabled() { return m_homingEnabled; }
         int axisCount() { return m_axisCount; }
         Units units() { return m_units; }
-
-        // void setHomingEnabled(bool);
-        // void setUnits(int);
-        // void setSoftLimitsEnabled(bool);
-        // void setRapidSpeed(float);
-        // void setAcceleration(float);
-        // bool referenceXPlus();
-        // bool referenceZPlus();
-        // bool referenceYPlus();
-        // void setMachineBounds(QVector3D);
-        // bool toolChangePause();
-        // bool ignoreErrors();
-        // QString beforePauseCommands();
-        // QString toolChangeCommands();
+        bool softLimitsEnabled() { return m_softLimitsEnabled; }
+        bool hardLimitsEnabled() { return m_hardLimitsEnabled; }
+        bool laserMode() { return m_laserMode; }
+        double homingPullOff() { return m_homingPullOff; }
+        float rapidSpeed() { return m_rapidSpeed; }
+        QVector3D stepsPerMM() { return m_stepsPerMM; }
+        QVector3D maxTravel() { return m_maxTravel; }
 
     private:
         bool m_homingEnabled = false;
@@ -40,7 +37,7 @@ class MachineConfiguration
         QVector3D m_maxTravel;
         QVector3D m_acceleration;
         QVector3D m_maxRate;
-        Units convertUnits(int setting);
+        Units setUnits(int setting);
 };
 
 #endif // MACHINECONFIGURATION_H
