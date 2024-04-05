@@ -92,6 +92,7 @@ public:
 
 signals:
     void rotationChanged();
+    void toolPos(QPointF);
     void resized();
 
 public slots:
@@ -143,6 +144,7 @@ private:
     QColor m_colorBackground;
     QColor m_colorText;
 
+    QPointF getClickPositionOnXYPlane(QVector2D mouseClickPosition, QMatrix4x4 projectionMatrix, QMatrix4x4 viewMatrix);
 protected:
     void initializeGL();
     void resizeGL(int width, int height);

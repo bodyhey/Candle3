@@ -244,6 +244,8 @@ private slots:
     void onScroolBarAction(int action);
     void onScriptException(const QScriptValue &exception);
 
+    void onToolPos(QPointF);
+
     void updateHeightMapInterpolationDrawer(bool reset = false);
     void placeVisualizerButtons();
 

@@ -275,6 +275,7 @@ frmMain::frmMain(QWidget *parent) :
     ui->glwVisualizer->fitDrawable();
 
     connect(ui->glwVisualizer, SIGNAL(resized()), this, SLOT(placeVisualizerButtons()));
+    connect(ui->glwVisualizer, SIGNAL(toolPos(QPointF)), this, SLOT(onToolPos(QPointF)));
     connect(&m_programModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(onTableCellChanged(QModelIndex,QModelIndex)));
     connect(&m_programHeightmapModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(onTableCellChanged(QModelIndex,QModelIndex)));
     connect(&m_probeModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(onTableCellChanged(QModelIndex,QModelIndex)));
@@ -2049,6 +2050,14 @@ void frmMain::onScroolBarAction(int action)
 void frmMain::onScriptException(const QScriptValue &exception)
 {
     qDebug() << "Script exception:" << exception.toString();
+}
+
+void frmMain::onToolPos(QPointF pos)
+{
+    m_toolDrawer.setToolPosition(
+        QVector3D(pos.x(), pos.y(), 0)
+    );
+    qDebug() << "Tool position" << pos;
 }
 
 void frmMain::updateHeightMapInterpolationDrawer(bool reset)

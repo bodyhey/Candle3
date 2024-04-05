@@ -320,15 +320,14 @@ int GLWidget::fps()
 }
 
 void GLWidget::toggleProjectionType() {
-    m_perspective = true;
-    //!m_perspective;
+    m_perspective = !m_perspective;
     updateProjection();
     updateView();
 }
 
 void GLWidget::setIsometricView()
 {
-    m_perspective = true; //false;
+    m_perspective = false;
     updateProjection();
     m_xRotTarget = 35.264;
     m_yRotTarget = m_yRot > 180 ? 405 : 45;
@@ -425,9 +424,14 @@ void GLWidget::updateProjection()
     // Reset projection
     m_projectionMatrix.setToIdentity();
 
-    double asp = (double)width() / height();
+    double aspectRatio = (double)width() / height();    
+    double orthoSize = m_zoomDistance * tan((m_fov * 0.0174533) / 2.0);
 
-    m_projectionMatrix.perspective(m_fov, asp, m_near, m_far);
+    // perspective / orthographic projection
+    if (m_perspective)
+        m_projectionMatrix.perspective(m_fov, aspectRatio, m_near, m_far);
+    else
+        m_projectionMatrix.ortho(-orthoSize * aspectRatio, orthoSize * aspectRatio, -orthoSize, orthoSize, -m_far/2.0, m_far/2.0);
 }
 
 void GLWidget::updateView()
@@ -551,9 +555,54 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     m_yLastRot = m_yRot;
 }
 
+QPointF GLWidget::getClickPositionOnXYPlane(QVector2D mouseClickPosition, QMatrix4x4 projectionMatrix, QMatrix4x4 viewMatrix)
+{
+    // Invert the matrices
+    QMatrix4x4 invertedProjection = projectionMatrix.inverted();
+    QMatrix4x4 invertedView = viewMatrix.inverted();
+
+    // Convert 2D mouse position to 3D position with Z = -1 (near plane)
+    QVector3D nearPlanePosition(mouseClickPosition, -1.0f);
+
+    // Unproject the 3D position on the near plane to the world space
+    QVector3D nearPlaneWorldPosition = invertedProjection * nearPlanePosition;
+    nearPlaneWorldPosition = invertedView * nearPlaneWorldPosition;
+
+    // Convert 2D mouse position to 3D position with Z = 1 (far plane)
+    QVector3D farPlanePosition(mouseClickPosition, 1.0f);
+
+    // Unproject the 3D position on the far plane to the world space
+    QVector3D farPlaneWorldPosition = invertedProjection * farPlanePosition;
+    farPlaneWorldPosition = invertedView * farPlaneWorldPosition;
+
+    // Calculate the direction from the near plane to the far plane
+    QVector3D direction = farPlaneWorldPosition - nearPlaneWorldPosition;
+
+    // If the direction is parallel to the XY plane, then the click is not on the XY plane
+    if (direction.z() == 0)
+    {
+        return QPointF(-1000000, -1000000);
+    }
+
+    // Calculate the intersection of the line with the XY plane (Z = 0)
+    float t = -nearPlaneWorldPosition.z() / direction.z();
+    QVector3D intersection = nearPlaneWorldPosition + direction * t;
+
+    return intersection.toPointF();
+}
+
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     QPoint pos = event->pos();
+    // QVector2D normalizedPos(
+    //     pos.x() / (width()  * 0.5f) - 1.0f,
+    //     -(pos.y() / (height() * 0.5f) - 1.0f)
+    // );
+    // QPointF clickPos = getClickPositionOnXYPlane(normalizedPos, m_projectionMatrix, m_viewMatrix);
+
+    // if (clickPos.x() != -1000000) {
+    //     emit toolPos(clickPos);
+    // }
 
     if ((event->buttons() & Qt::MiddleButton && !(event->modifiers() & Qt::ShiftModifier)) 
         || (event->buttons() & Qt::LeftButton && !(event->modifiers() & Qt::ShiftModifier))) {
@@ -585,8 +634,9 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         QVector4D lastMouseInWorld(
             (m_lastPos.x() / (double)width()) * 2.0 - 1.0,
             -((m_lastPos.y() / (double)height()) * 2.0 - 1.0),
-            0, 1.0
-            );
+            0,
+            1.0
+        );
         // Project last mouse pos to world
         lastMouseInWorld = mvpi * lastMouseInWorld * centerVector.w();
 
@@ -599,8 +649,6 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         );
         // Project current mouse pos to world
         currentMouseInWorld = mvpi * currentMouseInWorld * centerVector.w();
-
-        qDebug() << currentMouseInWorld << mvpi * currentMouseInWorld << currentMouseInWorld / currentMouseInWorld.w();
 
         //currentMouseInWorld /= currentMouseInWorld.w();
 
