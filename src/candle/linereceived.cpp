@@ -5,7 +5,6 @@
 /*
 to be refactored/replaced by signals and slots
 
-senderErrorBox
 machineBoundsDrawer
 
 ui->chkKeyboardControl
@@ -584,20 +583,24 @@ void Communicator::processCommandResponse(QString data)
         if (commandAttributes.tableIndex > -1 && response.toUpper().contains("ERROR") && !m_settings->ignoreErrors()) {
             errors.append(QString::number(commandAttributes.tableIndex + 1) + ": " + commandAttributes.command + " < " + response + "\n");
 
-            m_form->senderErrorBox().setText(tr("Error message(s) received:\n") + errors);
+            // @TODO move to UI
+            // m_form->senderErrorBox().setText(tr("Error message(s) received:\n") + errors);
 
             if (!holding) {
                 holding = true;         // Hold transmit while messagebox is visible
                 response.clear();
 
                 m_communicator->sendRealtimeCommand("!");
-                m_form->senderErrorBox().checkBox()->setChecked(false);
-                qApp->beep();
-                int result = m_form->senderErrorBox().exec();
+                // @TODO move to UI
+                // m_form->senderErrorBox().checkBox()->setChecked(false);
+                // qApp->beep();
+                // int result = m_form->senderErrorBox().exec();
+                int result = QMessageBox::Ignore;
 
                 holding = false;
                 errors.clear();
-                if (m_form->senderErrorBox().checkBox()->isChecked()) m_settings->setIgnoreErrors(true);
+                // @TODO move to UI
+                // if (m_form->senderErrorBox().checkBox()->isChecked()) m_settings->setIgnoreErrors(true);
                 if (result == QMessageBox::Ignore) {
                     m_communicator->sendRealtimeCommand("~");
                 } else {

@@ -99,7 +99,6 @@ public:
     GCodeTableModel &currentModel() override { return *m_currentModel; };
     bool &absoluteCoordinates() override { return m_absoluteCoordinates; };
     partMainConsole &partConsole() override { return *m_partConsole; };
-    QMessageBox &senderErrorBox() override { return *m_senderErrorBox; };
     // TO BE REMOVED !!!
 
     void initializeCommunicator();

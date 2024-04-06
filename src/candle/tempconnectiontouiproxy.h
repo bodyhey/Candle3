@@ -24,7 +24,6 @@ class TempConnectionToUiProxy {
         virtual GCodeTableModel &currentModel() = 0;
         virtual bool &absoluteCoordinates() = 0;
         virtual partMainConsole &partConsole() = 0;
-        virtual QMessageBox &senderErrorBox() = 0;
 };
 
 #endif // TEMPCONNECTIONTOUIPROXY_H
