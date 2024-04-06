@@ -96,10 +96,7 @@ public:
     ScriptVars &storedVars() override { return m_storedVars; };
     GCodeTableModel &programModel() override { return m_programModel; };
     GCodeTableModel &probeModel() override { return m_probeModel; };
-    GCodeTableModel &programHeightmapModel() override { return m_programHeightmapModel; };
     GCodeTableModel &currentModel() override { return *m_currentModel; };
-    HeightMapTableModel &heightMapModel() override { return m_heightMapModel; };
-    bool &heightMapMode() override { return m_heightMapMode; };
     bool &absoluteCoordinates() override { return m_absoluteCoordinates; };
     partMainConsole &partConsole() override { return *m_partConsole; };
     QMessageBox &senderErrorBox() override { return *m_senderErrorBox; };

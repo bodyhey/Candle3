@@ -31,11 +31,6 @@ qApp->beep()
 currentModel
 completeTransfer();
 
-// height map
-m_heightMapMode
-updateHeightMapInterpolationDrawer
-ui->tblHeightMap
-
 */
 
 void Communicator::onConnectionLineReceived(QString data)
@@ -495,37 +490,38 @@ void Communicator::processCommandResponse(QString data)
     }
 
     // Process probing on heightmap mode only from table commands
-    if (uncomment.contains("G38.2") && m_form->heightMapMode() && commandAttributes.tableIndex > -1) {
-        // Get probe Z coordinate
-        // "[PRB:0.000,0.000,0.000:0];ok"
-        // "[PRB:0.000,0.000,0.000,0.000:0];ok"
-        QRegExp rx(".*PRB:([^,]*),([^,]*),([^,:]*)");
-        double z = qQNaN();
-        if (rx.indexIn(response) != -1) {
-            z = m_communicator->toMetric(rx.cap(3).toDouble());
-        }
+    // @TODO refactor height map mode
+    // if (uncomment.contains("G38.2") && m_form->heightMapMode() && commandAttributes.tableIndex > -1) {
+    //     // Get probe Z coordinate
+    //     // "[PRB:0.000,0.000,0.000:0];ok"
+    //     // "[PRB:0.000,0.000,0.000,0.000:0];ok"
+    //     QRegExp rx(".*PRB:([^,]*),([^,]*),([^,:]*)");
+    //     double z = qQNaN();
+    //     if (rx.indexIn(response) != -1) {
+    //         z = m_communicator->toMetric(rx.cap(3).toDouble());
+    //     }
 
-        static double firstZ;
-        if (m_communicator->m_probeIndex == -1) {
-            firstZ = z;
-            z = 0;
-        } else {
-            // Calculate delta Z
-            z -= firstZ;
+    //     static double firstZ;
+    //     if (m_communicator->m_probeIndex == -1) {
+    //         firstZ = z;
+    //         z = 0;
+    //     } else {
+    //         // Calculate delta Z
+    //         z -= firstZ;
 
-            // Calculate table indexes
-            int row = (m_communicator->m_probeIndex / m_form->heightMapModel().columnCount());
-            int column = m_communicator->m_probeIndex - row * m_form->heightMapModel().columnCount();
-            if (row % 2) column = m_form->heightMapModel().columnCount() - 1 - column;
+    //         // Calculate table indexes
+    //         int row = (m_communicator->m_probeIndex / m_form->heightMapModel().columnCount());
+    //         int column = m_communicator->m_probeIndex - row * m_form->heightMapModel().columnCount();
+    //         if (row % 2) column = m_form->heightMapModel().columnCount() - 1 - column;
 
-            // Store Z in table
-            m_form->heightMapModel().setData(m_form->heightMapModel().index(row, column), z, Qt::UserRole);
-            ui->tblHeightMap->update(m_form->heightMapModel().index(m_form->heightMapModel().rowCount() - 1 - row, column));
-            m_form->updateHeightMapInterpolationDrawer();
-        }
+    //         // Store Z in table
+    //         m_form->heightMapModel().setData(m_form->heightMapModel().index(row, column), z, Qt::UserRole);
+    //         ui->tblHeightMap->update(m_form->heightMapModel().index(m_form->heightMapModel().rowCount() - 1 - row, column));
+    //         m_form->updateHeightMapInterpolationDrawer();
+    //     }
 
-        m_communicator->m_probeIndex++;
-    }
+    //     m_communicator->m_probeIndex++;
+    // }
 
     // Change state query time on check mode on
     if (uncomment.contains(QRegExp("$[cC]"))) {

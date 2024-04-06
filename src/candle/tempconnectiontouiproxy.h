@@ -9,9 +9,6 @@
 #include "globals.h"
 #include "drawers/machineboundsdrawer.h"
 #include "scripting/scripting.h"
-#include "drawers/gcodedrawer.h"
-#include "drawers/tooldrawer.h"
-#include "tables/heightmaptablemodel.h"
 #include "tables/gcodetablemodel.h"
 #include "form_partial/main/console.h"
 #include <QMessageBox>
@@ -21,16 +18,12 @@ class TempConnectionToUiProxy {
         virtual void completeTransfer() = 0;
         virtual void updateOverride(SliderBox *slider, int value, char command) = 0;
         virtual void jogContinuous() = 0;
-        virtual void updateHeightMapInterpolationDrawer(bool reset = false) = 0;
         virtual void grblReset() = 0;
         virtual MachineBoundsDrawer &machineBoundsDrawer() = 0;
         virtual ScriptVars &storedVars() = 0;
         virtual GCodeTableModel &programModel() = 0;
         virtual GCodeTableModel &probeModel() = 0;
-        virtual GCodeTableModel &programHeightmapModel() = 0;
         virtual GCodeTableModel &currentModel() = 0;
-        virtual HeightMapTableModel &heightMapModel() = 0;
-        virtual bool &heightMapMode() = 0;
         virtual bool &absoluteCoordinates() = 0;
         virtual partMainConsole &partConsole() = 0;
         virtual QMessageBox &senderErrorBox() = 0;
