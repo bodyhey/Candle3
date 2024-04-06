@@ -374,7 +374,7 @@ private:
 
     // Communication
     void openPort();
-    void grblReset() override;
+    //void grblReset() override;
     //void sendNextFileCommands();
     QString evaluateCommand(QString command);
 

@@ -933,13 +933,15 @@ void frmMain::on_cmdCheck_clicked(bool checked)
         m_communicator->sendCommand(CommandSource::GeneralUI, "$C", COMMAND_TI_UI);
     } else {
         m_communicator->m_aborting = true;
-        grblReset();
+        m_communicator->reset();
+//        grblReset();
     };
 }
 
 void frmMain::on_cmdReset_clicked()
 {
-    grblReset();
+    m_communicator->reset();
+    //grblReset();
 }
 
 void frmMain::on_cmdUnlock_clicked()
@@ -2851,18 +2853,17 @@ void frmMain::loadPlugins()
 void frmMain::openPort()
 {
     if (m_connection->openConnection()) {
-        this->m_partState->setStatusText(tr("Port opened"), "palette(button)", "palette(text)");
-        grblReset();
+        m_partState->setStatusText(tr("Port opened"), "palette(button)", "palette(text)");
+        m_communicator->reset();
+        //grblReset();
     }
 }
 
-void frmMain::grblReset()
-{
-    m_communicator->reset();
-    m_streamer->reset();
-    m_communicator->m_updateSpindleSpeed = true;
-    updateControlsState();
-}
+// void frmMain::grblReset()
+// {
+//     m_communicator->reset();
+//     updateControlsState();
+// }
 
 void frmMain::writeConsole(QString command)
 {

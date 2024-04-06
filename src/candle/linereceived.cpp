@@ -15,6 +15,7 @@ qApp->beep()
 // transfering file, streamer class?
 currentModel
 
+                        m_form->grblReset();
 */
 
 void Communicator::onConnectionLineReceived(QString data)
@@ -253,7 +254,7 @@ void Communicator::processStatus(QString data)
                         x = sNan;
                         y = sNan;
                         z = sNan;
-                        m_form->grblReset();
+                        reset();
                     } else {
                         const QVector3D pos = m_communicator->m_machinePos;
                         x = pos.x();

@@ -226,6 +226,11 @@ void Communicator::reset()
         command
     );
     m_commands.append(ca);
+
+    if (m_streamer != nullptr) {
+        m_streamer->reset();
+    }
+    m_communicator->m_updateSpindleSpeed = true;
 }
 
 void Communicator::abort()
