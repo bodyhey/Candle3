@@ -149,6 +149,7 @@ class Communicator : public QObject
         void floodStateReceived(bool state);
         void commandResponseReceived(CommandAttributes commandAttributes);
         void commandSent(CommandAttributes commandAttributes);
+        void feedSpindleSpeedReceived(int feedRate, int spindleSpeed);
         // @TODO aborted what?? find better name
         void aborted();
 };

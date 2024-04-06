@@ -216,6 +216,7 @@ private slots:
     void onFloodStateReceived(bool state);
     void onParserStateReceived(QString state);
     void onPinStateReceived(QString state);
+    void onFeedSpindleSpeedReceived(int feedRate, int spindleSpeed);
     void onAborted();
     void onResponseReceived(QString command, int tableIndex, QString response);
     void onCommandResponseReceived(CommandAttributes commandAttributes);

@@ -20,11 +20,9 @@ ui->slbRapidOverride->isChecked() ? ui->slbRapidOverride
 storeOffsetsVars(response)
 
 ui->slbSpindle
-ui->glwVisualizer
 ui->chkKeyboardControl
 ui->chkAutoScroll
 ui->tblProgram
-ui->glwVisualizer
 qApp->beep()
 
 // transfering file, streamer class?
@@ -89,7 +87,7 @@ void Communicator::processFeedSpindleSpeed(QString data)
 {
     static QRegExp fs("FS:([^,]*),([^,^|^>]*)");
     if (fs.indexIn(data) != -1) {
-        ui->glwVisualizer->setSpeedState((QString(tr("F/S: %1 / %2")).arg(fs.cap(1)).arg(fs.cap(2))));
+        emit feedSpindleSpeedReceived(fs.cap(1).toInt(), fs.cap(2).toInt());
     }
 }
 

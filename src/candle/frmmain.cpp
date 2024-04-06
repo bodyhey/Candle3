@@ -1728,6 +1728,11 @@ void frmMain::onPinStateReceived(QString state)
     ui->glwVisualizer->setPinState(state);
 }
 
+void frmMain::onFeedSpindleSpeedReceived(int feedRate, int spindleSpeed)
+{
+    ui->glwVisualizer->setSpeedState((QString(tr("F/S: %1 / %2")).arg(feedRate, spindleSpeed)));
+}
+
 void frmMain::onAborted()
 {
     //ui->cmdFileAbort->setEnabled(false);
