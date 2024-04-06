@@ -6,17 +6,15 @@
 to be refactored/replaced by signals and slots
 
 storedVars
-taskBarProgress
 senderErrorBox
 machineBoundsDrawer
+
+ui->chkKeyboardControl
 absoluteCoordinates
 
-storeOffsetsVars(response)
-
-ui->slbSpindle
-ui->chkKeyboardControl
 ui->chkAutoScroll
 ui->tblProgram
+
 qApp->beep()
 
 // transfering file, streamer class?
