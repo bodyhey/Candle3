@@ -153,6 +153,8 @@ class Communicator : public QObject
         void spindleSpeedReceived(int spindleSpeed);
         void feedSpindleSpeedReceived(int feedRate, int spindleSpeed);
         void overridesReceived(int feedOverride, int spindleOverride, int rapidOverride);
+        // @TODO how to do it better?? what signal should we attach to?
+        void commandProcessed(int tableIndex);
         // @TODO aborted what?? find better name
         void aborted();
 };

@@ -12,9 +12,6 @@ machineBoundsDrawer
 ui->chkKeyboardControl
 absoluteCoordinates
 
-ui->chkAutoScroll
-ui->tblProgram
-
 qApp->beep()
 
 // transfering file, streamer class?
@@ -560,9 +557,8 @@ void Communicator::processCommandResponse(QString data)
 
             m_streamer->resetProcessed(commandAttributes.tableIndex);
 
-            if (ui->chkAutoScroll->isChecked() && commandAttributes.tableIndex != -1) {
-                ui->tblProgram->scrollTo(m_form->currentModel().index(commandAttributes.tableIndex + 1, 0));      // TODO: Update by timer
-                ui->tblProgram->setCurrentIndex(m_form->currentModel().index(commandAttributes.tableIndex, 1));
+            if (commandAttributes.tableIndex != -1) {
+                emit commandProcessed(commandAttributes.tableIndex + 1);
             }
         }
 
@@ -672,7 +668,10 @@ void Communicator::processCommandResponse(QString data)
 
     // Same as M2, Program End, turn off spindle/laser and stops the machine.
     // Scroll to first line on "M30" command
-    if (uncomment.contains("M30")) ui->tblProgram->setCurrentIndex(m_form->currentModel().index(0, 1));
+    if (uncomment.contains("M30")) {
+        // @TODO new signal here?
+        emit commandProcessed(0);
+    }
 
     // Toolpath shadowing on check mode - moved to responseReceived signal handler
     // if (m_communicator->m_deviceState == DeviceCheck) {

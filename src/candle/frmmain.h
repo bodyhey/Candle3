@@ -223,6 +223,7 @@ private slots:
     void onResponseReceived(QString command, int tableIndex, QString response);
     void onCommandResponseReceived(CommandAttributes commandAttributes);
     void onCommandSent(CommandAttributes commandAttributes);
+    void onCommandProcessed(int tableIndex);
     void onConfigurationReceived(MachineConfiguration, QMap<int, double>);
     void onToolPositionReceived(QVector3D pos);
     void onConnectionError(QString error);
