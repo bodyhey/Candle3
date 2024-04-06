@@ -149,7 +149,10 @@ class Communicator : public QObject
         void floodStateReceived(bool state);
         void commandResponseReceived(CommandAttributes commandAttributes);
         void commandSent(CommandAttributes commandAttributes);
+        // @TODO what is the difference between spindleSpeedReceived and feedSpindleSpeedReceived??
+        void spindleSpeedReceived(int spindleSpeed);
         void feedSpindleSpeedReceived(int feedRate, int spindleSpeed);
+        void overridesReceived(int feedOverride, int spindleOverride, int rapidOverride);
         // @TODO aborted what?? find better name
         void aborted();
 };

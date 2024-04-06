@@ -217,6 +217,8 @@ private slots:
     void onParserStateReceived(QString state);
     void onPinStateReceived(QString state);
     void onFeedSpindleSpeedReceived(int feedRate, int spindleSpeed);
+    void onSpindleSpeedReceived(int spindleSpeed);
+    void onOverridesReceived(int feedOverride, int spindleOverride, int rapidOverride);
     void onAborted();
     void onResponseReceived(QString command, int tableIndex, QString response);
     void onCommandResponseReceived(CommandAttributes commandAttributes);

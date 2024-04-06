@@ -406,6 +406,9 @@ void frmMain::initializeCommunicator()
     connect(m_communicator, SIGNAL(commandResponseReceived(CommandAttributes)), this, SLOT(onCommandResponseReceived(CommandAttributes)));
     connect(m_communicator, SIGNAL(parserStateReceived(QString)), this, SLOT(onParserStateReceived(QString)));
     connect(m_communicator, SIGNAL(pinStateReceived(QString)), this, SLOT(onPinStateReceived(QString)));
+    connect(m_communicator, SIGNAL(spindleSpeedReceived(int)), this, SLOT(onSpindleSpeedReceived(int)));
+    connect(m_communicator, SIGNAL(feedSpindleSpeedReceived(int,int)), this, SLOT(onFeedSpindleSpeedReceived(int,int)));
+    connect(m_communicator, SIGNAL(overridesReceived(int,int,int)), this, SLOT(onOverridesReceived(int,int,int)));
     connect(m_communicator, SIGNAL(aborted()), this, SLOT(onAborted()));
 }
 
@@ -1731,6 +1734,35 @@ void frmMain::onPinStateReceived(QString state)
 void frmMain::onFeedSpindleSpeedReceived(int feedRate, int spindleSpeed)
 {
     ui->glwVisualizer->setSpeedState((QString(tr("F/S: %1 / %2")).arg(feedRate, spindleSpeed)));
+}
+
+void frmMain::onSpindleSpeedReceived(int spindleSpeed)
+{
+    ui->slbSpindle->setCurrentValue(spindleSpeed);
+}
+
+void frmMain::onOverridesReceived(int feedOverride, int spindleOverride, int rapidOverride)
+{
+    updateOverride(ui->slbFeedOverride, feedOverride, '\x91');
+    updateOverride(ui->slbSpindleOverride, spindleOverride, '\x9a');
+
+    ui->slbRapidOverride->setCurrentValue(rapidOverride);
+
+    int target = ui->slbRapidOverride->isChecked() ? ui->slbRapidOverride->value() : 100;
+
+    if (rapidOverride != target) {
+        switch (target) {
+            case 25:
+                m_communicator->sendRealtimeCommand(GRBL_LIVE_RAPID_FULL_RATE);
+                break;
+            case 50:
+                m_communicator->sendRealtimeCommand(GRBL_LIVE_RAPID_HALF_RATE);
+                break;
+            case 100:
+                m_communicator->sendRealtimeCommand(GRBL_LIVE_RAPID_QUARTER_RATE);
+                break;
+        }
+    }
 }
 
 void frmMain::onAborted()

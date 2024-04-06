@@ -11,12 +11,6 @@ senderErrorBox
 machineBoundsDrawer
 absoluteCoordinates
 
-// overrides
-updateOverride(ui->slbFeedOverride, ov.cap(1).toInt(), '\x91');
-ui->slbFeedOverride
-ui->slbSpindleOverride
-ui->slbRapidOverride->isChecked() ? ui->slbRapidOverride
-
 storeOffsetsVars(response)
 
 ui->slbSpindle
@@ -96,25 +90,13 @@ void Communicator::processOverrides(QString data)
     static QRegExp ov("Ov:([^,]*),([^,]*),([^,^>^|]*)");
     if (ov.indexIn(data) != -1)
     {
-        m_form->updateOverride(ui->slbFeedOverride, ov.cap(1).toInt(), '\x91');
-        m_form->updateOverride(ui->slbSpindleOverride, ov.cap(3).toInt(), '\x9a');
+        int feedOverride = ov.cap(1).toInt();
+        int spindleOverride = ov.cap(3).toInt();
+        int rapidOverride = ov.cap(2).toInt();
 
-        int rapid = ov.cap(2).toInt();
-        ui->slbRapidOverride->setCurrentValue(rapid);
+        emit overridesReceived(feedOverride, spindleOverride, rapidOverride);
 
-        int target = ui->slbRapidOverride->isChecked() ? ui->slbRapidOverride->value() : 100;
-
-        if (rapid != target) switch (target) {
-                case 25:
-                    m_communicator->sendRealtimeCommand(GRBL_LIVE_RAPID_FULL_RATE);
-                    break;
-                case 50:
-                    m_communicator->sendRealtimeCommand(GRBL_LIVE_RAPID_HALF_RATE);
-                    break;
-                case 100:
-                    m_communicator->sendRealtimeCommand(GRBL_LIVE_RAPID_QUARTER_RATE);
-                    break;
-            }
+        // @TODO why is this here?? This shouldn't be in processOverrides.
 
         // Update pins state
         QString pinState;
@@ -378,10 +360,11 @@ void Communicator::processCommandResponse(QString data)
         }
 
         // Spindle speed
+        // @TODO what is the difference between this and processFeedSpindleSpeed??
         QRegExp rx(".*S([\\d\\.]+)");
         if (rx.indexIn(response) != -1) {
-            double speed = rx.cap(1).toDouble();
-            ui->slbSpindle->setCurrentValue(speed);
+            double spindleSpeed = rx.cap(1).toDouble();
+            emit spindleSpeedReceived(spindleSpeed);
         }
 
         m_updateParserState = true;
