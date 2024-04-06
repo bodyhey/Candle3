@@ -410,6 +410,7 @@ void frmMain::initializeCommunicator()
     connect(m_communicator, SIGNAL(commandProcessed(int)), this, SLOT(onCommandProcessed(int)));
     connect(m_communicator, SIGNAL(feedSpindleSpeedReceived(int,int)), this, SLOT(onFeedSpindleSpeedReceived(int,int)));
     connect(m_communicator, SIGNAL(overridesReceived(int,int,int)), this, SLOT(onOverridesReceived(int,int,int)));
+    connect(m_communicator, SIGNAL(toolPositionReceived(QVector3D)), this, SLOT(onToolPositionReceived(QVector3D)));
     connect(m_communicator, SIGNAL(aborted()), this, SLOT(onAborted()));
 }
 
