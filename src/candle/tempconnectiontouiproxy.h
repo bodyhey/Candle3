@@ -19,7 +19,6 @@ class TempConnectionToUiProxy {
         //virtual void jogContinuous() = 0;
         virtual void grblReset() = 0;
         virtual MachineBoundsDrawer &machineBoundsDrawer() = 0;
-        virtual ScriptVars &storedVars() = 0;
         virtual GCodeTableModel &programModel() = 0;
         virtual GCodeTableModel &probeModel() = 0;
         virtual GCodeTableModel &currentModel() = 0;

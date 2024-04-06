@@ -93,7 +93,7 @@ public:
 
     // TO BE REMOVED !!!
     MachineBoundsDrawer &machineBoundsDrawer() override { return m_machineBoundsDrawer; };
-    ScriptVars &storedVars() override { return m_storedVars; };
+    // ScriptVars &storedVars() override { return m_storedVars; };
     GCodeTableModel &programModel() override { return m_programModel; };
     GCodeTableModel &probeModel() override { return m_probeModel; };
     GCodeTableModel &currentModel() override { return *m_currentModel; };
@@ -357,7 +357,7 @@ private:
     Configuration m_configuration;
     Scripting m_scripting;
     QScriptEngine m_scriptEngine;
-    ScriptVars m_storedVars;
+    ScriptVars m_scriptVars;
     ScriptFunctions m_scriptFunctions;
 
     // Drag & drop

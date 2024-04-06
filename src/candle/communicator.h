@@ -75,6 +75,8 @@ class Communicator : public QObject
         SenderState m_senderState;
         DeviceState m_deviceState;
 
+        ScriptVars m_storedVars;
+
         QTime m_startTime;
 
         // Coordinates

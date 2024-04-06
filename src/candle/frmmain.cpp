@@ -357,7 +357,7 @@ frmMain::frmMain(QWidget *parent) :
     }
     
     // Delegate vars to script engine
-    QScriptValue vars = m_scriptEngine.newQObject(&m_storedVars);
+    QScriptValue vars = m_scriptEngine.newQObject(&m_scriptVars);
     m_scriptEngine.globalObject().setProperty("vars", vars);
 
     // Delegate import extension function
@@ -1661,13 +1661,11 @@ void frmMain::onConnectionError(QString error)
 void frmMain::onMachinePosChanged(QVector3D pos)
 {
     this->m_partState->setMachineCoordinates(pos);
-    m_storedVars.setCoords("M", pos);
 }
 
 void frmMain::onWorkPosChanged(QVector3D pos)
 {
     this->m_partState->setWorkCoordinates(pos);
-    m_storedVars.setCoords("W", pos);
 }
 
 void frmMain::onDeviceStateChanged(DeviceState state)
@@ -2739,7 +2737,7 @@ void frmMain::loadPlugins()
             app.setProperty("settings", settings);
 
             // Stored vars
-            QScriptValue vars = se->newQObject(&m_storedVars);
+            QScriptValue vars = se->newQObject(&m_scriptVars);
             se->globalObject().setProperty("vars", vars);
 
             // Translator
@@ -4073,7 +4071,8 @@ void frmMain::jogContinuous()
             // Bounds
             QVector3D b = m_settings->machineBounds();
             // Current machine coords
-            QVector3D m(m_communicator->toMetric(m_storedVars.Mx()), m_communicator->toMetric(m_storedVars.My()), m_communicator->toMetric(m_storedVars.Mz()));
+            // @TODO use m_communicator storedVars
+            QVector3D m(0, 0, 0); //m_communicator->toMetric(m_storedVars.Mx()), m_communicator->toMetric(m_storedVars.My()), m_communicator->toMetric(m_storedVars.Mz()));
             // Distance to bounds
             QVector3D t;
             // Minimum distance to bounds

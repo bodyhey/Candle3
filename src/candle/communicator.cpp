@@ -352,24 +352,30 @@ void Communicator::processOffsetsVars(QString response)
     static QRegExp gx("\\[(G5[4-9]|G28|G30|G92|PRB):([\\d\\.\\-]+),([\\d\\.\\-]+),([\\d\\.\\-]+)");
     static QRegExp tx("\\[(TLO):([\\d\\.\\-]+)");
 
-    // int p = 0;
-    // while ((p = gx.indexIn(response, p)) != -1) {
-    //     m_storedVars.setCoords(gx.cap(1), QVector3D(
-    //                                           gx.cap(2).toDouble(),
-    //                                           gx.cap(3).toDouble(),
-    //                                           gx.cap(4).toDouble()
-    //                                           ));
+    int p = 0;
+    while ((p = gx.indexIn(response, p)) != -1) {
+        m_storedVars.setCoords(
+            gx.cap(1),
+            QVector3D(
+                gx.cap(2).toDouble(),
+                gx.cap(3).toDouble(),
+                gx.cap(4).toDouble()
+            )
+        );
 
-    //     p += gx.matchedLength();
-    // }
+        p += gx.matchedLength();
+    }
 
-    // if (tx.indexIn(response) != -1) {
-    //     m_storedVars.setCoords(tx.cap(1), QVector3D(
-    //                                           0,
-    //                                           0,
-    //                                           tx.cap(2).toDouble()
-    //                                           ));
-    // }
+    if (tx.indexIn(response) != -1) {
+        m_storedVars.setCoords(
+            tx.cap(1),
+            QVector3D(
+                0,
+                0,
+                tx.cap(2).toDouble()
+            )
+        );
+    }
 }
 
 bool Communicator::dataIsFloating(QString data)

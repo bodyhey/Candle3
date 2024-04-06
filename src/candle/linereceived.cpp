@@ -5,7 +5,6 @@
 /*
 to be refactored/replaced by signals and slots
 
-storedVars
 senderErrorBox
 machineBoundsDrawer
 
@@ -172,6 +171,7 @@ void Communicator::processWorkOffset(QString data)
     m_communicator->m_workPos = pos;
 
     if (changed) {
+        m_storedVars.setCoords("W", pos);
         emit workPosChanged(pos);
     }
 }
@@ -190,9 +190,10 @@ void Communicator::processStatus(QString data)
             mpx.cap(2).toDouble(),
             mpx.cap(3).toDouble()
         );
-        bool changed = newPos != m_communicator->m_machinePos;
+        bool changed = newPos != m_machinePos;
         if (changed) {
-            m_communicator->m_machinePos = newPos;
+            m_machinePos = newPos;
+            m_storedVars.setCoords("M", newPos);
             emit machinePosChanged(newPos);
         }
     }
@@ -321,13 +322,20 @@ void Communicator::processCommandResponse(QString data)
     if (uncomment == "$G") {
         static QRegExp g("G5[4-9]");
         if (g.indexIn(response) != -1) {
-            m_form->storedVars().setCS(g.cap(0));
-            m_form->machineBoundsDrawer().setOffset(QPointF(m_communicator->toMetric(m_form->storedVars().x()), m_communicator->toMetric(m_form->storedVars().y())) +
-                                            QPointF(m_communicator->toMetric(m_form->storedVars().G92x()), m_communicator->toMetric(m_form->storedVars().G92y())));
+            m_storedVars.setCS(g.cap(0));
+            m_form->machineBoundsDrawer().setOffset(
+                QPointF(
+                    m_communicator->toMetric(m_storedVars.x()),
+                    m_communicator->toMetric(m_storedVars.y())
+                ) + QPointF(
+                    m_communicator->toMetric(m_storedVars.G92x()),
+                    m_communicator->toMetric(m_storedVars.G92y()
+                )
+            ));
         }
         static QRegExp t("T(\\d+)(?!\\d)");
         if (t.indexIn(response) != -1) {
-            m_form->storedVars().setTool(g.cap(1).toInt());
+            m_storedVars.setTool(g.cap(1).toInt());
         }
     }
 
@@ -457,11 +465,11 @@ void Communicator::processCommandResponse(QString data)
     if (uncomment.contains("G38.2") && commandAttributes.tableIndex < 0) {
         static QRegExp PRB(".*PRB:([^,]*),([^,]*),([^,:]*)");
         if (PRB.indexIn(response) != -1) {
-            m_form->storedVars().setCoords("PRB", QVector3D(
-                                              PRB.cap(1).toDouble(),
-                                              PRB.cap(2).toDouble(),
-                                              PRB.cap(3).toDouble()
-                                              ));
+            m_storedVars.setCoords("PRB", QVector3D(
+                PRB.cap(1).toDouble(),
+                PRB.cap(2).toDouble(),
+                PRB.cap(3).toDouble()
+            ));
         }
     }
 
