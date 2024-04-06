@@ -14,7 +14,6 @@ qApp->beep()
 
 // transfering file, streamer class?
 currentModel
-completeTransfer();
 
 */
 
@@ -229,7 +228,7 @@ void Communicator::processStatus(QString data)
         if ((m_communicator->m_senderState == SenderStopping) &&
             ((state == DeviceIdle && m_communicator->m_deviceState == DeviceRun) || state == DeviceCheck))
         {
-            m_form->completeTransfer();
+            completeTransfer();
         }
 
         // Abort
@@ -616,7 +615,7 @@ void Communicator::processCommandResponse(QString data)
             if (m_communicator->m_deviceState == DeviceRun) {
                 m_communicator->setSenderStateAndEmitSignal(SenderStopping);
             } else {
-                m_form->completeTransfer();
+                completeTransfer();
             }
         } else if ((m_streamer->commandIndex() < m_form->currentModel().rowCount())
                    && (m_communicator->m_senderState == SenderTransferring)

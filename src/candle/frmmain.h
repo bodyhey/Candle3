@@ -225,6 +225,7 @@ private slots:
     void onCommandProcessed(int tableIndex);
     void onConfigurationReceived(MachineConfiguration, QMap<int, double>);
     void onToolPositionReceived(QVector3D pos);
+    void onTransferCompleted();
     void onConnectionError(QString error);
     void onConsoleNewCommand(QString command);
 
@@ -420,7 +421,6 @@ private:
     bool isGCodeFile(QString fileName);
     bool isHeightmapFile(QString fileName);
     int buttonSize();
-    void completeTransfer();
     QString getLineInitCommands(int row);
 
     static bool actionLessThan(const QAction *a1, const QAction *a2);

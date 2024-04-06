@@ -15,7 +15,7 @@
 
 class TempConnectionToUiProxy {
     public:
-        virtual void completeTransfer() = 0;
+        //virtual void completeTransfer() = 0;
         //virtual void jogContinuous() = 0;
         virtual void grblReset() = 0;
         virtual MachineBoundsDrawer &machineBoundsDrawer() = 0;

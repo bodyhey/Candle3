@@ -128,6 +128,7 @@ class Communicator : public QObject
         void processNewToolPosition();
         void storeParserState();
         void restoreParserState();
+        void completeTransfer();
     private slots:
         void onTimerStateQuery();
         void onConnectionLineReceived(QString);
@@ -159,6 +160,7 @@ class Communicator : public QObject
         void commandProcessed(int tableIndex);
         // @TODO aborted what?? find better name
         void aborted();
+        void transferCompleted();
 };
 
 #endif // COMMUNICATOR_H

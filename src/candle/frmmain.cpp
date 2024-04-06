@@ -411,6 +411,7 @@ void frmMain::initializeCommunicator()
     connect(m_communicator, SIGNAL(feedSpindleSpeedReceived(int,int)), this, SLOT(onFeedSpindleSpeedReceived(int,int)));
     connect(m_communicator, SIGNAL(overridesReceived(int,int,int)), this, SLOT(onOverridesReceived(int,int,int)));
     connect(m_communicator, SIGNAL(toolPositionReceived(QVector3D)), this, SLOT(onToolPositionReceived(QVector3D)));
+    connect(m_communicator, SIGNAL(transferCompleted()), this, SLOT(onTransferCompleted()));
     connect(m_communicator, SIGNAL(aborted()), this, SLOT(onAborted()));
 }
 
@@ -4126,7 +4127,7 @@ int frmMain::buttonSize()
     return ui->cmdHome->minimumWidth();
 }
 
-void frmMain::completeTransfer()
+void frmMain::onTransferCompleted()
 {
     // Shadow last segment
     GcodeViewParse *parser = m_currentDrawer->viewParser();
@@ -4137,15 +4138,8 @@ void frmMain::completeTransfer()
     }
 
     // Update state
-    m_communicator->setSenderStateAndEmitSignal(SenderStopped);
-    m_streamer->resetProcessed();
     m_lastDrawnLineIndex = 0;
-    m_communicator->m_storedParserState.clear();
-
     updateControlsState();
-
-    // Send end commands
-    if (m_settings->useEndCommands()) m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_settings->endCommands());
 
     // Show message box
     qApp->beep();
@@ -4156,7 +4150,7 @@ void frmMain::completeTransfer()
                                 .arg(ui->glwVisualizer->spendTime().toString("hh:mm:ss")));
 
     m_timerConnection.start();
-    m_communicator->startUpdatingState(m_settings->queryStateTime());
+    m_communicator->startUpdatingState();
 }
 
 QString frmMain::getLineInitCommands(int row)

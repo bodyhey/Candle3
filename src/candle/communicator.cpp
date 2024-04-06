@@ -463,3 +463,39 @@ void Communicator::restoreParserState()
         sendCommand(CommandSource::System, m_storedParserState, COMMAND_TI_UI);
     }
 }
+
+void Communicator::completeTransfer()
+{
+    // // Shadow last segment
+    // GcodeViewParse *parser = m_currentDrawer->viewParser();
+    // QList<LineSegment*> list = parser->getLineSegmentList();
+    // if (m_lastDrawnLineIndex < list.count()) {
+    //     list[m_lastDrawnLineIndex]->setDrawn(true);
+    //     m_currentDrawer->update(QList<int>() << m_lastDrawnLineIndex);
+    // }
+
+    // Update state
+    setSenderStateAndEmitSignal(SenderStopped);
+    m_streamer->resetProcessed();
+    //m_lastDrawnLineIndex = 0;
+    m_storedParserState.clear();
+
+    // updateControlsState();
+
+    // Send end commands
+    if (m_settings->useEndCommands()) m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_settings->endCommands());
+
+    emit transferCompleted();
+
+    // Show message box
+    //qApp->beep();
+
+    // m_communicator->stopUpdatingState();
+    // m_timerConnection.stop();
+
+    // QMessageBox::information(this, qApp->applicationDisplayName(), tr("Job done.\nTime elapsed: %1")
+    //                                                                    .arg(ui->glwVisualizer->spendTime().toString("hh:mm:ss")));
+
+    // m_timerConnection.start();
+    // m_communicator->startUpdatingState(m_settings->queryStateTime());
+}
