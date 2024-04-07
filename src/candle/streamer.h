@@ -6,6 +6,7 @@
 #define STREAMER_H
 
 #include <QObject>
+#include "tables/gcodetablemodel.h"
 
 enum StreamerStartResult
 {
@@ -27,11 +28,19 @@ class Streamer : public QObject
         void advanceCommandIndex();
         StreamerStartResult start();
         void stop();
-        void pause();
-
+        void pause();        
+        bool isLastCommand();
+        bool isLastCommandProcessed();
+        // @TODO remove this method??
+        void setModel(GCodeTableModel *model) {
+            m_currentModel = model;
+            m_commandsCount = model->rowCount() - 1;
+        }
     private:
         int m_commandIndex;
         int m_processedCommandIndex;
+        int m_commandsCount;
+        GCodeTableModel *m_currentModel;
 
     signals:
         void progressChanged(int progress);
