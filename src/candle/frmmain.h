@@ -21,6 +21,7 @@
 
 #include "connection/connection.h"
 #include "communicator.h"
+#include "drawers/tablesurfacedrawer.h"
 #include "streamer.h"
 #include "globals.h"
 
@@ -276,6 +277,7 @@ private:
 
     // Visualizer drawers
     // TODO: Add machine table visualizer
+    TableSurfaceDrawer m_tableSurfaceDrawer;
     OriginDrawer *m_originDrawer;
     GcodeDrawer *m_codeDrawer;    
     GcodeDrawer *m_probeDrawer;
@@ -420,6 +422,7 @@ private:
     static QScriptValue importExtension(QScriptContext *context, QScriptEngine *engine);
 
     void initializeConnection(ConnectionMode mode);
+    void initializeVisualizer();
 };
 
 typedef QMap<QString, QList<QKeySequence>> ShortcutsMap;

@@ -263,16 +263,7 @@ frmMain::frmMain(QWidget *parent) :
     m_tableMenu->addAction(tr("&Insert line"), this, SLOT(onTableInsertLine()), QKeySequence(Qt::Key_Insert));
     m_tableMenu->addAction(tr("&Delete lines"), this, SLOT(onTableDeleteLines()), QKeySequence(Qt::Key_Delete));
 
-    ui->glwVisualizer->addDrawable(m_originDrawer);
-    ui->glwVisualizer->addDrawable(m_codeDrawer);
-    ui->glwVisualizer->addDrawable(m_probeDrawer);
-    ui->glwVisualizer->addDrawable(&m_toolDrawer);
-    ui->glwVisualizer->addDrawable(&m_heightMapBorderDrawer);
-    ui->glwVisualizer->addDrawable(&m_heightMapGridDrawer);
-    ui->glwVisualizer->addDrawable(&m_heightMapInterpolationDrawer);
-    ui->glwVisualizer->addDrawable(&m_selectionDrawer);
-    ui->glwVisualizer->addDrawable(&m_machineBoundsDrawer);
-    ui->glwVisualizer->fitDrawable();
+    initializeVisualizer();
 
     connect(ui->glwVisualizer, SIGNAL(resized()), this, SLOT(placeVisualizerButtons()));
     connect(ui->glwVisualizer, SIGNAL(toolPos(QPointF)), this, SLOT(onToolPos(QPointF)));
@@ -414,6 +405,21 @@ void frmMain::initializeCommunicator()
     connect(m_communicator, SIGNAL(toolPositionReceived(QVector3D)), this, SLOT(onToolPositionReceived(QVector3D)));
     connect(m_communicator, SIGNAL(transferCompleted()), this, SLOT(onTransferCompleted()));
     connect(m_communicator, SIGNAL(aborted()), this, SLOT(onAborted()));
+}
+
+void frmMain::initializeVisualizer()
+{
+    ui->glwVisualizer->addDrawable(&m_tableSurfaceDrawer);
+    ui->glwVisualizer->addDrawable(m_originDrawer);
+    ui->glwVisualizer->addDrawable(m_codeDrawer);
+    ui->glwVisualizer->addDrawable(m_probeDrawer);
+    ui->glwVisualizer->addDrawable(&m_toolDrawer);
+    ui->glwVisualizer->addDrawable(&m_heightMapBorderDrawer);
+    ui->glwVisualizer->addDrawable(&m_heightMapGridDrawer);
+    ui->glwVisualizer->addDrawable(&m_heightMapInterpolationDrawer);
+    ui->glwVisualizer->addDrawable(&m_selectionDrawer);
+    ui->glwVisualizer->addDrawable(&m_machineBoundsDrawer);
+    ui->glwVisualizer->fitDrawable();
 }
 
 void frmMain::showEvent(QShowEvent *se)

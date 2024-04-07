@@ -149,7 +149,12 @@ void ShaderDrawable::draw(QOpenGLShaderProgram *shaderProgram)
         int start = shaderProgram->attributeLocation("a_start");
         shaderProgram->enableAttributeArray(start);
         shaderProgram->setAttributeBuffer(start, GL_FLOAT, offset, 3, sizeof(VertexData));
+
+        shaderProgram->setAttributeValue("a_alpha", m_globalAlpha);
     }
+
+    // setAttributeBuffer must used every time, because it is not stored in VAO??
+    shaderProgram->setAttributeValue("a_alpha", m_globalAlpha);
 
     if (!m_triangles.isEmpty()) {
         if (m_texture) {
