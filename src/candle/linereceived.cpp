@@ -5,8 +5,6 @@
 /*
 to be refactored/replaced by signals and slots
 
-ui->chkKeyboardControl
-absoluteCoordinates
 
 qApp->beep()
 
@@ -343,8 +341,10 @@ void Communicator::processCommandResponse(QString data)
 
     // Restore absolute/relative coordinate system after jog
     if (uncomment == "$G" && commandAttributes.tableIndex == -2) {
-        if (ui->chkKeyboardControl->isChecked()) m_form->absoluteCoordinates() = response.contains("G90");
-        else if (response.contains("G90")) m_communicator->sendCommand(CommandSource::System, "G90", COMMAND_TI_UI);
+        // @TODO how to handle keyboard control?? not like this!
+        // if (ui->chkKeyboardControl->isChecked()) m_form->absoluteCoordinates() = response.contains("G90");
+        // else if (response.contains("G90")) m_communicator->sendCommand(CommandSource::System, "G90", COMMAND_TI_UI);
+        if (response.contains("G90")) sendCommand(CommandSource::System, "G90", COMMAND_TI_UI);
     }
 
     // Process GCore parser state
