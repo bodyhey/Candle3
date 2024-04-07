@@ -8,18 +8,14 @@
 #include <parser/gcodeviewparse.h>
 
 Communicator::Communicator(
+    QObject *parent,
     Connection *connection,
-    TempConnectionToUiProxy *frmMain,
     Configuration *configuration,
-    Ui::frmMain *ui,
-    frmSettings *frmSettings,
-    QObject *parent = nullptr
+    frmSettings *frmSettings
 ) : QObject(parent),
     m_connection(connection),
     m_settings(frmSettings),
     m_configuration(configuration),
-    ui(ui),
-    m_form(frmMain),
     m_timerStateQuery(this),
     m_deviceStatesDictionary({
         {DeviceUnknown, "Unknown"},
@@ -122,9 +118,11 @@ SendCommandResult Communicator::sendCommand(CommandSource source, QString comman
     static QRegExp s("[Ss]0*(\\d+)");
     if (s.indexIn(uncomment) != -1 && commandAttributes.tableIndex > -2) {
         int speed = s.cap(1).toInt();
-        if (ui->slbSpindle->value() != speed) {
-            ui->slbSpindle->setValue(speed);
-        }
+        // @TODO we are about to send new spindle speed, should we update UI now or wait for response?? or
+        // maybe in onFeedSpindleSpeedReceived ??
+        // if (ui->slbSpindle->value() != speed) {
+        //     ui->slbSpindle->setValue(speed);
+        // }
     }
 
     // Set M2 & M30 commands sent flag
@@ -338,11 +336,12 @@ void Communicator::processConnectionTimer()
         return;
     }
 
-    // @TODO refactor ui->cmdHold->isChecked
-    if (!m_homing && !ui->cmdHold->isChecked() && m_queue.empty()) {
+    // @TODO what does it do??? not homing, not hold, empty queue, are these the idle state tasks??
+    // @TODO refactor ui->cmdHold->isChecked, for now we will assume that its value is always false
+    if (!m_homing /*&& !ui->cmdHold->isChecked()*/ && m_queue.empty()) {
         if (m_updateSpindleSpeed) {
             m_updateSpindleSpeed = false;
-            sendCommand(CommandSource::System, QString("S%1").arg(ui->slbSpindle->value()), COMMAND_TI_UTIL1);
+            // sendCommand(CommandSource::System, QString("S%1").arg(ui->slbSpindle->value()), COMMAND_TI_UTIL1);
         }
         if (m_updateParserState) {
             m_updateParserState = false;

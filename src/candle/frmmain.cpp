@@ -387,10 +387,11 @@ frmMain::~frmMain()
 void frmMain::initializeCommunicator()
 {
     m_communicator = new Communicator(
-        m_connection,
         this,
+        m_connection,
         &m_configuration,
-        ui, m_settings, this);
+        m_settings
+    );
     m_streamer = new Streamer();
     // @TODO temporary!
     m_communicator->streamCommands(m_streamer);

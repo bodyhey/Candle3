@@ -79,7 +79,7 @@ public:
     }
 };
 
-class frmMain : public QMainWindow, TempConnectionToUiProxy
+class frmMain : public QMainWindow
 {
     Q_OBJECT
 
@@ -90,17 +90,6 @@ public:
     ~frmMain();
     
     void writeConsole(QString command);
-
-    // TO BE REMOVED !!!
-    MachineBoundsDrawer &machineBoundsDrawer() override { return m_machineBoundsDrawer; };
-    // ScriptVars &storedVars() override { return m_storedVars; };
-    bool &absoluteCoordinates() override { return m_absoluteCoordinates; };
-    partMainConsole &partConsole() override { return *m_partConsole; };
-    // GCodeTableModel &programModel() override { return m_programModel; };
-    // GCodeTableModel &probeModel() override { return m_probeModel; };
-    // GCodeTableModel &currentModel() override { return *m_currentModel; };
-    // TO BE REMOVED !!!
-
     void initializeCommunicator();
 
 signals:

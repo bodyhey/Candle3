@@ -2,17 +2,6 @@
 #include "parser/gcodeviewparse.h"
 #include <QMessageBox>
 
-/*
-to be refactored/replaced by signals and slots
-
-
-qApp->beep()
-
-// transfering file, streamer class?
-
-                        m_form->grblReset();
-*/
-
 void Communicator::onConnectionLineReceived(QString data)
 {
     assert(QThread::currentThread() == QCoreApplication::instance()->thread());

@@ -2,14 +2,12 @@
 #define COMMUNICATOR_H
 
 #include <QScrollBar>
-//#include "frmmain.h"
 #include "frmsettings.h"
 #include "globals.h"
 #include "streamer.h"
 #include "connection/connection.h"
-#include "tempconnectiontouiproxy.h"
 #include "machine/machineconfiguration.h"
-#include "ui_frmmain.h"
+#include "scripting/scriptvars.h"
 
 #ifdef WINDOWS
     #include <QtWinExtras/QtWinExtras>
@@ -27,13 +25,11 @@ class Communicator : public QObject
 
     public:
         Communicator(
+            QObject *parent,
             Connection *connection,
-            TempConnectionToUiProxy *frmMain,
             Configuration *configuration,
-            Ui::frmMain *ui,
-            frmSettings *frmSettings,
-            //frmMain *form,
-            QObject *parent);
+            frmSettings *frmSettings
+        );
         SendCommandResult sendCommand(CommandSource source, QString command, int tableIndex = -1, bool wait = false);
         void sendRealtimeCommand(QString command);
         void sendRealtimeCommand(int command);
@@ -62,8 +58,6 @@ class Communicator : public QObject
         Connection *m_connection;
         frmSettings *m_settings;
         Configuration *m_configuration;
-        Ui::frmMain *ui;
-        TempConnectionToUiProxy *m_form;
         Communicator *m_communicator;
         Streamer *m_streamer = nullptr;
 
