@@ -94,11 +94,11 @@ public:
     // TO BE REMOVED !!!
     MachineBoundsDrawer &machineBoundsDrawer() override { return m_machineBoundsDrawer; };
     // ScriptVars &storedVars() override { return m_storedVars; };
-    GCodeTableModel &programModel() override { return m_programModel; };
-    GCodeTableModel &probeModel() override { return m_probeModel; };
-    GCodeTableModel &currentModel() override { return *m_currentModel; };
     bool &absoluteCoordinates() override { return m_absoluteCoordinates; };
     partMainConsole &partConsole() override { return *m_partConsole; };
+    // GCodeTableModel &programModel() override { return m_programModel; };
+    // GCodeTableModel &probeModel() override { return m_probeModel; };
+    // GCodeTableModel &currentModel() override { return *m_currentModel; };
     // TO BE REMOVED !!!
 
     void initializeCommunicator();
@@ -409,6 +409,8 @@ private:
     void updateHeightMapGrid(double arg1);
     void resizeTableHeightMapSections();
     bool eventFilter(QObject *obj, QEvent *event) override;
+
+    void updateCurrentModel(GCodeTableModel *m_currentModel);
 
     void updateToolPositionAndToolpathShadowing(QVector3D toolPosition);
     void updateToolpathShadowingOnCheckMode();

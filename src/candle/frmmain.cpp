@@ -176,7 +176,7 @@ frmMain::frmMain(QWidget *parent) :
     m_lastDrawnLineIndex = 0;
     m_streamer->resetProcessed();
     m_programLoading = false;
-    m_currentModel = &m_programModel;
+    updateCurrentModel(&m_programModel);
 
     // Dock widgets
     setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
@@ -1117,7 +1117,7 @@ void frmMain::on_chkHeightMapUse_clicked(bool checked)
         progress.setStyleSheet("QProgressBar {text-align: center; qproperty-format: \"\"}");
 
         // Set current model to prevent reseting heightmap cache
-        m_currentModel = &m_programHeightmapModel;
+        updateCurrentModel(&m_programHeightmapModel);
 
         // Update heightmap-modificated program if not cached
         if (m_programHeightmapModel.rowCount() == 0) {
@@ -1300,7 +1300,7 @@ void frmMain::on_chkHeightMapUse_clicked(bool checked)
     }
     catch (CancelException) {                       // Cancel modification
         m_programHeightmapModel.clear();
-        m_currentModel = &m_programModel;
+        updateCurrentModel(&m_programModel);
 
         ui->tblProgram->setModel(&m_programModel);
         ui->tblProgram->horizontalHeader()->restoreState(headerState);
@@ -1312,7 +1312,7 @@ void frmMain::on_chkHeightMapUse_clicked(bool checked)
 
         return;
     } else {                                        // Restore original program
-        m_currentModel = &m_programModel;
+        updateCurrentModel(&m_programModel);
 
         ui->tblProgram->setModel(&m_programModel);
         ui->tblProgram->horizontalHeader()->restoreState(headerState);
@@ -1423,7 +1423,7 @@ void frmMain::on_cmdHeightMapMode_toggled(bool checked)
     if (checked) {
         ui->tblProgram->setModel(&m_probeModel);
         resizeTableHeightMapSections();
-        m_currentModel = &m_probeModel;
+        updateCurrentModel(&m_programModel);
         m_currentDrawer = m_probeDrawer;
         updateParser();  // Update probe program parser
     } else {
@@ -1434,7 +1434,7 @@ void frmMain::on_cmdHeightMapMode_toggled(bool checked)
             ui->tblProgram->selectRow(0);
 
             resizeTableHeightMapSections();
-            m_currentModel = &m_programModel;
+            updateCurrentModel(&m_programModel);
             m_currentDrawer = m_codeDrawer;
 
             if (!ui->chkHeightMapUse->isChecked()) {
@@ -3124,7 +3124,7 @@ void frmMain::loadFile(QList<std::string> data)
     clearTable();
     m_probeModel.clear();
     m_programHeightmapModel.clear();
-    m_currentModel = &m_programModel;
+    updateCurrentModel(&m_programModel);
 
     // Reset parsers
     m_viewParser.reset();
@@ -3400,7 +3400,7 @@ void frmMain::newFile()
     clearTable();
     m_probeModel.clear();
     m_programHeightmapModel.clear();
-    m_currentModel = &m_programModel;
+    updateCurrentModel(&m_programModel);
 
     // Reset parsers
     m_viewParser.reset();
@@ -3877,6 +3877,12 @@ bool frmMain::eventFilter(QObject *obj, QEvent *event)
     }
 
     return QMainWindow::eventFilter(obj, event);
+}
+
+void frmMain::updateCurrentModel(GCodeTableModel *m_currentModel)
+{
+    this->m_currentModel = m_currentModel;
+    m_streamer->setModel(m_currentModel);
 }
 
 void frmMain::updateToolPositionAndToolpathShadowing(QVector3D toolPosition)

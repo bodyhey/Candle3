@@ -318,17 +318,17 @@ void Communicator::sendStreamerCommandsUntilBufferIsFull()
 {
     if (m_queue.length() > 0) return;
 
-    QString command = m_form->currentModel().data(m_form->currentModel().index(m_streamer->commandIndex(), 1)).toString();
+    QString command = m_streamer->command();
     static QRegExp M230("(M0*2|M30|M0*6)(?!\\d)");
 
     while ((bufferLength() + command.length() + 1) <= BUFFERLENGTH
-           && m_streamer->commandIndex() < m_form->currentModel().rowCount() - 1
+           && !m_streamer->noMoreCommands() /* commandIndex() < m_form->currentModel().rowCount() - 1 */
            && !(!m_commands.isEmpty() && GcodePreprocessorUtils::removeComment(m_commands.last().command).contains(M230))
     ) {
-        m_form->currentModel().setData(m_form->currentModel().index(m_streamer->commandIndex(), 2), GCodeItem::Sent);
+        m_streamer->commandSent();
         sendCommand(CommandSource::Program, command, m_streamer->commandIndex());
         m_streamer->advanceCommandIndex();
-        command = m_form->currentModel().data(m_form->currentModel().index(m_streamer->commandIndex(), 1)).toString();
+        command = m_streamer->command();
     }
 }
 

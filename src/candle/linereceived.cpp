@@ -9,7 +9,6 @@ to be refactored/replaced by signals and slots
 qApp->beep()
 
 // transfering file, streamer class?
-currentModel
 
                         m_form->grblReset();
 */
@@ -129,7 +128,8 @@ void Communicator::processOverrides(QString data)
 void Communicator::processNewToolPosition()
 {
     QVector3D toolPosition;
-    if (!(m_deviceState == DeviceCheck && m_streamer->processedCommandIndex() < m_form->currentModel().rowCount() - 1)) {
+//    if (!(m_deviceState == DeviceCheck && m_streamer->processedCommandIndex() < m_form->currentModel().rowCount() - 1)) {
+    if (!(m_deviceState == DeviceCheck && !m_streamer->isLastCommandProcessed())) {
         toolPosition = m_communicator->m_machinePos;
         //m_form->toolDrawer().setToolPosition(m_form->codeDrawer().getIgnoreZ() ? QVector3D(toolPosition.x(), toolPosition.y(), 0) : toolPosition);
 
@@ -606,14 +606,15 @@ void Communicator::processCommandResponse(QString data)
         }
 
         // Check transfer complete (last row always blank, last command row = rowcount - 2)
-        if ((m_streamer->processedCommandIndex() == m_form->currentModel().rowCount() - 2) || uncomment.contains(QRegExp("(M0*2|M30)(?!\\d)"))) {
-            if (m_communicator->m_deviceState == DeviceRun) {
-                m_communicator->setSenderStateAndEmitSignal(SenderStopping);
+//        if ((m_streamer->processedCommandIndex() == m_form->currentModel().rowCount() - 2) || uncomment.contains(QRegExp("(M0*2|M30)(?!\\d)"))) {
+        if (m_streamer->isLastCommandProcessed() || uncomment.contains(QRegExp("(M0*2|M30)(?!\\d)"))) {
+            if (m_deviceState == DeviceRun) {
+                setSenderStateAndEmitSignal(SenderStopping);
             } else {
                 completeTransfer();
             }
-        } else if ((m_streamer->commandIndex() < m_form->currentModel().rowCount())
-                   && (m_communicator->m_senderState == SenderTransferring)
+        } else if (m_streamer->isLastCommand()  // /*(m_streamer->commandIndex() < m_form->currentModel().rowCount())
+                   && (m_senderState == SenderTransferring)
                    && !holding)
         {
             // Send next program commands

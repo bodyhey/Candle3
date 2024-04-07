@@ -24,18 +24,21 @@ class Streamer : public QObject
         void reset(int commandIndex = 0);
         void resetProcessed(int commandIndex = 0);
         int commandIndex() { return m_commandIndex; }
+        QString command();
         int processedCommandIndex() { return m_processedCommandIndex; }
         void advanceCommandIndex();
         StreamerStartResult start();
         void stop();
         void pause();        
         bool isLastCommand();
+        bool noMoreCommands();
         bool isLastCommandProcessed();
         // @TODO remove this method??
         void setModel(GCodeTableModel *model) {
             m_currentModel = model;
             m_commandsCount = model->rowCount() - 1;
         }
+        void commandSent();
     private:
         int m_commandIndex;
         int m_processedCommandIndex;
