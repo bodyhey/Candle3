@@ -157,7 +157,7 @@ class Communicator : public QObject
         void feedSpindleSpeedReceived(int feedRate, int spindleSpeed);
         void overridesReceived(int feedOverride, int spindleOverride, int rapidOverride);
         // @TODO how to do it better?? what signal should we attach to?
-        void commandProcessed(int tableIndex);
+        void commandProcessed(int tableIndex, QString response);
         // @TODO aborted what?? find better name
         void aborted();
         void transferCompleted();

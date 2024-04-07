@@ -559,14 +559,9 @@ void Communicator::processCommandResponse(QString data)
     if (m_communicator->m_senderState != SenderStopped) {
         // Only if command from table
         if (commandAttributes.tableIndex > -1) {
-            m_form->currentModel().setData(m_form->currentModel().index(commandAttributes.tableIndex, 2), GCodeItem::Processed);
-            m_form->currentModel().setData(m_form->currentModel().index(commandAttributes.tableIndex, 3), response);
-
             m_streamer->resetProcessed(commandAttributes.tableIndex);
 
-            if (commandAttributes.tableIndex != -1) {
-                emit commandProcessed(commandAttributes.tableIndex + 1);
-            }
+            emit commandProcessed(commandAttributes.tableIndex, response);
         }
 
 // Update taskbar progress
@@ -681,7 +676,7 @@ void Communicator::processCommandResponse(QString data)
     // Scroll to first line on "M30" command
     if (uncomment.contains("M30")) {
         // @TODO new signal here?
-        emit commandProcessed(0);
+        emit commandProcessed(-1, "");
     }
 
     // Toolpath shadowing on check mode - moved to responseReceived signal handler

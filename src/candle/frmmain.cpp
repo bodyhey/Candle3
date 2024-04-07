@@ -407,7 +407,7 @@ void frmMain::initializeCommunicator()
     connect(m_communicator, SIGNAL(parserStateReceived(QString)), this, SLOT(onParserStateReceived(QString)));
     connect(m_communicator, SIGNAL(pinStateReceived(QString)), this, SLOT(onPinStateReceived(QString)));
     connect(m_communicator, SIGNAL(spindleSpeedReceived(int)), this, SLOT(onSpindleSpeedReceived(int)));
-    connect(m_communicator, SIGNAL(commandProcessed(int)), this, SLOT(onCommandProcessed(int)));
+    connect(m_communicator, SIGNAL(commandProcessed(int,QString)), this, SLOT(onCommandProcessed(int,QString)));
     connect(m_communicator, SIGNAL(feedSpindleSpeedReceived(int,int)), this, SLOT(onFeedSpindleSpeedReceived(int,int)));
     connect(m_communicator, SIGNAL(overridesReceived(int,int,int)), this, SLOT(onOverridesReceived(int,int,int)));
     connect(m_communicator, SIGNAL(toolPositionReceived(QVector3D)), this, SLOT(onToolPositionReceived(QVector3D)));
@@ -1795,11 +1795,17 @@ void frmMain::onCommandSent(CommandAttributes commandAttributes)
     m_partConsole->append(commandAttributes);
 }
 
-void frmMain::onCommandProcessed(int tableIndex)
+void frmMain::onCommandProcessed(int tableIndex, QString response)
 {
     if (ui->chkAutoScroll->isChecked()) {
-        ui->tblProgram->scrollTo(m_currentModel->index(tableIndex, 0));      // TODO: Update by timer
-        ui->tblProgram->setCurrentIndex(m_currentModel->index(tableIndex, 1));
+        // scroll to NEXT command (+1)
+        ui->tblProgram->scrollTo(m_currentModel->index(tableIndex + 1, 0));      // TODO: Update by timer
+        ui->tblProgram->setCurrentIndex(m_currentModel->index(tableIndex + 1, 1));
+    }
+
+    if (tableIndex > -1) {
+        m_currentModel->setData(m_currentModel->index(tableIndex, 2), GCodeItem::Processed);
+        m_currentModel->setData(m_currentModel->index(tableIndex, 3), response);
     }
 }
 
