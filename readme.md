@@ -74,22 +74,13 @@ The original Candle was built in a way that was not transparent and difficult to
 Configurations:
 ---------------
 
-Another module begging for a rewrite is the configuration storage mechanism. Of course, it will be detached into a separate module. Settings sets will be wrapped in separate classes. The reading and writing of fields will be partially automated.
+Another module begging for a rewrite is the configuration storage mechanism. Of course, it will be detached into a separate module. Settings sets will be wrapped in separate classes. The reading and writing of fields will be partially automated. Persistence layer will be separated from the configuration logic. The configuration will be stored in a local file or in a cloud, for example Dropbox or Google Drive.
 
 ![screenshot](/screenshots/arch2.png)
 
 Downloads:
 ----------
-No new releases yet. Sorry!
-
-Older versions:
-
-For GRBL v1.1 firmware
-
-* Windows: [candle_1.1.7.zip](https://github.com/Denvi/Candle/releases/download/v1.1/Candle_1.1.7.zip)
-* Linux: [candle_1.1.7.tar.gz](https://github.com/Denvi/Candle/releases/download/v1.1/Candle_1.1.7.tar.gz)
-
-(for GRBL v0.9 and below use Candle 1.0)
+Only Windows preview version is available at the moment. They are not stable and contain many critical bugs. The Linux version will be available sooner or later.
 
 How it looks:
 -------------
@@ -105,11 +96,3 @@ Settings:
 GRBL configurator:
 
 ![grbl configurator](/screenshots/screenshot_grbl_configurator.png)
-
-Technical information for my use:
----------------------------------
-
-To check .a and .dll versions I used objdump and readelf
-
-SFML-2.6.1 compiled from sources. CMake was needed and the rest
-happens in QTCreator 12. joystickplugin is created and SFML-2.6.1-Released.

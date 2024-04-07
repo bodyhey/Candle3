@@ -1,0 +1,7 @@
+Technical information for my use:
+---------------------------------
+
+To check .a and .dll versions I used objdump and readelf
+
+SFML-2.6.1 compiled from sources. CMake was needed and the rest
+happens in QTCreator 12. joystickplugin is created and SFML-2.6.1-Released.
