@@ -716,7 +716,8 @@ void Communicator::processUnhandledResponse(QString data)
         // m_form->updateControlsState();
     }
 
-    m_form->partConsole().append(data);
+    // @TODO do we want to log it here?
+    //m_form->partConsole().append(data);
 }
 
 void Communicator::processMessage(QString data)
