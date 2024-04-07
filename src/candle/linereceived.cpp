@@ -5,8 +5,6 @@
 /*
 to be refactored/replaced by signals and slots
 
-machineBoundsDrawer
-
 ui->chkKeyboardControl
 absoluteCoordinates
 
@@ -322,15 +320,16 @@ void Communicator::processCommandResponse(QString data)
         static QRegExp g("G5[4-9]");
         if (g.indexIn(response) != -1) {
             m_storedVars.setCS(g.cap(0));
-            m_form->machineBoundsDrawer().setOffset(
-                QPointF(
-                    m_communicator->toMetric(m_storedVars.x()),
-                    m_communicator->toMetric(m_storedVars.y())
-                ) + QPointF(
-                    m_communicator->toMetric(m_storedVars.G92x()),
-                    m_communicator->toMetric(m_storedVars.G92y()
-                )
-            ));
+            // @TODO how to update drawer? signal? timer?
+            // m_form->machineBoundsDrawer().setOffset(
+            //     QPointF(
+            //         m_communicator->toMetric(m_storedVars.x()),
+            //         m_communicator->toMetric(m_storedVars.y())
+            //     ) + QPointF(
+            //         m_communicator->toMetric(m_storedVars.G92x()),
+            //         m_communicator->toMetric(m_storedVars.G92y()
+            //     )
+            // ));
         }
         static QRegExp t("T(\\d+)(?!\\d)");
         if (t.indexIn(response) != -1) {
