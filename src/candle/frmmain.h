@@ -15,7 +15,6 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QProgressDialog>
-#include <QScriptEngine>
 #include <QGroupBox>
 #include <exception>
 
@@ -43,7 +42,6 @@
 #include "drawers/selectiondrawer.h"
 #include "drawers/machineboundsdrawer.h"
 
-#include "scripting/scripting.h"
 #include "tables/gcodetablemodel.h"
 #include "tables/heightmaptablemodel.h"
 
@@ -56,7 +54,6 @@
 #include "frmabout.h"
 
 #include "scripting/scriptvars.h"
-#include "scripting/scriptfunctions.h"
 
 #ifdef WINDOWS
     #include <QtWinExtras/QtWinExtras>
@@ -84,8 +81,6 @@ public:
 class frmMain : public QMainWindow
 {
     Q_OBJECT
-
-    friend class ScriptFunctions;
 
 public:
     explicit frmMain(QWidget *parent = 0);
@@ -235,7 +230,6 @@ private slots:
 //    void onCboCommandReturnPressed();
     void onDockTopLevelChanged(bool topLevel);
     void onScroolBarAction(int action);
-    void onScriptException(const QScriptValue &exception);
 
     void onToolPos(QPointF);
 
@@ -346,12 +340,8 @@ private:
     // Jog
     QVector3D m_jogVector;
 
-    // Script
     Configuration m_configuration;
-    Scripting m_scripting;
-    QScriptEngine m_scriptEngine;
     ScriptVars m_scriptVars;
-    ScriptFunctions m_scriptFunctions;
 
     // Drag & drop
     QPoint m_mousePressPos;
@@ -420,7 +410,6 @@ private:
 
     static bool actionLessThan(const QAction *a1, const QAction *a2);
     static bool actionTextLessThan(const QAction *a1, const QAction *a2);
-    static QScriptValue importExtension(QScriptContext *context, QScriptEngine *engine);
 
     void initializeConnection(ConnectionMode mode);
     void initializeVisualizer();

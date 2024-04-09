@@ -16,7 +16,6 @@
 #include <QDrag>
 #include <QMimeData>
 #include <QTranslator>
-#include <QScriptValueIterator>
 #include <QDockWidget>
 #include "frmmain.h"
 #include "form_partial/main/jog.h"
@@ -33,7 +32,6 @@ frmMain::frmMain(QWidget *parent) :
     ui(new Ui::frmMain ),
     m_connectionManager(this, m_configuration.connectionModule()),
     m_configuration(this),
-    m_scripting(&m_configuration)
 {
     m_configuration.load();
 //    setDefaults();
@@ -283,23 +281,6 @@ frmMain::frmMain(QWidget *parent) :
                                        QMessageBox::Ignore | QMessageBox::Abort, this);
     m_senderErrorBox->setCheckBox(new QCheckBox(tr("Don't show again")));
 
-    // Prepare script functions
-    m_scriptFunctions.setFrmMain(this);
-    connect(this, &frmMain::responseReceived, &m_scriptFunctions, &ScriptFunctions::responseReceived);
-    connect(this, &frmMain::statusReceived, &m_scriptFunctions, &ScriptFunctions::statusReceived);
-    connect(this, &frmMain::senderStateChanged, &m_scriptFunctions, &ScriptFunctions::senderStateChanged);
-    // @TODO scripting, what values to use for device state?
-    //connect(this, &frmMain::deviceStateChanged, &m_scriptFunctions, &ScriptFunctions::deviceStateChanged);
-    connect(this, &frmMain::settingsAboutToLoad, &m_scriptFunctions, &ScriptFunctions::settingsAboutToLoad);
-    connect(this, &frmMain::settingsLoaded, &m_scriptFunctions, &ScriptFunctions::settingsLoaded);
-    connect(this, &frmMain::settingsAboutToSave, &m_scriptFunctions, &ScriptFunctions::settingsAboutToSave);
-    connect(this, &frmMain::settingsSaved, &m_scriptFunctions, &ScriptFunctions::settingsSaved);
-    connect(this, &frmMain::settingsAboutToShow, &m_scriptFunctions, &ScriptFunctions::settingsAboutToShow);
-    connect(this, &frmMain::settingsAccepted, &m_scriptFunctions, &ScriptFunctions::settingsAccepted);
-    connect(this, &frmMain::settingsRejected, &m_scriptFunctions, &ScriptFunctions::settingsRejected);
-    connect(this, &frmMain::settingsSetToDefault, &m_scriptFunctions, &ScriptFunctions::settingsSetToDefault);
-    connect(this, &frmMain::pluginsLoaded, &m_scriptFunctions, &ScriptFunctions::pluginsLoaded);
-
     // Loading settings
     loadSettings();
     ui->tblProgram->hideColumn(4);
@@ -348,18 +329,8 @@ frmMain::frmMain(QWidget *parent) :
         loadFile(qApp->arguments().last());
     }
     
-    // Delegate vars to script engine
-    QScriptValue vars = m_scriptEngine.newQObject(&m_scriptVars);
-    m_scriptEngine.globalObject().setProperty("vars", vars);
-
-    // Delegate import extension function
-    QScriptValue sv = m_scriptEngine.newObject();
-    sv.setProperty("importExtension", m_scriptEngine.newFunction(frmMain::importExtension));
-    m_scriptEngine.globalObject().setProperty("script", sv);
-
     // Signals/slots
     connect(&m_timerConnection, SIGNAL(timeout()), this, SLOT(onTimerConnection()));
-    connect(&m_scriptEngine, &QScriptEngine::signalHandlerException, this, &frmMain::onScriptException);
 
     // Event filter
     qApp->installEventFilter(this);
@@ -2109,11 +2080,6 @@ void frmMain::onScroolBarAction(int action)
         ui->chkAutoScroll->setChecked(false);
 }
 
-void frmMain::onScriptException(const QScriptValue &exception)
-{
-    qDebug() << "Script exception:" << exception.toString();
-}
-
 void frmMain::onToolPos(QPointF pos)
 {
     m_toolDrawer.setToolPosition(
@@ -2321,10 +2287,6 @@ void frmMain::loadSettings()
     // ui->cboCommand->addItems(set.value("recentCommands", QStringList()).toStringList());
     // ui->cboCommand->setCurrentIndex(-1);
 
-    // Load plugins
-    loadPlugins();
-    emit pluginsLoaded();
-
     // Adjust docks width 
     int w = qMax(ui->dockDevice->widget()->sizeHint().width(), 
         ui->dockModification->widget()->sizeHint().width());
@@ -2406,14 +2368,6 @@ void frmMain::loadSettings()
 
     m_settings->restoreGeometry(set.value("formSettingsGeometry", m_settings->saveGeometry()).toByteArray());
 
-
-    // Loading stored script variables
-    QScriptValue g = m_scriptEngine.globalObject();
-    set.beginGroup("script");
-    QStringList l = set.childKeys();
-    foreach (const QString &k, l) {
-        g.setProperty(k, m_scriptEngine.newVariant(set.value(k)));
-    }
     set.endGroup();
 
     m_settingsLoading = false;
@@ -2564,27 +2518,6 @@ void frmMain::saveSettings()
     set.setValue("lockWindows", ui->actViewLockWindows->isChecked());
     set.setValue("lockPanels", ui->actViewLockPanels->isChecked());
 
-    // Save script variables
-    QScriptEngine e;
-    QScriptValue d = e.globalObject();
-    QScriptValueIterator i(d);
-    QStringList l;
-    while (i.hasNext()) {
-        i.next();
-        l << i.name();
-    }
-
-    QScriptValue v = m_scriptEngine.globalObject();
-    QScriptValueIterator it(v);
-    while (it.hasNext()) {
-        it.next();
-        if (!l.contains(it.name())) {
-            if (it.value().isNumber() || it.value().isString()) {
-                set.setValue("script/" + it.name(), it.value().toVariant());
-            }
-        }
-    }
-
     emit settingsSaved();
 }
 
@@ -2703,164 +2636,6 @@ void frmMain::applySettings() {
     if (m_connection->getSupportedMode() != m_configuration.connectionModule().connectionMode()) {
         initializeConnection(m_configuration.connectionModule().connectionMode());
         m_communicator->replaceConnection(m_connection);
-    }
-}
-
-void frmMain::loadPlugins()
-{
-    QString pluginsDir = qApp->applicationDirPath() + "/plugins/";
-
-    // Get plugins list
-    QStringList pl = QDir(pluginsDir).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-
-    qDebug() << "Loading plugins:" << pl;
-
-    foreach (QString p, pl) {
-        // Config
-        QSettings set(pluginsDir + p + "/config.ini", QSettings::IniFormat);
-        QString title = set.value("title").toString();
-        QString name = set.value("name").toString();
-        qDebug() << "Loading plugin:" << p << title << name;
-
-        // Translation
-        QString loc = m_settings->language();
-        QString translationFileName = pluginsDir + p + "/translation_" + loc + ".qm";
-        if(QFile::exists(translationFileName)) {
-            QTranslator *translator = new QTranslator();
-            if (translator->load(translationFileName)) qApp->installTranslator(translator);
-            else delete translator;
-        }        
-
-        // Script
-        QFile f;
-        f.setFileName(pluginsDir + p + "/script.js");
-        if (f.open(QFile::ReadOnly)) {
-            QScriptEngine *se = new QScriptEngine();
-            
-            QScriptValue sv = se->newObject();
-            sv.setProperty("importExtension", se->newFunction(frmMain::importExtension));
-            sv.setProperty("path", pluginsDir + p);            
-            se->globalObject().setProperty("script", sv);
-            connect(se, &QScriptEngine::signalHandlerException, this, &frmMain::onScriptException);
-
-            // Delegate objects
-            // Main form
-            QScriptValue app = se->newQObject(&m_scriptFunctions);
-            app.setProperty("path", qApp->applicationDirPath());
-            se->globalObject().setProperty("app", app);
-
-            // // Settings
-            QScriptValue settings = se->newQObject(m_settings);
-            app.setProperty("settings", settings);
-
-            // Stored vars
-            QScriptValue vars = se->newQObject(&m_scriptVars);
-            se->globalObject().setProperty("vars", vars);
-
-            // Translator
-            se->installTranslatorFunctions();
-
-            // Run script
-            QString script = f.readAll();
-
-            qDebug() << "Starting plugin:" << p;
-            sv = se->evaluate(script);
-            if (sv.isError()) {
-                qDebug() << sv.toString();
-                qDebug() << se->uncaughtExceptionBacktrace();
-            }
-
-            // Init
-            sv = se->evaluate("init()");
-            if (sv.isError()) {
-                qDebug() << sv.toString();
-                qDebug() << se->uncaughtExceptionBacktrace();
-            }
-
-            // Panel widget
-            sv = se->evaluate("createPanelWidget()");
-            if (sv.isError()) {
-                qDebug() << sv.toString();
-                qDebug() << se->uncaughtExceptionBacktrace();
-            } else {
-                QWidget *w = qobject_cast<QWidget*>(sv.toQObject());
-                if (w) {
-                    // Create panel
-                    QGroupBox *box = new QGroupBox(this);
-                    QVBoxLayout *layout1 = new QVBoxLayout(box);
-                    QWidget *bw = new QWidget(box);
-                    QVBoxLayout *layout2 = new QVBoxLayout(bw);
-                    box->setObjectName("grp" + name);
-                    box->setTitle(tr(title.toLatin1()));
-                    box->setLayout(layout1);
-                    box->setCheckable(true);
-                    box->setProperty("overrided", false);
-                    layout1->addWidget(bw);
-                    bw->setLayout(layout2);
-                    layout2->addWidget(w);
-                    layout2->setMargin(0);
-                    connect(box, &QGroupBox::toggled, bw, &QWidget::setVisible);
-
-                    // Add panel to user window
-                    static_cast<QVBoxLayout*>(ui->scrollContentsUser->layout())->insertWidget(0, box);                
-                }
-            }
-
-            // Window widget
-            sv = se->evaluate("createWindowWidget()");
-            if (sv.isError()) {
-                qDebug() << sv.toString();
-                qDebug() << se->uncaughtExceptionBacktrace();
-            } else {
-                QWidget *w = qobject_cast<QWidget*>(sv.toQObject());
-                if (w) {
-                    // Create dock widget
-                    QDockWidget *dock = new QDockWidget(this);
-                    QWidget *contents = new QWidget(dock);
-                    QFrame *frame = new QFrame(contents);
-                    QVBoxLayout *layout1 = new QVBoxLayout(contents);
-                    QVBoxLayout *layout2 = new QVBoxLayout(frame);
-                    dock->setObjectName("dock" + name);
-                    dock->setWindowTitle(tr(title.toLatin1()));
-                    dock->setWidget(contents);
-                    contents->setLayout(layout1);
-                    layout1->addWidget(frame);
-                    QMargins m = layout1->contentsMargins();
-                    m.setLeft(0);
-                    m.setRight(0);
-                    layout1->setContentsMargins(m);
-                    frame->setLayout(layout2);
-                    layout2->addWidget(w);
-                    layout2->setMargin(0);
-
-                    // Add to main form
-                    this->addDockWidget(Qt::RightDockWidgetArea, dock);
-                }
-            }
-
-            // Settings widget
-            sv = se->evaluate("createSettingsWidget()");
-            if (sv.isError()) {
-                qDebug() << sv.toString();
-                qDebug() << se->uncaughtExceptionBacktrace();
-            } else {
-                QWidget *w = qobject_cast<QWidget*>(sv.toQObject());
-                if (w) {
-                    // Create groupbox
-                    QGroupBox *box = new QGroupBox(m_settings);
-                    QVBoxLayout *layout1 = new QVBoxLayout(box);
-                    box->setObjectName("grpSettings" + name);
-                    box->setTitle(tr(title.toLatin1()));
-                    box->setLayout(layout1);
-                    layout1->addWidget(w);
-
-                    // Add to settings form
-                    m_settings->addCustomSettings(box);
-                }
-            }
-
-            f.close();
-        }
     }
 }
 
@@ -2996,23 +2771,6 @@ void frmMain::writeConsole(QString command)
 //         command = m_currentModel->data(m_currentModel->index(m_streamer->commandIndex(), 1)).toString();
 //     }
 // }
-
-QString frmMain::evaluateCommand(QString command)
-{
-    // Evaluate script  
-    static QRegularExpression rx("\\{(?:(?>[^\\{\\}])|(?0))*\\}");
-    QRegularExpressionMatch m; 
-    QScriptValue v;
-    QString vs;
-   
-    while ((m = rx.match(command)).hasMatch()) {
-        v = m_scriptEngine.evaluate(m.captured(0));
-        vs = v.isUndefined() ? "" : v.isNumber() ? QString::number(v.toNumber(), 'f', 4) : v.toString();
-        command.replace(m.captured(0), vs);
-    }
-    
-    return command;
-}
 
 void frmMain::updateParser()
 {
@@ -4228,9 +3986,4 @@ bool frmMain::actionLessThan(const QAction *a1, const QAction *a2)
 bool frmMain::actionTextLessThan(const QAction *a1, const QAction *a2)
 {
     return a1->text() < a2->text();
-}
-
-QScriptValue frmMain::importExtension(QScriptContext *context, QScriptEngine *engine)
-{
-    return engine->importExtension(context->argument(0).toString());
 }

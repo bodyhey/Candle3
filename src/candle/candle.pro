@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       = core gui opengl serialport script uitools
+QT       = core gui opengl serialport uitools
 equals(QT_MAJOR_VERSION, 5): QT += widgets network
 
 win32: {
@@ -85,7 +85,6 @@ SOURCES += main.cpp\
     parser/gcodeviewparse.cpp \
     parser/linesegment.cpp \
     parser/pointsegment.cpp \
-    scripting/scripting.cpp \
     streamer.cpp \
     tables/gcodetablemodel.cpp \
     tables/heightmaptablemodel.cpp \
@@ -94,7 +93,6 @@ SOURCES += main.cpp\
     widgets/glwidget.cpp \
     drawers/selectiondrawer.cpp \
     scripting/scriptvars.cpp \
-    scripting/scriptfunctions.cpp \
     widgets/dropwidget.cpp
 
 HEADERS  += frmmain.h \
@@ -141,7 +139,6 @@ HEADERS  += frmmain.h \
     parser/gcodeviewparse.h \
     parser/linesegment.h \
     parser/pointsegment.h \
-    scripting/scripting.h \
     streamer.h \
     tables/gcodetablemodel.h \
     tables/heightmaptablemodel.h \
@@ -152,7 +149,6 @@ HEADERS  += frmmain.h \
     widgets/glwidget.h \
     drawers/selectiondrawer.h \
     scripting/scriptvars.h \
-    scripting/scriptfunctions.h \
     widgets/dropwidget.h
 
 FORMS    += frmmain.ui \
