@@ -17,7 +17,7 @@ void Communicator::onConnectionLineReceived(QString data)
         if (!m_communicator->dataIsReset(data)) return;
         m_communicator->m_reseting = false;
         m_communicator->stopUpdatingState();
-        m_communicator->startUpdatingState(m_settings->queryStateTime());
+        m_communicator->startUpdatingState(m_configuration->connectionModule().queryStateInterval());
     }
 
     if (data.isEmpty()) {
@@ -496,7 +496,7 @@ void Communicator::processCommandResponse(QString data)
 
     // Change state query time on check mode on
     if (uncomment.contains(QRegExp("$[cC]"))) {
-        m_communicator->m_timerStateQuery.setInterval(response.contains("Enable") ? 1000 : m_settings->queryStateTime());
+        m_communicator->m_timerStateQuery.setInterval(response.contains("Enable") ? 1000 : m_configuration->connectionModule().queryStateInterval());
     }
 
     // emit signal, was `Add response to console`

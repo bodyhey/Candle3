@@ -27,8 +27,7 @@ class Communicator : public QObject
         Communicator(
             QObject *parent,
             Connection *connection,
-            Configuration *configuration,
-            frmSettings *frmSettings
+            Configuration *configuration
         );
         SendCommandResult sendCommand(CommandSource source, QString command, int tableIndex = -1, bool wait = false);
         void sendRealtimeCommand(QString command);

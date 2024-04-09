@@ -10,11 +10,9 @@
 Communicator::Communicator(
     QObject *parent,
     Connection *connection,
-    Configuration *configuration,
-    frmSettings *frmSettings
+    Configuration *configuration
 ) : QObject(parent),
     m_connection(connection),
-    m_settings(frmSettings),
     m_configuration(configuration),
     m_timerStateQuery(this),
     m_deviceStatesDictionary({
@@ -36,7 +34,6 @@ Communicator::Communicator(
     })
 {
     assert(m_connection != nullptr);
-    assert(m_settings != nullptr);
 
     m_reseting = false;
     m_resetCompleted = true;
@@ -247,6 +244,7 @@ void Communicator::abort()
 void Communicator::replaceConnection(Connection *newConnection)
 {
     if (m_connection == newConnection) return;
+
     disconnect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
     m_connection->disconnect();
     m_connection = newConnection;

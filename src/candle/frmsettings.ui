@@ -84,7 +84,7 @@ QSplitter::handle:horizontal {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-2079</y>
+         <y>0</y>
          <width>642</width>
          <height>2627</height>
         </rect>
@@ -156,7 +156,7 @@ QSplitter::handle:horizontal {
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QSpinBox" name="txtQueryStateTime">
+                 <widget class="QSpinBox" name="txtQueryStateInterval">
                   <property name="font">
                    <font>
                     <pointsize>9</pointsize>
@@ -210,7 +210,7 @@ QSplitter::handle:horizontal {
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit">
+               <widget class="QLineEdit" name="txtRawTcpHost">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>3</horstretch>
@@ -220,7 +220,7 @@ QSplitter::handle:horizontal {
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_2">
+               <widget class="QLineEdit" name="txtRawTcpPort">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>1</horstretch>
@@ -270,7 +270,7 @@ QSplitter::handle:horizontal {
                  </widget>
                 </item>
                 <item row="0" column="4">
-                 <widget class="QComboBox" name="cboBaud">
+                 <widget class="QComboBox" name="cboSerialBaud">
                   <property name="editable">
                    <bool>true</bool>
                   </property>
@@ -312,14 +312,14 @@ QSplitter::handle:horizontal {
                 <item row="0" column="1">
                  <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0">
                   <item>
-                   <widget class="QComboBox" name="cboPort">
+                   <widget class="QComboBox" name="cboSerialPort">
                     <property name="editable">
                      <bool>true</bool>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QToolButton" name="cmdRefresh">
+                   <widget class="QToolButton" name="cmdSerialRefresh">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
                       <horstretch>0</horstretch>

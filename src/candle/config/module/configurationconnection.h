@@ -12,6 +12,8 @@
 
 class ConfigurationConnection : public ConfigurationModule
 {
+    friend class frmSettings;
+
     Q_OBJECT
     Q_PROPERTY(QString serialPort MEMBER m_serialPort NOTIFY changed)
     Q_PROPERTY(QString rawTcpHost MEMBER m_rawTcpHost NOTIFY changed)
@@ -26,6 +28,13 @@ class ConfigurationConnection : public ConfigurationModule
         QVariant customGet(QString) override;
         void customSet(QString, QVariant) override;
         QString getName() override { return "connection"; }
+
+        ConnectionMode connectionMode() const { return m_connectionMode; }
+        int queryStateInterval() const { return m_queryStateInterval; }
+        QString serialPort() const { return m_serialPort; }
+        int serialBaud() const { return m_serialBaud; }
+        QString rawTcpHost() const { return m_rawTcpHost; }
+        int rawTcpPort() const { return m_rawTcpPort; }
 
     private:       
         // General

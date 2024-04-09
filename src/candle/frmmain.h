@@ -21,6 +21,7 @@
 
 #include "connection/connection.h"
 #include "communicator.h"
+#include "connection/connectionmanager.h"
 #include "drawers/tablesurfacedrawer.h"
 #include "streamer.h"
 #include "globals.h"
@@ -105,7 +106,7 @@ signals:
     void settingsAboutToShow();
     void settingsAccepted();
     void settingsRejected();
-    void settingsSetByDefault();
+    void settingsSetToDefault();
     void pluginsLoaded();
 
 private slots:
@@ -297,6 +298,7 @@ private:
     HeightMapTableModel m_heightMapModel;
 
     // @TODO to be moved to separate core class
+    ConnectionManager m_connectionManager;
     Connection *m_connection;
     Communicator *m_communicator;
     Streamer *m_streamer;

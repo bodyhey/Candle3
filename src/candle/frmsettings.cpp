@@ -87,14 +87,14 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
 
     ui->listCategories->item(0)->setSelected(true);
     connect(ui->scrollSettings->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(onScrollBarValueChanged(int)));
-    connect(this, SIGNAL(settingsSetByDefault()), parent, SIGNAL(settingsSetByDefault()));
+    connect(this, SIGNAL(settingsSetToDefault()), parent, SIGNAL(settingsSetToDefault()));
 
     // Shortcuts table
     ui->tblShortcuts->setItemDelegateForColumn(2, new ShortcutDelegate);
     ui->tblShortcuts->setTabKeyNavigation(false);
     ui->tblShortcuts->setEditTriggers(QAbstractItemView::AllEditTriggers);
 
-    searchPorts();
+    searchForSerialPorts();
 
     // Languages
     QDir d(qApp->applicationDirPath() + "/translations");
@@ -120,6 +120,40 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
 frmSettings::~frmSettings()
 {
     delete ui;
+}
+
+void frmSettings::initializeWidgets()
+{
+    const ConfigurationConsole &console = m_configuration.consoleModule();
+    ui->chkConsoleAutocompletion->setChecked(console.commandAutoCompletion());
+    ui->chkConsoleDarkMode->setChecked(console.darkBackgroundMode());
+    ui->chkConsoleShowProgramCommands->setChecked(console.showProgramCommands());
+    ui->chkConsoleShowUICommands->setChecked(console.showUiCommands());
+
+    const ConfigurationConnection &connection = m_configuration.connectionModule();
+    ui->cboConnectionMode->setCurrentIndex(connection.connectionMode());
+    ui->txtQueryStateInterval->setValue(connection.queryStateInterval());
+    ui->cboSerialPort->setCurrentText(connection.serialPort());
+    ui->cboSerialBaud->setCurrentText(QString::number(connection.serialBaud()));
+    ui->txtRawTcpHost->setText(connection.rawTcpHost());
+    ui->txtRawTcpPort->setText(QString::number(connection.rawTcpPort()));
+}
+
+void frmSettings::applySettings()
+{
+    ConfigurationConsole &console = m_configuration.consoleModule();
+    console.m_commandAutoCompletion = ui->chkConsoleAutocompletion->isChecked();
+    console.m_darkBackgroundMode = ui->chkConsoleDarkMode->isChecked();
+    console.m_showProgramCommands = ui->chkConsoleShowProgramCommands->isChecked();
+    console.m_showUiCommands = ui->chkConsoleShowUICommands->isChecked();
+
+    ConfigurationConnection &connection = m_configuration.connectionModule();
+    connection.m_connectionMode = static_cast<ConnectionMode>(ui->cboConnectionMode->currentIndex());
+    connection.m_queryStateInterval = ui->txtQueryStateInterval->value();
+    connection.m_serialPort = ui->cboSerialPort->currentText();
+    connection.m_serialBaud = ui->cboSerialBaud->currentText().toInt();
+    connection.m_rawTcpHost = ui->txtRawTcpHost->text();
+    connection.m_rawTcpPort = ui->txtRawTcpPort->text().toInt();
 }
 
 int frmSettings::exec()
@@ -150,11 +184,7 @@ int frmSettings::exec()
     foreach (QPlainTextEdit* o, this->findChildren<QPlainTextEdit*>())
         m_storedPlainTexts.append(o->toPlainText());
 
-    const ConfigurationConsole &console = m_configuration.consoleModule();
-    ui->chkConsoleAutocompletion->setChecked(console.commandAutoCompletion());
-    ui->chkConsoleDarkMode->setChecked(console.darkBackgroundMode());
-    ui->chkConsoleShowProgramCommands->setChecked(console.showProgramCommands());
-    ui->chkConsoleShowUICommands->setChecked(console.showUiCommands());
+    initializeWidgets();
 
     return QDialog::exec();
 }
@@ -188,16 +218,6 @@ void frmSettings::addCustomSettings(QGroupBox *box)
     ui->listCategories->item(ui->listCategories->count() - 1)->setData(Qt::UserRole, box->objectName());
 
     m_customSettings.append(box);
-}
-
-ConnectionMode frmSettings::connectionMode()
-{
-    return static_cast<ConnectionMode>(ui->cboConnectionMode->currentIndex());
-}
-
-void frmSettings::setConnectionMode(ConnectionMode mode)
-{
-    ui->cboConnectionMode->setCurrentIndex(mode);
 }
 
 void frmSettings::on_listCategories_currentRowChanged(int currentRow)
@@ -257,26 +277,6 @@ void frmSettings::onScrollBarValueChanged(int value)
             }
         }
     }
-}
-
-QString frmSettings::port()
-{
-    return ui->cboPort->currentText();
-}
-
-void frmSettings::setPort(QString port)
-{
-    ui->cboPort->setCurrentText(port);
-}
-
-int frmSettings::baud()
-{
-    return ui->cboBaud->currentText().toInt();
-}
-
-void frmSettings::setBaud(int baud)
-{
-    ui->cboBaud->setCurrentText(QString::number(baud));
 }
 
 double frmSettings::toolDiameter()
@@ -456,16 +456,6 @@ int frmSettings::acceleration()
 void frmSettings::setAcceleration(int acceleration)
 {
     m_acceleration = acceleration;
-}
-
-int frmSettings::queryStateTime()
-{
-    return ui->txtQueryStateTime->value();
-}
-
-void frmSettings::setQueryStateTime(int queryStateTime)
-{
-    ui->txtQueryStateTime->setValue(queryStateTime);
 }
 
 int frmSettings::toolType()
@@ -817,27 +807,23 @@ void frmSettings::showEvent(QShowEvent *se)
     Q_UNUSED(se)
 }
 
-void frmSettings::searchPorts()
+void frmSettings::searchForSerialPorts()
 {
-    ui->cboPort->clear();
+    ui->cboSerialPort->clear();
 
     foreach (QSerialPortInfo info ,QSerialPortInfo::availablePorts()) {
-        ui->cboPort->insertItem(0, info.portName());
+        ui->cboSerialPort->insertItem(0, info.portName());
     }
 }
 
-void frmSettings::on_cmdRefresh_clicked()
+void frmSettings::on_cmdSerialRefresh_clicked()
 {
-    searchPorts();
+    searchForSerialPorts();
 }
 
 void frmSettings::on_cmdOK_clicked()
 {
-    ConfigurationConsole &console = m_configuration.consoleModule();
-    console.m_commandAutoCompletion = ui->chkConsoleAutocompletion->isChecked();
-    console.m_darkBackgroundMode = ui->chkConsoleDarkMode->isChecked();
-    console.m_showProgramCommands = ui->chkConsoleShowProgramCommands->isChecked();
-    console.m_showUiCommands = ui->chkConsoleShowUICommands->isChecked();
+    applySettings();
 
     this->accept();
 }
@@ -853,17 +839,21 @@ void frmSettings::on_cboToolType_currentIndexChanged(int index)
     ui->txtToolAngle->setEnabled(index == 1);
 }
 
+void frmSettings::resetToDefaults()
+{
+    m_configuration.setDefaults();
+    initializeWidgets();
+}
+
 void frmSettings::on_cmdDefaults_clicked()
 {
     if (QMessageBox::warning(this, qApp->applicationDisplayName(), tr("Reset settings to default values?"),
                              QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel) != QMessageBox::Yes) return;
 
-    setPort("");
-    setBaud(115200);
+    resetToDefaults();
 
     setIgnoreErrors(false);
 
-    setQueryStateTime(40);
     setRapidSpeed(2000);
     setAcceleration(100);
     setSpindleSpeedMin(0);
@@ -949,7 +939,7 @@ void frmSettings::on_cmdDefaults_clicked()
     ui->chkToolChangeUseCommandsConfirm->setChecked(false);
     setLanguage("en");
 
-    emit settingsSetByDefault();
+    emit settingsSetToDefault();
 }
 
 void frmSettings::on_cboFontSize_currentTextChanged(const QString &arg1)

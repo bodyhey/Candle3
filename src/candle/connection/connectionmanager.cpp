@@ -5,7 +5,9 @@
 #include "connectionmanager.h"
 #include "../globals.h"
 
-ConnectionManager::ConnectionManager(QObject *parent) : QObject(parent)
+ConnectionManager::ConnectionManager(QObject *parent, const ConfigurationConnection &configurationConnection)
+    : QObject(parent)
+    , m_configurationConnection(configurationConnection)
 {
 }
 
@@ -26,8 +28,8 @@ Connection *ConnectionManager::getConnection()
 Connection *ConnectionManager::initializeSerialConnection()
 {
     SerialConnection* serialConnection = new SerialConnection(this);
-    serialConnection->setPortName("COM3");
-    serialConnection->setBaudRate(115200);
+    serialConnection->setPortName(m_configurationConnection.serialPort());
+    serialConnection->setBaudRate(m_configurationConnection.serialBaud());
 
     return serialConnection;
 }
@@ -42,8 +44,8 @@ Connection *ConnectionManager::initializeVirtualConnection()
 Connection *ConnectionManager::initializeRawTcpConnection()
 {
     RawTcpConnection* rawTcpConnection = new RawTcpConnection(this);
-    rawTcpConnection->setHost("");
-    rawTcpConnection->setPort(0);
+    rawTcpConnection->setHost(m_configurationConnection.rawTcpHost());
+    rawTcpConnection->setPort(m_configurationConnection.rawTcpPort());
 
     return rawTcpConnection;
 }

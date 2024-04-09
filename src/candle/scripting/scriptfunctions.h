@@ -52,7 +52,7 @@ signals:
     void settingsAboutToShow();
     void settingsAccepted();
     void settingsRejected();
-    void settingsSetByDefault();
+    void settingsSetToDefault();
     void pluginsLoaded();
 
 private:

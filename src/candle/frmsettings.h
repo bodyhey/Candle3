@@ -22,9 +22,6 @@ class frmSettings;
 class frmSettings : public QDialog
 {
     Q_OBJECT
-    Q_PROPERTY(QString port READ port WRITE setPort)
-    Q_PROPERTY(ConnectionMode connectionMode READ connectionMode WRITE setConnectionMode)
-    Q_PROPERTY(int baud READ baud WRITE setBaud)
     Q_PROPERTY(double toolDiameter READ toolDiameter WRITE setToolDiameter)
     Q_PROPERTY(double toolLength READ toolLength WRITE setToolLength)
     Q_PROPERTY(bool antialiasing READ antialiasing WRITE setAntialiasing)
@@ -33,19 +30,15 @@ class frmSettings : public QDialog
     Q_PROPERTY(double arcLength READ arcLength WRITE setArcLength)
     Q_PROPERTY(double arcDegree READ arcDegree WRITE setArcDegree)
     Q_PROPERTY(bool arcDegreeMode READ arcDegreeMode WRITE setArcDegreeMode)
-    // Q_PROPERTY(bool showProgramCommands READ showProgramCommands WRITE setShowProgramCommands)
-    // Q_PROPERTY(bool showUICommands READ showUICommands WRITE setShowUICommands)
     Q_PROPERTY(int spindleSpeedMin READ spindleSpeedMin WRITE setSpindleSpeedMin)
     Q_PROPERTY(int spindleSpeedMax READ spindleSpeedMax WRITE setSpindleSpeedMax)
     Q_PROPERTY(int laserPowerMin READ laserPowerMin WRITE setLaserPowerMin)
     Q_PROPERTY(int laserPowerMax READ laserPowerMax WRITE setLaserPowerMax)
-    Q_PROPERTY(int queryStateTime READ queryStateTime WRITE setQueryStateTime)
     Q_PROPERTY(int toolType READ toolType WRITE setToolType)
     Q_PROPERTY(double toolAngle READ toolAngle WRITE setToolAngle)
     Q_PROPERTY(int fps READ fps WRITE setFps)
     Q_PROPERTY(bool vsync READ vsync WRITE setVsync)
     Q_PROPERTY(bool msaa READ msaa WRITE setMsaa)
-    // Q_PROPERTY(bool autoCompletion READ autoCompletion WRITE setAutoCompletion)
     Q_PROPERTY(bool simplify READ simplify WRITE setSimplify)
     Q_PROPERTY(double simplifyPrecision READ simplifyPrecision WRITE setSimplifyPrecision)
     Q_PROPERTY(int fontSize READ fontSize WRITE setFontSize)
@@ -84,12 +77,6 @@ public:
 
     void addCustomSettings(QGroupBox *box);
 
-    ConnectionMode connectionMode();
-    void setConnectionMode(ConnectionMode mode);
-    QString port();
-    void setPort(QString port);
-    int baud();
-    void setBaud(int baud);
     double toolDiameter();
     void setToolDiameter(double diameter);
     double toolLength();
@@ -195,14 +182,14 @@ public:
     QString beforePauseCommands();
     QString afterPauseCommands();
 signals:
-    void settingsSetByDefault();
+    void settingsSetToDefault();
 
 protected:
     void showEvent(QShowEvent *se);
 
 private slots:
     void onScrollBarValueChanged(int value);
-    void on_cmdRefresh_clicked();
+    void on_cmdSerialRefresh_clicked();
     void on_cmdOK_clicked();
     void on_cmdCancel_clicked();
     void on_cboToolType_currentIndexChanged(int index);
@@ -224,7 +211,7 @@ private:
     void setShowProgramCommands(bool showProgramCommands);
     void setShowUICommands(bool showUICommands);
 
-    void searchPorts();
+    void searchForSerialPorts();
 
     QList<double> m_storedValues;
     QList<bool> m_storedChecks;
@@ -245,6 +232,9 @@ private:
     QVector3D m_machineBounds;
     bool m_homingEnabled;
     bool m_softLimitsEnabled;
+    void initializeWidgets();
+    void resetToDefaults();
+    void applySettings();
 };
 
 #endif // FRMSETTINGS_H

@@ -145,17 +145,17 @@ void Configuration::loadModule(ConfigurationModule& module)
     }
 }
 
-const ConfigurationConnection& Configuration::connectionModule()
+ConfigurationConnection& Configuration::connectionModule()
 {
     return m_connection;
 }
 
-const ConfigurationVisualizer& Configuration::visualizerModule()
+ConfigurationVisualizer& Configuration::visualizerModule()
 {
     return m_visualizer;
 }
 
-const ConfigurationSender& Configuration::senderModule()
+ConfigurationSender& Configuration::senderModule()
 {
     return m_sender;
 }

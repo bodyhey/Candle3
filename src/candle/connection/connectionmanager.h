@@ -6,6 +6,7 @@
 #define CONNECTIONMANAGER_H
 
 #include <QObject>
+#include "config/module/configurationconnection.h"
 #include "connection.h"
 
 class ConnectionManager : public QObject
@@ -13,7 +14,7 @@ class ConnectionManager : public QObject
     Q_OBJECT
 
     public:
-        ConnectionManager(QObject *parent = nullptr);
+        ConnectionManager(QObject *parent, const ConfigurationConnection &configurationConnection);
         //~ConnectionManager();
 
         Connection* getConnection();
@@ -22,6 +23,7 @@ class ConnectionManager : public QObject
         Connection* initializeSerialConnection();
         Connection* initializeVirtualConnection();
         Connection* initializeRawTcpConnection();
+        const ConfigurationConnection& m_configurationConnection;
 };
 
 #endif // CONNECTIONMANAGER_H

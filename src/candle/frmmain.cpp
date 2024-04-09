@@ -31,6 +31,7 @@
 frmMain::frmMain(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::frmMain ),
+    m_connectionManager(this, m_configuration.connectionModule()),
     m_configuration(this),
     m_scripting(&m_configuration)
 {
@@ -296,7 +297,7 @@ frmMain::frmMain(QWidget *parent) :
     connect(this, &frmMain::settingsAboutToShow, &m_scriptFunctions, &ScriptFunctions::settingsAboutToShow);
     connect(this, &frmMain::settingsAccepted, &m_scriptFunctions, &ScriptFunctions::settingsAccepted);
     connect(this, &frmMain::settingsRejected, &m_scriptFunctions, &ScriptFunctions::settingsRejected);
-    connect(this, &frmMain::settingsSetByDefault, &m_scriptFunctions, &ScriptFunctions::settingsSetByDefault);
+    connect(this, &frmMain::settingsSetToDefault, &m_scriptFunctions, &ScriptFunctions::settingsSetToDefault);
     connect(this, &frmMain::pluginsLoaded, &m_scriptFunctions, &ScriptFunctions::pluginsLoaded);
 
     // Loading settings
@@ -327,13 +328,13 @@ frmMain::frmMain(QWidget *parent) :
     // m_serialPort.setFlowControl(QSerialPort::NoFlowControl);
     // m_serialPort.setStopBits(QSerialPort::OneStop);
 
-    if (m_settings->port() != "") {
-        SerialConnection *connection = qobject_cast<SerialConnection*>(m_connection);
-        if (connection != nullptr) {
-            connection->setPortName(m_settings->port());
-            connection->setBaudRate(m_settings->baud());
-        }
-    }
+    // if (m_settings->port() != "") {
+    //     SerialConnection *connection = qobject_cast<SerialConnection*>(m_connection);
+    //     if (connection != nullptr) {
+    //         connection->setPortName(m_settings->port());
+    //         connection->setBaudRate(m_settings->baud());
+    //     }
+    // }
 
     // Enable form actions
     QList<QAction*> noActions;
@@ -380,8 +381,7 @@ void frmMain::initializeCommunicator()
     m_communicator = new Communicator(
         this,
         m_connection,
-        &m_configuration,
-        m_settings
+        &m_configuration
     );
     m_streamer = new Streamer();
     // @TODO temporary!
@@ -2195,10 +2195,10 @@ void frmMain::loadSettings()
 
     emit settingsAboutToLoad();
 
-    m_settings->setConnectionMode(static_cast<ConnectionMode>(set.value("connectionMode").toInt()));
+    // m_settings->setConnectionMode(static_cast<ConnectionMode>(set.value("connectionMode").toInt()));
     m_settings->setFontSize(set.value("fontSize", 8).toInt());
-    m_settings->setPort(set.value("serialPort").toString());
-    m_settings->setBaud(set.value("serialBaud").toInt());
+    // m_settings->setPort(set.value("serialPort").toString());
+    // m_settings->setBaud(set.value("serialBaud").toInt());
     m_settings->setIgnoreErrors(set.value("ignoreErrors", false).toBool());
     m_settings->setAutoLine(set.value("autoLine", true).toBool());
     m_settings->setToolDiameter(set.value("toolDiameter", 3).toDouble());
@@ -2230,7 +2230,6 @@ void frmMain::loadSettings()
     m_settings->setToolAngle(set.value("toolAngle", 0).toDouble());
     m_settings->setToolType(set.value("toolType", 0).toInt());
     m_settings->setFps(set.value("fps", 60).toInt());
-    m_settings->setQueryStateTime(set.value("queryStateTime", 250).toInt());
     m_settings->setUseStartCommands(set.value("useStartCommands").toBool());
     m_settings->setStartCommands(set.value("startCommands").toString());
     m_settings->setUseEndCommands(set.value("useEndCommands").toBool());
@@ -2426,9 +2425,9 @@ void frmMain::saveSettings()
 
     emit settingsAboutToSave();
 
-    set.setValue("connectionMode", m_settings->connectionMode());
-    set.setValue("serialPort", m_settings->port());
-    set.setValue("serialBaud", m_settings->baud());
+    // set.setValue("connectionMode", m_settings->connectionMode());
+    // set.setValue("serialPort", m_settings->port());
+    // set.setValue("serialBaud", m_settings->baud());
     set.setValue("ignoreErrors", m_settings->ignoreErrors());
     set.setValue("autoLine", m_settings->autoLine());
     set.setValue("toolDiameter", m_settings->toolDiameter());
@@ -2460,7 +2459,6 @@ void frmMain::saveSettings()
     set.setValue("toolAngle", m_settings->toolAngle());
     set.setValue("toolType", m_settings->toolType());
     set.setValue("fps", m_settings->fps());
-    set.setValue("queryStateTime", m_settings->queryStateTime());
     set.setValue("autoScroll", ui->chkAutoScroll->isChecked());
     set.setValue("header", ui->tblProgram->horizontalHeader()->saveState());
     set.setValue("settingsSplitMain", m_settings->ui->splitMain->saveState());
@@ -2617,8 +2615,10 @@ void frmMain::applySettings() {
     m_heightMapGridDrawer.setLineWidth(0.1);
     m_heightMapInterpolationDrawer.setLineWidth(m_settings->lineWidth());
     ui->glwVisualizer->setLineWidth(m_settings->lineWidth());
+
+    // @TODO watch for changes is communicator?
     m_communicator->stopUpdatingState();
-    m_communicator->startUpdatingState(m_settings->queryStateTime());
+    m_communicator->startUpdatingState(m_configuration.connectionModule().queryStateInterval());
 
     m_toolDrawer.setToolAngle(m_settings->toolType() == 0 ? 180 : m_settings->toolAngle());
     m_toolDrawer.setColor(m_settings->colors("Tool"));
@@ -2699,8 +2699,8 @@ void frmMain::applySettings() {
     // ui->cmdClearConsole->setFixedSize(s);
     // ui->cmdCommandSend->setFixedSize(s);
 
-    if (m_connection->getSupportedMode() != m_settings->connectionMode()) {
-        initializeConnection(m_settings->connectionMode());
+    if (m_connection->getSupportedMode() != m_configuration.connectionModule().connectionMode()) {
+        initializeConnection(m_configuration.connectionModule().connectionMode());
         m_communicator->replaceConnection(m_connection);
     }
 }
@@ -3632,7 +3632,7 @@ void frmMain::updateOverride(SliderBox *slider, int value, char command)
     slider->setCurrentValue(value);
 
     int target = slider->isChecked() ? slider->value() : 100;
-    bool smallStep = abs(target - slider->currentValue()) < 10 || m_settings->queryStateTime() < 100;
+    bool smallStep = abs(target - slider->currentValue()) < 10 || m_configuration.connectionModule().queryStateInterval() < 100;
 
     if (slider->currentValue() < target) {
         m_connection->sendByteArray(QByteArray(1, char(smallStep ? command + 2 : command)));

@@ -25,9 +25,9 @@ class Configuration : public QObject
         void save();
         void load();
         void setDefaults();
-        const ConfigurationConnection& connectionModule();
-        const ConfigurationVisualizer& visualizerModule();
-        const ConfigurationSender& senderModule();
+        ConfigurationConnection& connectionModule();
+        ConfigurationVisualizer& visualizerModule();
+        ConfigurationSender& senderModule();
         ConfigurationConsole& consoleModule();
     private:
         QString m_language;
