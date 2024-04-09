@@ -41,8 +41,6 @@ QMAKE_CXXFLAGS += -std=c++14
 # don't create both debug and release folders
 CONFIG -= debug_and_release
 
-SUBDIRS += vendor/PropertyEditor
-
 SOURCES += main.cpp\
     communicator.cpp \
     config/configuration.cpp \

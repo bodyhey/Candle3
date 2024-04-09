@@ -29,9 +29,9 @@
 
 frmMain::frmMain(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::frmMain ),
+    ui(new Ui::frmMain),
     m_connectionManager(this, m_configuration.connectionModule()),
-    m_configuration(this),
+    m_configuration(this)
 {
     m_configuration.load();
 //    setDefaults();
