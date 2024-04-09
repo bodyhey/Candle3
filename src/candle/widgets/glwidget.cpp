@@ -84,6 +84,13 @@ void GLWidget::addDrawable(ShaderDrawable *drawable)
     m_shaderDrawables.append(drawable);
 }
 
+GLWidget& GLWidget::operator<<(ShaderDrawable *drawable)
+{
+    addDrawable(drawable);
+
+    return *this;
+}
+
 void GLWidget::fitDrawable(ShaderDrawable *drawable)
 {
     stopViewAnimation();

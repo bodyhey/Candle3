@@ -409,16 +409,17 @@ void frmMain::initializeCommunicator()
 
 void frmMain::initializeVisualizer()
 {
-    ui->glwVisualizer->addDrawable(&m_tableSurfaceDrawer);
-    ui->glwVisualizer->addDrawable(m_originDrawer);
-    ui->glwVisualizer->addDrawable(m_codeDrawer);
-    ui->glwVisualizer->addDrawable(m_probeDrawer);
-    ui->glwVisualizer->addDrawable(&m_toolDrawer);
-    ui->glwVisualizer->addDrawable(&m_heightMapBorderDrawer);
-    ui->glwVisualizer->addDrawable(&m_heightMapGridDrawer);
-    ui->glwVisualizer->addDrawable(&m_heightMapInterpolationDrawer);
-    ui->glwVisualizer->addDrawable(&m_selectionDrawer);
-    ui->glwVisualizer->addDrawable(&m_machineBoundsDrawer);
+    *ui->glwVisualizer << &m_tableSurfaceDrawer
+                      << m_originDrawer
+                      << m_codeDrawer
+                      << m_probeDrawer
+                      << &m_toolDrawer
+                      << &m_heightMapBorderDrawer
+                      << &m_heightMapGridDrawer
+                      << &m_heightMapInterpolationDrawer
+                      << &m_selectionDrawer
+                      << &m_machineBoundsDrawer;
+
     ui->glwVisualizer->fitDrawable();
 }
 

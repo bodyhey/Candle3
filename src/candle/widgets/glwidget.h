@@ -24,7 +24,10 @@ class GLWidget : public QGLWidget, protected QOpenGLFunctions
 public:
     explicit GLWidget(QWidget *parent = 0);
     ~GLWidget();
+
     void addDrawable(ShaderDrawable *drawable);
+    GLWidget &operator<<(ShaderDrawable *drawable);
+
     void updateExtremes(ShaderDrawable *drawable);
     void fitDrawable(ShaderDrawable *drawable = NULL);
     bool antialiasing() const;

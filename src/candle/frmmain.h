@@ -253,7 +253,6 @@ protected:
     QMenu *createPopupMenu() override;
 
 private:
-    static const int BUFFERLENGTH = 127;
     static const int PROGRESSMINLINES = 10000;
     static const int PROGRESSSTEP = 1000;    
 

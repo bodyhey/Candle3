@@ -10,7 +10,7 @@ TableSurfaceDrawer::TableSurfaceDrawer() {
 
 bool TableSurfaceDrawer::updateData()
 {
-    #define SIZE 150
+    const float SIZE = 50;
 
     QVector3D color = QVector3D(89 / 255, 94 / 255, 255 / 255);
 
