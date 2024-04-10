@@ -27,7 +27,7 @@ class ConfigurationConnection : public ConfigurationModule
         ConfigurationConnection& operator=(const ConfigurationConnection&) { return *this; }
         QVariant customGet(QString) override;
         void customSet(QString, QVariant) override;
-        QString getName() override { return "connection"; }
+        QString getSectionName() override { return "connection"; }
 
         ConnectionMode connectionMode() const { return m_connectionMode; }
         int queryStateInterval() const { return m_queryStateInterval; }
@@ -38,20 +38,16 @@ class ConfigurationConnection : public ConfigurationModule
 
     private:       
         // General
-
         ConnectionMode m_connectionMode;
         int m_queryStateInterval;
 
         // Serial
-
         QString m_serialPort;
         int m_serialBaud;
 
         // Raw TCP
-
         QString m_rawTcpHost;
         int m_rawTcpPort;
-
 };
 
 #endif // CONFIGURATION_CONNECTION_H

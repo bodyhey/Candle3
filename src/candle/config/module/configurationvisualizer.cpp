@@ -14,12 +14,12 @@ ConfigurationVisualizer::ConfigurationVisualizer(QObject *parent) : Configuratio
     
 }
 
-QVariant ConfigurationVisualizer::customGet(QString)
-{
+// QVariant ConfigurationVisualizer::customGet(QString)
+// {
 
-}
+// }
 
-void ConfigurationVisualizer::customSet(QString, QVariant)
-{
+// void ConfigurationVisualizer::customSet(QString, QVariant)
+// {
 
-}
+// }

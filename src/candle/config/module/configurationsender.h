@@ -10,20 +10,57 @@
 
 class ConfigurationSender : public ConfigurationModule
 {
+    friend class frmSettings;
+
     Q_OBJECT
-    Q_PROPERTY(QString test MEMBER m_test)
-    Q_PROPERTY(int test2 MEMBER m_test2)
+    Q_PROPERTY(bool useProgramStartCommands MEMBER m_useProgramStartCommands NOTIFY changed)
+    Q_PROPERTY(QString programStartCommands MEMBER m_programStartCommands NOTIFY changed)
+    Q_PROPERTY(bool useProgramEndCommands MEMBER m_useProgramEndommands NOTIFY changed)
+    Q_PROPERTY(QString programEndCommands MEMBER m_programEndCommands NOTIFY changed)
+    Q_PROPERTY(bool usePauseCommands MEMBER m_usePauseCommands NOTIFY changed)
+    Q_PROPERTY(QString beforePauseCommands MEMBER m_beforePauseCommands NOTIFY changed)
+    Q_PROPERTY(QString afterPauseCommands MEMBER m_afterPauseCommands NOTIFY changed)
+    Q_PROPERTY(bool useToolChangeCommands MEMBER m_useToolChangeCommands NOTIFY changed)
+    Q_PROPERTY(QString toolChangeCommands MEMBER m_toolChangeCommands NOTIFY changed)
+    Q_PROPERTY(bool confirmToolChangeCommandsExecution MEMBER m_confirmToolChangeCommandsExecution NOTIFY changed)
+    Q_PROPERTY(bool pauseSenderOnM6 MEMBER m_pauseSenderOnM6 NOTIFY changed)
+    Q_PROPERTY(bool ignoreErrorResponses MEMBER m_ignoreErrorResponses NOTIFY changed)
+    Q_PROPERTY(bool setParserStateBeforeSendingFromSelectedLine MEMBER m_setParserStateBeforeSendingFromSelectedLine NOTIFY changed)
 
     public:
         explicit ConfigurationSender(QObject *parent = nullptr);
         ConfigurationSender& operator=(const ConfigurationSender&) { return *this; }
-        QVariant customGet(QString) override;
-        void customSet(QString, QVariant) override;
-        QString getName() override { return "sender"; }
+        QString getSectionName() override { return "sender"; }
+
+        bool useProgramStartCommands() const { return m_useProgramStartCommands; }
+        QString programStartCommands() const { return m_programStartCommands; }
+        bool useProgramEndCommands() const { return m_useProgramEndommands; }
+        QString programEndCommands() const { return m_programEndCommands; }
+        bool usePauseCommands() const { return m_usePauseCommands; }
+        QString beforePauseCommands() const { return m_beforePauseCommands; }
+        QString afterPauseCommands() const { return m_afterPauseCommands; }
+        bool useToolChangeCommands() const { return m_useToolChangeCommands; }
+        QString toolChangeCommands() const { return m_toolChangeCommands; }
+        bool confirmToolChangeCommandsExecution() const { return m_confirmToolChangeCommandsExecution; }
+        bool pauseSenderOnM6() const { return m_pauseSenderOnM6; }
+        bool ignoreErrorResponses() const { return m_ignoreErrorResponses; }
+        bool setParserStateBeforeSendingFromSelectedLine() const { return m_setParserStateBeforeSendingFromSelectedLine; }
 
     private:
-        QString m_test = "ahugu";
-        int m_test2 = 421412111;
+        bool m_useProgramStartCommands;
+        QString m_programStartCommands;
+        bool m_useProgramEndommands;
+        QString m_programEndCommands;
+        bool m_usePauseCommands;
+        QString m_beforePauseCommands;
+        QString m_afterPauseCommands;
+        bool m_useToolChangeCommands;
+        QString m_toolChangeCommands;
+        bool m_confirmToolChangeCommandsExecution;
+        bool m_pauseSenderOnM6;
+        bool m_ignoreErrorResponses;
+        bool m_setParserStateBeforeSendingFromSelectedLine;
+
 };
 
 #endif // CONFIGURATION_SENDER_H

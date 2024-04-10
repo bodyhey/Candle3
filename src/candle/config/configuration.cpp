@@ -9,9 +9,19 @@ Configuration::Configuration(QObject *parent)
     m_connection(parent),
     m_visualizer(parent),
     m_console(parent),
+    m_parser(parent),
+    m_ui(parent),
+    m_machine(parent),
     m_persister(parent),
     m_provider(parent)
 {
+    m_modules << &m_sender
+        << &m_connection
+        << &m_visualizer
+        << &m_console
+        << &m_parser
+        << &m_ui
+        << &m_machine;
 }
 
 QString Configuration::language()
@@ -27,10 +37,9 @@ void Configuration::setLanguage(QString language)
 void Configuration::save()
 {
     m_persister.open();
-    saveModule(m_connection);
-    saveModule(m_visualizer);
-    saveModule(m_sender);
-    saveModule(m_console);
+    for (ConfigurationModule* module : m_modules) {
+        saveModule(module);
+    }
     m_persister.close();
 }
 
@@ -51,9 +60,9 @@ bool Configuration::persistByType(QString module, QString name, QVariant value, 
     return true;
 }
 
-void Configuration::saveModule(ConfigurationModule& module)
+void Configuration::saveModule(ConfigurationModule *module)
 {
-    const QMetaObject *metaObj = module.metaObject();
+    const QMetaObject *metaObj = module->metaObject();
     // qDebug() << "MetaObject: " << metaObj->className();
     // qDebug() << "Property Count: " << metaObj->propertyCount();
     // qDebug() << "Property Offset: " << metaObj->classInfoCount();
@@ -62,9 +71,9 @@ void Configuration::saveModule(ConfigurationModule& module)
 
         if (QString(prop.name()) == "objectName") continue;
 
-        if (!persistByType(module.getName(), prop.name(), prop.read(&module), prop.typeName())) {
-            QVariant value = module.customGet(prop.name());
-            if (!persistByType(module.getName(), prop.name(), value, value.typeName())) {
+        if (!persistByType(module->getSectionName(), prop.name(), prop.read(module), prop.typeName())) {
+            QVariant value = module->customGet(prop.name());
+            if (!persistByType(module->getSectionName(), prop.name(), value, value.typeName())) {
                 // something went wrong
                 // @TODO exception??
             }
@@ -72,11 +81,11 @@ void Configuration::saveModule(ConfigurationModule& module)
     }
 }
 
-void Configuration::setModuleDefaults(ConfigurationModule &module)
+void Configuration::setModuleDefaults(ConfigurationModule *module)
 {
-    QMap<QString, QVariant> defaults = module.getDefaults();
+    QMap<QString, QVariant> defaults = module->getDefaults();
 
-    const QMetaObject *metaObj = module.metaObject();
+    const QMetaObject *metaObj = module->metaObject();
     for (int i = 0; i < metaObj->propertyCount(); ++i) {
         QMetaProperty prop = metaObj->property(i);
 
@@ -84,15 +93,15 @@ void Configuration::setModuleDefaults(ConfigurationModule &module)
 
         QString type(prop.typeName());
         if (type == "QString") {
-            prop.write(&module, defaults[prop.name()].toString());
+            prop.write(module, defaults[prop.name()].toString());
         } else if (type == "int") {
-            prop.write(&module, defaults[prop.name()].toInt());
+            prop.write(module, defaults[prop.name()].toInt());
         } else if (type == "bool") {
-            prop.write(&module, defaults[prop.name()].toBool());
+            prop.write(module, defaults[prop.name()].toBool());
         } else if (type == "float") {
-            prop.write(&module, defaults[prop.name()].toFloat());
+            prop.write(module, defaults[prop.name()].toFloat());
         } else {
-            module.customSet(prop.name(), defaults[prop.name()]);
+            module->customSet(prop.name(), defaults[prop.name()]);
         }
     }
 }
@@ -100,28 +109,26 @@ void Configuration::setModuleDefaults(ConfigurationModule &module)
 void Configuration::load()
 {
     m_provider.open();
-    loadModule(m_connection);
-    loadModule(m_visualizer);
-    loadModule(m_sender);
-    loadModule(m_console);
+    for (ConfigurationModule* module : m_modules) {
+        loadModule(module);
+    }
     m_provider.close();
 }
 
 void Configuration::setDefaults()
 {
-    setModuleDefaults(m_connection);
-    setModuleDefaults(m_visualizer);
-    setModuleDefaults(m_sender);
-    setModuleDefaults(m_console);
+    for (ConfigurationModule* module : m_modules) {
+        setModuleDefaults(module);
+    }
 
     emit defaultConfigurationLoaded();
 }
 
-void Configuration::loadModule(ConfigurationModule& module)
+void Configuration::loadModule(ConfigurationModule *module)
 {
-    QMap<QString, QVariant> defaults = module.getDefaults();
+    QMap<QString, QVariant> defaults = module->getDefaults();
 
-    const QMetaObject *metaObj = module.metaObject();
+    const QMetaObject *metaObj = module->metaObject();
     // qDebug() << "MetaObject: " << metaObj->className();
     // qDebug() << "Property Count: " << metaObj->propertyCount();
     // qDebug() << "Property Offset: " << metaObj->classInfoCount();
@@ -132,36 +139,16 @@ void Configuration::loadModule(ConfigurationModule& module)
 
         QString type(prop.typeName());
         if (type == "QString") {
-            prop.write(&module, m_provider.getString(module.getName(), QString(prop.name()), defaults[prop.name()].toString()));
+            prop.write(module, m_provider.getString(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toString()));
         } else if (type == "int") {
-            prop.write(&module, m_provider.getInt(module.getName(), QString(prop.name()), defaults[prop.name()].toInt()));
+            prop.write(module, m_provider.getInt(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toInt()));
         } else if (type == "bool") {
-            prop.write(&module, m_provider.getBool(module.getName(), QString(prop.name()), defaults[prop.name()].toBool()));
+            prop.write(module, m_provider.getBool(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toBool()));
         } else if (type == "float") {
-            prop.write(&module, m_provider.getFloat(module.getName(), QString(prop.name()), defaults[prop.name()].toFloat()));
+            prop.write(module, m_provider.getFloat(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toFloat()));
         } else {
-            module.customSet(prop.name(), m_provider.get(module.getName(), QString(prop.name()), defaults[prop.name()]));
+            module->customSet(prop.name(), m_provider.get(module->getSectionName(), QString(prop.name()), defaults[prop.name()]));
         }
     }
-}
-
-ConfigurationConnection& Configuration::connectionModule()
-{
-    return m_connection;
-}
-
-ConfigurationVisualizer& Configuration::visualizerModule()
-{
-    return m_visualizer;
-}
-
-ConfigurationSender& Configuration::senderModule()
-{
-    return m_sender;
-}
-
-ConfigurationConsole &Configuration::consoleModule()
-{
-    return m_console;
 }
 

@@ -22,7 +22,7 @@ class ConfigurationConsole : public ConfigurationModule
     public:
         explicit ConfigurationConsole(QObject *parent = nullptr);
         ConfigurationConsole& operator=(const ConfigurationConsole&) { return *this; }
-        QString getName() override { return "console"; }
+        QString getSectionName() override { return "console"; }
 
         bool showProgramCommands() const { return m_showProgramCommands; }
         bool showUiCommands() const { return m_showUiCommands; }

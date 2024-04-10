@@ -46,7 +46,10 @@ SOURCES += main.cpp\
     config/configuration.cpp \
     config/module/configurationconnection.cpp \
     config/module/configurationconsole.cpp \
+    config/module/configurationmachine.cpp \
+    config/module/configurationparser.cpp \
     config/module/configurationsender.cpp \
+    config/module/configurationui.cpp \
     config/module/configurationvisualizer.cpp \
     config/persistence/ini/inipersister.cpp \
     config/persistence/ini/iniprovider.cpp \
@@ -98,7 +101,10 @@ HEADERS  += frmmain.h \
     config/configuration.h \
     config/module/configurationconnection.h \
     config/module/configurationconsole.h \
+    config/module/configurationmachine.h \
+    config/module/configurationparser.h \
     config/module/configurationsender.h \
+    config/module/configurationui.h \
     config/module/configurationvisualizer.h \
     config/module/module.h \
     config/persistence/persister.h \

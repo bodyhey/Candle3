@@ -13,12 +13,3 @@ ConfigurationSender::ConfigurationSender(QObject *parent) : ConfigurationModule(
 {
 }
 
-QVariant ConfigurationSender::customGet(QString)
-{
-
-}
-
-void ConfigurationSender::customSet(QString, QVariant)
-{
-
-}

@@ -18,7 +18,16 @@ class ConfigurationModule : public QObject
         QMap<QString, QVariant> getDefaults() { return m_defaults; }
         virtual QVariant customGet(QString) { return QVariant(); };
         virtual void customSet(QString, QVariant) {};
-        virtual QString getName() = 0;
+        virtual QString getSectionName() = 0;
+
+        struct MinMax {
+            int min;
+            int max;
+        };
+        struct MinMaxFloat {
+            float min;
+            float max;
+        };
 
     private:
         QMap<QString, QVariant> m_defaults;
