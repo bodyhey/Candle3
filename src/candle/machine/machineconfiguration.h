@@ -16,6 +16,8 @@ class MachineConfiguration
         bool homingEnabled() { return m_homingEnabled; }
         int axisCount() { return m_axisCount; }
         Units units() { return m_units; }
+        bool unitsInches() { return m_units == Units::Inches; }
+        bool unitsMM() { return m_units == Units::Millimeters; }
         bool softLimitsEnabled() { return m_softLimitsEnabled; }
         bool hardLimitsEnabled() { return m_hardLimitsEnabled; }
         bool laserMode() { return m_laserMode; }

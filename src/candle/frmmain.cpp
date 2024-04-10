@@ -3795,15 +3795,17 @@ void frmMain::jogStep()
         QVector3D vec = m_jogVector * ui->cboJogStep->currentText().toDouble();
 
         if (vec.length()) {
+            bool unitsInches = m_communicator->machineConfiguration().unitsInches();
             m_communicator->sendCommand(
                 CommandSource::System,
                 QString("$J=%5G91X%1Y%2Z%3F%4")
-                    .arg(vec.x(), 0, 'f', m_settings->units() ? 4 : 3)
-                    .arg(vec.y(), 0, 'f', m_settings->units() ? 4 : 3)
-                    .arg(vec.z(), 0, 'f', m_settings->units() ? 4 : 3)
+                    .arg(vec.x(), 0, 'f', unitsInches ? 4 : 3)
+                    .arg(vec.y(), 0, 'f', unitsInches ? 4 : 3)
+                    .arg(vec.z(), 0, 'f', unitsInches ? 4 : 3)
                     .arg(ui->cboJogFeed->currentText().toDouble())
-                    .arg(m_settings->units() ? "G20" : "G21"),
-                -3);
+                    .arg(unitsInches ? "G20" : "G21"),
+                -3
+            );
         }
     }
 }
@@ -3814,6 +3816,7 @@ void frmMain::jogContinuous()
     static QVector3D v;
 
     if ((ui->cboJogStep->currentText().toDouble() == 0) && !block) {
+        bool unitsInches = m_communicator->machineConfiguration().unitsInches();
 
         if (m_jogVector != v) {
             // Store jog vector before block
@@ -3841,7 +3844,7 @@ void frmMain::jogContinuous()
                               j.z() * b.z() < 0 ? 0 - m.z() : b.z() - m.z());
                 for (int i = 0; i < 3; i++) if ((j[i] && (qAbs(t[i]) < d)) || (j[i] && !d)) d = qAbs(t[i]);
                 // Coords not aligned, add some bounds offset
-                d -= m_settings->units() ? m_communicator->toMetric(0.0005) : 0.005;
+                d -= unitsInches ? m_communicator->toMetric(0.0005) : 0.005;
             } else {
                 for (int i = 0; i < 3; i++) if (j[i] && (qAbs(b[i]) > d)) d = qAbs(b[i]);
             }
@@ -3851,11 +3854,11 @@ void frmMain::jogContinuous()
 
             if (vec.length()) {
                 m_communicator->sendCommand(CommandSource::System, QString("$J=%5G91X%1Y%2Z%3F%4")
-                            .arg(vec.x(), 0, 'f', m_settings->units() ? 4 : 3)
-                            .arg(vec.y(), 0, 'f', m_settings->units() ? 4 : 3)
-                            .arg(vec.z(), 0, 'f', m_settings->units() ? 4 : 3)
+                            .arg(vec.x(), 0, 'f', unitsInches ? 4 : 3)
+                            .arg(vec.y(), 0, 'f', unitsInches ? 4 : 3)
+                            .arg(vec.z(), 0, 'f', unitsInches ? 4 : 3)
                             .arg(ui->cboJogFeed->currentText().toDouble())
-                            .arg(m_settings->units() ? "G20" : "G21")
+                            .arg(unitsInches ? "G20" : "G21")
                             , -2);
             }
             v = j;

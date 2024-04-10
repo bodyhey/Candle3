@@ -448,12 +448,12 @@ bool Communicator::compareCoordinates(double x, double y, double z)
 
 double Communicator::toMetric(double value)
 {
-    return m_settings->units() == 0 ? value : value * 25.4;
+    return m_machineConfiguration->units() == Units::Millimeters ? value : value * 25.4;
 }
 
 double Communicator::toInches(double value)
 {
-    return m_settings->units() == 0 ? value : value / 25.4;
+    return m_machineConfiguration->units() == Units::Inches ? value : value / 25.4;
 }
 
 void Communicator::storeParserState()

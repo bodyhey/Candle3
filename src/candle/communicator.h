@@ -45,6 +45,7 @@ class Communicator : public QObject
         void startUpdatingState(int interval = -1);
         SenderState senderState() const { return m_senderState; }
         DeviceState deviceState() const { return m_deviceState; }
+        MachineConfiguration machineConfiguration() const { return *m_machineConfiguration; }
         void processWorkOffset(QString data);
         void sendStreamerCommandsUntilBufferIsFull();
 
@@ -55,10 +56,10 @@ class Communicator : public QObject
         static const int BUFFERLENGTH = 127;
 
         Connection *m_connection;
-        frmSettings *m_settings;
         Configuration *m_configuration;
         Communicator *m_communicator;
         Streamer *m_streamer = nullptr;
+        MachineConfiguration *m_machineConfiguration = nullptr;
 
         // Queues
         QList<CommandAttributes> m_commands;

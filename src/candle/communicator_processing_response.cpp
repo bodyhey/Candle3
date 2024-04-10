@@ -373,10 +373,10 @@ void Communicator::processCommandResponse(QString data)
             p += gs.matchedLength();
         }
 
-        MachineConfiguration machineConfiguration(rawMachineConfiguration);
+        m_machineConfiguration = new MachineConfiguration(rawMachineConfiguration);
 
         emit m_communicator->configurationReceived(
-            machineConfiguration,
+            *m_machineConfiguration,
             rawMachineConfiguration
         );
 
