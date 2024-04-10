@@ -11,9 +11,13 @@ class TableSurfaceDrawer : public ShaderDrawable
 {
     public:
         TableSurfaceDrawer();
+        void setGridColor(QColor color) { m_gridColor = color; }
 
     protected:
         bool updateData();
+
+    private:
+        QColor m_gridColor;
 };
 
 #endif // TABLESURFACEDRAWER_H

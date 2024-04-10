@@ -29,6 +29,7 @@ const QMap<QString, QVariant> DEFAULTS = {
     {"zMovementColor", QColor("#f3f337")},
     {"startPointColor", QColor("#45ab48")},
     {"endPointColor", QColor("#000000")},
+    {"tableSurfaceGridColor", QColor("#00BFFF")},
     {"toolDiameter", 3.175},
     {"toolLength", 30.0},
     {"toolType", ConfigurationVisualizer::ToolType::Flat},

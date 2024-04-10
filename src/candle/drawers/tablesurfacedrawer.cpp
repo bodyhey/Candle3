@@ -12,7 +12,7 @@ bool TableSurfaceDrawer::updateData()
 {
     const float SIZE = 50;
 
-    QVector3D color = QVector3D(89 / 255, 94 / 255, 255 / 255);
+    QVector3D color = QVector3D(m_gridColor.redF(), m_gridColor.greenF(), m_gridColor.blueF());
 
     m_lines.clear();
 

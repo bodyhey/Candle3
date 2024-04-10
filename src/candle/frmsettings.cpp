@@ -176,6 +176,7 @@ void frmSettings::initializeWidgets()
     ui->clpToolpathZMovementColor->setColor(visualizer.zMovementColor());
     ui->clpToolpathStartColor->setColor(visualizer.startPointColor());
     ui->clpToolpathEndColor->setColor(visualizer.endPointColor());
+    ui->clpVisualizerTableGridColor->setColor(visualizer.tableSurfaceGridColor());
 
     const ConfigurationSender &sender = m_configuration.senderModule();
     ui->chkUseStartCommands->setChecked(sender.useProgramStartCommands());
@@ -238,6 +239,7 @@ void frmSettings::applySettings()
     visualizer.m_zMovementColor = ui->clpToolpathZMovementColor->color();
     visualizer.m_startPointColor = ui->clpToolpathStartColor->color();
     visualizer.m_endPointColor = ui->clpToolpathEndColor->color();
+    visualizer.m_tableSurfaceGridColor = ui->clpVisualizerTableGridColor->color();
 
     ConfigurationSender &sender = m_configuration.senderModule();
     sender.m_useProgramStartCommands = ui->chkUseStartCommands->isChecked();

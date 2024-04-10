@@ -2567,6 +2567,9 @@ void frmMain::applySettings()
 
     m_selectionDrawer.setColor(visualizerConfiguration.hightlightToolpathColor());
 
+    m_tableSurfaceDrawer.setGridColor(visualizerConfiguration.tableSurfaceGridColor());
+    m_tableSurfaceDrawer.update();
+
     // Adapt visualizer buttons colors
     const int LIGHTBOUND = 127;
     const int NORMALSHIFT = 40;

@@ -38,6 +38,7 @@ class ConfigurationVisualizer : public ConfigurationModule
     Q_PROPERTY(QColor zMovementColor MEMBER m_zMovementColor NOTIFY changed);
     Q_PROPERTY(QColor startPointColor MEMBER m_startPointColor NOTIFY changed);
     Q_PROPERTY(QColor endPointColor MEMBER m_endPointColor NOTIFY changed);
+    Q_PROPERTY(QColor tableSurfaceGridColor MEMBER m_tableSurfaceGridColor NOTIFY changed);
     Q_PROPERTY(double toolDiameter MEMBER m_toolDiameter NOTIFY changed);
     Q_PROPERTY(double toolLength MEMBER m_toolLength NOTIFY changed);
     Q_PROPERTY(ToolType toolType MEMBER m_toolType NOTIFY changed);
@@ -85,6 +86,7 @@ class ConfigurationVisualizer : public ConfigurationModule
         QColor zMovementColor() const { return m_zMovementColor; }
         QColor startPointColor() const { return m_startPointColor; }
         QColor endPointColor() const { return m_endPointColor; }
+        QColor tableSurfaceGridColor() const { return m_tableSurfaceGridColor; }
         // tool
         double toolDiameter() const { return m_toolDiameter; }
         double toolLength() const { return m_toolLength; }
@@ -117,6 +119,7 @@ class ConfigurationVisualizer : public ConfigurationModule
         QColor m_zMovementColor;
         QColor m_startPointColor;
         QColor m_endPointColor;
+        QColor m_tableSurfaceGridColor;
         // tool
         double m_toolDiameter;
         double m_toolLength;
