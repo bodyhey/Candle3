@@ -1,5 +1,5 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                         #include "communicator.h"
-#include "parser/gcodeviewparse.h"
+#include "parser/gcodepreprocessorutils.h"
 #include <QMessageBox>
 
 void Communicator::onConnectionLineReceived(QString data)
@@ -47,11 +47,6 @@ void Communicator::onConnectionLineReceived(QString data)
     // Unprocessed responses
     // Handle hardware reset
     processUnhandledResponse(data);
-}
-
-void Communicator::onConnectionError(QString message)
-{
-    qDebug() << "Connection error: " << message;
 }
 
 void Communicator::processFeedSpindleSpeed(QString data)
