@@ -1,10 +1,10 @@
 TEMPLATE = subdirs
- 
-SUBDIRS =   src/designerplugins \
-            src/candle \
-            src/candleplugins \
-            src/vendor/PropertyEditor
+
+SUBDIRS =   src/candle
+            src/designerplugins \
             src/vendor/uCNC \
+            src/vendor/uCNCTestUI \
+            src/vendor/PropertyEditor \
             
 # Make plugins translations
 system(qmake src/candleplugins/candleplugins.pro)
@@ -12,17 +12,11 @@ system(qmake src/candleplugins/candleplugins.pro)
 install_main.path = bin
 install_main.files += $$OUT_PWD/src/candle/GPilot.exe
 
-install_plugins.path = bin/plugins
-install_plugins.files = src/candleplugins/camera src/candleplugins/emergencybutton src/candleplugins/usercommands src/candleplugins/coordinatesystem
-
 install_translations.path = bin/translations
 install_translations.files = src/candle/translations/*
 
 install_license.path = bin
 install_license.files = LICENSE
-
-install_scriptbindings.path = bin/script
-install_scriptbindings.files = src/scriptbindings/plugins/script/*.dll
 
 install_propertyeditor.path = bin
 install_propertyeditor.files = src/vendor/PropertyEditor/PropertyEditor.dll
@@ -38,9 +32,7 @@ INSTALLS += install_propertyeditor install_ucnc
 
 INSTALLS += install_main
 # install_ucnc
-# install_plugins
 # install_translations install_license
-# install_scriptbindings
 
 CONFIG += c++14
 QMAKE_CXXFLAGS += -std=c++14
