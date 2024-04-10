@@ -79,8 +79,8 @@ public:
     // void setToolType(int toolType);
     // double toolAngle();
     // void setToolAngle(double toolAngle);
-    QList<ColorPicker*> colors();
-    QColor colors(QString name);
+//    QList<ColorPicker*> colors();
+//    QColor colors(QString name);
     int fontSize();
     void setFontSize(int fontSize);
     bool ignoreErrors();

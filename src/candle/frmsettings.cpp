@@ -167,6 +167,15 @@ void frmSettings::initializeWidgets()
     ui->txtToolAngle->setValue(visualizer.toolAngle());
     ui->txtToolDiameter->setValue(visualizer.toolDiameter());
     ui->txtToolLength->setValue(visualizer.toolLength());
+    ui->clpToolColor->setColor(visualizer.toolColor());
+    ui->clpVisualizerBackgroundColor->setColor(visualizer.backgroundColor());
+    ui->clpVisualizerTextColor->setColor(visualizer.textColor());
+    ui->clpToolpathNormalColor->setColor(visualizer.normalToolpathColor());
+    ui->clpToolpathDrawnColor->setColor(visualizer.drawnToolpathColor());
+    ui->clpToolpathHighlightColor->setColor(visualizer.hightlightToolpathColor());
+    ui->clpToolpathZMovementColor->setColor(visualizer.zMovementColor());
+    ui->clpToolpathStartColor->setColor(visualizer.startPointColor());
+    ui->clpToolpathEndColor->setColor(visualizer.endPointColor());
 
     const ConfigurationSender &sender = m_configuration.senderModule();
     ui->chkUseStartCommands->setChecked(sender.useProgramStartCommands());
@@ -220,6 +229,15 @@ void frmSettings::applySettings()
     visualizer.m_toolAngle = ui->txtToolAngle->value();
     visualizer.m_toolDiameter = ui->txtToolDiameter->value();
     visualizer.m_toolLength = ui->txtToolLength->value();
+    visualizer.m_toolColor = ui->clpToolColor->color();
+    visualizer.m_backgroundColor = ui->clpVisualizerBackgroundColor->color();
+    visualizer.m_textColor = ui->clpVisualizerTextColor->color();
+    visualizer.m_normalToolpathColor = ui->clpToolpathNormalColor->color();
+    visualizer.m_drawnToolpathColor = ui->clpToolpathDrawnColor->color();
+    visualizer.m_hightlightToolpathColor = ui->clpToolpathHighlightColor->color();
+    visualizer.m_zMovementColor = ui->clpToolpathZMovementColor->color();
+    visualizer.m_startPointColor = ui->clpToolpathStartColor->color();
+    visualizer.m_endPointColor = ui->clpToolpathEndColor->color();
 
     ConfigurationSender &sender = m_configuration.senderModule();
     sender.m_useProgramStartCommands = ui->chkUseStartCommands->isChecked();
@@ -495,16 +513,16 @@ void frmSettings::setAutoCompletion(bool autoCompletion)
     ui->chkConsoleAutocompletion->setChecked(autoCompletion);
 }
 
-QList<ColorPicker *> frmSettings::colors()
-{
-    return ui->grpColors->findChildren<ColorPicker*>();
-}
+// QList<ColorPicker *> frmSettings::colors()
+// {
+//     return ui->grpColors->findChildren<ColorPicker*>();
+// }
 
-QColor frmSettings::colors(QString name)
-{
-    ColorPicker *pick = this->findChildren<ColorPicker*>("clp" + name).at(0);
-    if (pick) return pick->color(); else return QColor();
-}
+// QColor frmSettings::colors(QString name)
+// {
+//     ColorPicker *pick = this->findChildren<ColorPicker*>("clp" + name).at(0);
+//     if (pick) return pick->color(); else return QColor();
+// }
 
 int frmSettings::fontSize()
 {
@@ -672,18 +690,6 @@ void frmSettings::onCmdDefaultsClicked()
 
     setShowProgramCommands(false);
     setAutoCompletion(true);
-
-    ui->clpTool->setColor(QColor(255, 153, 0));
-
-    ui->clpVisualizerBackground->setColor(QColor(255, 255, 255));
-    ui->clpVisualizerText->setColor(QColor(0, 0, 0));
-
-    ui->clpToolpathNormal->setColor(QColor(0, 0, 0));
-    ui->clpToolpathDrawn->setColor(QColor(217, 217, 217));
-    ui->clpToolpathHighlight->setColor(QColor(145, 130, 230));
-    ui->clpToolpathZMovement->setColor(QColor(255, 0, 0));
-    ui->clpToolpathStart->setColor(QColor(255, 0, 0));
-    ui->clpToolpathEnd->setColor(QColor(0, 255, 0));
 
     setFontSize(9);
 

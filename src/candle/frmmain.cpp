@@ -2259,9 +2259,9 @@ void frmMain::loadSettings()
     ui->cboHeightMapInterpolationType->setCurrentIndex(set.value("heightmapInterpolationType", 0).toInt());
     ui->chkHeightMapInterpolationShow->setChecked(set.value("heightmapInterpolationShow", false).toBool());
 
-    foreach (ColorPicker* pick, m_settings->colors()) {
-        pick->setColor(QColor(set.value(pick->objectName().mid(3), "black").toString()));
-    }
+    // foreach (ColorPicker* pick, m_settings->colors()) {
+    //     pick->setColor(QColor(set.value(pick->objectName().mid(3), "black").toString()));
+    // }
 
     updateRecentFilesMenu();
 
@@ -2444,10 +2444,6 @@ void frmMain::saveSettings()
     set.setValue("heightmapInterpolationType", ui->cboHeightMapInterpolationType->currentIndex());
     set.setValue("heightmapInterpolationShow", ui->chkHeightMapInterpolationShow->isChecked());
 
-    foreach (ColorPicker* pick, m_settings->colors()) {
-        set.setValue(pick->objectName().mid(3), pick->color().name());
-    }
-
     QStringList list;
 
     // for (int i = 0; i < ui->cboCommand->count(); i++) list.append(ui->cboCommand->itemText(i));
@@ -2529,7 +2525,7 @@ void frmMain::applySettings()
     m_communicator->startUpdatingState(m_configuration.connectionModule().queryStateInterval());
 
     m_toolDrawer.setToolAngle(visualizerConfiguration.toolType() == ConfigurationVisualizer::ToolType::Conic ? 180 : visualizerConfiguration.toolAngle());
-    m_toolDrawer.setColor(m_settings->colors("Tool"));
+    m_toolDrawer.setColor(visualizerConfiguration.toolColor());
     m_toolDrawer.update();
 
     ui->glwVisualizer->setAntialiasing(visualizerConfiguration.antialiasing());
@@ -2540,8 +2536,8 @@ void frmMain::applySettings()
     ui->glwVisualizer->setFarPlane(visualizerConfiguration.farPlane());
     ui->glwVisualizer->setVsync(visualizerConfiguration.vsync());
     ui->glwVisualizer->setFps(visualizerConfiguration.fpsLock());
-    ui->glwVisualizer->setColorBackground(m_settings->colors("VisualizerBackground"));
-    ui->glwVisualizer->setColorText(m_settings->colors("VisualizerText"));
+    ui->glwVisualizer->setColorBackground(visualizerConfiguration.backgroundColor());
+    ui->glwVisualizer->setColorText(visualizerConfiguration.textColor());
 
     ui->slbSpindle->setRatio((m_settings->spindleSpeedMax() - m_settings->spindleSpeedMin()) / 100);
     ui->slbSpindle->setMinimum(m_settings->spindleSpeedMin());
@@ -2551,13 +2547,13 @@ void frmMain::applySettings()
 
     m_codeDrawer->setSimplify(visualizerConfiguration.simplifyGeometry());
     m_codeDrawer->setSimplifyPrecision(visualizerConfiguration.simplifyGeometryPrecision());
-    m_codeDrawer->setColorNormal(m_settings->colors("ToolpathNormal"));
-    m_codeDrawer->setColorDrawn(m_settings->colors("ToolpathDrawn"));
-    m_codeDrawer->setColorHighlight(m_settings->colors("ToolpathHighlight"));
-    m_codeDrawer->setColorZMovement(m_settings->colors("ToolpathZMovement"));
-    m_codeDrawer->setColorStart(m_settings->colors("ToolpathStart"));
-    m_codeDrawer->setColorEnd(m_settings->colors("ToolpathEnd"));
-    m_codeDrawer->setIgnoreZ(visualizerConfiguration.grayscaleSegments() || !visualizerConfiguration.programDrawMode() != ConfigurationVisualizer::ProgramDrawMode::Vectors);
+    m_codeDrawer->setColorNormal(visualizerConfiguration.normalToolpathColor());
+    m_codeDrawer->setColorDrawn(visualizerConfiguration.drawnToolpathColor());
+    m_codeDrawer->setColorHighlight(visualizerConfiguration.hightlightToolpathColor());
+    m_codeDrawer->setColorZMovement(visualizerConfiguration.zMovementColor());
+    m_codeDrawer->setColorStart(visualizerConfiguration.startPointColor());
+    m_codeDrawer->setColorEnd(visualizerConfiguration.endPointColor());
+    m_codeDrawer->setIgnoreZ(visualizerConfiguration.grayscaleSegments() || visualizerConfiguration.programDrawMode() != ConfigurationVisualizer::ProgramDrawMode::Vectors);
     m_codeDrawer->setGrayscaleSegments(visualizerConfiguration.grayscaleSegments());
     m_codeDrawer->setGrayscaleCode(visualizerConfiguration.grayscaleSegmentsBySCode() ? GcodeDrawer::S : GcodeDrawer::Z);
     m_codeDrawer->setDrawMode(
@@ -2569,14 +2565,14 @@ void frmMain::applySettings()
     m_codeDrawer->setGrayscaleMax(m_settings->laserPowerMax());
     m_codeDrawer->update();    
 
-    m_selectionDrawer.setColor(m_settings->colors("ToolpathHighlight"));
+    m_selectionDrawer.setColor(visualizerConfiguration.hightlightToolpathColor());
 
     // Adapt visualizer buttons colors
     const int LIGHTBOUND = 127;
     const int NORMALSHIFT = 40;
     const int HIGHLIGHTSHIFT = 80;
 
-    QColor base = m_settings->colors("VisualizerBackground");
+    QColor base = visualizerConfiguration.backgroundColor();
     bool light = base.value() > LIGHTBOUND;
     QColor normal, highlight;
 
