@@ -23,7 +23,7 @@ class ConfigurationSender : public ConfigurationModule
     Q_PROPERTY(bool useToolChangeCommands MEMBER m_useToolChangeCommands NOTIFY changed)
     Q_PROPERTY(QString toolChangeCommands MEMBER m_toolChangeCommands NOTIFY changed)
     Q_PROPERTY(bool confirmToolChangeCommandsExecution MEMBER m_confirmToolChangeCommandsExecution NOTIFY changed)
-    Q_PROPERTY(bool pauseSenderOnM6 MEMBER m_pauseSenderOnM6 NOTIFY changed)
+    Q_PROPERTY(bool toolChangePause MEMBER m_toolChangePause NOTIFY changed)
     Q_PROPERTY(bool ignoreErrorResponses MEMBER m_ignoreErrorResponses NOTIFY changed)
     Q_PROPERTY(bool setParserStateBeforeSendingFromSelectedLine MEMBER m_setParserStateBeforeSendingFromSelectedLine NOTIFY changed)
 
@@ -42,7 +42,7 @@ class ConfigurationSender : public ConfigurationModule
         bool useToolChangeCommands() const { return m_useToolChangeCommands; }
         QString toolChangeCommands() const { return m_toolChangeCommands; }
         bool confirmToolChangeCommandsExecution() const { return m_confirmToolChangeCommandsExecution; }
-        bool pauseSenderOnM6() const { return m_pauseSenderOnM6; }
+        bool pauseSenderOnToolChange() const { return m_toolChangePause; }
         bool ignoreErrorResponses() const { return m_ignoreErrorResponses; }
         bool setParserStateBeforeSendingFromSelectedLine() const { return m_setParserStateBeforeSendingFromSelectedLine; }
 
@@ -57,7 +57,7 @@ class ConfigurationSender : public ConfigurationModule
         bool m_useToolChangeCommands;
         QString m_toolChangeCommands;
         bool m_confirmToolChangeCommandsExecution;
-        bool m_pauseSenderOnM6;
+        bool m_toolChangePause;
         bool m_ignoreErrorResponses;
         bool m_setParserStateBeforeSendingFromSelectedLine;
 

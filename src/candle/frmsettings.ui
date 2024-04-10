@@ -84,7 +84,7 @@ QSplitter::handle:horizontal {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
+         <y>-1034</y>
          <width>642</width>
          <height>2627</height>
         </rect>
@@ -813,7 +813,7 @@ QSplitter::handle:horizontal {
             </layout>
            </item>
            <item>
-            <widget class="QCheckBox" name="chkToolChangeUseCommands">
+            <widget class="QCheckBox" name="chkUseToolChangeCommands">
              <property name="text">
               <string>Use tool change commands:</string>
              </property>
@@ -823,7 +823,7 @@ QSplitter::handle:horizontal {
             <widget class="QPlainTextEdit" name="txtToolChangeCommands"/>
            </item>
            <item>
-            <widget class="QCheckBox" name="chkToolChangeUseCommandsConfirm">
+            <widget class="QCheckBox" name="chkConfirmToolChangeCommandsExecution">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -833,21 +833,21 @@ QSplitter::handle:horizontal {
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="chkToolChangePause">
+            <widget class="QCheckBox" name="chkPauseOnToolChange">
              <property name="text">
-              <string>Pause sender on M6 command</string>
+              <string>Pause sender on tool change (M6) command</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="chkIgnoreErrors">
+            <widget class="QCheckBox" name="chkIgnoreResponseErrors">
              <property name="text">
               <string>Ignore error responses</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="chkAutoLine">
+            <widget class="QCheckBox" name="chkSetParseStateBeforeSendFromLine">
              <property name="text">
               <string>Automatically set parser state before sending from selected line</string>
              </property>
@@ -1846,9 +1846,9 @@ QSplitter::handle:horizontal {
    </hints>
   </connection>
   <connection>
-   <sender>chkToolChangeUseCommands</sender>
+   <sender>chkUseToolChangeCommands</sender>
    <signal>toggled(bool)</signal>
-   <receiver>chkToolChangeUseCommandsConfirm</receiver>
+   <receiver>chkConfirmToolChangeCommandsExecution</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">

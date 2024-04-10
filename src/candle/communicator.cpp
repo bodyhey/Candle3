@@ -126,7 +126,11 @@ SendCommandResult Communicator::sendCommand(CommandSource source, QString comman
     static QRegExp M230("(M0*2|M30|M0*6|M25)(?!\\d)");
     static QRegExp M6("(M0*6)(?!\\d)");
     if ((m_senderState == SenderTransferring) && uncomment.contains(M230)) {
-        if (!uncomment.contains(M6) || m_settings->toolChangeUseCommands() || m_settings->toolChangePause()) setSenderStateAndEmitSignal(SenderPausing);
+        if (
+            !uncomment.contains(M6) ||
+            m_configuration->senderModule().useToolChangeCommands() ||
+            m_configuration->senderModule().pauseSenderOnToolChange()
+        ) setSenderStateAndEmitSignal(SenderPausing);
     }
 
     // Queue offsets request on G92, G10 commands
@@ -485,7 +489,8 @@ void Communicator::completeTransfer()
     // updateControlsState();
 
     // Send end commands
-    if (m_settings->useEndCommands()) m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_settings->endCommands());
+    if (m_configuration->senderModule().useProgramEndCommands())
+        m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_configuration->senderModule().programEndCommands());
 
     emit transferCompleted();
 

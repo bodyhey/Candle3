@@ -5,11 +5,21 @@
 #include "configurationsender.h"
 
 const QMap<QString, QVariant> DEFAULTS = {
-    {"test", "ahugu"},
-    {"test2", 421412111},
+    {"useProgramStartCommands", false},
+    {"programStartCommands", ""},
+    {"useProgramEndCommands", false},
+    {"programEndCommands", ""},
+    {"usePauseCommands", false},
+    {"beforePauseCommands", ""},
+    {"afterPauseCommands", ""},
+    {"useToolChangeCommands", false},
+    {"toolChangeCommands", ""},
+    {"confirmToolChangeCommandsExecution", false},
+    {"toolChangePause", false},
+    {"ignoreErrorResponses", false},
+    {"setParserStateBeforeSendingFromSelectedLine", false},
 };
 
 ConfigurationSender::ConfigurationSender(QObject *parent) : ConfigurationModule(parent, DEFAULTS)
 {
 }
-

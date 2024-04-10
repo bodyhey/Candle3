@@ -750,6 +750,9 @@ void frmMain::on_actViewLockWindows_toggled(bool checked)
 void frmMain::on_cmdFileOpen_clicked()
 {
     if (!m_heightMapMode) {
+        loadFile("d:\\Obiekty3d\\TestGcode.nc");
+        return;
+
         if (!saveChanges(false)) return;
 
         QString fileName  = QFileDialog::getOpenFileName(this, tr("Open"), m_lastFolder,
@@ -804,8 +807,8 @@ void frmMain::on_cmdFileSend_clicked()
     updateControlsState();
     ui->cmdFilePause->setFocus();
 
-    if (m_settings->useStartCommands())
-        m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_settings->startCommands());
+    if (m_configuration.senderModule().useProgramStartCommands())
+        m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_configuration.senderModule().programStartCommands());
 
     m_communicator->sendStreamerCommandsUntilBufferIsFull();
 }
@@ -826,8 +829,8 @@ void frmMain::on_cmdFilePause_clicked(bool checked)
         if (m_communicator->senderState() == SenderChangingTool) {
             m_communicator->setSenderStateAndEmitSignal(SenderTransferring);
         } else {
-            if (m_settings->usePauseCommands()) {
-                m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_settings->afterPauseCommands());
+            if (m_configuration.senderModule().usePauseCommands()) {
+                m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_configuration.senderModule().afterPauseCommands());
             }
             m_communicator->setSenderStateAndEmitSignal(s);
         }
@@ -2148,9 +2151,9 @@ void frmMain::preloadSettings()
     qApp->setStyleSheet(QString(qApp->styleSheet()).replace(QRegExp("font-size:\\s*\\d+"), "font-size: " + set.value("fontSize", "8").toString()));
 
     // Update v-sync in glformat
-    QGLFormat fmt = QGLFormat::defaultFormat();
-    fmt.setSwapInterval(set.value("vsync", false).toBool() ? 1 : 0);
-    QGLFormat::setDefaultFormat(fmt);
+    // QGLFormat fmt = QGLFormat::defaultFormat();
+    // fmt.setSwapInterval(set.value("vsync", false).toBool() ? 1 : 0);
+    // QGLFormat::setDefaultFormat(fmt);
 }
 
 void frmMain::loadSettings()
@@ -2197,17 +2200,17 @@ void frmMain::loadSettings()
     m_settings->setToolAngle(set.value("toolAngle", 0).toDouble());
     m_settings->setToolType(set.value("toolType", 0).toInt());
     m_settings->setFps(set.value("fps", 60).toInt());
-    m_settings->setUseStartCommands(set.value("useStartCommands").toBool());
-    m_settings->setStartCommands(set.value("startCommands").toString());
-    m_settings->setUseEndCommands(set.value("useEndCommands").toBool());
-    m_settings->setEndCommands(set.value("endCommands").toString());
-    m_settings->setUsePauseCommands(set.value("usePauseCommands").toBool());
-    m_settings->setBeforePauseCommands(set.value("beforePauseCommands").toString());
-    m_settings->setAfterPauseCommands(set.value("afterPauseCommands").toString());
-    m_settings->setToolChangeCommands(set.value("toolChangeCommands").toString());
-    m_settings->setToolChangePause(set.value("toolChangePause").toBool());
-    m_settings->setToolChangeUseCommands(set.value("toolChangeUseCommands").toBool());
-    m_settings->setToolChangeUseCommandsConfirm(set.value("toolChangeUseCommandsConfirm").toBool());
+    // m_settings->setUseStartCommands(set.value("useStartCommands").toBool());
+    // m_settings->setStartCommands(set.value("startCommands").toString());
+    // m_settings->setUseEndCommands(set.value("useEndCommands").toBool());
+    // m_settings->setEndCommands(set.value("endCommands").toString());
+    // m_settings->setUsePauseCommands(set.value("usePauseCommands").toBool());
+    // m_settings->setBeforePauseCommands(set.value("beforePauseCommands").toString());
+    // m_settings->setAfterPauseCommands(set.value("afterPauseCommands").toString());
+    // m_settings->setToolChangeCommands(set.value("toolChangeCommands").toString());
+    // m_settings->setToolChangePause(set.value("toolChangePause").toBool());
+    // m_settings->setToolChangeUseCommands(set.value("toolChangeUseCommands").toBool());
+    // m_settings->setToolChangeUseCommandsConfirm(set.value("toolChangeUseCommandsConfirm").toBool());
     m_settings->setReferenceXPlus(set.value("referenceXPlus", false).toBool());
     m_settings->setReferenceYPlus(set.value("referenceYPlus", false).toBool());
     m_settings->setReferenceZPlus(set.value("referenceZPlus", false).toBool());
@@ -2427,17 +2430,17 @@ void frmMain::saveSettings()
     set.setValue("lastFolder", m_lastFolder);
     set.setValue("fontSize", m_settings->fontSize());
 
-    set.setValue("useStartCommands", m_settings->useStartCommands());
-    set.setValue("startCommands", m_settings->startCommands());
-    set.setValue("useEndCommands", m_settings->useEndCommands());
-    set.setValue("endCommands", m_settings->endCommands());
-    set.setValue("usePauseCommands", m_settings->usePauseCommands());
-    set.setValue("afterPauseCommands", m_settings->afterPauseCommands());
-    set.setValue("beforePauseCommands", m_settings->beforePauseCommands());
-    set.setValue("toolChangeCommands", m_settings->toolChangeCommands());
-    set.setValue("toolChangePause", m_settings->toolChangePause());
-    set.setValue("toolChangeUseCommands", m_settings->toolChangeUseCommands());
-    set.setValue("toolChangeUseCommandsConfirm", m_settings->toolChangeUseCommandsConfirm());
+    // set.setValue("useStartCommands", m_settings->useStartCommands());
+    // set.setValue("startCommands", m_settings->startCommands());
+    // set.setValue("useEndCommands", m_settings->useEndCommands());
+    // set.setValue("endCommands", m_settings->endCommands());
+    // set.setValue("usePauseCommands", m_settings->usePauseCommands());
+    // set.setValue("afterPauseCommands", m_settings->afterPauseCommands());
+    // set.setValue("beforePauseCommands", m_settings->beforePauseCommands());
+    // set.setValue("toolChangeCommands", m_settings->toolChangeCommands());
+    // set.setValue("toolChangePause", m_settings->toolChangePause());
+    // set.setValue("toolChangeUseCommands", m_settings->toolChangeUseCommands());
+    // set.setValue("toolChangeUseCommandsConfirm", m_settings->toolChangeUseCommandsConfirm());
     set.setValue("referenceXPlus", m_settings->referenceXPlus());
     set.setValue("referenceYPlus", m_settings->referenceYPlus());
     set.setValue("referenceZPlus", m_settings->referenceZPlus());

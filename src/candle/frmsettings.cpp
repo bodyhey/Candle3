@@ -137,6 +137,23 @@ void frmSettings::initializeWidgets()
     ui->cboSerialBaud->setCurrentText(QString::number(connection.serialBaud()));
     ui->txtRawTcpHost->setText(connection.rawTcpHost());
     ui->txtRawTcpPort->setText(QString::number(connection.rawTcpPort()));
+
+    const ConfigurationVisualizer &visualizer = m_configuration.visualizerModule();
+
+    const ConfigurationSender &sender = m_configuration.senderModule();
+    ui->chkUseStartCommands->setChecked(sender.useProgramStartCommands());
+    ui->txtStartCommands->setPlainText(sender.programStartCommands());
+    ui->chkUseEndCommands->setChecked(sender.useProgramEndCommands());
+    ui->txtEndCommands->setPlainText(sender.programEndCommands());
+    ui->txtToolChangeCommands->setPlainText(sender.toolChangeCommands());
+    ui->chkUseToolChangeCommands->setChecked(sender.useToolChangeCommands());
+    ui->chkConfirmToolChangeCommandsExecution->setChecked(sender.confirmToolChangeCommandsExecution());
+    ui->chkPauseOnToolChange->setChecked(sender.pauseSenderOnToolChange());
+    ui->chkUsePauseCommands->setChecked(sender.usePauseCommands());
+    ui->txtBeforePauseCommands->setPlainText(sender.beforePauseCommands());
+    ui->txtAfterPauseCommands->setPlainText(sender.afterPauseCommands());
+    ui->chkSetParseStateBeforeSendFromLine->setChecked(sender.setParserStateBeforeSendingFromSelectedLine());
+    ui->chkIgnoreResponseErrors->setChecked(sender.ignoreErrorResponses());
 }
 
 void frmSettings::applySettings()
@@ -154,6 +171,23 @@ void frmSettings::applySettings()
     connection.m_serialBaud = ui->cboSerialBaud->currentText().toInt();
     connection.m_rawTcpHost = ui->txtRawTcpHost->text();
     connection.m_rawTcpPort = ui->txtRawTcpPort->text().toInt();
+
+    ConfigurationVisualizer &visualizer = m_configuration.visualizerModule();
+
+    ConfigurationSender &sender = m_configuration.senderModule();
+    sender.m_useProgramStartCommands = ui->chkUseStartCommands->isChecked();
+    sender.m_programStartCommands = ui->txtStartCommands->toPlainText();
+    sender.m_useProgramEndommands = ui->chkUseEndCommands->isChecked();
+    sender.m_programEndCommands = ui->txtEndCommands->toPlainText();
+    sender.m_usePauseCommands = ui->chkUsePauseCommands->isChecked();
+    sender.m_beforePauseCommands = ui->txtBeforePauseCommands->toPlainText();
+    sender.m_afterPauseCommands = ui->txtAfterPauseCommands->toPlainText();
+    sender.m_useToolChangeCommands = ui->chkUseToolChangeCommands->isChecked();
+    sender.m_toolChangeCommands = ui->txtToolChangeCommands->toPlainText();
+    sender.m_confirmToolChangeCommandsExecution = ui->chkConfirmToolChangeCommandsExecution->isChecked();
+    sender.m_toolChangePause = ui->chkPauseOnToolChange->isChecked();
+    sender.m_ignoreErrorResponses = ui->chkIgnoreResponseErrors->isChecked();
+    sender.m_setParserStateBeforeSendingFromSelectedLine = ui->chkSetParseStateBeforeSendFromLine->isChecked();
 }
 
 int frmSettings::exec()
@@ -603,102 +637,22 @@ void frmSettings::setDrawModeVectors(bool value)
 
 bool frmSettings::ignoreErrors()
 {
-    return ui->chkIgnoreErrors->isChecked();
+    return ui->chkIgnoreResponseErrors->isChecked();
 }
 
 void frmSettings::setIgnoreErrors(bool value)
 {
-    ui->chkIgnoreErrors->setChecked(value);
+    ui->chkIgnoreResponseErrors->setChecked(value);
 }
 
 bool frmSettings::autoLine()
 {
-    return ui->chkAutoLine->isChecked();
+    return ui->chkSetParseStateBeforeSendFromLine->isChecked();
 }
 
 void frmSettings::setAutoLine(bool value)
 {
-    ui->chkAutoLine->setChecked(value);
-}
-
-bool frmSettings::useStartCommands()
-{
-    return ui->chkUseStartCommands->isChecked();
-}
-
-void frmSettings::setUseStartCommands(bool value)
-{
-    ui->chkUseStartCommands->setChecked(value);
-}
-
-QString frmSettings::startCommands()
-{
-    return ui->txtStartCommands->toPlainText();
-}
-
-void frmSettings::setStartCommands(QString commands)
-{
-    ui->txtStartCommands->setPlainText(commands);
-}
-
-bool frmSettings::useEndCommands()
-{
-    return ui->chkUseEndCommands->isChecked();
-}
-
-void frmSettings::setUseEndCommands(bool value)
-{
-    ui->chkUseEndCommands->setChecked(value);
-}
-
-QString frmSettings::endCommands()
-{
-    return ui->txtEndCommands->toPlainText();
-}
-
-void frmSettings::setEndCommands(QString commands)
-{
-    ui->txtEndCommands->setPlainText(commands);
-}
-
-QString frmSettings::toolChangeCommands()
-{
-    return ui->txtToolChangeCommands->toPlainText();
-}
-
-void frmSettings::setToolChangeCommands(QString commands)
-{
-    ui->txtToolChangeCommands->setPlainText(commands);
-}
-
-bool frmSettings::toolChangeUseCommands()
-{
-    return ui->chkToolChangeUseCommands->isChecked();
-}
-
-void frmSettings::setToolChangeUseCommands(bool value)
-{
-    ui->chkToolChangeUseCommands->setChecked(value);
-}
-
-bool frmSettings::toolChangeUseCommandsConfirm()
-{
-    return ui->chkToolChangeUseCommandsConfirm->isChecked();
-}
-
-void frmSettings::setToolChangeUseCommandsConfirm(bool value)
-{
-    ui->chkToolChangeUseCommandsConfirm->setChecked(value);
-}
-
-bool frmSettings::toolChangePause()
-{
-    return ui->chkToolChangePause->isChecked();
-}
-
-void frmSettings::setToolChangePause(bool pause)
-{
-    ui->chkToolChangePause->setChecked(pause);
+    ui->chkSetParseStateBeforeSendFromLine->setChecked(value);
 }
 
 QString frmSettings::language()
@@ -770,36 +724,6 @@ bool frmSettings::referenceZPlus()
 void frmSettings::setReferenceZPlus(bool value)
 {
     ui->radReferenceZPlus->setChecked(value);
-}
-
-void frmSettings::setUsePauseCommands(bool value)
-{
-    ui->chkUsePauseCommands->setChecked(value);
-}
-
-bool frmSettings::usePauseCommands()
-{
-    return ui->chkUsePauseCommands->isChecked();
-}
-
-void frmSettings::setBeforePauseCommands(QString text)
-{
-    ui->txtBeforePauseCommands->setPlainText(text);
-}
-
-void frmSettings::setAfterPauseCommands(QString text)
-{
-    ui->txtAfterPauseCommands->setPlainText(text);
-}
-
-QString frmSettings::beforePauseCommands()
-{
-    return ui->txtBeforePauseCommands->toPlainText();
-}
-
-QString frmSettings::afterPauseCommands()
-{
-    return ui->txtAfterPauseCommands->toPlainText();
 }
 
 void frmSettings::showEvent(QShowEvent *se)
@@ -934,9 +858,9 @@ void frmSettings::on_cmdDefaults_clicked()
     ui->txtStartCommands->clear();
     ui->txtEndCommands->clear();
     ui->txtToolChangeCommands->clear();
-    ui->chkToolChangePause->setChecked(false);
-    ui->chkToolChangeUseCommands->setChecked(false);
-    ui->chkToolChangeUseCommandsConfirm->setChecked(false);
+    ui->chkPauseOnToolChange->setChecked(false);
+    ui->chkUseToolChangeCommands->setChecked(false);
+    ui->chkConfirmToolChangeCommandsExecution->setChecked(false);
     setLanguage("en");
 
     emit settingsSetToDefault();

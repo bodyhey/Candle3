@@ -616,14 +616,14 @@ void Communicator::processCommandResponse(QString data)
     static QRegExp M6("(M0*6)(?!\\d)");
     if ((m_communicator->m_senderState == SenderPausing) && uncomment.contains(M6)) {
         response.clear();
-
-        if (m_settings->toolChangePause()) {
+        
+        if (m_configuration->senderModule(). pauseSenderOnToolChange()) {
             // QMessageBox::information(this, qApp->applicationDisplayName(),
             //                          tr("Change tool and press 'Pause' button to continue job"));
         }
 
-        if (m_settings->toolChangeUseCommands()) {
-            if (m_settings->toolChangeUseCommandsConfirm()) {
+        if (m_configuration->senderModule().useToolChangeCommands()) {
+            if (m_configuration->senderModule().confirmToolChangeCommandsExecution()) {
                 // QMessageBox box(this);
                 // box.setIcon(QMessageBox::Information);
                 // box.setText(tr("M6 command detected. Send tool change commands?\n"));
@@ -636,7 +636,7 @@ void Communicator::processCommandResponse(QString data)
                 //     m_communicator->sendCommands(m_settings->toolChangeCommands());
                 // }
             } else {
-                m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_settings->toolChangeCommands());
+                m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_configuration->senderModule().toolChangeCommands());
             }
         }
 
@@ -645,12 +645,12 @@ void Communicator::processCommandResponse(QString data)
 
     // Pausing on button?
     if ((m_communicator->m_senderState == SenderPausing) && !uncomment.contains(M6)) {
-        if (m_settings->usePauseCommands()) {
-            m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_settings->beforePauseCommands());
+        if (m_configuration->senderModule().usePauseCommands()) {
+            m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_configuration->senderModule().beforePauseCommands());
             m_communicator->setSenderStateAndEmitSignal(SenderPausing2);
         }
     }
-    if ((m_communicator->m_senderState == SenderChangingTool) && !m_settings->toolChangePause()
+    if ((m_communicator->m_senderState == SenderChangingTool) && !m_configuration->senderModule().pauseSenderOnToolChange()
         && m_communicator->m_commands.isEmpty())
     {
         m_communicator->setSenderStateAndEmitSignal(SenderTransferring);
