@@ -156,12 +156,12 @@ protected:
 
 private slots:
     void onScrollBarValueChanged(int value);
-    void on_cmdSerialRefresh_clicked();
-    void on_cmdOK_clicked();
-    void on_cmdCancel_clicked();
+    void onCmdSerialPortsRefreshClicked();
+    void onCmdOKClicked();
+    void onCmdCancelClicked();
     void on_cboToolType_currentIndexChanged(int index);
     void on_listCategories_currentRowChanged(int currentRow);
-    void on_cmdDefaults_clicked();
+    void onCmdDefaultsClicked();
     void on_cboFontSize_currentTextChanged(const QString &arg1);
     void on_radDrawModeVectors_toggled(bool checked);
     void on_radDrawModeRaster_toggled(bool checked);

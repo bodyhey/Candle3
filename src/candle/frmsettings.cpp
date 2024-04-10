@@ -74,6 +74,13 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
 {
     ui->setupUi(this);
 
+    connect(ui->cmdOK, &QAbstractButton::clicked, this, &frmSettings::onCmdOKClicked);
+    connect(ui->cmdCancel, &QAbstractButton::clicked, this, &frmSettings::onCmdCancelClicked);
+    connect(ui->cmdDefaults, &QAbstractButton::clicked, this, &frmSettings::onCmdDefaultsClicked);
+    connect(ui->cmdSerialPortsRefresh, &QAbstractButton::clicked, this, &frmSettings::onCmdSerialPortsRefreshClicked);
+
+    //
+
     this->setLocale(QLocale::C);
     m_intValidator.setBottom(1);
     m_intValidator.setTop(999);
@@ -740,19 +747,19 @@ void frmSettings::searchForSerialPorts()
     }
 }
 
-void frmSettings::on_cmdSerialRefresh_clicked()
+void frmSettings::onCmdSerialPortsRefreshClicked()
 {
     searchForSerialPorts();
 }
 
-void frmSettings::on_cmdOK_clicked()
+void frmSettings::onCmdOKClicked()
 {
     applySettings();
 
     this->accept();
 }
 
-void frmSettings::on_cmdCancel_clicked()
+void frmSettings::onCmdCancelClicked()
 {
     this->reject();
 }
@@ -769,7 +776,7 @@ void frmSettings::resetToDefaults()
     initializeWidgets();
 }
 
-void frmSettings::on_cmdDefaults_clicked()
+void frmSettings::onCmdDefaultsClicked()
 {
     if (QMessageBox::warning(this, qApp->applicationDisplayName(), tr("Reset settings to default values?"),
                              QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel) != QMessageBox::Yes) return;

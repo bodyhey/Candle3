@@ -319,7 +319,7 @@ QSplitter::handle:horizontal {
                    </widget>
                   </item>
                   <item>
-                   <widget class="QToolButton" name="cmdSerialRefresh">
+                   <widget class="QToolButton" name="cmdSerialPortsRefresh">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
                       <horstretch>0</horstretch>
