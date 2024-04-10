@@ -506,3 +506,9 @@ void Communicator::completeTransfer()
     // m_timerConnection.start();
     // m_communicator->startUpdatingState(m_settings->queryStateTime());
 }
+
+void Communicator::onConnectionError(QString message)
+{
+    qDebug() << "Connection error: " << message;
+}
+

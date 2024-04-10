@@ -43,6 +43,7 @@ CONFIG -= debug_and_release
 
 SOURCES += main.cpp\
     communicator.cpp \
+    communicator_processing_response.cpp \
     config/configuration.cpp \
     config/module/configurationconnection.cpp \
     config/module/configurationconsole.cpp \
@@ -68,7 +69,6 @@ SOURCES += main.cpp\
     form_partial/main/state.cpp \
     frmgrblconfigurator.cpp \
     frmmain.cpp \
-    linereceived.cpp \
     frmsettings.cpp \
     frmabout.cpp \
     drawers/gcodedrawer.cpp \
