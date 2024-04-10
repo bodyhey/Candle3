@@ -37,7 +37,7 @@ void Configuration::setLanguage(QString language)
 void Configuration::save()
 {
     m_persister.open();
-    for (ConfigurationModule* module : m_modules) {
+    for (ConfigurationModule* module : qAsConst(m_modules)) {
         saveModule(module);
     }
     m_persister.close();
@@ -109,7 +109,7 @@ void Configuration::setModuleDefaults(ConfigurationModule *module)
 void Configuration::load()
 {
     m_provider.open();
-    for (ConfigurationModule* module : m_modules) {
+    for (ConfigurationModule* module : qAsConst(m_modules)) {
         loadModule(module);
     }
     m_provider.close();
@@ -117,7 +117,7 @@ void Configuration::load()
 
 void Configuration::setDefaults()
 {
-    for (ConfigurationModule* module : m_modules) {
+    for (ConfigurationModule* module : qAsConst(m_modules)) {
         setModuleDefaults(module);
     }
 
