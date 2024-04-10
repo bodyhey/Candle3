@@ -1,10 +1,10 @@
 TEMPLATE = subdirs
 
-SUBDIRS =   src/candle
+SUBDIRS =   src/candle \
             src/designerplugins \
             src/vendor/uCNC \
             src/vendor/uCNCTestUI \
-            src/vendor/PropertyEditor \
+            src/vendor/PropertyEditor
             
 # Make plugins translations
 system(qmake src/candleplugins/candleplugins.pro)
