@@ -1,21 +1,13 @@
 #ifndef COMMUNICATOR_H
 #define COMMUNICATOR_H
 
-#include <QScrollBar>
-#include "frmsettings.h"
 #include "globals.h"
 #include "streamer.h"
+#include "config/configuration.h"
 #include "connection/connection.h"
 #include "machine/machineconfiguration.h"
 #include "scripting/scriptvars.h"
-
-#ifdef WINDOWS
-    #include <QtWinExtras/QtWinExtras>
-#endif
-
-namespace Ui {
-class frmMain;
-}
+#include <QTimer>
 
 class Communicator : public QObject
 {
@@ -71,7 +63,7 @@ class Communicator : public QObject
 
         ScriptVars m_storedVars;
 
-        QTime m_startTime;
+        QTimer m_startTime;
 
         // Coordinates
         QVector3D m_machinePos;

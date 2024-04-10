@@ -1,6 +1,8 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                         #include "communicator.h"
 #include "parser/gcodepreprocessorutils.h"
 #include <QMessageBox>
+#include <QThread>
+#include <QCoreApplication>
 
 void Communicator::onConnectionLineReceived(QString data)
 {

@@ -1,5 +1,6 @@
 #include "frmgrblconfigurator.h"
 #include "ui_frmgrblconfigurator.h"
+#include <QMessageBox>
 #include <CPropertyEditor.h>
 #include <CPropertyHeader.h>
 #include <CStringProperty.h>
