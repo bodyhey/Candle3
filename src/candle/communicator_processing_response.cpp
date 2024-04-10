@@ -563,7 +563,11 @@ void Communicator::processCommandResponse(QString data)
         static bool holding = false;
         static QString errors;
 
-        if (commandAttributes.tableIndex > -1 && response.toUpper().contains("ERROR") && !m_settings->ignoreErrors()) {
+        if (
+            commandAttributes.tableIndex > -1 &&
+            response.toUpper().contains("ERROR") &&
+            !m_configuration->senderModule().ignoreErrorResponses()
+        ) {
             errors.append(QString::number(commandAttributes.tableIndex + 1) + ": " + commandAttributes.command + " < " + response + "\n");
 
             // @TODO move to UI

@@ -6,6 +6,7 @@
 #define CONFIGURATION_VISUALIZER_H
 
 #include <QObject>
+#include <QColor>
 #include "module.h"
 
 class ConfigurationVisualizer : public ConfigurationModule
@@ -13,9 +14,9 @@ class ConfigurationVisualizer : public ConfigurationModule
     friend class frmSettings;
 
     Q_OBJECT;
-    Q_PROPERTY(int lineWidth MEMBER m_lineWidth NOTIFY changed);
+    Q_PROPERTY(float lineWidth MEMBER m_lineWidth NOTIFY changed);
     Q_PROPERTY(int fpsLock MEMBER m_fpsLock NOTIFY changed);
-    Q_PROPERTY(bool smoothing MEMBER m_smoothing NOTIFY changed);
+    Q_PROPERTY(bool antialiasing MEMBER m_antialiasing NOTIFY changed);
     Q_PROPERTY(bool msaa MEMBER m_msaa NOTIFY changed);
     Q_PROPERTY(bool zBuffer MEMBER m_zBuffer NOTIFY changed);
     Q_PROPERTY(bool vsync MEMBER m_vsync NOTIFY changed);
@@ -28,6 +29,19 @@ class ConfigurationVisualizer : public ConfigurationModule
     Q_PROPERTY(float fieldOfView MEMBER m_fieldOfView NOTIFY changed);
     Q_PROPERTY(float nearPlane MEMBER m_nearPlane NOTIFY changed);
     Q_PROPERTY(float farPlane MEMBER m_farPlane NOTIFY changed);
+    Q_PROPERTY(QColor backgroundColor MEMBER m_backgroundColor NOTIFY changed);
+    Q_PROPERTY(QColor toolColor MEMBER m_toolColor NOTIFY changed);
+    Q_PROPERTY(QColor textColor MEMBER m_textColor NOTIFY changed);
+    Q_PROPERTY(QColor normalToolpathColor MEMBER m_normalToolpathColor NOTIFY changed);
+    Q_PROPERTY(QColor drawnToolpathColor MEMBER m_drawnToolpathColor NOTIFY changed);
+    Q_PROPERTY(QColor hightlightToolpathColor MEMBER m_hightlightToolpathColor NOTIFY changed);
+    Q_PROPERTY(QColor zMovementColor MEMBER m_zMovementColor NOTIFY changed);
+    Q_PROPERTY(QColor startPointColor MEMBER m_startPointColor NOTIFY changed);
+    Q_PROPERTY(QColor endPointColor MEMBER m_endPointColor NOTIFY changed);
+    Q_PROPERTY(double toolDiameter MEMBER m_toolDiameter NOTIFY changed);
+    Q_PROPERTY(double toolLength MEMBER m_toolLength NOTIFY changed);
+    Q_PROPERTY(ToolType toolType MEMBER m_toolType NOTIFY changed);
+    Q_PROPERTY(double toolAngle MEMBER m_toolAngle NOTIFY changed);
 
     public:
         explicit ConfigurationVisualizer(QObject *parent);
@@ -40,9 +54,15 @@ class ConfigurationVisualizer : public ConfigurationModule
         };
         Q_ENUM(ProgramDrawMode);
 
-        int lineWidth() const { return m_lineWidth; }
+        enum ToolType {
+            Flat,
+            Conic
+        };
+        Q_ENUM(ToolType);
+
+        float lineWidth() const { return m_lineWidth; }
         int fpsLock() const { return m_fpsLock; }
-        bool smoothing() const { return m_smoothing; }
+        bool antialiasing() const { return m_antialiasing; }
         bool msaa() const { return m_msaa; }
         bool zBuffer() const { return m_zBuffer; }
         bool vsync() const { return m_vsync; }
@@ -55,11 +75,26 @@ class ConfigurationVisualizer : public ConfigurationModule
         float fieldOfView() const { return m_fieldOfView; }
         float nearPlane() const { return m_nearPlane; }
         float farPlane() const { return m_farPlane; }
+        // colors
+        QColor backgroundColor() const { return m_backgroundColor; }
+        QColor toolColor() const { return m_toolColor; }
+        QColor textColor() const { return m_textColor; }
+        QColor normalToolpathColor() const { return m_normalToolpathColor; }
+        QColor drawnToolpathColor() const { return m_drawnToolpathColor; }
+        QColor hightlightToolpathColor() const { return m_hightlightToolpathColor; }
+        QColor zMovementColor() const { return m_zMovementColor; }
+        QColor startPointColor() const { return m_startPointColor; }
+        QColor endPointColor() const { return m_endPointColor; }
+        // tool
+        double toolDiameter() const { return m_toolDiameter; }
+        double toolLength() const { return m_toolLength; }
+        ToolType toolType() const { return m_toolType; }
+        double toolAngle() const { return m_toolAngle; }
 
     private:
-        int m_lineWidth;
+        float m_lineWidth;
         int m_fpsLock;
-        bool m_smoothing;
+        bool m_antialiasing;
         bool m_msaa;
         bool m_zBuffer;
         bool m_vsync;
@@ -72,6 +107,21 @@ class ConfigurationVisualizer : public ConfigurationModule
         float m_fieldOfView;
         float m_nearPlane;
         float m_farPlane;
+        // colors
+        QColor m_backgroundColor;
+        QColor m_toolColor;
+        QColor m_textColor;
+        QColor m_normalToolpathColor;
+        QColor m_drawnToolpathColor;
+        QColor m_hightlightToolpathColor;
+        QColor m_zMovementColor;
+        QColor m_startPointColor;
+        QColor m_endPointColor;
+        // tool
+        double m_toolDiameter;
+        double m_toolLength;
+        ToolType m_toolType;
+        double m_toolAngle;
 };
 
 #endif // CONFIGURATION_VISUALIZER_H

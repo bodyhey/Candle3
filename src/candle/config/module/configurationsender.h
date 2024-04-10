@@ -60,7 +60,6 @@ class ConfigurationSender : public ConfigurationModule
         bool m_toolChangePause;
         bool m_ignoreErrorResponses;
         bool m_setParserStateBeforeSendingFromSelectedLine;
-
 };
 
 #endif // CONFIGURATION_SENDER_H

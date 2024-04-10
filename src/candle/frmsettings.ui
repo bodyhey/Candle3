@@ -872,7 +872,7 @@ QSplitter::handle:horizontal {
               </widget>
              </item>
              <item row="0" column="4">
-              <widget class="QCheckBox" name="radMSAA">
+              <widget class="QCheckBox" name="chkMSAA">
                <property name="enabled">
                 <bool>false</bool>
                </property>
@@ -918,7 +918,7 @@ QSplitter::handle:horizontal {
                 </widget>
                </item>
                <item>
-                <widget class="QComboBox" name="cboFps">
+                <widget class="QComboBox" name="cboFpsLock">
                  <property name="inputMethodHints">
                   <set>Qt::ImhDigitsOnly|Qt::ImhFormattedNumbersOnly</set>
                  </property>
@@ -962,6 +962,9 @@ QSplitter::handle:horizontal {
                <property name="autoExclusive">
                 <bool>false</bool>
                </property>
+               <attribute name="buttonGroup">
+                <string notr="true">grpProgramDrawMode</string>
+               </attribute>
               </widget>
              </item>
              <item row="2" column="4">
@@ -972,6 +975,9 @@ QSplitter::handle:horizontal {
                <property name="autoExclusive">
                 <bool>false</bool>
                </property>
+               <attribute name="buttonGroup">
+                <string notr="true">grpProgramDrawMode</string>
+               </attribute>
               </widget>
              </item>
              <item row="0" column="2">
@@ -991,7 +997,7 @@ QSplitter::handle:horizontal {
               </spacer>
              </item>
              <item row="4" column="4">
-              <widget class="QRadioButton" name="radGrayscaleZ">
+              <widget class="QRadioButton" name="radGrayscaleSegmentsByZ">
                <property name="enabled">
                 <bool>false</bool>
                </property>
@@ -1001,10 +1007,13 @@ QSplitter::handle:horizontal {
                <property name="autoExclusive">
                 <bool>false</bool>
                </property>
+               <attribute name="buttonGroup">
+                <string notr="true">grpGrayscaleSegments</string>
+               </attribute>
               </widget>
              </item>
              <item row="4" column="3">
-              <widget class="QRadioButton" name="radGrayscaleS">
+              <widget class="QRadioButton" name="radGrayscaleSegmentsByS">
                <property name="enabled">
                 <bool>false</bool>
                </property>
@@ -1014,10 +1023,13 @@ QSplitter::handle:horizontal {
                <property name="autoExclusive">
                 <bool>false</bool>
                </property>
+               <attribute name="buttonGroup">
+                <string notr="true">grpGrayscaleSegments</string>
+               </attribute>
               </widget>
              </item>
              <item row="4" column="0">
-              <widget class="QCheckBox" name="chkGrayscale">
+              <widget class="QCheckBox" name="chkGrayscaleSegments">
                <property name="text">
                 <string>Grayscale segments</string>
                </property>
@@ -1043,7 +1055,7 @@ QSplitter::handle:horizontal {
               </widget>
              </item>
              <item row="3" column="0">
-              <widget class="QCheckBox" name="chkSimplify">
+              <widget class="QCheckBox" name="chkSimplifyGeometry">
                <property name="text">
                 <string>Simplify geometry</string>
                </property>
@@ -1085,7 +1097,7 @@ QSplitter::handle:horizontal {
               </widget>
              </item>
              <item>
-              <widget class="QDoubleSpinBox" name="txtFov">
+              <widget class="QDoubleSpinBox" name="txtFieldOfView">
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
                </property>
@@ -1115,7 +1127,7 @@ QSplitter::handle:horizontal {
               </widget>
              </item>
              <item>
-              <widget class="QDoubleSpinBox" name="txtNear">
+              <widget class="QDoubleSpinBox" name="txtNearPlane">
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
                </property>
@@ -1145,7 +1157,7 @@ QSplitter::handle:horizontal {
               </widget>
              </item>
              <item>
-              <widget class="QDoubleSpinBox" name="txtFar">
+              <widget class="QDoubleSpinBox" name="txtFarPlane">
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
                </property>
@@ -1720,7 +1732,7 @@ QSplitter::handle:horizontal {
   <connection>
    <sender>chkAntialiasing</sender>
    <signal>toggled(bool)</signal>
-   <receiver>radMSAA</receiver>
+   <receiver>chkMSAA</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1734,9 +1746,9 @@ QSplitter::handle:horizontal {
    </hints>
   </connection>
   <connection>
-   <sender>chkGrayscale</sender>
+   <sender>chkGrayscaleSegments</sender>
    <signal>toggled(bool)</signal>
-   <receiver>radGrayscaleS</receiver>
+   <receiver>radGrayscaleSegmentsByS</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1750,9 +1762,9 @@ QSplitter::handle:horizontal {
    </hints>
   </connection>
   <connection>
-   <sender>chkGrayscale</sender>
+   <sender>chkGrayscaleSegments</sender>
    <signal>toggled(bool)</signal>
-   <receiver>radGrayscaleZ</receiver>
+   <receiver>radGrayscaleSegmentsByZ</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1784,7 +1796,7 @@ QSplitter::handle:horizontal {
   <connection>
    <sender>chkVSync</sender>
    <signal>toggled(bool)</signal>
-   <receiver>cboFps</receiver>
+   <receiver>cboFpsLock</receiver>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1814,7 +1826,7 @@ QSplitter::handle:horizontal {
    </hints>
   </connection>
   <connection>
-   <sender>chkSimplify</sender>
+   <sender>chkSimplifyGeometry</sender>
    <signal>toggled(bool)</signal>
    <receiver>lblSimpilyPrecision</receiver>
    <slot>setEnabled(bool)</slot>
@@ -1830,7 +1842,7 @@ QSplitter::handle:horizontal {
    </hints>
   </connection>
   <connection>
-   <sender>chkSimplify</sender>
+   <sender>chkSimplifyGeometry</sender>
    <signal>toggled(bool)</signal>
    <receiver>txtSimplifyPrecision</receiver>
    <slot>setEnabled(bool)</slot>
@@ -1862,4 +1874,8 @@ QSplitter::handle:horizontal {
    </hints>
   </connection>
  </connections>
+ <buttongroups>
+  <buttongroup name="grpProgramDrawMode"/>
+  <buttongroup name="grpGrayscaleSegments"/>
+ </buttongroups>
 </ui>

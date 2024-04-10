@@ -22,11 +22,6 @@ class frmSettings;
 class frmSettings : public QDialog
 {
     Q_OBJECT
-    Q_PROPERTY(double toolDiameter READ toolDiameter WRITE setToolDiameter)
-    Q_PROPERTY(double toolLength READ toolLength WRITE setToolLength)
-    Q_PROPERTY(bool antialiasing READ antialiasing WRITE setAntialiasing)
-    Q_PROPERTY(bool zBuffer READ zBuffer WRITE setZBuffer)
-    Q_PROPERTY(double lineWidth READ lineWidth WRITE setLineWidth)
     Q_PROPERTY(double arcLength READ arcLength WRITE setArcLength)
     Q_PROPERTY(double arcDegree READ arcDegree WRITE setArcDegree)
     Q_PROPERTY(bool arcDegreeMode READ arcDegreeMode WRITE setArcDegreeMode)
@@ -34,21 +29,10 @@ class frmSettings : public QDialog
     Q_PROPERTY(int spindleSpeedMax READ spindleSpeedMax WRITE setSpindleSpeedMax)
     Q_PROPERTY(int laserPowerMin READ laserPowerMin WRITE setLaserPowerMin)
     Q_PROPERTY(int laserPowerMax READ laserPowerMax WRITE setLaserPowerMax)
-    Q_PROPERTY(int toolType READ toolType WRITE setToolType)
-    Q_PROPERTY(double toolAngle READ toolAngle WRITE setToolAngle)
-    Q_PROPERTY(int fps READ fps WRITE setFps)
-    Q_PROPERTY(bool vsync READ vsync WRITE setVsync)
-    Q_PROPERTY(bool msaa READ msaa WRITE setMsaa)
-    Q_PROPERTY(bool simplify READ simplify WRITE setSimplify)
-    Q_PROPERTY(double simplifyPrecision READ simplifyPrecision WRITE setSimplifyPrecision)
     Q_PROPERTY(int fontSize READ fontSize WRITE setFontSize)
-    Q_PROPERTY(bool grayscaleSegments READ grayscaleSegments WRITE setGrayscaleSegments)
-    Q_PROPERTY(bool grayscaleSCode READ grayscaleSCode WRITE setGrayscaleSCode)
-    Q_PROPERTY(bool drawModeVectors READ drawModeVectors WRITE setDrawModeVectors)
     Q_PROPERTY(bool ignoreErrors READ ignoreErrors WRITE setIgnoreErrors)
     Q_PROPERTY(bool autoLine READ autoLine WRITE setAutoLine)
     Q_PROPERTY(QString language READ language WRITE setLanguage)
-    Q_PROPERTY(bool units READ units WRITE setUnits)
     Q_PROPERTY(int rapidSpeed READ rapidSpeed WRITE setRapidSpeed)
     Q_PROPERTY(int acceleration READ acceleration WRITE setAcceleration)
     Q_PROPERTY(QVector3D machineBounds READ machineBounds WRITE setMachineBounds)
@@ -66,22 +50,10 @@ public:
 
     void addCustomSettings(QGroupBox *box);
 
-    double toolDiameter();
-    void setToolDiameter(double diameter);
-    double toolLength();
-    void setToolLength(double length);
-    bool antialiasing();
-    void setAntialiasing(bool antialiasing);
-    bool zBuffer();
-    void setZBuffer(bool zBuffer);
-    double fov();
-    void setFov(double fov);
-    double nearPlane();
-    void setNearPlane(double nearPlane);
-    double farPlane();
-    void setFarPlane(double farPlane);
-    double lineWidth();
-    void setLineWidth(double lineWidth);
+    // double toolDiameter();
+    // void setToolDiameter(double diameter);
+    // double toolLength();
+    // void setToolLength(double length);
     double arcLength();
     void setArcLength(double arcLength);
     double arcDegree();
@@ -103,32 +75,14 @@ public:
     void setAcceleration(int acceleration);
     int queryStateTime();
     void setQueryStateTime(int queryStateTime);
-    int toolType();
-    void setToolType(int toolType);
-    double toolAngle();
-    void setToolAngle(double toolAngle);
-    int fps();
-    void setFps(int fps);
-    bool vsync();
-    void setVsync(bool value);
-    bool msaa();
-    void setMsaa(bool msaa);
-    int units();
-    void setUnits(int units);
-    bool simplify();
-    void setSimplify(bool simplify);
-    double simplifyPrecision();
-    void setSimplifyPrecision(double simplifyPrecision);
+    // int toolType();
+    // void setToolType(int toolType);
+    // double toolAngle();
+    // void setToolAngle(double toolAngle);
     QList<ColorPicker*> colors();
     QColor colors(QString name);
     int fontSize();
     void setFontSize(int fontSize);
-    bool grayscaleSegments();
-    void setGrayscaleSegments(bool value);
-    bool grayscaleSCode();
-    void setGrayscaleSCode(bool value);
-    bool drawModeVectors();
-    void setDrawModeVectors(bool value);
     bool ignoreErrors();
     void setIgnoreErrors(bool value);
     bool autoLine();
@@ -163,10 +117,7 @@ private slots:
     void on_listCategories_currentRowChanged(int currentRow);
     void onCmdDefaultsClicked();
     void on_cboFontSize_currentTextChanged(const QString &arg1);
-    void on_radDrawModeVectors_toggled(bool checked);
-    void on_radDrawModeRaster_toggled(bool checked);
-    void on_radGrayscaleS_toggled(bool checked);
-    void on_radGrayscaleZ_toggled(bool checked);
+    void onDrawModeVectorsToggled(bool checked);
     void onConnectionModeChanged(int);
 
 private:
@@ -193,7 +144,6 @@ private:
 
     QList<QWidget*> m_customSettings;
 
-    int m_units;
     int m_acceleration;
     int m_rapidSpeed;
     QVector3D m_machineBounds;

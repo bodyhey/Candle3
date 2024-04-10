@@ -4,7 +4,10 @@
 
 #include "configurationui.h"
 
-const QMap<QString,QVariant> DEFAULTS = {};
+const QMap<QString,QVariant> DEFAULTS = {
+    {"fontSize", 12},
+    {"language", "en"}
+};
 
 ConfigurationUI::ConfigurationUI(QObject *parent) : ConfigurationModule(parent, DEFAULTS) {
 }

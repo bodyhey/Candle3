@@ -78,13 +78,14 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
     connect(ui->cmdCancel, &QAbstractButton::clicked, this, &frmSettings::onCmdCancelClicked);
     connect(ui->cmdDefaults, &QAbstractButton::clicked, this, &frmSettings::onCmdDefaultsClicked);
     connect(ui->cmdSerialPortsRefresh, &QAbstractButton::clicked, this, &frmSettings::onCmdSerialPortsRefreshClicked);
+    connect(ui->radDrawModeVectors, &QRadioButton::toggled, this, &frmSettings::onDrawModeVectorsToggled);
 
     //
 
     this->setLocale(QLocale::C);
     m_intValidator.setBottom(1);
     m_intValidator.setTop(999);
-    ui->cboFps->setValidator(&m_intValidator);
+    ui->cboFpsLock->setValidator(&m_intValidator);
     ui->cboFontSize->setValidator(&m_intValidator);
 
     foreach (QGroupBox *box, this->findChildren<QGroupBox*>()) {
@@ -146,6 +147,26 @@ void frmSettings::initializeWidgets()
     ui->txtRawTcpPort->setText(QString::number(connection.rawTcpPort()));
 
     const ConfigurationVisualizer &visualizer = m_configuration.visualizerModule();
+    ui->chkAntialiasing->setChecked(visualizer.antialiasing());
+    ui->chkZBuffer->setChecked(visualizer.zBuffer());
+    ui->txtFieldOfView->setValue(visualizer.fieldOfView());
+    ui->txtNearPlane->setValue(visualizer.nearPlane());
+    ui->txtFarPlane->setValue(visualizer.farPlane());
+    ui->txtLineWidth->setValue(visualizer.lineWidth());
+    ui->cboFpsLock->setCurrentText(QString::number(visualizer.fpsLock()));
+    ui->chkVSync->setChecked(visualizer.vsync());
+    ui->chkMSAA->setChecked(visualizer.msaa());
+    ui->chkSimplifyGeometry->setChecked(visualizer.simplifyGeometry());
+    ui->txtSimplifyPrecision->setValue(visualizer.simplifyGeometryPrecision());
+    ui->chkGrayscaleSegments->setChecked(visualizer.grayscaleSegments());
+    ui->radGrayscaleSegmentsByS->setChecked(visualizer.grayscaleSegmentsBySCode());
+    ui->radGrayscaleSegmentsByZ->setChecked(visualizer.grayscaleSegmentsByZCode());
+    ui->radDrawModeVectors->setChecked(visualizer.programDrawMode() == ConfigurationVisualizer::ProgramDrawMode::Vectors);
+    ui->radDrawModeRaster->setChecked(visualizer.programDrawMode() == ConfigurationVisualizer::ProgramDrawMode::Raster);
+    ui->cboToolType->setCurrentIndex(visualizer.toolType());
+    ui->txtToolAngle->setValue(visualizer.toolAngle());
+    ui->txtToolDiameter->setValue(visualizer.toolDiameter());
+    ui->txtToolLength->setValue(visualizer.toolLength());
 
     const ConfigurationSender &sender = m_configuration.senderModule();
     ui->chkUseStartCommands->setChecked(sender.useProgramStartCommands());
@@ -180,6 +201,25 @@ void frmSettings::applySettings()
     connection.m_rawTcpPort = ui->txtRawTcpPort->text().toInt();
 
     ConfigurationVisualizer &visualizer = m_configuration.visualizerModule();
+    visualizer.m_antialiasing = ui->chkAntialiasing->isChecked();
+    visualizer.m_zBuffer = ui->chkZBuffer->isChecked();
+    visualizer.m_fieldOfView = ui->txtFieldOfView->value();
+    visualizer.m_nearPlane = ui->txtNearPlane->value();
+    visualizer.m_farPlane = ui->txtFarPlane->value();
+    visualizer.m_lineWidth = ui->txtLineWidth->value();
+    visualizer.m_fpsLock = ui->cboFpsLock->currentText().toInt();
+    visualizer.m_vsync = ui->chkVSync->isChecked();
+    visualizer.m_msaa = ui->chkMSAA->isChecked();
+    visualizer.m_simplifyGeometry = ui->chkSimplifyGeometry->isChecked();
+    visualizer.m_simplifyGeometryPrecision = ui->txtSimplifyPrecision->value();
+    visualizer.m_grayscaleSegments = ui->chkGrayscaleSegments->isChecked();
+    visualizer.m_grayscaleSegmentsBySCode = ui->radGrayscaleSegmentsByS->isChecked();
+    visualizer.m_grayscaleSegmentsByZCode = ui->radGrayscaleSegmentsByZ->isChecked();
+    visualizer.m_programDrawMode = ui->radDrawModeVectors->isChecked() ? ConfigurationVisualizer::ProgramDrawMode::Vectors : ConfigurationVisualizer::ProgramDrawMode::Raster;
+    visualizer.m_toolType = (ConfigurationVisualizer::ToolType) ui->cboToolType->currentIndex();
+    visualizer.m_toolAngle = ui->txtToolAngle->value();
+    visualizer.m_toolDiameter = ui->txtToolDiameter->value();
+    visualizer.m_toolLength = ui->txtToolLength->value();
 
     ConfigurationSender &sender = m_configuration.senderModule();
     sender.m_useProgramStartCommands = ui->chkUseStartCommands->isChecked();
@@ -320,79 +360,25 @@ void frmSettings::onScrollBarValueChanged(int value)
     }
 }
 
-double frmSettings::toolDiameter()
-{
-    return ui->txtToolDiameter->value();
-}
+// double frmSettings::toolDiameter()
+// {
+//     return ui->txtToolDiameter->value();
+// }
 
-void frmSettings::setToolDiameter(double diameter)
-{
-    ui->txtToolDiameter->setValue(diameter);
-}
+// void frmSettings::setToolDiameter(double diameter)
+// {
+//     ui->txtToolDiameter->setValue(diameter);
+// }
 
-double frmSettings::toolLength()
-{
-    return ui->txtToolLength->value();
-}
+// double frmSettings::toolLength()
+// {
+//     return ui->txtToolLength->value();
+// }
 
-void frmSettings::setToolLength(double length)
-{
-    ui->txtToolLength->setValue(length);
-}
-
-bool frmSettings::antialiasing()
-{
-    return ui->chkAntialiasing->isChecked();
-}
-
-void frmSettings::setAntialiasing(bool antialiasing)
-{
-    ui->chkAntialiasing->setChecked(antialiasing);
-}
-
-bool frmSettings::zBuffer()
-{
-    return ui->chkZBuffer->isChecked();
-}
-
-void frmSettings::setZBuffer(bool zBuffer)
-{
-    ui->chkZBuffer->setChecked(zBuffer);
-}
-
-double frmSettings::fov() {
-    return ui->txtFov->value();
-}
-
-void frmSettings::setFov(double fov) {
-    ui->txtFov->setValue(fov);
-}
-
-double frmSettings::nearPlane() {
-    return ui->txtNear->value();
-}
-
-void frmSettings::setNearPlane(double near) {
-    ui->txtNear->setValue(near);
-}
-
-double frmSettings::farPlane() {
-    return ui->txtFar->value();
-}
-
-void frmSettings::setFarPlane(double far) {
-    ui->txtFar->setValue(far);
-}
-
-double frmSettings::lineWidth()
-{
-    return ui->txtLineWidth->value();
-}
-
-void frmSettings::setLineWidth(double lineWidth)
-{
-    ui->txtLineWidth->setValue(lineWidth);
-}
+// void frmSettings::setToolLength(double length)
+// {
+//     ui->txtToolLength->setValue(length);
+// }
 
 double frmSettings::arcLength()
 {
@@ -499,56 +485,6 @@ void frmSettings::setAcceleration(int acceleration)
     m_acceleration = acceleration;
 }
 
-int frmSettings::toolType()
-{
-    return ui->cboToolType->currentIndex();
-}
-
-void frmSettings::setToolType(int toolType)
-{
-    ui->cboToolType->setCurrentIndex(toolType);
-}
-
-double frmSettings::toolAngle()
-{
-    return ui->txtToolAngle->value();
-}
-
-void frmSettings::setToolAngle(double toolAngle)
-{
-    ui->txtToolAngle->setValue(toolAngle);
-}
-
-int frmSettings::fps()
-{
-    return ui->cboFps->currentText().toInt();
-}
-
-void frmSettings::setFps(int fps)
-{
-    ui->cboFps->setCurrentText(QString::number(fps));
-}
-
-bool frmSettings::vsync()
-{
-    return ui->chkVSync->isChecked();
-}
-
-void frmSettings::setVsync(bool value)
-{
-    ui->chkVSync->setChecked(value);
-}
-
-bool frmSettings::msaa()
-{
-    return ui->radMSAA->isChecked();
-}
-
-void frmSettings::setMsaa(bool msaa)
-{
-    ui->radMSAA->setChecked(msaa);
-}
-
 bool frmSettings::autoCompletion()
 {
     return ui->chkConsoleAutocompletion->isChecked();
@@ -557,36 +493,6 @@ bool frmSettings::autoCompletion()
 void frmSettings::setAutoCompletion(bool autoCompletion)
 {
     ui->chkConsoleAutocompletion->setChecked(autoCompletion);
-}
-
-int frmSettings::units()
-{
-    return m_units;
-}
-
-void frmSettings::setUnits(int units)
-{
-    m_units = units;
-}
-
-bool frmSettings::simplify()
-{
-    return ui->chkSimplify->isChecked();
-}
-
-void frmSettings::setSimplify(bool simplify)
-{
-    ui->chkSimplify->setChecked(simplify);
-}
-
-double frmSettings::simplifyPrecision()
-{
-    return ui->txtSimplifyPrecision->value();
-}
-
-void frmSettings::setSimplifyPrecision(double simplifyPrecision)
-{
-    ui->txtSimplifyPrecision->setValue(simplifyPrecision);
 }
 
 QList<ColorPicker *> frmSettings::colors()
@@ -608,38 +514,6 @@ int frmSettings::fontSize()
 void frmSettings::setFontSize(int fontSize)
 {
     ui->cboFontSize->setCurrentText(QString::number(fontSize));
-}
-
-bool frmSettings::grayscaleSegments()
-{
-    return ui->chkGrayscale->isChecked();
-}
-
-void frmSettings::setGrayscaleSegments(bool value)
-{
-    ui->chkGrayscale->setChecked(value);
-}
-
-bool frmSettings::grayscaleSCode()
-{
-    return ui->radGrayscaleS->isChecked();
-}
-
-void frmSettings::setGrayscaleSCode(bool value)
-{
-    ui->radGrayscaleS->setChecked(value);
-    ui->radGrayscaleZ->setChecked(!value);
-}
-
-bool frmSettings::drawModeVectors()
-{
-    return ui->radDrawModeVectors->isChecked();
-}
-
-void frmSettings::setDrawModeVectors(bool value)
-{
-    ui->radDrawModeVectors->setChecked(value);
-    ui->radDrawModeRaster->setChecked(!value);
 }
 
 bool frmSettings::ignoreErrors()
@@ -791,30 +665,10 @@ void frmSettings::onCmdDefaultsClicked()
     setSpindleSpeedMax(10000);
     setLaserPowerMin(0);
     setLaserPowerMax(100);
-    setUnits(0);
 
     setArcLength(0.1);
     setArcDegreeMode(true);
     setArcDegree(5.0);
-
-    setLineWidth(1.5);
-    setAntialiasing(true);
-    setMsaa(true);
-    setSimplify(true);
-    setSimplifyPrecision(0.0);
-    setFps(60);
-    setZBuffer(false);
-    setFov(60.0);
-    setNearPlane(0.5);
-    setFarPlane(10000.0);
-    setGrayscaleSegments(false);
-    setGrayscaleSCode(true);
-    setDrawModeVectors(true);
-
-    setToolType(1);
-    setToolAngle(15.0);
-    setToolDiameter(3.0);
-    setToolLength(30.0);
 
     setShowProgramCommands(false);
     setAutoCompletion(true);
@@ -878,28 +732,11 @@ void frmSettings::on_cboFontSize_currentTextChanged(const QString &arg1)
     qApp->setStyleSheet(QString(qApp->styleSheet()).replace(QRegExp("font-size:\\s*\\d+"), "font-size: " + arg1));
 }
 
-void frmSettings::on_radDrawModeVectors_toggled(bool checked)
+void frmSettings::onDrawModeVectorsToggled(bool checked)
 {
-    ui->chkSimplify->setEnabled(checked);
-    ui->lblSimpilyPrecision->setEnabled(checked && ui->chkSimplify->isChecked());
-    ui->txtSimplifyPrecision->setEnabled(checked && ui->chkSimplify->isChecked());
-
-    ui->radDrawModeRaster->setChecked(!checked);
-}
-
-void frmSettings::on_radDrawModeRaster_toggled(bool checked)
-{
-    ui->radDrawModeVectors->setChecked(!checked);
-}
-
-void frmSettings::on_radGrayscaleS_toggled(bool checked)
-{
-    ui->radGrayscaleZ->setChecked(!checked);
-}
-
-void frmSettings::on_radGrayscaleZ_toggled(bool checked)
-{
-    ui->radGrayscaleS->setChecked(!checked);
+    ui->chkSimplifyGeometry->setEnabled(checked);
+    ui->lblSimpilyPrecision->setEnabled(checked && ui->chkSimplifyGeometry->isChecked());
+    ui->txtSimplifyPrecision->setEnabled(checked && ui->chkSimplifyGeometry->isChecked());
 }
 
 void frmSettings::onConnectionModeChanged(int mod)

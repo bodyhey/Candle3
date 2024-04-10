@@ -2171,21 +2171,8 @@ void frmMain::loadSettings()
     // m_settings->setBaud(set.value("serialBaud").toInt());
     m_settings->setIgnoreErrors(set.value("ignoreErrors", false).toBool());
     m_settings->setAutoLine(set.value("autoLine", true).toBool());
-    m_settings->setToolDiameter(set.value("toolDiameter", 3).toDouble());
-    m_settings->setToolLength(set.value("toolLength", 15).toDouble());
-    m_settings->setAntialiasing(set.value("antialiasing", true).toBool());
-    m_settings->setMsaa(set.value("msaa", true).toBool());
-    m_settings->setVsync(set.value("vsync", false).toBool());
-    m_settings->setZBuffer(set.value("zBuffer", false).toBool());
-    m_settings->setFov(set.value("fov", 60).toDouble());
-    m_settings->setNearPlane(set.value("nearPlane", 0.5).toDouble());
-    m_settings->setFarPlane(set.value("farPlane", 10000.0).toDouble());
-    m_settings->setSimplify(set.value("simplify", false).toBool());
-    m_settings->setSimplifyPrecision(set.value("simplifyPrecision", 0).toDouble());
-    m_settings->setGrayscaleSegments(set.value("grayscaleSegments", false).toBool());
-    m_settings->setGrayscaleSCode(set.value("grayscaleSCode", true).toBool());
-    m_settings->setDrawModeVectors(set.value("drawModeVectors", true).toBool());    
-    m_settings->setLineWidth(set.value("lineWidth", 1).toDouble());
+    // m_settings->setToolDiameter(set.value("toolDiameter", 3).toDouble());
+    // m_settings->setToolLength(set.value("toolLength", 15).toDouble());
     m_settings->setArcLength(set.value("arcLength", 0).toDouble());
     m_settings->setArcDegree(set.value("arcDegree", 0).toDouble());
     m_settings->setArcDegreeMode(set.value("arcDegreeMode", true).toBool());
@@ -2197,9 +2184,8 @@ void frmMain::loadSettings()
     m_settings->setLaserPowerMax(set.value("laserPowerMax", 100).toInt());
     m_settings->setRapidSpeed(set.value("rapidSpeed", 0).toInt());
     m_settings->setAcceleration(set.value("acceleration", 10).toInt());
-    m_settings->setToolAngle(set.value("toolAngle", 0).toDouble());
-    m_settings->setToolType(set.value("toolType", 0).toInt());
-    m_settings->setFps(set.value("fps", 60).toInt());
+    // m_settings->setToolAngle(set.value("toolAngle", 0).toDouble());
+    // m_settings->setToolType(set.value("toolType", 0).toInt());
     // m_settings->setUseStartCommands(set.value("useStartCommands").toBool());
     // m_settings->setStartCommands(set.value("startCommands").toString());
     // m_settings->setUseEndCommands(set.value("useEndCommands").toBool());
@@ -2231,8 +2217,6 @@ void frmMain::loadSettings()
 
     ui->slbSpindleOverride->setChecked(set.value("spindleOverride", false).toBool());
     ui->slbSpindleOverride->setValue(set.value("spindleOverrideValue", 100).toInt());
-
-    m_settings->setUnits(set.value("units", 0).toInt());
 
     m_recentFiles = set.value("recentFiles", QStringList()).toStringList();
     m_recentHeightmaps = set.value("recentHeightmaps", QStringList()).toStringList();
@@ -2388,23 +2372,9 @@ void frmMain::saveSettings()
     // set.setValue("serialBaud", m_settings->baud());
     set.setValue("ignoreErrors", m_settings->ignoreErrors());
     set.setValue("autoLine", m_settings->autoLine());
-    set.setValue("toolDiameter", m_settings->toolDiameter());
-    set.setValue("toolLength", m_settings->toolLength());
-    set.setValue("antialiasing", m_settings->antialiasing());
-    set.setValue("msaa", m_settings->msaa());
-    set.setValue("vsync", m_settings->vsync());
-    set.setValue("zBuffer", m_settings->zBuffer());
-    set.setValue("fov", m_settings->fov());
-    set.setValue("nearPlane", m_settings->nearPlane());
-    set.setValue("farPlane", m_settings->farPlane());
-    set.setValue("simplify", m_settings->simplify());
-    set.setValue("simplifyPrecision", m_settings->simplifyPrecision());
-    set.setValue("grayscaleSegments", m_settings->grayscaleSegments());
-    set.setValue("grayscaleSCode", m_settings->grayscaleSCode());
-    set.setValue("drawModeVectors", m_settings->drawModeVectors());
-
+    // set.setValue("toolDiameter", m_settings->toolDiameter());
+    // set.setValue("toolLength", m_settings->toolLength());
     set.setValue("spindleSpeed", ui->slbSpindle->value());
-    set.setValue("lineWidth", m_settings->lineWidth());
     set.setValue("arcLength", m_settings->arcLength());
     set.setValue("arcDegree", m_settings->arcDegree());
     set.setValue("arcDegreeMode", m_settings->arcDegreeMode());
@@ -2414,9 +2384,8 @@ void frmMain::saveSettings()
     set.setValue("laserPowerMax", m_settings->laserPowerMax());
     set.setValue("rapidSpeed", m_settings->rapidSpeed());
     set.setValue("acceleration", m_settings->acceleration());
-    set.setValue("toolAngle", m_settings->toolAngle());
-    set.setValue("toolType", m_settings->toolType());
-    set.setValue("fps", m_settings->fps());
+    // set.setValue("toolAngle", m_settings->toolAngle());
+    // set.setValue("toolType", m_settings->toolType());
     set.setValue("autoScroll", ui->chkAutoScroll->isChecked());
     set.setValue("header", ui->tblProgram->horizontalHeader()->saveState());
     set.setValue("settingsSplitMain", m_settings->ui->splitMain->saveState());
@@ -2424,7 +2393,6 @@ void frmMain::saveSettings()
     set.setValue("formSettingsGeometry", m_settings->saveGeometry()); 
 
     // set.setValue("autoCompletion", m_settings->autoCompletion());
-    set.setValue("units", m_settings->units());
     set.setValue("recentFiles", m_recentFiles);
     set.setValue("recentHeightmaps", m_recentHeightmaps);
     set.setValue("lastFolder", m_lastFolder);
@@ -2542,33 +2510,36 @@ void frmMain::initializeConnection(ConnectionMode mode)
     connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));
 }
 
-void frmMain::applySettings() {
-    m_originDrawer->setLineWidth(m_settings->lineWidth());
-    m_toolDrawer.setToolDiameter(m_settings->toolDiameter());
-    m_toolDrawer.setToolLength(m_settings->toolLength());
-    m_toolDrawer.setLineWidth(m_settings->lineWidth());
-    m_codeDrawer->setLineWidth(m_settings->lineWidth());
-    m_heightMapBorderDrawer.setLineWidth(m_settings->lineWidth());
+void frmMain::applySettings()
+{
+    ConfigurationVisualizer &visualizerConfiguration = m_configuration.visualizerModule();
+
+    m_originDrawer->setLineWidth(visualizerConfiguration.lineWidth());
+    m_toolDrawer.setToolDiameter(visualizerConfiguration.toolDiameter());
+    m_toolDrawer.setToolLength(visualizerConfiguration.toolLength());
+    m_toolDrawer.setLineWidth(visualizerConfiguration.lineWidth());
+    m_codeDrawer->setLineWidth(visualizerConfiguration.lineWidth());
+    m_heightMapBorderDrawer.setLineWidth(visualizerConfiguration.lineWidth());
     m_heightMapGridDrawer.setLineWidth(0.1);
-    m_heightMapInterpolationDrawer.setLineWidth(m_settings->lineWidth());
-    ui->glwVisualizer->setLineWidth(m_settings->lineWidth());
+    m_heightMapInterpolationDrawer.setLineWidth(visualizerConfiguration.lineWidth());
+    ui->glwVisualizer->setLineWidth(visualizerConfiguration.lineWidth());
 
     // @TODO watch for changes is communicator?
     m_communicator->stopUpdatingState();
     m_communicator->startUpdatingState(m_configuration.connectionModule().queryStateInterval());
 
-    m_toolDrawer.setToolAngle(m_settings->toolType() == 0 ? 180 : m_settings->toolAngle());
+    m_toolDrawer.setToolAngle(visualizerConfiguration.toolType() == ConfigurationVisualizer::ToolType::Conic ? 180 : visualizerConfiguration.toolAngle());
     m_toolDrawer.setColor(m_settings->colors("Tool"));
     m_toolDrawer.update();
 
-    ui->glwVisualizer->setAntialiasing(m_settings->antialiasing());
-    ui->glwVisualizer->setMsaa(m_settings->msaa());
-    ui->glwVisualizer->setZBuffer(m_settings->zBuffer());
-    ui->glwVisualizer->setFov(m_settings->fov());
-    ui->glwVisualizer->setNearPlane(m_settings->nearPlane());
-    ui->glwVisualizer->setFarPlane(m_settings->farPlane());
-    ui->glwVisualizer->setVsync(m_settings->vsync());
-    ui->glwVisualizer->setFps(m_settings->fps());
+    ui->glwVisualizer->setAntialiasing(visualizerConfiguration.antialiasing());
+    ui->glwVisualizer->setMsaa(visualizerConfiguration.msaa());
+    ui->glwVisualizer->setZBuffer(visualizerConfiguration.zBuffer());
+    ui->glwVisualizer->setFov(visualizerConfiguration.fieldOfView());
+    ui->glwVisualizer->setNearPlane(visualizerConfiguration.nearPlane());
+    ui->glwVisualizer->setFarPlane(visualizerConfiguration.farPlane());
+    ui->glwVisualizer->setVsync(visualizerConfiguration.vsync());
+    ui->glwVisualizer->setFps(visualizerConfiguration.fpsLock());
     ui->glwVisualizer->setColorBackground(m_settings->colors("VisualizerBackground"));
     ui->glwVisualizer->setColorText(m_settings->colors("VisualizerText"));
 
@@ -2578,18 +2549,22 @@ void frmMain::applySettings() {
 
     // ui->cboCommand->setAutoCompletion(m_configuration.consoleModule().commandAutoCompletion());
 
-    m_codeDrawer->setSimplify(m_settings->simplify());
-    m_codeDrawer->setSimplifyPrecision(m_settings->simplifyPrecision());
+    m_codeDrawer->setSimplify(visualizerConfiguration.simplifyGeometry());
+    m_codeDrawer->setSimplifyPrecision(visualizerConfiguration.simplifyGeometryPrecision());
     m_codeDrawer->setColorNormal(m_settings->colors("ToolpathNormal"));
     m_codeDrawer->setColorDrawn(m_settings->colors("ToolpathDrawn"));
     m_codeDrawer->setColorHighlight(m_settings->colors("ToolpathHighlight"));
     m_codeDrawer->setColorZMovement(m_settings->colors("ToolpathZMovement"));
     m_codeDrawer->setColorStart(m_settings->colors("ToolpathStart"));
     m_codeDrawer->setColorEnd(m_settings->colors("ToolpathEnd"));
-    m_codeDrawer->setIgnoreZ(m_settings->grayscaleSegments() || !m_settings->drawModeVectors());
-    m_codeDrawer->setGrayscaleSegments(m_settings->grayscaleSegments());
-    m_codeDrawer->setGrayscaleCode(m_settings->grayscaleSCode() ? GcodeDrawer::S : GcodeDrawer::Z);
-    m_codeDrawer->setDrawMode(m_settings->drawModeVectors() ? GcodeDrawer::Vectors : GcodeDrawer::Raster);
+    m_codeDrawer->setIgnoreZ(visualizerConfiguration.grayscaleSegments() || !visualizerConfiguration.programDrawMode() != ConfigurationVisualizer::ProgramDrawMode::Vectors);
+    m_codeDrawer->setGrayscaleSegments(visualizerConfiguration.grayscaleSegments());
+    m_codeDrawer->setGrayscaleCode(visualizerConfiguration.grayscaleSegmentsBySCode() ? GcodeDrawer::S : GcodeDrawer::Z);
+    m_codeDrawer->setDrawMode(
+        visualizerConfiguration.programDrawMode() == ConfigurationVisualizer::ProgramDrawMode::Vectors
+        ? GcodeDrawer::Vectors
+        : GcodeDrawer::Raster
+    );
     m_codeDrawer->setGrayscaleMin(m_settings->laserPowerMin());
     m_codeDrawer->setGrayscaleMax(m_settings->laserPowerMax());
     m_codeDrawer->update();    
