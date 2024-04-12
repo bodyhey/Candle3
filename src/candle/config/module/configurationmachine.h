@@ -30,7 +30,11 @@ class ConfigurationMachine : public ConfigurationModule
         Q_ENUM(ReferencePositionDir);
 
         MinMax spindleSpeedRange() const { return {m_spindleSpeedMin, m_spindleSpeedMax}; }
+        int spindleSpeedMin() const { return m_spindleSpeedMin; }
+        int spindleSpeedMax() const { return m_spindleSpeedMax; }
         MinMax laserPowerRange() const { return {m_laserPowerMin, m_laserPowerMax}; }
+        int laserPowerMin() const { return m_laserPowerMin; }
+        int laserPowerMax() const { return m_laserPowerMax; }
         ReferencePositionDir referencePositionDirX() const { return m_referencePositionDirX; }
         ReferencePositionDir referencePositionDirY() const { return m_referencePositionDirY; }
         ReferencePositionDir referencePositionDirZ() const { return m_referencePositionDirZ; }

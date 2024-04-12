@@ -197,6 +197,18 @@ void frmSettings::initializeWidgets()
     ui->radArcDegreeMode->setChecked(parser.arcApproximationMode() == ConfigurationParser::ByAngle);
     ui->txtArcLength->setValue(parser.arcApproximationLength());
     ui->txtArcDegree->setValue(parser.arcApproximationAngle());
+
+    const ConfigurationMachine &machine = m_configuration.machineModule();
+    ui->txtSpindleSpeedMin->setValue(machine.spindleSpeedRange().min);
+    ui->txtSpindleSpeedMax->setValue(machine.spindleSpeedRange().max);
+    ui->txtLaserPowerMin->setValue(machine.laserPowerRange().min);
+    ui->txtLaserPowerMax->setValue(machine.laserPowerRange().max);
+    ui->radReferenceXMinus->setChecked(machine.referencePositionDirX() == ConfigurationMachine::Negative);
+    ui->radReferenceXPlus->setChecked(machine.referencePositionDirX() == ConfigurationMachine::Positive);
+    ui->radReferenceYMinus->setChecked(machine.referencePositionDirY() == ConfigurationMachine::Negative);
+    ui->radReferenceYPlus->setChecked(machine.referencePositionDirY() == ConfigurationMachine::Positive);
+    ui->radReferenceZMinus->setChecked(machine.referencePositionDirZ() == ConfigurationMachine::Negative);
+    ui->radReferenceZPlus->setChecked(machine.referencePositionDirZ() == ConfigurationMachine::Positive);
 }
 
 void frmSettings::applySettings()
@@ -265,6 +277,15 @@ void frmSettings::applySettings()
     parser.m_arcApproximationMode = ui->radArcDegreeMode->isChecked() ? ConfigurationParser::ByAngle : ConfigurationParser::ByLength;
     parser.m_arcApproximationLength = ui->txtArcLength->value();
     parser.m_arcApproximationAngle = ui->txtArcDegree->value();
+
+    ConfigurationMachine &machine = m_configuration.machineModule();
+    machine.m_spindleSpeedMin = ui->txtSpindleSpeedMin->value();
+    machine.m_spindleSpeedMax = ui->txtSpindleSpeedMax->value();
+    machine.m_laserPowerMin = ui->txtLaserPowerMin->value();
+    machine.m_laserPowerMax = ui->txtLaserPowerMax->value();
+    machine.m_referencePositionDirX = ui->radReferenceXMinus->isChecked() ? ConfigurationMachine::Negative : ConfigurationMachine::Positive;
+    machine.m_referencePositionDirY = ui->radReferenceYMinus->isChecked() ? ConfigurationMachine::Negative : ConfigurationMachine::Positive;
+    machine.m_referencePositionDirZ = ui->radReferenceZMinus->isChecked() ? ConfigurationMachine::Negative : ConfigurationMachine::Positive;
 }
 
 int frmSettings::exec()
@@ -390,66 +411,6 @@ void frmSettings::onScrollBarValueChanged(int value)
     }
 }
 
-int frmSettings::spindleSpeedMin()
-{
-    return ui->txtSpindleSpeedMin->value();
-}
-
-void frmSettings::setSpindleSpeedMin(int speed)
-{
-    ui->txtSpindleSpeedMin->setValue(speed);
-}
-
-int frmSettings::spindleSpeedMax()
-{
-    return ui->txtSpindleSpeedMax->value();
-}
-
-void frmSettings::setSpindleSpeedMax(int speed)
-{
-    ui->txtSpindleSpeedMax->setValue(speed);
-}
-
-int frmSettings::laserPowerMin()
-{
-    return ui->txtLaserPowerMin->value();
-}
-
-void frmSettings::setLaserPowerMin(int value)
-{
-    ui->txtLaserPowerMin->setValue(value);
-}
-
-int frmSettings::laserPowerMax()
-{
-    return ui->txtLaserPowerMax->value();
-}
-
-void frmSettings::setLaserPowerMax(int value)
-{
-    ui->txtLaserPowerMax->setValue(value);
-}
-
-bool frmSettings::ignoreErrors()
-{
-    return ui->chkIgnoreResponseErrors->isChecked();
-}
-
-void frmSettings::setIgnoreErrors(bool value)
-{
-    ui->chkIgnoreResponseErrors->setChecked(value);
-}
-
-bool frmSettings::autoLine()
-{
-    return ui->chkSetParseStateBeforeSendFromLine->isChecked();
-}
-
-void frmSettings::setAutoLine(bool value)
-{
-    ui->chkSetParseStateBeforeSendFromLine->setChecked(value);
-}
-
 void frmSettings::showEvent(QShowEvent *se)
 {
     Q_UNUSED(se)
@@ -499,13 +460,6 @@ void frmSettings::onCmdDefaultsClicked()
                              QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel) != QMessageBox::Yes) return;
 
     resetToDefaults();
-
-    setIgnoreErrors(false);
-
-    setSpindleSpeedMin(0);
-    setSpindleSpeedMax(10000);
-    setLaserPowerMin(0);
-    setLaserPowerMax(100);
 
     // setFontSize(9);
 

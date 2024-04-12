@@ -34,27 +34,6 @@ public:
 
     void addCustomSettings(QGroupBox *box);
 
-    int spindleSpeedMin();
-    void setSpindleSpeedMin(int speed);
-    int spindleSpeedMax();
-    void setSpindleSpeedMax(int speed);
-    int laserPowerMin();
-    void setLaserPowerMin(int value);
-    int laserPowerMax();
-    void setLaserPowerMax(int value);
-    int rapidSpeed();
-    void setRapidSpeed(int rapidSpeed);
-    int acceleration();
-    void setAcceleration(int acceleration);
-    int queryStateTime();
-    void setQueryStateTime(int queryStateTime);
-//    QList<ColorPicker*> colors();
-//    QColor colors(QString name);
-    bool ignoreErrors();
-    void setIgnoreErrors(bool value);
-    bool autoLine();
-    void setAutoLine(bool value);
-
 signals:
     void settingsSetToDefault();
 

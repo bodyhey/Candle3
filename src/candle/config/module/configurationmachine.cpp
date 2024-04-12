@@ -4,7 +4,15 @@
 
 #include "configurationmachine.h"
 
-const QMap<QString,QVariant> DEFAULTS = {};
+const QMap<QString,QVariant> DEFAULTS = {
+    {"spindleSpeedMin", 0},
+    {"spindleSpeedMax", 10000},
+    {"laserPowerMin", 0},
+    {"laserPowerMax", 100},
+    {"referencePositionDirX", ConfigurationMachine::ReferencePositionDir::Positive},
+    {"referencePositionDirY", ConfigurationMachine::ReferencePositionDir::Positive},
+    {"referencePositionDirZ", ConfigurationMachine::ReferencePositionDir::Positive}
+};
 
 ConfigurationMachine::ConfigurationMachine(QObject *parent) : ConfigurationModule(parent, DEFAULTS) {
 }

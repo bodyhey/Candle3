@@ -1981,7 +1981,7 @@ void frmMain::onActSendFromLineTriggered()
     int commandIndex = ui->tblProgram->currentIndex().row();
 
     // Set parser state
-    if (m_settings->autoLine()) {
+    if (m_configuration.senderModule().setParserStateBeforeSendingFromSelectedLine()) {
         QString commands = getLineInitCommands(commandIndex);
 
         QMessageBox box(this);
@@ -2165,18 +2165,11 @@ void frmMain::loadSettings()
 
     emit settingsAboutToLoad();
 
-    m_settings->setIgnoreErrors(set.value("ignoreErrors", false).toBool());
-    m_settings->setAutoLine(set.value("autoLine", true).toBool());
-    m_settings->setSpindleSpeedMin(set.value("spindleSpeedMin", 0).toInt());
-    m_settings->setSpindleSpeedMax(set.value("spindleSpeedMax", 100).toInt());
-    m_settings->setLaserPowerMin(set.value("laserPowerMin", 0).toInt());
-    m_settings->setLaserPowerMax(set.value("laserPowerMax", 100).toInt());
-
     ui->chkAutoScroll->setChecked(set.value("autoScroll", false).toBool());
 
     ui->slbSpindle->setRatio(100);
-    ui->slbSpindle->setMinimum(m_settings->spindleSpeedMin());
-    ui->slbSpindle->setMaximum(m_settings->spindleSpeedMax());
+    ui->slbSpindle->setMinimum(m_configuration.machineModule().spindleSpeedMin());
+    ui->slbSpindle->setMaximum(m_configuration.machineModule().spindleSpeedMax());
     ui->slbSpindle->setValue(set.value("spindleSpeed", 100).toInt());
 
     ui->slbFeedOverride->setChecked(set.value("feedOverride", false).toBool());
@@ -2337,13 +2330,7 @@ void frmMain::saveSettings()
 
     emit settingsAboutToSave();
 
-    set.setValue("ignoreErrors", m_settings->ignoreErrors());
-    set.setValue("autoLine", m_settings->autoLine());
     set.setValue("spindleSpeed", ui->slbSpindle->value());
-    set.setValue("spindleSpeedMin", m_settings->spindleSpeedMin());
-    set.setValue("spindleSpeedMax", m_settings->spindleSpeedMax());
-    set.setValue("laserPowerMin", m_settings->laserPowerMin());
-    set.setValue("laserPowerMax", m_settings->laserPowerMax());
     set.setValue("autoScroll", ui->chkAutoScroll->isChecked());
     set.setValue("header", ui->tblProgram->horizontalHeader()->saveState());
     set.setValue("settingsSplitMain", m_settings->ui->splitMain->saveState());
@@ -2479,9 +2466,9 @@ void frmMain::applySettings()
     ui->glwVisualizer->setColorBackground(visualizerConfiguration.backgroundColor());
     ui->glwVisualizer->setColorText(visualizerConfiguration.textColor());
 
-    ui->slbSpindle->setRatio((m_settings->spindleSpeedMax() - m_settings->spindleSpeedMin()) / 100);
-    ui->slbSpindle->setMinimum(m_settings->spindleSpeedMin());
-    ui->slbSpindle->setMaximum(m_settings->spindleSpeedMax());
+    ui->slbSpindle->setRatio((m_configuration.machineModule().spindleSpeedMax() - m_configuration.machineModule().spindleSpeedMin()) / 100);
+    ui->slbSpindle->setMinimum(m_configuration.machineModule().spindleSpeedMin());
+    ui->slbSpindle->setMaximum(m_configuration.machineModule().spindleSpeedMax());
 
     // ui->cboCommand->setAutoCompletion(m_configuration.consoleModule().commandAutoCompletion());
 
@@ -2501,8 +2488,8 @@ void frmMain::applySettings()
         ? GcodeDrawer::Vectors
         : GcodeDrawer::Raster
     );
-    m_codeDrawer->setGrayscaleMin(m_settings->laserPowerMin());
-    m_codeDrawer->setGrayscaleMax(m_settings->laserPowerMax());
+    m_codeDrawer->setGrayscaleMin(m_configuration.machineModule().laserPowerMin());
+    m_codeDrawer->setGrayscaleMax(m_configuration.machineModule().laserPowerMax());
     m_codeDrawer->update();    
 
     m_selectionDrawer.setColor(visualizerConfiguration.hightlightToolpathColor());
