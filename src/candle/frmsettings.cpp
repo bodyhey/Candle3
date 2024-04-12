@@ -192,6 +192,11 @@ void frmSettings::initializeWidgets()
     ui->txtAfterPauseCommands->setPlainText(sender.afterPauseCommands());
     ui->chkSetParseStateBeforeSendFromLine->setChecked(sender.setParserStateBeforeSendingFromSelectedLine());
     ui->chkIgnoreResponseErrors->setChecked(sender.ignoreErrorResponses());
+
+    const ConfigurationParser &parser = m_configuration.parserModule();
+    ui->radArcDegreeMode->setChecked(parser.arcApproximationMode() == ConfigurationParser::ByAngle);
+    ui->txtArcLength->setValue(parser.arcApproximationLength());
+    ui->txtArcDegree->setValue(parser.arcApproximationAngle());
 }
 
 void frmSettings::applySettings()
@@ -255,6 +260,11 @@ void frmSettings::applySettings()
     sender.m_toolChangePause = ui->chkPauseOnToolChange->isChecked();
     sender.m_ignoreErrorResponses = ui->chkIgnoreResponseErrors->isChecked();
     sender.m_setParserStateBeforeSendingFromSelectedLine = ui->chkSetParseStateBeforeSendFromLine->isChecked();
+
+    ConfigurationParser &parser = m_configuration.parserModule();
+    parser.m_arcApproximationMode = ui->radArcDegreeMode->isChecked() ? ConfigurationParser::ByAngle : ConfigurationParser::ByLength;
+    parser.m_arcApproximationLength = ui->txtArcLength->value();
+    parser.m_arcApproximationAngle = ui->txtArcDegree->value();
 }
 
 int frmSettings::exec()
@@ -400,40 +410,40 @@ void frmSettings::onScrollBarValueChanged(int value)
 //     ui->txtToolLength->setValue(length);
 // }
 
-double frmSettings::arcLength()
-{
-    return ui->txtArcLength->value();
-}
+// double frmSettings::arcLength()
+// {
+//     return ui->txtArcLength->value();
+// }
 
-void frmSettings::setArcLength(double arcPrecision)
-{
-    ui->txtArcLength->setValue(arcPrecision);
-}
+// void frmSettings::setArcLength(double arcPrecision)
+// {
+//     ui->txtArcLength->setValue(arcPrecision);
+// }
 
-double frmSettings::arcDegree()
-{
-    return ui->txtArcDegree->value();
-}
+// double frmSettings::arcDegree()
+// {
+//     return ui->txtArcDegree->value();
+// }
 
-void frmSettings::setArcDegree(double arcDegree)
-{
-    ui->txtArcDegree->setValue(arcDegree);
-}
+// void frmSettings::setArcDegree(double arcDegree)
+// {
+//     ui->txtArcDegree->setValue(arcDegree);
+// }
 
-double frmSettings::arcPrecision()
-{
-    return ui->radArcDegreeMode->isChecked() ? ui->txtArcDegree->value() : ui->txtArcLength->value();
-}
+// double frmSettings::arcPrecision()
+// {
+//     return ui->radArcDegreeMode->isChecked() ? ui->txtArcDegree->value() : ui->txtArcLength->value();
+// }
 
-bool frmSettings::arcDegreeMode()
-{
-    return ui->radArcDegreeMode->isChecked();
-}
+// bool frmSettings::arcDegreeMode()
+// {
+//     return ui->radArcDegreeMode->isChecked();
+// }
 
-void frmSettings::setArcDegreeMode(bool arcDegreeMode)
-{
-    ui->radArcDegreeMode->setChecked(arcDegreeMode);
-}
+// void frmSettings::setArcDegreeMode(bool arcDegreeMode)
+// {
+//     ui->radArcDegreeMode->setChecked(arcDegreeMode);
+// }
 
 void frmSettings::setShowProgramCommands(bool showAllCommands)
 {
@@ -685,10 +695,6 @@ void frmSettings::onCmdDefaultsClicked()
     setSpindleSpeedMax(10000);
     setLaserPowerMin(0);
     setLaserPowerMax(100);
-
-    setArcLength(0.1);
-    setArcDegreeMode(true);
-    setArcDegree(5.0);
 
     setShowProgramCommands(false);
     setAutoCompletion(true);

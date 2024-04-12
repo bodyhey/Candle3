@@ -2173,9 +2173,6 @@ void frmMain::loadSettings()
     m_settings->setAutoLine(set.value("autoLine", true).toBool());
     // m_settings->setToolDiameter(set.value("toolDiameter", 3).toDouble());
     // m_settings->setToolLength(set.value("toolLength", 15).toDouble());
-    m_settings->setArcLength(set.value("arcLength", 0).toDouble());
-    m_settings->setArcDegree(set.value("arcDegree", 0).toDouble());
-    m_settings->setArcDegreeMode(set.value("arcDegreeMode", true).toBool());
     // m_settings->setShowProgramCommands(set.value("showProgramCommands", 0).toBool());
     // m_settings->setShowUICommands(set.value("showUICommands", 0).toBool());
     m_settings->setSpindleSpeedMin(set.value("spindleSpeedMin", 0).toInt());
@@ -2375,9 +2372,6 @@ void frmMain::saveSettings()
     // set.setValue("toolDiameter", m_settings->toolDiameter());
     // set.setValue("toolLength", m_settings->toolLength());
     set.setValue("spindleSpeed", ui->slbSpindle->value());
-    set.setValue("arcLength", m_settings->arcLength());
-    set.setValue("arcDegree", m_settings->arcDegree());
-    set.setValue("arcDegreeMode", m_settings->arcDegreeMode());
     set.setValue("spindleSpeedMin", m_settings->spindleSpeedMin());
     set.setValue("spindleSpeedMax", m_settings->spindleSpeedMax());
     set.setValue("laserPowerMin", m_settings->laserPowerMin());
@@ -2802,7 +2796,15 @@ void frmMain::updateParser()
 
     parser->reset();
 
-    updateProgramEstimatedTime(parser->getLinesFromParser(&gp, m_settings->arcPrecision(), m_settings->arcDegreeMode()));
+    ConfigurationParser &configurationParser = m_configuration.parserModule();
+
+    updateProgramEstimatedTime(
+        parser->getLinesFromParser(
+            &gp,
+            configurationParser.arcApproximationValue(),
+            configurationParser.arcApproximationMode() == ConfigurationParser::ParserArcApproximationMode::ByAngle
+        )
+    );
     m_currentDrawer->update();
     ui->glwVisualizer->updateExtremes(m_currentDrawer);
     updateControlsState();
@@ -2953,7 +2955,13 @@ void frmMain::loadFile(QList<std::string> data)
 
     m_programModel.insertRow(m_programModel.rowCount());
 
-    updateProgramEstimatedTime(m_viewParser.getLinesFromParser(&gp, m_settings->arcPrecision(), m_settings->arcDegreeMode()));
+    updateProgramEstimatedTime(
+        m_viewParser.getLinesFromParser(
+            &gp,
+            m_configuration.parserModule().arcApproximationValue(),
+            m_configuration.parserModule().arcApproximationMode() == ConfigurationParser::ParserArcApproximationMode::ByAngle
+        )
+    );
 
     m_programLoading = false;
 

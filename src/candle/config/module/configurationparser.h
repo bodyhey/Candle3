@@ -13,26 +13,29 @@ class ConfigurationParser : public ConfigurationModule
     friend class frmSettings;
 
     Q_OBJECT
+    Q_PROPERTY(ParserArcApproximationMode arcApproximationMode MEMBER m_arcApproximationMode NOTIFY changed)
+    Q_PROPERTY(double arcApproximationLength MEMBER m_arcApproximationLength NOTIFY changed)
+    Q_PROPERTY(double arcApproximationAngle MEMBER m_arcApproximationAngle NOTIFY changed)
 
     public:
         explicit ConfigurationParser(QObject *parent);
         ConfigurationParser& operator=(const ConfigurationParser&) { return *this; }
         QString getSectionName() override { return "parser"; }
 
-        enum ApproximatationMode {
+        enum ParserArcApproximationMode {
             ByLength,
             ByAngle
         };
-        Q_ENUM(ApproximatationMode);
 
-        ApproximatationMode approximatationMode() const { return m_approximatationMode; }
-        float approximatationLength() const { return m_approximatationLength; }
-        float approximatationAngle() const { return m_approximatationAngle; }
+        ParserArcApproximationMode arcApproximationMode() const { return m_arcApproximationMode; }
+        double arcApproximationLength() const { return m_arcApproximationLength; }
+        double arcApproximationAngle() const { return m_arcApproximationAngle; }
+        double arcApproximationValue() const { return m_arcApproximationMode == ByLength ? m_arcApproximationLength : m_arcApproximationAngle; }
 
     private:
-        ApproximatationMode m_approximatationMode;
-        float m_approximatationLength;
-        float m_approximatationAngle;
+        ParserArcApproximationMode m_arcApproximationMode;
+        double m_arcApproximationLength;
+        double m_arcApproximationAngle;
 };
 
 #endif // CONFIGURATIONPARSER_H
