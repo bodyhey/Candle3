@@ -115,6 +115,7 @@ class Communicator : public QObject
         void storeParserState();
         void restoreParserState();
         void completeTransfer();
+
     private slots:
         void onTimerStateQuery();
         void onConnectionLineReceived(QString);

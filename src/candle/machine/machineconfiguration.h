@@ -8,11 +8,12 @@
 #include <QVector3D>
 #include <QMap>
 #include "../globals.h"
+#include "../config/module//configurationmachine.h"
 
 class MachineConfiguration
 {
     public:
-        MachineConfiguration(QMap<int, double> settings);
+        MachineConfiguration(QMap<int, double> settings, ConfigurationMachine &configuration);
         bool homingEnabled() { return m_homingEnabled; }
         int axisCount() { return m_axisCount; }
         Units units() { return m_units; }
@@ -25,6 +26,9 @@ class MachineConfiguration
         float rapidSpeed() { return m_rapidSpeed; }
         QVector3D stepsPerMM() { return m_stepsPerMM; }
         QVector3D maxTravel() { return m_maxTravel; }
+        QVector3D acceleration() { return m_acceleration; }
+        QVector3D maxRate() { return m_maxRate; }
+        QVector3D machineBounds() { return m_machineBounds; }
 
     private:
         bool m_homingEnabled = false;
@@ -35,10 +39,11 @@ class MachineConfiguration
         bool m_laserMode = false;
         double m_homingPullOff = 0;
         float m_rapidSpeed = 0;
-        QVector3D m_stepsPerMM;
-        QVector3D m_maxTravel;
-        QVector3D m_acceleration;
-        QVector3D m_maxRate;
+        QVector3D m_stepsPerMM = QVector3D(0,0,0);
+        QVector3D m_maxTravel = QVector3D(0,0,0);
+        QVector3D m_acceleration = QVector3D(0,0,0);
+        QVector3D m_maxRate = QVector3D(0,0,0);
+        QVector3D m_machineBounds = QVector3D(0,0,0);
         Units setUnits(int setting);
 };
 

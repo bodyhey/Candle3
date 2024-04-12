@@ -430,36 +430,6 @@ void frmSettings::setLaserPowerMax(int value)
     ui->txtLaserPowerMax->setValue(value);
 }
 
-int frmSettings::rapidSpeed()
-{
-    return m_rapidSpeed;
-}
-
-void frmSettings::setRapidSpeed(int rapidSpeed)
-{
-    m_rapidSpeed = rapidSpeed;
-}
-
-int frmSettings::acceleration()
-{
-    return m_acceleration;
-}
-
-void frmSettings::setAcceleration(int acceleration)
-{
-    m_acceleration = acceleration;
-}
-
-int frmSettings::fontSize()
-{
-    return ui->cboFontSize->currentText().toInt();
-}
-
-void frmSettings::setFontSize(int fontSize)
-{
-    ui->cboFontSize->setCurrentText(QString::number(fontSize));
-}
-
 bool frmSettings::ignoreErrors()
 {
     return ui->chkIgnoreResponseErrors->isChecked();
@@ -478,77 +448,6 @@ bool frmSettings::autoLine()
 void frmSettings::setAutoLine(bool value)
 {
     ui->chkSetParseStateBeforeSendFromLine->setChecked(value);
-}
-
-QString frmSettings::language()
-{
-    return ui->cboLanguage->currentData().toString();
-}
-
-void frmSettings::setLanguage(QString language)
-{
-    int i = ui->cboLanguage->findData(language);
-    if (i != -1) ui->cboLanguage->setCurrentIndex(i);
-}
-
-QVector3D frmSettings::machineBounds()
-{
-    return m_machineBounds;
-}
-
-void frmSettings::setMachineBounds(QVector3D bounds)
-{
-    m_machineBounds = bounds;
-}
-
-bool frmSettings::homingEnabled()
-{
-    return m_homingEnabled;
-}
-
-void frmSettings::setHomingEnabled(bool homing)
-{
-    m_homingEnabled = homing;
-}
-
-bool frmSettings::softLimitsEnabled()
-{
-    return m_softLimitsEnabled;
-}
-
-void frmSettings::setSoftLimitsEnabled(bool softLimits)
-{
-    m_softLimitsEnabled = softLimits;
-}
-
-bool frmSettings::referenceXPlus()
-{
-    return ui->radReferenceXPlus->isChecked();
-}
-
-void frmSettings::setReferenceXPlus(bool value)
-{
-    ui->radReferenceXPlus->setChecked(value);
-}
-
-bool frmSettings::referenceYPlus()
-{
-    return ui->radReferenceYPlus->isChecked();
-}
-
-void frmSettings::setReferenceYPlus(bool value)
-{
-    ui->radReferenceYPlus->setChecked(value);
-}
-
-bool frmSettings::referenceZPlus()
-{
-    return ui->radReferenceZPlus->isChecked();
-}
-
-void frmSettings::setReferenceZPlus(bool value)
-{
-    ui->radReferenceZPlus->setChecked(value);
 }
 
 void frmSettings::showEvent(QShowEvent *se)
@@ -603,14 +502,12 @@ void frmSettings::onCmdDefaultsClicked()
 
     setIgnoreErrors(false);
 
-    setRapidSpeed(2000);
-    setAcceleration(100);
     setSpindleSpeedMin(0);
     setSpindleSpeedMax(10000);
     setLaserPowerMin(0);
     setLaserPowerMax(100);
 
-    setFontSize(9);
+    // setFontSize(9);
 
     // Shortcuts
     QMap<QString, QString> d;
@@ -647,7 +544,6 @@ void frmSettings::onCmdDefaultsClicked()
     ui->chkPauseOnToolChange->setChecked(false);
     ui->chkUseToolChangeCommands->setChecked(false);
     ui->chkConfirmToolChangeCommandsExecution->setChecked(false);
-    setLanguage("en");
 
     emit settingsSetToDefault();
 }

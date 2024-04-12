@@ -4,7 +4,7 @@
 
 #include "machineconfiguration.h"
 
-MachineConfiguration::MachineConfiguration(QMap<int, double> settings)
+MachineConfiguration::MachineConfiguration(QMap<int, double> settings, ConfigurationMachine &configuration)
 {
     if (settings.contains(13)) m_units = setUnits(settings[13]);
     if (settings.contains(20)) m_softLimitsEnabled = (bool)settings[20];
@@ -19,6 +19,7 @@ MachineConfiguration::MachineConfiguration(QMap<int, double> settings)
         m_maxRate.setX(settings[110]);
         m_acceleration.setX(settings[120]);
         m_maxTravel.setX(settings[130]);
+        m_machineBounds.setX(configuration.referencePositionDirX() ? -settings[130] : settings[130]);
     }
     if (settings.contains(111)) {
         m_axisCount++;
@@ -26,6 +27,7 @@ MachineConfiguration::MachineConfiguration(QMap<int, double> settings)
         m_maxRate.setY(settings[111]);
         m_acceleration.setY(settings[121]);
         m_maxTravel.setY(settings[131]);
+        m_machineBounds.setY(configuration.referencePositionDirY() ? -settings[131] : settings[131]);
     }
     if (settings.contains(112)) {
         m_axisCount++;
@@ -33,6 +35,7 @@ MachineConfiguration::MachineConfiguration(QMap<int, double> settings)
         m_maxRate.setZ(settings[112]);
         m_acceleration.setZ(settings[122]);
         m_maxTravel.setZ(settings[132]);
+        m_machineBounds.setZ(configuration.referencePositionDirZ() ? -settings[132] : settings[132]);
     }
 }
 

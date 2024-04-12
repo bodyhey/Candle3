@@ -2165,39 +2165,12 @@ void frmMain::loadSettings()
 
     emit settingsAboutToLoad();
 
-    // m_settings->setConnectionMode(static_cast<ConnectionMode>(set.value("connectionMode").toInt()));
-    m_settings->setFontSize(set.value("fontSize", 8).toInt());
-    // m_settings->setPort(set.value("serialPort").toString());
-    // m_settings->setBaud(set.value("serialBaud").toInt());
     m_settings->setIgnoreErrors(set.value("ignoreErrors", false).toBool());
     m_settings->setAutoLine(set.value("autoLine", true).toBool());
-    // m_settings->setToolDiameter(set.value("toolDiameter", 3).toDouble());
-    // m_settings->setToolLength(set.value("toolLength", 15).toDouble());
-    // m_settings->setShowProgramCommands(set.value("showProgramCommands", 0).toBool());
-    // m_settings->setShowUICommands(set.value("showUICommands", 0).toBool());
     m_settings->setSpindleSpeedMin(set.value("spindleSpeedMin", 0).toInt());
     m_settings->setSpindleSpeedMax(set.value("spindleSpeedMax", 100).toInt());
     m_settings->setLaserPowerMin(set.value("laserPowerMin", 0).toInt());
     m_settings->setLaserPowerMax(set.value("laserPowerMax", 100).toInt());
-    m_settings->setRapidSpeed(set.value("rapidSpeed", 0).toInt());
-    m_settings->setAcceleration(set.value("acceleration", 10).toInt());
-    // m_settings->setToolAngle(set.value("toolAngle", 0).toDouble());
-    // m_settings->setToolType(set.value("toolType", 0).toInt());
-    // m_settings->setUseStartCommands(set.value("useStartCommands").toBool());
-    // m_settings->setStartCommands(set.value("startCommands").toString());
-    // m_settings->setUseEndCommands(set.value("useEndCommands").toBool());
-    // m_settings->setEndCommands(set.value("endCommands").toString());
-    // m_settings->setUsePauseCommands(set.value("usePauseCommands").toBool());
-    // m_settings->setBeforePauseCommands(set.value("beforePauseCommands").toString());
-    // m_settings->setAfterPauseCommands(set.value("afterPauseCommands").toString());
-    // m_settings->setToolChangeCommands(set.value("toolChangeCommands").toString());
-    // m_settings->setToolChangePause(set.value("toolChangePause").toBool());
-    // m_settings->setToolChangeUseCommands(set.value("toolChangeUseCommands").toBool());
-    // m_settings->setToolChangeUseCommandsConfirm(set.value("toolChangeUseCommandsConfirm").toBool());
-    m_settings->setReferenceXPlus(set.value("referenceXPlus", false).toBool());
-    m_settings->setReferenceYPlus(set.value("referenceYPlus", false).toBool());
-    m_settings->setReferenceZPlus(set.value("referenceZPlus", false).toBool());
-    m_settings->setLanguage(set.value("language", "en").toString());
 
     ui->chkAutoScroll->setChecked(set.value("autoScroll", false).toBool());
 
@@ -2364,49 +2337,22 @@ void frmMain::saveSettings()
 
     emit settingsAboutToSave();
 
-    // set.setValue("connectionMode", m_settings->connectionMode());
-    // set.setValue("serialPort", m_settings->port());
-    // set.setValue("serialBaud", m_settings->baud());
     set.setValue("ignoreErrors", m_settings->ignoreErrors());
     set.setValue("autoLine", m_settings->autoLine());
-    // set.setValue("toolDiameter", m_settings->toolDiameter());
-    // set.setValue("toolLength", m_settings->toolLength());
     set.setValue("spindleSpeed", ui->slbSpindle->value());
     set.setValue("spindleSpeedMin", m_settings->spindleSpeedMin());
     set.setValue("spindleSpeedMax", m_settings->spindleSpeedMax());
     set.setValue("laserPowerMin", m_settings->laserPowerMin());
     set.setValue("laserPowerMax", m_settings->laserPowerMax());
-    set.setValue("rapidSpeed", m_settings->rapidSpeed());
-    set.setValue("acceleration", m_settings->acceleration());
-    // set.setValue("toolAngle", m_settings->toolAngle());
-    // set.setValue("toolType", m_settings->toolType());
     set.setValue("autoScroll", ui->chkAutoScroll->isChecked());
     set.setValue("header", ui->tblProgram->horizontalHeader()->saveState());
     set.setValue("settingsSplitMain", m_settings->ui->splitMain->saveState());
     set.setValue("formGeometry", this->saveGeometry());
     set.setValue("formSettingsGeometry", m_settings->saveGeometry()); 
 
-    // set.setValue("autoCompletion", m_settings->autoCompletion());
     set.setValue("recentFiles", m_recentFiles);
     set.setValue("recentHeightmaps", m_recentHeightmaps);
     set.setValue("lastFolder", m_lastFolder);
-    set.setValue("fontSize", m_settings->fontSize());
-
-    // set.setValue("useStartCommands", m_settings->useStartCommands());
-    // set.setValue("startCommands", m_settings->startCommands());
-    // set.setValue("useEndCommands", m_settings->useEndCommands());
-    // set.setValue("endCommands", m_settings->endCommands());
-    // set.setValue("usePauseCommands", m_settings->usePauseCommands());
-    // set.setValue("afterPauseCommands", m_settings->afterPauseCommands());
-    // set.setValue("beforePauseCommands", m_settings->beforePauseCommands());
-    // set.setValue("toolChangeCommands", m_settings->toolChangeCommands());
-    // set.setValue("toolChangePause", m_settings->toolChangePause());
-    // set.setValue("toolChangeUseCommands", m_settings->toolChangeUseCommands());
-    // set.setValue("toolChangeUseCommandsConfirm", m_settings->toolChangeUseCommandsConfirm());
-    set.setValue("referenceXPlus", m_settings->referenceXPlus());
-    set.setValue("referenceYPlus", m_settings->referenceYPlus());
-    set.setValue("referenceZPlus", m_settings->referenceZPlus());
-    set.setValue("language", m_settings->language());
 
     set.setValue("feedOverride", ui->slbFeedOverride->isChecked());
     set.setValue("feedOverrideValue", ui->slbFeedOverride->value());
@@ -2748,7 +2694,7 @@ void frmMain::updateParser()
     GcodeViewParse *parser = m_currentDrawer->viewParser();
 
     GcodeParser gp;
-    gp.setTraverseSpeed(m_settings->rapidSpeed());
+    gp.setTraverseSpeed(m_communicator->machineConfiguration().rapidSpeed());
     if (m_codeDrawer->getIgnoreZ()) gp.reset(QVector3D(qQNaN(), qQNaN(), 0));
 
     ui->tblProgram->setUpdatesEnabled(false);
@@ -2893,7 +2839,7 @@ void frmMain::loadFile(QList<std::string> data)
 
     // Prepare parser
     GcodeParser gp;
-    gp.setTraverseSpeed(m_settings->rapidSpeed());
+    gp.setTraverseSpeed(m_communicator->machineConfiguration().rapidSpeed());
     if (m_codeDrawer->getIgnoreZ()) gp.reset(QVector3D(qQNaN(), qQNaN(), 0));
 
     // Block parser updates on table changes
@@ -3327,7 +3273,7 @@ void frmMain::updateControlsState()
     ui->cboJogFeed->setEditable(!ui->chkKeyboardControl->isChecked());
     ui->cboJogStep->setEnabled(!ui->chkKeyboardControl->isChecked());
     ui->cboJogFeed->setEnabled(!ui->chkKeyboardControl->isChecked());
-    ui->cboJogStep->setStyleSheet(QString("font-size: %1").arg(m_settings->fontSize()));
+    ui->cboJogStep->setStyleSheet(QString("font-size: %1").arg(m_configuration.uiModule().fontSize()));
     ui->cboJogFeed->setStyleSheet(ui->cboJogStep->styleSheet());
 
     ui->tblHeightMap->setVisible(m_heightMapMode);
@@ -3837,15 +3783,19 @@ void frmMain::jogContinuous()
             }
             
             // Bounds
-            QVector3D b = m_settings->machineBounds();
+            QVector3D b = m_communicator->machineConfiguration().machineBounds();
             // Current machine coords
             // @TODO use m_communicator storedVars
-            QVector3D m(0, 0, 0); //m_communicator->toMetric(m_storedVars.Mx()), m_communicator->toMetric(m_storedVars.My()), m_communicator->toMetric(m_storedVars.Mz()));
+            QVector3D m(
+                m_communicator->toMetric(m_communicator->m_storedVars.Mx()),
+                m_communicator->toMetric(m_communicator->m_storedVars.My()),
+                m_communicator->toMetric(m_communicator->m_storedVars.Mz())
+            );
             // Distance to bounds
             QVector3D t;
             // Minimum distance to bounds
             double d = 0;
-            if (m_settings->softLimitsEnabled()) {
+            if (m_communicator->machineConfiguration().softLimitsEnabled()) {
                 t = QVector3D(j.x() * b.x() < 0 ? 0 - m.x() : b.x() - m.x(), 
                               j.y() * b.y() < 0 ? 0 - m.y() : b.y() - m.y(),
                               j.z() * b.z() < 0 ? 0 - m.z() : b.z() - m.z());
