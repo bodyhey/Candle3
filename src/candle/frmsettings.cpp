@@ -390,71 +390,6 @@ void frmSettings::onScrollBarValueChanged(int value)
     }
 }
 
-// double frmSettings::toolDiameter()
-// {
-//     return ui->txtToolDiameter->value();
-// }
-
-// void frmSettings::setToolDiameter(double diameter)
-// {
-//     ui->txtToolDiameter->setValue(diameter);
-// }
-
-// double frmSettings::toolLength()
-// {
-//     return ui->txtToolLength->value();
-// }
-
-// void frmSettings::setToolLength(double length)
-// {
-//     ui->txtToolLength->setValue(length);
-// }
-
-// double frmSettings::arcLength()
-// {
-//     return ui->txtArcLength->value();
-// }
-
-// void frmSettings::setArcLength(double arcPrecision)
-// {
-//     ui->txtArcLength->setValue(arcPrecision);
-// }
-
-// double frmSettings::arcDegree()
-// {
-//     return ui->txtArcDegree->value();
-// }
-
-// void frmSettings::setArcDegree(double arcDegree)
-// {
-//     ui->txtArcDegree->setValue(arcDegree);
-// }
-
-// double frmSettings::arcPrecision()
-// {
-//     return ui->radArcDegreeMode->isChecked() ? ui->txtArcDegree->value() : ui->txtArcLength->value();
-// }
-
-// bool frmSettings::arcDegreeMode()
-// {
-//     return ui->radArcDegreeMode->isChecked();
-// }
-
-// void frmSettings::setArcDegreeMode(bool arcDegreeMode)
-// {
-//     ui->radArcDegreeMode->setChecked(arcDegreeMode);
-// }
-
-void frmSettings::setShowProgramCommands(bool showAllCommands)
-{
-    ui->chkConsoleShowProgramCommands->setChecked(showAllCommands);
-}
-
-void frmSettings::setShowUICommands(bool showUICommands)
-{
-    ui->chkConsoleShowUICommands->setChecked(showUICommands);
-}
-
 int frmSettings::spindleSpeedMin()
 {
     return ui->txtSpindleSpeedMin->value();
@@ -514,27 +449,6 @@ void frmSettings::setAcceleration(int acceleration)
 {
     m_acceleration = acceleration;
 }
-
-bool frmSettings::autoCompletion()
-{
-    return ui->chkConsoleAutocompletion->isChecked();
-}
-
-void frmSettings::setAutoCompletion(bool autoCompletion)
-{
-    ui->chkConsoleAutocompletion->setChecked(autoCompletion);
-}
-
-// QList<ColorPicker *> frmSettings::colors()
-// {
-//     return ui->grpColors->findChildren<ColorPicker*>();
-// }
-
-// QColor frmSettings::colors(QString name)
-// {
-//     ColorPicker *pick = this->findChildren<ColorPicker*>("clp" + name).at(0);
-//     if (pick) return pick->color(); else return QColor();
-// }
 
 int frmSettings::fontSize()
 {
@@ -695,9 +609,6 @@ void frmSettings::onCmdDefaultsClicked()
     setSpindleSpeedMax(10000);
     setLaserPowerMin(0);
     setLaserPowerMax(100);
-
-    setShowProgramCommands(false);
-    setAutoCompletion(true);
 
     setFontSize(9);
 

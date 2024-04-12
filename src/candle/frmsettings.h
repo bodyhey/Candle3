@@ -22,9 +22,6 @@ class frmSettings;
 class frmSettings : public QDialog
 {
     Q_OBJECT
-    // Q_PROPERTY(double arcLength READ arcLength WRITE setArcLength)
-    // Q_PROPERTY(double arcDegree READ arcDegree WRITE setArcDegree)
-    // Q_PROPERTY(bool arcDegreeMode READ arcDegreeMode WRITE setArcDegreeMode)
     Q_PROPERTY(int spindleSpeedMin READ spindleSpeedMin WRITE setSpindleSpeedMin)
     Q_PROPERTY(int spindleSpeedMax READ spindleSpeedMax WRITE setSpindleSpeedMax)
     Q_PROPERTY(int laserPowerMin READ laserPowerMin WRITE setLaserPowerMin)
@@ -50,17 +47,6 @@ public:
 
     void addCustomSettings(QGroupBox *box);
 
-    // double toolDiameter();
-    // void setToolDiameter(double diameter);
-    // double toolLength();
-    // void setToolLength(double length);
-    // double arcLength();
-    // void setArcLength(double arcLength);
-    // double arcDegree();
-    // void setArcDegree(double arcDegree);
-    // double arcPrecision();
-    // bool arcDegreeMode();
-    // void setArcDegreeMode(bool arcDegreeMode);
     int spindleSpeedMin();
     void setSpindleSpeedMin(int speed);
     int spindleSpeedMax();
@@ -75,10 +61,6 @@ public:
     void setAcceleration(int acceleration);
     int queryStateTime();
     void setQueryStateTime(int queryStateTime);
-    // int toolType();
-    // void setToolType(int toolType);
-    // double toolAngle();
-    // void setToolAngle(double toolAngle);
 //    QList<ColorPicker*> colors();
 //    QColor colors(QString name);
     int fontSize();
@@ -122,12 +104,6 @@ private slots:
 
 private:
     Configuration &m_configuration;
-
-    bool autoCompletion();
-    void setAutoCompletion(bool autoCompletion);
-    bool showProgramCommands();
-    void setShowProgramCommands(bool showProgramCommands);
-    void setShowUICommands(bool showUICommands);
 
     void searchForSerialPorts();
 
