@@ -344,7 +344,7 @@ frmMain::~frmMain()
     delete m_communicator;
     delete m_connection;
     delete m_senderErrorBox;
-    delete ui;
+    delete ui; ui = nullptr;
 }
 
 void frmMain::initializeCommunicator()
@@ -3465,6 +3465,10 @@ void frmMain::resizeTableHeightMapSections()
 
 bool frmMain::eventFilter(QObject *obj, QEvent *event)
 {
+    if (ui == nullptr) {
+        return QMainWindow::eventFilter(obj, event);
+    }
+
     if (obj->inherits("QWidgetWindow")) {
 
         // Jog on keyboard control
