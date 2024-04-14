@@ -47,6 +47,7 @@ SOURCES += main.cpp\
     config/configuration.cpp \
     config/module/configurationconnection.cpp \
     config/module/configurationconsole.cpp \
+    config/module/configurationheightmap.cpp \
     config/module/configurationmachine.cpp \
     config/module/configurationparser.cpp \
     config/module/configurationsender.cpp \
@@ -101,6 +102,7 @@ HEADERS  += frmmain.h \
     config/configuration.h \
     config/module/configurationconnection.h \
     config/module/configurationconsole.h \
+    config/module/configurationheightmap.h \
     config/module/configurationmachine.h \
     config/module/configurationparser.h \
     config/module/configurationsender.h \

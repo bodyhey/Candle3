@@ -12,6 +12,7 @@ Configuration::Configuration(QObject *parent)
     m_parser(parent),
     m_ui(parent),
     m_machine(parent),
+    m_heightmap(parent),
     m_persister(parent),
     m_provider(parent)
 {
@@ -21,7 +22,8 @@ Configuration::Configuration(QObject *parent)
         << &m_console
         << &m_parser
         << &m_ui
-        << &m_machine;
+        << &m_machine
+        << &m_heightmap;
 }
 
 QString Configuration::language()

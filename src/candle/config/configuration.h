@@ -9,6 +9,7 @@
 #include "module/configurationparser.h"
 #include "module/configurationui.h"
 #include "module/configurationmachine.h"
+#include "module/configurationheightmap.h"
 #include "persistence/ini/inipersister.h"
 #include "persistence/ini/iniprovider.h"
 #include <QObject>
@@ -35,6 +36,7 @@ class Configuration : public QObject
         ConfigurationParser& parserModule() { return m_parser; };
         ConfigurationUI& uiModule() { return m_ui; };
         ConfigurationMachine& machineModule() { return m_machine; };
+        ConfigurationHeightmap& heightmapModule() { return m_heightmap; };
     private:
         QString m_language;
         QList<ConfigurationModule*> m_modules;
@@ -47,6 +49,7 @@ class Configuration : public QObject
         ConfigurationParser m_parser;
         ConfigurationUI m_ui;
         ConfigurationMachine m_machine;
+        ConfigurationHeightmap m_heightmap;
 
         // Read/Write
         IniPersister m_persister;
