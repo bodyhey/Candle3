@@ -83,24 +83,24 @@ void Configuration::saveModule(ConfigurationModule *module)
         QVariant value = prop.read(module);
 
         if (!persistByType(module->getSectionName(), prop.name(), value, prop.typeName())) {
-            auto registryItem = ConfigRegistry::getInfo(prop.typeName());
+            auto registryItem = ConfigurationRegistry::getInfo(prop.typeName());
             char *pos = (char*) value.data();
             switch (registryItem.type) {
-                case ConfigRegistry::Type::Unknown:
+                case ConfigurationRegistry::Type::Unknown:
                     break;
-                case ConfigRegistry::Type::Struct: {
+                case ConfigurationRegistry::Type::Struct: {
                     QVariant normalized = registryItem.normalizeStruct((const char*)value.constData());
                     persistByType(module->getSectionName(), prop.name(), normalized, "QVariantMap");
 
                     break;
                 }
-                case ConfigRegistry::Type::Value: {
+                case ConfigurationRegistry::Type::Value: {
                     QVariant normalized = registryItem.normalizeValue(value);
                     persistByType(module->getSectionName(), prop.name(), normalized, "QVariant");
 
                     break;
                 }
-                case ConfigRegistry::Type::Enum:
+                case ConfigurationRegistry::Type::Enum:
                     persistByType(module->getSectionName(), prop.name(), prop.read(module), "int");
 
                     break;
@@ -178,12 +178,12 @@ void Configuration::loadModule(ConfigurationModule *module)
         } else if (type == "double" || type == "float") {
             prop.write(module, m_provider.getDouble(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toDouble()));
         } else {
-            auto registryItem = ConfigRegistry::getInfo(prop.typeName());
+            auto registryItem = ConfigurationRegistry::getInfo(prop.typeName());
 
             switch (registryItem.type) {
-                case ConfigRegistry::Type::Unknown:
+                case ConfigurationRegistry::Type::Unknown:
                     break;
-                case ConfigRegistry::Type::Value: {
+                case ConfigurationRegistry::Type::Value: {
                     QVariant denormalized = registryItem.denormalizeValue(
                         m_provider.getVariant(module->getSectionName(), prop.name(), defaults[prop.name()])
                     );
@@ -192,7 +192,7 @@ void Configuration::loadModule(ConfigurationModule *module)
 
                     break;
                 }
-                case ConfigRegistry::Type::Struct: {
+                case ConfigurationRegistry::Type::Struct: {
                     QVariant denormalized = registryItem.denormalizeStruct(
                         m_provider.getVariantMap(module->getSectionName(), prop.name(), defaults[prop.name()].toMap())
                     );
@@ -201,7 +201,7 @@ void Configuration::loadModule(ConfigurationModule *module)
 
                     break;
                 }
-                case ConfigRegistry::Type::Enum:
+                case ConfigurationRegistry::Type::Enum:
                     prop.write(module, m_provider.getInt(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toInt()));
 
                     break;

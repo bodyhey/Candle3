@@ -11,5 +11,5 @@ const QMap<QString,QVariant> DEFAULTS = {
 };
 
 ConfigurationParser::ConfigurationParser(QObject *parent) : ConfigurationModule(parent, DEFAULTS) {
-    ConfigRegistry::registerEnum("ParserArcApproximationMode");
+    ConfigurationRegistry::registerEnum("ParserArcApproximationMode");
 }

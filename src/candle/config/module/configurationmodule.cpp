@@ -7,7 +7,7 @@
 
 ConfigurationModule::ConfigurationModule(QObject *parent, QMap<QString, QVariant> defaults) : QObject(parent), m_defaults(defaults)
 {
-    ConfigRegistry::registerStruct(
+    ConfigurationRegistry::registerStruct(
         "ConfigurationModule::MinMax",
         [](const char* data) -> QVariantMap {
             ConfigurationModule::MinMax *minMax = (ConfigurationModule::MinMax*)data;
@@ -36,7 +36,7 @@ ConfigurationModule::ConfigurationModule(QObject *parent, QMap<QString, QVariant
             });
         }
     );
-    ConfigRegistry::registerStruct(
+    ConfigurationRegistry::registerStruct(
         "ConfigurationModule::MinMaxDouble",
         [](const char* data) -> QVariantMap {
             ConfigurationModule::MinMaxDouble *minMax = (ConfigurationModule::MinMaxDouble*)data;
@@ -60,7 +60,7 @@ ConfigurationModule::ConfigurationModule(QObject *parent, QMap<QString, QVariant
             });
         }
     );
-    ConfigRegistry::registerValue(
+    ConfigurationRegistry::registerValue(
         "QColor",
         [](QVariant raw) -> QVariant {
             return raw.value<QColor>().name(QColor::HexArgb);

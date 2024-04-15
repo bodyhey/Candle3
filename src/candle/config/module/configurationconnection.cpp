@@ -15,4 +15,5 @@ const QMap<QString,QVariant> DEFAULTS = {
 
 ConfigurationConnection::ConfigurationConnection(QObject *parent) : ConfigurationModule(parent, DEFAULTS)
 {
+    ConfigurationRegistry::registerEnum("ConnectionMode");
 }

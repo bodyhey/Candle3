@@ -7,16 +7,10 @@
 
 #include <QDebug>
 #include <QVector>
-#include <functional>
 
 using namespace std;
 
-struct ConfigRegistryField {
-    QString name;
-    QString type;
-};
-
-class ConfigRegistry
+class ConfigurationRegistry
 {
     public:
         enum class Type {
