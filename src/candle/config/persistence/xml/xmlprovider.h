@@ -14,8 +14,8 @@ class XmlProvider : public Provider
         int getInt(const QString group, const QString key, int defaultValue) override;
         bool getBool(const QString group, const QString key, bool defaultValue) override;
         QString getString(const QString group, const QString key, QString defaultValue) override;
-        float getFloat(const QString group, const QString key, float defaultValue) override;
-        QVariant get(const QString group, const QString key, QVariant defaultValue) override;
+        double getDouble(const QString group, const QString key, double defaultValue) override;
+        QVariant getVariant(const QString group, const QString key, QVariant defaultValue) override;
 
     private:
         QSettings *m_settings;

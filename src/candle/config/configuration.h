@@ -1,7 +1,7 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
-#include "module/module.h"
+#include "module/configurationmodule.h"
 #include "module/configurationconnection.h"
 #include "module/configurationvisualizer.h"
 #include "module/configurationsender.h"
@@ -17,10 +17,6 @@
 class Configuration : public QObject
 {
     Q_OBJECT;
-    // Q_PROPERTY(ConfigurationConnection connection READ connectionModule CONSTANT);
-    // Q_PROPERTY(ConfigurationVisualizer visualizer READ visualizerModule CONSTANT);
-    // Q_PROPERTY(ConfigurationSender sender READ senderModule CONSTANT);
-    // Q_PROPERTY(ConfigurationConsole console READ consoleModule CONSTANT);
 
     public:
         Configuration(QObject *parent);
@@ -63,7 +59,6 @@ class Configuration : public QObject
     signals:
         void configurationChanged();
         void defaultConfigurationLoaded();
-
 };
 
 #endif // CONFIGURATION_H

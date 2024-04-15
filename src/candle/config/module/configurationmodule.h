@@ -7,26 +7,36 @@
 
 #include <QObject>
 #include <QVariant>
+#include "../registry.h"
 
 class ConfigurationModule : public QObject
 {
     Q_OBJECT
 
     public:
-        ConfigurationModule(QObject *parent, QMap<QString, QVariant> defaults) : QObject(parent), m_defaults(defaults) {}
+        ConfigurationModule(QObject *parent, QMap<QString, QVariant> defaults);
 
         QMap<QString, QVariant> getDefaults() { return m_defaults; }
-        virtual QVariant customGet(QString) { return QVariant(); };
+        virtual QVariant customGet(QString) { return QVariant(""); };
         virtual void customSet(QString, QVariant) {};
         virtual QString getSectionName() = 0;
 
         struct MinMax {
             int min;
             int max;
+
+            bool operator!=(const ConfigurationModule::MinMax& other) const {
+                return min != other.min || max != other.max;
+            }
         };
-        struct MinMaxFloat {
-            float min;
-            float max;
+
+        struct MinMaxDouble {
+            double min;
+            double max;
+
+            bool operator!=(const ConfigurationModule::MinMaxDouble& other) const {
+                return min != other.min || max != other.max;
+            }
         };
 
     private:
@@ -35,5 +45,8 @@ class ConfigurationModule : public QObject
     signals:
         void changed();
 };
+
+Q_DECLARE_METATYPE(ConfigurationModule::MinMax);
+Q_DECLARE_METATYPE(ConfigurationModule::MinMaxDouble);
 
 #endif // CONFIGURATION_MODULE_H

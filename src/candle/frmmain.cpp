@@ -2168,8 +2168,8 @@ void frmMain::loadSettings()
     ui->chkAutoScroll->setChecked(set.value("autoScroll", false).toBool());
 
     ui->slbSpindle->setRatio(100);
-    ui->slbSpindle->setMinimum(m_configuration.machineModule().spindleSpeedMin());
-    ui->slbSpindle->setMaximum(m_configuration.machineModule().spindleSpeedMax());
+    ui->slbSpindle->setMinimum(m_configuration.machineModule().spindleSpeedRange().min);
+    ui->slbSpindle->setMaximum(m_configuration.machineModule().spindleSpeedRange().max);
     ui->slbSpindle->setValue(set.value("spindleSpeed", 100).toInt());
 
     ui->slbFeedOverride->setChecked(set.value("feedOverride", false).toBool());
@@ -2247,7 +2247,7 @@ void frmMain::loadSettings()
     ui->dockUser->setMinimumWidth(w);
     ui->dockUser->setMaximumWidth(w + ui->scrollArea->verticalScrollBar()->width());
 
-        // Buttons
+    // Buttons
     int b = (w - ui->grpControl->layout()->margin() * 2 - ui->grpControl->layout()->spacing() * 3) / 4 * 0.8;
     int c = b * 0.8;
     setStyleSheet(styleSheet() + QString("\nStyledToolButton[adjustSize='true'] {\n\
@@ -2466,9 +2466,9 @@ void frmMain::applySettings()
     ui->glwVisualizer->setColorBackground(visualizerConfiguration.backgroundColor());
     ui->glwVisualizer->setColorText(visualizerConfiguration.textColor());
 
-    ui->slbSpindle->setRatio((m_configuration.machineModule().spindleSpeedMax() - m_configuration.machineModule().spindleSpeedMin()) / 100);
-    ui->slbSpindle->setMinimum(m_configuration.machineModule().spindleSpeedMin());
-    ui->slbSpindle->setMaximum(m_configuration.machineModule().spindleSpeedMax());
+    ui->slbSpindle->setRatio(m_configuration.machineModule().spindleSpeedRatio());
+    ui->slbSpindle->setMinimum(m_configuration.machineModule().spindleSpeedRange().min);
+    ui->slbSpindle->setMaximum(m_configuration.machineModule().spindleSpeedRange().max);
 
     // ui->cboCommand->setAutoCompletion(m_configuration.consoleModule().commandAutoCompletion());
 
@@ -2488,8 +2488,8 @@ void frmMain::applySettings()
         ? GcodeDrawer::Vectors
         : GcodeDrawer::Raster
     );
-    m_codeDrawer->setGrayscaleMin(m_configuration.machineModule().laserPowerMin());
-    m_codeDrawer->setGrayscaleMax(m_configuration.machineModule().laserPowerMax());
+    m_codeDrawer->setGrayscaleMin(m_configuration.machineModule().laserPowerRange().min);
+    m_codeDrawer->setGrayscaleMax(m_configuration.machineModule().laserPowerRange().max);
     m_codeDrawer->update();    
 
     m_selectionDrawer.setColor(visualizerConfiguration.hightlightToolpathColor());

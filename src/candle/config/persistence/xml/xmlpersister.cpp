@@ -46,7 +46,7 @@ bool XmlPersister::setString(const QString group, const QString key, const QStri
     return true;
 }
 
-bool XmlPersister::setFloat(const QString group, const QString key, const float value)
+bool XmlPersister::setDouble(const QString group, const QString key, const double value)
 {
     if (!m_settings) {
         return false;

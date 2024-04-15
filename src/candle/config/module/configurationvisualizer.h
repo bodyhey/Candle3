@@ -7,14 +7,14 @@
 
 #include <QObject>
 #include <QColor>
-#include "module.h"
+#include "configurationmodule.h"
 
 class ConfigurationVisualizer : public ConfigurationModule
 {
     friend class frmSettings;
 
     Q_OBJECT;
-    Q_PROPERTY(float lineWidth MEMBER m_lineWidth NOTIFY changed);
+    Q_PROPERTY(double lineWidth MEMBER m_lineWidth NOTIFY changed);
     Q_PROPERTY(int fpsLock MEMBER m_fpsLock NOTIFY changed);
     Q_PROPERTY(bool antialiasing MEMBER m_antialiasing NOTIFY changed);
     Q_PROPERTY(bool msaa MEMBER m_msaa NOTIFY changed);
@@ -22,13 +22,13 @@ class ConfigurationVisualizer : public ConfigurationModule
     Q_PROPERTY(bool vsync MEMBER m_vsync NOTIFY changed);
     Q_PROPERTY(ProgramDrawMode programDrawMode MEMBER m_programDrawMode NOTIFY changed);
     Q_PROPERTY(bool simplifyGeometry MEMBER m_simplifyGeometry NOTIFY changed);
-    Q_PROPERTY(float simplifyGeometryPrecision MEMBER m_simplifyGeometryPrecision NOTIFY changed);
+    Q_PROPERTY(double simplifyGeometryPrecision MEMBER m_simplifyGeometryPrecision NOTIFY changed);
     Q_PROPERTY(bool grayscaleSegments MEMBER m_grayscaleSegments NOTIFY changed);
     Q_PROPERTY(bool grayscaleSegmentsBySCode MEMBER m_grayscaleSegmentsBySCode NOTIFY changed);
     Q_PROPERTY(bool grayscaleSegmentsByZCode MEMBER m_grayscaleSegmentsByZCode NOTIFY changed);
-    Q_PROPERTY(float fieldOfView MEMBER m_fieldOfView NOTIFY changed);
-    Q_PROPERTY(float nearPlane MEMBER m_nearPlane NOTIFY changed);
-    Q_PROPERTY(float farPlane MEMBER m_farPlane NOTIFY changed);
+    Q_PROPERTY(double fieldOfView MEMBER m_fieldOfView NOTIFY changed);
+    Q_PROPERTY(double nearPlane MEMBER m_nearPlane NOTIFY changed);
+    Q_PROPERTY(double farPlane MEMBER m_farPlane NOTIFY changed);
     Q_PROPERTY(QColor backgroundColor MEMBER m_backgroundColor NOTIFY changed);
     Q_PROPERTY(QColor toolColor MEMBER m_toolColor NOTIFY changed);
     Q_PROPERTY(QColor textColor MEMBER m_textColor NOTIFY changed);
@@ -61,7 +61,7 @@ class ConfigurationVisualizer : public ConfigurationModule
         };
         Q_ENUM(ToolType);
 
-        float lineWidth() const { return m_lineWidth; }
+        double lineWidth() const { return m_lineWidth; }
         int fpsLock() const { return m_fpsLock; }
         bool antialiasing() const { return m_antialiasing; }
         bool msaa() const { return m_msaa; }
@@ -69,13 +69,13 @@ class ConfigurationVisualizer : public ConfigurationModule
         bool vsync() const { return m_vsync; }
         ProgramDrawMode programDrawMode() const { return m_programDrawMode; }
         bool simplifyGeometry() const { return m_simplifyGeometry; }
-        float simplifyGeometryPrecision() const { return m_simplifyGeometryPrecision; }
+        double simplifyGeometryPrecision() const { return m_simplifyGeometryPrecision; }
         bool grayscaleSegments() const { return m_grayscaleSegments; }
         bool grayscaleSegmentsBySCode() const { return m_grayscaleSegmentsBySCode; }
         bool grayscaleSegmentsByZCode() const { return m_grayscaleSegmentsByZCode; }
-        float fieldOfView() const { return m_fieldOfView; }
-        float nearPlane() const { return m_nearPlane; }
-        float farPlane() const { return m_farPlane; }
+        double fieldOfView() const { return m_fieldOfView; }
+        double nearPlane() const { return m_nearPlane; }
+        double farPlane() const { return m_farPlane; }
         // colors
         QColor backgroundColor() const { return m_backgroundColor; }
         QColor toolColor() const { return m_toolColor; }
@@ -94,7 +94,7 @@ class ConfigurationVisualizer : public ConfigurationModule
         double toolAngle() const { return m_toolAngle; }
 
     private:
-        float m_lineWidth;
+        double m_lineWidth;
         int m_fpsLock;
         bool m_antialiasing;
         bool m_msaa;
@@ -102,13 +102,13 @@ class ConfigurationVisualizer : public ConfigurationModule
         bool m_vsync;
         ProgramDrawMode m_programDrawMode;
         bool m_simplifyGeometry;
-        float m_simplifyGeometryPrecision;
+        double m_simplifyGeometryPrecision;
         bool m_grayscaleSegments;
         bool m_grayscaleSegmentsBySCode;
         bool m_grayscaleSegmentsByZCode;
-        float m_fieldOfView;
-        float m_nearPlane;
-        float m_farPlane;
+        double m_fieldOfView;
+        double m_nearPlane;
+        double m_farPlane;
         // colors
         QColor m_backgroundColor;
         QColor m_toolColor;
@@ -126,5 +126,10 @@ class ConfigurationVisualizer : public ConfigurationModule
         ToolType m_toolType;
         double m_toolAngle;
 };
+
+Q_DECLARE_METATYPE(ConfigurationVisualizer::ProgramDrawMode);
+Q_DECLARE_METATYPE(ConfigurationVisualizer::ToolType);
+Q_ENUMS(ConfigurationVisualizer::ProgramDrawMode);
+Q_ENUMS(ConfigurationVisualizer::ToolType);
 
 #endif // CONFIGURATION_VISUALIZER_H

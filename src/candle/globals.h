@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QVector3D>
 #include <QString>
+#include "config/registry.h"
 
 #define GRBL_LIVE_SOFT_RESET 0x18
 #define GRBL_LIVE_STATUS_REPORT '?'

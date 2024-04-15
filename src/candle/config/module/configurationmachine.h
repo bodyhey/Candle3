@@ -6,48 +6,44 @@
 #define CONFIGURATIONMACHINE_H
 
 #include <QObject>
-#include "module.h"
+#include "configurationmodule.h"
 
 class ConfigurationMachine : public ConfigurationModule
 {
     friend class frmSettings;
 
     Q_OBJECT
-    Q_PROPERTY(MinMax spindleSpeedRange READ spindleSpeedRange CONSTANT)
-    Q_PROPERTY(MinMax laserPowerRange READ laserPowerRange CONSTANT)
-    Q_PROPERTY(ReferencePositionDir referencePositionDirX READ referencePositionDirX CONSTANT)
-    Q_PROPERTY(ReferencePositionDir referencePositionDirY READ referencePositionDirY CONSTANT)
-    Q_PROPERTY(ReferencePositionDir referencePositionDirZ READ referencePositionDirZ CONSTANT)
+    Q_PROPERTY(ConfigurationModule::MinMax spindleSpeedRange MEMBER m_spindleSpeedRange NOTIFY changed)
+    Q_PROPERTY(ConfigurationModule::MinMax laserPowerRange MEMBER m_laserPowerRange NOTIFY changed)
+    Q_PROPERTY(ConfigurationMachine::ReferencePositionDir referencePositionDirX MEMBER m_referencePositionDirX NOTIFY changed)
+    Q_PROPERTY(ConfigurationMachine::ReferencePositionDir referencePositionDirY MEMBER m_referencePositionDirY NOTIFY changed)
+    Q_PROPERTY(ConfigurationMachine::ReferencePositionDir referencePositionDirZ MEMBER m_referencePositionDirZ NOTIFY changed)
 
     public:
         ConfigurationMachine(QObject *parent);
         QString getSectionName() override { return "machine"; }
 
-        enum ReferencePositionDir {
+        enum ReferencePositionDir : int {
             Negative,
             Positive
         };
-        Q_ENUM(ReferencePositionDir);
 
-        MinMax spindleSpeedRange() const { return {m_spindleSpeedMin, m_spindleSpeedMax}; }
-        int spindleSpeedMin() const { return m_spindleSpeedMin; }
-        int spindleSpeedMax() const { return m_spindleSpeedMax; }
-        MinMax laserPowerRange() const { return {m_laserPowerMin, m_laserPowerMax}; }
-        int laserPowerMin() const { return m_laserPowerMin; }
-        int laserPowerMax() const { return m_laserPowerMax; }
+        ConfigurationModule::MinMax spindleSpeedRange() const { return m_spindleSpeedRange; }
+        double spindleSpeedRatio() const { return (m_spindleSpeedRange.max - m_spindleSpeedRange.min) / 100; }
+        ConfigurationModule::MinMax laserPowerRange() const { return m_laserPowerRange; }
         ReferencePositionDir referencePositionDirX() const { return m_referencePositionDirX; }
         ReferencePositionDir referencePositionDirY() const { return m_referencePositionDirY; }
         ReferencePositionDir referencePositionDirZ() const { return m_referencePositionDirZ; }
 
     private:
-        int m_spindleSpeedMin;
-        int m_spindleSpeedMax;
-        int m_laserPowerMin;
-        int m_laserPowerMax;
+        MinMax m_spindleSpeedRange;
+        MinMax m_laserPowerRange;
 
         ReferencePositionDir m_referencePositionDirX;
         ReferencePositionDir m_referencePositionDirY;
         ReferencePositionDir m_referencePositionDirZ;
 };
+
+Q_DECLARE_METATYPE(ConfigurationMachine::ReferencePositionDir);
 
 #endif // CONFIGURATIONMACHINE_H

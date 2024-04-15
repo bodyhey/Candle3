@@ -13,4 +13,6 @@ const QMap<QString, QVariant> DEFAULTS = {
 
 ConfigurationConsole::ConfigurationConsole(QObject *parent) : ConfigurationModule(parent, DEFAULTS)
 {
+    m_commandHistory << "G0 X10 Y10 Z10"
+                     << "G1 X20 Y20 Z20";
 }

@@ -13,11 +13,16 @@ class IniPersister : public Persister
         void close() override;
         bool setInt(const QString group, const QString key, const int value) override;
         bool setString(const QString group, const QString key, const QString value) override;
-        bool setFloat(const QString group, const QString key, const float value) override;
+        bool setDouble(const QString group, const QString key, const double value) override;
         bool setBool(const QString group, const QString key, const bool value) override;
+        bool setStringList(const QString group, const QString key, const QStringList value) override;
+        bool setVariantMap(const QString group, const QString key, const QVariantMap value) override;
+        bool setVariant(const QString group, const QString key, const QVariant value) override;
 
     private:
         QSettings *m_settings;
+
+        // Persister interface
 };
 
 #endif // INI_CONFIG_PERSISTER_H

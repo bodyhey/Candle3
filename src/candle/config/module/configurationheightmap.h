@@ -5,7 +5,7 @@
 #ifndef CONFIGURATIONHEIGHTMAP_H
 #define CONFIGURATIONHEIGHTMAP_H
 
-#include "module.h"
+#include "configurationmodule.h"
 
 class ConfigurationHeightmap : public ConfigurationModule
 {

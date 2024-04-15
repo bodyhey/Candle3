@@ -6,7 +6,7 @@
 #define CONFIGURATIONPARSER_H
 
 #include <QObject>
-#include "module.h"
+#include "configurationmodule.h"
 
 class ConfigurationParser : public ConfigurationModule
 {
@@ -26,6 +26,7 @@ class ConfigurationParser : public ConfigurationModule
             ByLength,
             ByAngle
         };
+        Q_ENUM(ParserArcApproximationMode);
 
         ParserArcApproximationMode arcApproximationMode() const { return m_arcApproximationMode; }
         double arcApproximationLength() const { return m_arcApproximationLength; }

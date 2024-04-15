@@ -49,6 +49,7 @@ SOURCES += main.cpp\
     config/module/configurationconsole.cpp \
     config/module/configurationheightmap.cpp \
     config/module/configurationmachine.cpp \
+    config/module/configurationmodule.cpp \
     config/module/configurationparser.cpp \
     config/module/configurationsender.cpp \
     config/module/configurationui.cpp \
@@ -104,17 +105,18 @@ HEADERS  += frmmain.h \
     config/module/configurationconsole.h \
     config/module/configurationheightmap.h \
     config/module/configurationmachine.h \
+    config/module/configurationmodule.h \
     config/module/configurationparser.h \
     config/module/configurationsender.h \
     config/module/configurationui.h \
     config/module/configurationvisualizer.h \
-    config/module/module.h \
     config/persistence/persister.h \
     config/persistence/provider.h \
     config/persistence/ini/inipersister.h \
     config/persistence/ini/iniprovider.h \
     config/persistence/xml/xmlpersister.h \
     config/persistence/xml/xmlprovider.h \
+    config/registry.h \
     connection/connection.h \
     connection/connectionmanager.h \
     connection/rawtcpconnection.h \

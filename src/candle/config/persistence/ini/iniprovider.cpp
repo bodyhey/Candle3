@@ -44,12 +44,40 @@ QString IniProvider::getString(const QString group, const QString key, QString d
     return m_settings->value(group + '\\' + key, defaultValue).toString();
 }
 
-float IniProvider::getFloat(const QString group, const QString key, float defaultValue)
+double IniProvider::getDouble(const QString group, const QString key, double defaultValue)
 {
-    return m_settings->value(group + '\\' + key, defaultValue).toFloat();
+    return m_settings->value(group + '\\' + key, defaultValue).toDouble();
 }
 
-QVariant IniProvider::get(const QString group, const QString key, QVariant defaultValue)
+QVariant IniProvider::getVariant(const QString group, const QString key, QVariant defaultValue)
 {
     return m_settings->value(group + '\\' + key, defaultValue);
+}
+
+QStringList IniProvider::getStringList(const QString group, const QString key, QStringList defaultValue)
+{
+    return QStringList("");
+    // QVariant variantValue = m_settings->value(group + '\\' + key);
+    // if (!variantValue.isValid()) {
+    //     return defaultValue;
+    // }
+
+    // QString value = variantValue.toString();
+    // static const QRegExp rx("\\s*,\\s*");
+    // value.replace()
+    // value.split()
+}
+
+QVariantMap IniProvider::getVariantMap(const QString group, const QString key, QVariantMap mapWithDefaultValues)
+{
+    QMapIterator<QString, QVariant> it(mapWithDefaultValues);
+    QVariantMap result;
+    while (it.hasNext()) {
+        it.next();
+        result[it.key()] = m_settings->value(group + '/' + key + "." + it.key(), it.value());
+    }
+
+    //qDebug() << "abc" << group << key << mapWithDefaultValues << result;
+
+    return result;
 }

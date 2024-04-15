@@ -6,7 +6,7 @@
 #define CONFIGURATION_SENDER_H
 
 #include <QObject>
-#include "module.h"
+#include "configurationmodule.h"
 
 class ConfigurationSender : public ConfigurationModule
 {

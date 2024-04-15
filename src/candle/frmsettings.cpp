@@ -279,10 +279,8 @@ void frmSettings::applySettings()
     parser.m_arcApproximationAngle = ui->txtArcDegree->value();
 
     ConfigurationMachine &machine = m_configuration.machineModule();
-    machine.m_spindleSpeedMin = ui->txtSpindleSpeedMin->value();
-    machine.m_spindleSpeedMax = ui->txtSpindleSpeedMax->value();
-    machine.m_laserPowerMin = ui->txtLaserPowerMin->value();
-    machine.m_laserPowerMax = ui->txtLaserPowerMax->value();
+    machine.m_spindleSpeedRange = {ui->txtSpindleSpeedMin->value(), ui->txtSpindleSpeedMax->value()};
+    machine.m_laserPowerRange = {ui->txtLaserPowerMin->value(), ui->txtLaserPowerMax->value()};
     machine.m_referencePositionDirX = ui->radReferenceXMinus->isChecked() ? ConfigurationMachine::Negative : ConfigurationMachine::Positive;
     machine.m_referencePositionDirY = ui->radReferenceYMinus->isChecked() ? ConfigurationMachine::Negative : ConfigurationMachine::Positive;
     machine.m_referencePositionDirZ = ui->radReferenceZMinus->isChecked() ? ConfigurationMachine::Negative : ConfigurationMachine::Positive;

@@ -6,8 +6,11 @@
 
 const QMap<QString,QVariant> DEFAULTS = {
     {"fontSize", 12},
-    {"language", "en"}
+    {"language", "en"}    
 };
 
-ConfigurationUI::ConfigurationUI(QObject *parent) : ConfigurationModule(parent, DEFAULTS) {
+ConfigurationUI::ConfigurationUI(QObject *parent) : ConfigurationModule(parent, DEFAULTS)
+{
+    m_recentFiles << "ab,,,,,c.txt"
+                  << "text.gc\node";
 }

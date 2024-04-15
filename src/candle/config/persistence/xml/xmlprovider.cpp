@@ -44,12 +44,12 @@ QString XmlProvider::getString(const QString group, const QString key, QString d
     return m_settings->value(group + '\\' + key, defaultValue).toString();
 }
 
-float XmlProvider::getFloat(const QString group, const QString key, float defaultValue)
+double XmlProvider::getDouble(const QString group, const QString key, double defaultValue)
 {
-    return m_settings->value(group + '\\' + key, defaultValue).toFloat();
+    return m_settings->value(group + '\\' + key, defaultValue).toDouble();
 }
 
-QVariant XmlProvider::get(const QString group, const QString key, QVariant defaultValue)
+QVariant XmlProvider::getVariant(const QString group, const QString key, QVariant defaultValue)
 {
     return m_settings->value(group + '\\' + key, defaultValue);
 }

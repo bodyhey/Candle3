@@ -14,7 +14,10 @@ class Persister : public QObject
         virtual bool setInt(const QString group, const QString key, const int value) = 0;
         virtual bool setBool(const QString group, const QString key, const bool value) = 0;
         virtual bool setString(const QString group, const QString key, const QString value) = 0;
-        virtual bool setFloat(const QString group, const QString key, const float value) = 0;
+        virtual bool setDouble(const QString group, const QString key, const double value) = 0;
+        virtual bool setStringList(const QString group, const QString key, const QStringList value) = 0;
+        virtual bool setVariantMap(const QString group, const QString key, const QVariantMap value) = 0;
+        virtual bool setVariant(const QString group, const QString key, const QVariant value) = 0;
 };
 
 #endif // CONFIG_PERSISTER_H

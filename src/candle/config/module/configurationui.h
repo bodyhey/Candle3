@@ -6,7 +6,7 @@
 #define CONFIGURATIONUI_H
 
 #include <QObject>
-#include "module.h"
+#include "configurationmodule.h"
 
 class ConfigurationUI : public ConfigurationModule
 {
@@ -15,6 +15,7 @@ class ConfigurationUI : public ConfigurationModule
     Q_OBJECT
     Q_PROPERTY(int fontSize MEMBER m_fontSize NOTIFY changed)
     Q_PROPERTY(QString language MEMBER m_language NOTIFY changed)
+    Q_PROPERTY(QStringList recentFiles MEMBER m_recentFiles NOTIFY changed)
 
     public:
         explicit ConfigurationUI(QObject *parent);
@@ -22,10 +23,12 @@ class ConfigurationUI : public ConfigurationModule
 
         int fontSize() const { return m_fontSize; }
         QString language() const { return m_language; }
+        QStringList recentFiles() const { return m_recentFiles; }
 
     private:
         int m_fontSize;
         QString m_language;
+        QStringList m_recentFiles;
 
 };
 

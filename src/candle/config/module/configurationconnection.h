@@ -8,7 +8,7 @@
 #include <QObject>
 #include <QVariant>
 #include "../../globals.h"
-#include "module.h"
+#include "configurationmodule.h"
 
 class ConfigurationConnection : public ConfigurationModule
 {
@@ -49,5 +49,7 @@ class ConfigurationConnection : public ConfigurationModule
         QString m_rawTcpHost;
         int m_rawTcpPort;
 };
+
+Q_DECLARE_METATYPE(ConnectionMode);
 
 #endif // CONFIGURATION_CONNECTION_H

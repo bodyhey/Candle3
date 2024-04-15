@@ -1,6 +1,9 @@
 #include "inipersister.h"
 #include "../../../globals.h"
-#include "qguiapplication.h"
+#include <QJsonDocument>
+#include <QGuiApplication>
+#include <QStringList>
+#include <QJsonObject>
 
 IniPersister::IniPersister(QObject *parent) : Persister(parent)
 {
@@ -46,7 +49,7 @@ bool IniPersister::setString(const QString group, const QString key, const QStri
     return true;
 }
 
-bool IniPersister::setFloat(const QString group, const QString key, const float value)
+bool IniPersister::setDouble(const QString group, const QString key, const double value)
 {
     if (!m_settings) {
         return false;
@@ -61,6 +64,51 @@ bool IniPersister::setBool(const QString group, const QString key, const bool va
     if (!m_settings) {
         return false;
     }
+    m_settings->setValue(group + '/' + key, value);
+
+    return true;
+}
+
+bool IniPersister::setStringList(const QString group, const QString key, const QStringList value)
+{
+    if (!m_settings) {
+        return false;
+    }
+
+    QStringList list = value;
+
+    m_settings->setValue(group + '/' + key, list);//.replaceInStrings(",", "\\,").join(","));
+
+    return true;
+}
+
+bool IniPersister::setVariantMap(const QString group, const QString key, const QVariantMap value)
+{
+    if (!m_settings) {
+        return false;
+    }
+
+    QJsonObject obj;
+    QMapIterator<QString, QVariant> it(value);
+    while (it.hasNext()) {
+        it.next();
+        obj[it.key()] = it.value().toJsonValue();
+        m_settings->setValue(group + '/' + key + "." + it.key(), it.value());
+    }
+    QJsonDocument doc(obj);
+
+    //qDebug() << "Set variant: " << value << doc.toJson(QJsonDocument::Indented);
+    m_settings->setValue(group + '/' + key, QString(doc.toJson(QJsonDocument::Compact)));
+
+    return true;
+}
+
+bool IniPersister::setVariant(const QString group, const QString key, const QVariant value)
+{
+    if (!m_settings) {
+        return false;
+    }
+
     m_settings->setValue(group + '/' + key, value);
 
     return true;
