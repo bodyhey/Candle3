@@ -60,6 +60,10 @@ bool Configuration::persistByType(QString module, QString name, QVariant value, 
         m_persister.setDouble(module, name, value.toDouble());
     } else if (type == "QStringList") {
         m_persister.setStringList(module, name, value.toStringList());
+    } else if (type == "QVariantMap") {
+        m_persister.setVariantMap(module, name, value.toMap());
+    } else if (type == "QVariant") {
+        m_persister.setVariant(module, name, value);
     } else {
         return false;
     }
@@ -70,9 +74,7 @@ bool Configuration::persistByType(QString module, QString name, QVariant value, 
 void Configuration::saveModule(ConfigurationModule *module)
 {
     const QMetaObject *metaObj = module->metaObject();
-    // qDebug() << "MetaObject: " << metaObj->className();
-    // qDebug() << "Property Count: " << metaObj->propertyCount();
-    // qDebug() << "Property Offset: " << metaObj->classInfoCount();
+
     for (int i = 0; i < metaObj->propertyCount(); ++i) {
         QMetaProperty prop = metaObj->property(i);
 
@@ -80,39 +82,30 @@ void Configuration::saveModule(ConfigurationModule *module)
 
         QVariant value = prop.read(module);
 
-        //auto val = value.value<"abc">();
-
-//        qDebug() << "wartość" << prop.typeName() << prop.name() << value << value.isValid();
-
         if (!persistByType(module->getSectionName(), prop.name(), value, prop.typeName())) {
             auto registryItem = ConfigRegistry::getInfo(prop.typeName());
             char *pos = (char*) value.data();
             switch (registryItem.type) {
                 case ConfigRegistry::Type::Unknown:
-                    // qDebug() << "Custom get: " << prop.name() << prop.typeName();
                     break;
                 case ConfigRegistry::Type::Struct: {
-                    QVariantMap normalized = registryItem.normalizeStruct((const char*)value.constData());
-                    m_persister.setVariantMap(module->getSectionName(), prop.name(), normalized);
-                    // qDebug() << "Save struct: " << prop.name();
+                    QVariant normalized = registryItem.normalizeStruct((const char*)value.constData());
+                    persistByType(module->getSectionName(), prop.name(), normalized, "QVariantMap");
+
                     break;
                 }
                 case ConfigRegistry::Type::Value: {
                     QVariant normalized = registryItem.normalizeValue(value);
-                    m_persister.setVariant(module->getSectionName(), prop.name(), normalized);
-                    // qDebug() << "Save value: " << prop.name() << normalized << normalized.typeName();
+                    persistByType(module->getSectionName(), prop.name(), normalized, "QVariant");
+
                     break;
                 }
                 case ConfigRegistry::Type::Enum:
                     persistByType(module->getSectionName(), prop.name(), prop.read(module), "int");
+
                     break;
             }
 
-            // QVariant value = module->customGet(prop.name());
-            // if (!persistByType(module->getSectionName(), prop.name(), value, value.typeName())) {
-            //     // something went wrong
-            //     // @TODO exception??
-            // }
         }
     }
 }
@@ -134,13 +127,13 @@ void Configuration::setModuleDefaults(ConfigurationModule *module)
             prop.write(module, defaults[prop.name()].toInt());
         } else if (type == "bool") {
             prop.write(module, defaults[prop.name()].toBool());
-        } else if (type == "float") {
-            prop.write(module, defaults[prop.name()].toFloat());
-        } else if (type == "double") {
+        } else if (type == "double" || type == "float") {
             prop.write(module, defaults[prop.name()].toDouble());
-        } else {
-            module->customSet(prop.name(), defaults[prop.name()]);
-        }
+        } else if (type == "QVariantMap") {
+            prop.write(module, defaults[prop.name()].toMap());
+        } else if (type == "QVariant") {
+            prop.write(module, defaults[prop.name()]);
+        };
     }
 }
 
@@ -169,9 +162,7 @@ void Configuration::loadModule(ConfigurationModule *module)
     QMap<QString, QVariant> defaults = module->getDefaults();
 
     const QMetaObject *metaObj = module->metaObject();
-    // qDebug() << "MetaObject: " << metaObj->className();
-    // qDebug() << "Property Count: " << metaObj->propertyCount();
-    // qDebug() << "Property Offset: " << metaObj->classInfoCount();
+
     for (int i = 0; i < metaObj->propertyCount(); ++i) {
         QMetaProperty prop = metaObj->property(i);
 
@@ -184,30 +175,18 @@ void Configuration::loadModule(ConfigurationModule *module)
             prop.write(module, m_provider.getInt(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toInt()));
         } else if (type == "bool") {
             prop.write(module, m_provider.getBool(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toBool()));
-        } else if (type == "float_") {
-            //prop.write(module, m_provider.getFloat(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toFloat()));
         } else if (type == "double" || type == "float") {
             prop.write(module, m_provider.getDouble(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toDouble()));
-        }/* else if (type == "QColor") {
-        } else if (type == "QStringList") {
-            //prop.write(module, m_provider.getStringList(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toStringList()));
-        } else if (type == "QMap<QString,QString>___") {
-            //prop.write(module, m_provider.getStringStringMap(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toMap()));
-        }*/ else {
-            qDebug() << "Ładowanie: " << prop.name() << type << "wr" << prop.isWritable();
+        } else {
             auto registryItem = ConfigRegistry::getInfo(prop.typeName());
 
             switch (registryItem.type) {
                 case ConfigRegistry::Type::Unknown:
-
-                    //module->customSet(prop.name(), m_provider.get(module->getSectionName(), QString(prop.name()), defaults[prop.name()]));
                     break;
                 case ConfigRegistry::Type::Value: {
                     QVariant denormalized = registryItem.denormalizeValue(
                         m_provider.getVariant(module->getSectionName(), prop.name(), defaults[prop.name()])
                     );
-
-                    qDebug() << denormalized;
 
                     prop.write(module, denormalized);
 
@@ -218,21 +197,13 @@ void Configuration::loadModule(ConfigurationModule *module)
                         m_provider.getVariantMap(module->getSectionName(), prop.name(), defaults[prop.name()].toMap())
                     );
 
-                    qDebug() << defaults[prop.name()].toMap()
-                             << m_provider.getVariantMap(module->getSectionName(), prop.name(), defaults[prop.name()].toMap())
-                             << denormalized;
-
-                    if (QString(prop.name()) == "spindleSpeedRange") {
-                        ConfigurationModule::MinMax mm = denormalized.value<ConfigurationModule::MinMax>();
-                        qDebug() << mm.min << mm.max;
-                    }
-
                     prop.write(module, denormalized);
 
                     break;
                 }
                 case ConfigRegistry::Type::Enum:
                     prop.write(module, m_provider.getInt(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toInt()));
+
                     break;
             }
         }

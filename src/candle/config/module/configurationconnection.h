@@ -25,8 +25,6 @@ class ConfigurationConnection : public ConfigurationModule
     public:
         explicit ConfigurationConnection(QObject *parent);
         ConfigurationConnection& operator=(const ConfigurationConnection&) { return *this; }
-        QVariant customGet(QString) override;
-        void customSet(QString, QVariant) override;
         QString getSectionName() override { return "connection"; }
 
         ConnectionMode connectionMode() const { return m_connectionMode; }

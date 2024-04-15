@@ -16,15 +16,3 @@ const QMap<QString,QVariant> DEFAULTS = {
 ConfigurationConnection::ConfigurationConnection(QObject *parent) : ConfigurationModule(parent, DEFAULTS)
 {
 }
-
-QVariant ConfigurationConnection::customGet(QString param)
-{
-    if (param == "connectionMode") return (int) m_connectionMode;
-
-    return QVariant::Type::Invalid;
-}
-
-void ConfigurationConnection::customSet(QString param, QVariant)
-{
-    if (param == "connectionMode") m_connectionMode = (ConnectionMode) param.toInt();
-}
