@@ -749,6 +749,10 @@ void frmMain::on_actViewLockWindows_toggled(bool checked)
 
 void frmMain::on_cmdFileOpen_clicked()
 {
+    if (!m_communicator->isMachineConfigurationReady()) {
+        return;
+    }
+
     if (!m_heightMapMode) {
         loadFile("d:\\Obiekty3d\\TestGcode.nc");
         return;
@@ -2798,6 +2802,11 @@ void frmMain::loadFile(QString fileName)
 
 void frmMain::loadFile(QList<std::string> data)
 {
+    assert(m_communicator->isMachineConfigurationReady());
+    if (!m_communicator->isMachineConfigurationReady()) {
+        return;
+    }
+
     // Reset tables
     clearTable();
     m_probeModel.clear();

@@ -43,11 +43,7 @@ Communicator::Communicator(
     // temporary !!!
     m_communicator = this;
 
-    m_deviceState = DeviceUnknown;
-    m_senderState = SenderUnknown;
-
-    m_machinePos = QVector3D(0, 0, 0);
-    m_workPos = QVector3D(0, 0, 0);
+    resetStateVariables();
 
     // this->connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));
     connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
@@ -57,6 +53,15 @@ Communicator::Communicator(
     // Update state timer
     connect(&m_timerStateQuery, SIGNAL(timeout()), this, SLOT(onTimerStateQuery()));
     m_timerStateQuery.start();
+}
+
+void Communicator::resetStateVariables()
+{
+    m_deviceState = DeviceUnknown;
+    m_senderState = SenderUnknown;
+    m_machinePos = QVector3D(0, 0, 0);
+    m_workPos = QVector3D(0, 0, 0);
+    m_machineConfiguration = nullptr;
 }
 
 /**
@@ -197,6 +202,8 @@ void Communicator::reset()
 {
     m_connection->sendByteArray(QByteArray(1, GRBL_LIVE_SOFT_RESET));
 
+    resetStateVariables();
+
     setSenderStateAndEmitSignal(SenderStopped);
     setDeviceStateAndEmitSignal(DeviceUnknown);
     // in main form
@@ -271,17 +278,17 @@ void Communicator::startUpdatingState(int interval)
 void Communicator::restoreOffsets()
 {
     // Still have pre-reset working position
-    // sendCommand(QString("%4G53G90X%1Y%2Z%3").arg(ui->txtMPosX->value())
-    //                 .arg(ui->txtMPosY->value())
-    //                 .arg(ui->txtMPosZ->value())
-    //                 .arg(m_settings->units() ? "G20" : "G21"),
-    //             COMMAND_TI_UTIL1);
+    sendCommand(
+        CommandSource::System,
+        QString("%4G53G90X%1Y%2Z%3").arg(m_machinePos.x()).arg(m_machinePos.y()).arg(m_machinePos.z()).arg(m_machineConfiguration->unitsInches() ? "G20" : "G21"),
+        COMMAND_TI_UTIL1
+    );
 
-    // sendCommand(QString("%4G92X%1Y%2Z%3").arg(ui->txtWPosX->value())
-    //                 .arg(ui->txtWPosY->value())
-    //                 .arg(ui->txtWPosZ->value())
-    //                 .arg(m_settings->units() ? "G20" : "G21"),
-    //             COMMAND_TI_UTIL1);
+    sendCommand(
+        CommandSource::System,
+        QString("%4G92X%1Y%2Z%3").arg(m_workPos.x()).arg(m_workPos.y()).arg(m_workPos.z()).arg(m_machineConfiguration->unitsInches() ? "G20" : "G21"),
+        COMMAND_TI_UTIL1
+    );
 }
 
 void Communicator::setSenderStateAndEmitSignal(SenderState state)
@@ -330,6 +337,11 @@ void Communicator::sendStreamerCommandsUntilBufferIsFull()
         m_streamer->advanceCommandIndex();
         command = m_streamer->command();
     }
+}
+
+bool Communicator::isMachineConfigurationReady() const
+{
+    return m_machineConfiguration != nullptr;
 }
 
 void Communicator::processConnectionTimer()

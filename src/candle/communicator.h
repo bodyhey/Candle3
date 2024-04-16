@@ -40,6 +40,7 @@ class Communicator : public QObject
         MachineConfiguration machineConfiguration() const { return *m_machineConfiguration; }
         void processWorkOffset(QString data);
         void sendStreamerCommandsUntilBufferIsFull();
+        bool isMachineConfigurationReady() const;
 
         // @TODO to be removed!! another local timer? how it works??
         void processConnectionTimer();
@@ -115,6 +116,8 @@ class Communicator : public QObject
         void storeParserState();
         void restoreParserState();
         void completeTransfer();
+
+        void resetStateVariables();
 
     private slots:
         void onTimerStateQuery();
