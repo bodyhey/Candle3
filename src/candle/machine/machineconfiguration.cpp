@@ -19,7 +19,7 @@ MachineConfiguration::MachineConfiguration(QMap<int, double> settings, Configura
         m_maxRate.setX(settings[110]);
         m_acceleration.setX(settings[120]);
         m_maxTravel.setX(settings[130]);
-        m_machineBounds.setX(configuration.referencePositionDirX() ? -settings[130] : settings[130]);
+        m_machineBounds.setX(negativeValue(settings[130], configuration.referencePositionDirX()));
     }
     if (settings.contains(111)) {
         m_axisCount++;
@@ -27,7 +27,7 @@ MachineConfiguration::MachineConfiguration(QMap<int, double> settings, Configura
         m_maxRate.setY(settings[111]);
         m_acceleration.setY(settings[121]);
         m_maxTravel.setY(settings[131]);
-        m_machineBounds.setY(configuration.referencePositionDirY() ? -settings[131] : settings[131]);
+        m_machineBounds.setY(negativeValue(settings[131], configuration.referencePositionDirY()));
     }
     if (settings.contains(112)) {
         m_axisCount++;
@@ -35,7 +35,13 @@ MachineConfiguration::MachineConfiguration(QMap<int, double> settings, Configura
         m_maxRate.setZ(settings[112]);
         m_acceleration.setZ(settings[122]);
         m_maxTravel.setZ(settings[132]);
-        m_machineBounds.setZ(configuration.referencePositionDirZ() ? -settings[132] : settings[132]);
+        m_machineBounds.setZ(negativeValue(settings[132], configuration.referencePositionDirZ()));
+    }
+
+    if (configuration.overrideMaxTravel()) {
+        m_machineBounds.setX(negativeValue(configuration.maxTravel().x(), configuration.referencePositionDirX()));
+        m_machineBounds.setY(negativeValue(configuration.maxTravel().y(), configuration.referencePositionDirY()));
+        m_machineBounds.setZ(negativeValue(configuration.maxTravel().z(), configuration.referencePositionDirZ()));
     }
 }
 
@@ -44,4 +50,9 @@ Units MachineConfiguration::setUnits(int setting)
     if (setting == 1) return Units::Inches;
 
     return Units::Millimeters;
+}
+
+double MachineConfiguration::negativeValue(double value, bool negative)
+{
+    return negative ? -value : value;
 }

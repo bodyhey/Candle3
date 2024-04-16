@@ -45,6 +45,7 @@ class MachineConfiguration
         QVector3D m_maxRate = QVector3D(0,0,0);
         QVector3D m_machineBounds = QVector3D(0,0,0);
         Units setUnits(int setting);
+        double negativeValue(double value, bool negative);
 };
 
 #endif // MACHINECONFIGURATION_H

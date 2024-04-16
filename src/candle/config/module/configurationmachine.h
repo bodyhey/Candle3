@@ -7,6 +7,7 @@
 
 #include <QObject>
 #include "configurationmodule.h"
+#include <QVector3D>
 
 class ConfigurationMachine : public ConfigurationModule
 {
@@ -18,6 +19,8 @@ class ConfigurationMachine : public ConfigurationModule
     Q_PROPERTY(ConfigurationMachine::ReferencePositionDir referencePositionDirX MEMBER m_referencePositionDirX NOTIFY changed)
     Q_PROPERTY(ConfigurationMachine::ReferencePositionDir referencePositionDirY MEMBER m_referencePositionDirY NOTIFY changed)
     Q_PROPERTY(ConfigurationMachine::ReferencePositionDir referencePositionDirZ MEMBER m_referencePositionDirZ NOTIFY changed)
+    Q_PROPERTY(bool overrideMaxTravel MEMBER m_overrideMaxTravel NOTIFY changed)
+    Q_PROPERTY(QVector3D maxTravel MEMBER m_maxTravel NOTIFY changed)
 
     public:
         ConfigurationMachine(QObject *parent);
@@ -34,14 +37,17 @@ class ConfigurationMachine : public ConfigurationModule
         ReferencePositionDir referencePositionDirX() const { return m_referencePositionDirX; }
         ReferencePositionDir referencePositionDirY() const { return m_referencePositionDirY; }
         ReferencePositionDir referencePositionDirZ() const { return m_referencePositionDirZ; }
+        bool overrideMaxTravel() const { return m_overrideMaxTravel; }
+        QVector3D maxTravel() const { return m_maxTravel; }
 
     private:
         MinMax m_spindleSpeedRange;
         MinMax m_laserPowerRange;
-
         ReferencePositionDir m_referencePositionDirX;
         ReferencePositionDir m_referencePositionDirY;
         ReferencePositionDir m_referencePositionDirZ;
+        bool m_overrideMaxTravel;
+        QVector3D m_maxTravel;
 };
 
 Q_DECLARE_METATYPE(ConfigurationMachine::ReferencePositionDir);

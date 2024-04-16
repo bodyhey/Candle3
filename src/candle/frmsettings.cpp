@@ -79,6 +79,13 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
     connect(ui->cmdDefaults, &QAbstractButton::clicked, this, &frmSettings::onCmdDefaultsClicked);
     connect(ui->cmdSerialPortsRefresh, &QAbstractButton::clicked, this, &frmSettings::onCmdSerialPortsRefreshClicked);
     connect(ui->radDrawModeVectors, &QRadioButton::toggled, this, &frmSettings::onDrawModeVectorsToggled);
+    connect(ui->radArcDegreeMode, &QRadioButton::toggled, this, &frmSettings::onArcApproximationModeChanged);
+    connect(ui->radArcLengthMode, &QRadioButton::toggled, this, &frmSettings::onArcApproximationModeChanged);
+    connect(ui->chkOverrideMaxTravel, &QAbstractButton::toggled, [=](bool checked) {
+        ui->txtMaxTravelX->setEnabled(checked);
+        ui->txtMaxTravelY->setEnabled(checked);
+        ui->txtMaxTravelZ->setEnabled(checked);
+    });
 
     //
 
@@ -209,6 +216,10 @@ void frmSettings::initializeWidgets()
     ui->radReferenceYPlus->setChecked(machine.referencePositionDirY() == ConfigurationMachine::Positive);
     ui->radReferenceZMinus->setChecked(machine.referencePositionDirZ() == ConfigurationMachine::Negative);
     ui->radReferenceZPlus->setChecked(machine.referencePositionDirZ() == ConfigurationMachine::Positive);
+    ui->chkOverrideMaxTravel->setChecked(machine.overrideMaxTravel());
+    ui->txtMaxTravelX->setValue(machine.maxTravel().x());
+    ui->txtMaxTravelY->setValue(machine.maxTravel().y());
+    ui->txtMaxTravelZ->setValue(machine.maxTravel().z());
 }
 
 void frmSettings::applySettings()
@@ -277,6 +288,7 @@ void frmSettings::applySettings()
     parser.m_arcApproximationMode = ui->radArcDegreeMode->isChecked() ? ConfigurationParser::ByAngle : ConfigurationParser::ByLength;
     parser.m_arcApproximationLength = ui->txtArcLength->value();
     parser.m_arcApproximationAngle = ui->txtArcDegree->value();
+    onArcApproximationModeChanged(false);
 
     ConfigurationMachine &machine = m_configuration.machineModule();
     machine.m_spindleSpeedRange = {ui->txtSpindleSpeedMin->value(), ui->txtSpindleSpeedMax->value()};
@@ -284,6 +296,8 @@ void frmSettings::applySettings()
     machine.m_referencePositionDirX = ui->radReferenceXMinus->isChecked() ? ConfigurationMachine::Negative : ConfigurationMachine::Positive;
     machine.m_referencePositionDirY = ui->radReferenceYMinus->isChecked() ? ConfigurationMachine::Negative : ConfigurationMachine::Positive;
     machine.m_referencePositionDirZ = ui->radReferenceZMinus->isChecked() ? ConfigurationMachine::Negative : ConfigurationMachine::Positive;
+    machine.m_overrideMaxTravel = ui->chkOverrideMaxTravel->isChecked();
+    machine.m_maxTravel = QVector3D(ui->txtMaxTravelX->value(), ui->txtMaxTravelY->value(), ui->txtMaxTravelZ->value());
 }
 
 int frmSettings::exec()
@@ -510,6 +524,14 @@ void frmSettings::onDrawModeVectorsToggled(bool checked)
     ui->chkSimplifyGeometry->setEnabled(checked);
     ui->lblSimpilyPrecision->setEnabled(checked && ui->chkSimplifyGeometry->isChecked());
     ui->txtSimplifyPrecision->setEnabled(checked && ui->chkSimplifyGeometry->isChecked());
+}
+
+void frmSettings::onArcApproximationModeChanged(bool checked)
+{
+    Q_UNUSED(checked);
+
+    ui->txtArcLength->setEnabled(ui->radArcLengthMode->isChecked());
+    ui->txtArcDegree->setEnabled(ui->radArcDegreeMode->isChecked());
 }
 
 void frmSettings::onConnectionModeChanged(int mod)

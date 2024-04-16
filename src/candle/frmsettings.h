@@ -50,6 +50,7 @@ private slots:
     void onCmdDefaultsClicked();
     void on_cboFontSize_currentTextChanged(const QString &arg1);
     void onDrawModeVectorsToggled(bool checked);
+    void onArcApproximationModeChanged(bool checked);
     void onConnectionModeChanged(int);
 
 private:

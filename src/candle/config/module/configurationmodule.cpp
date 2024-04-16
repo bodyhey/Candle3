@@ -4,6 +4,7 @@
 
 #include "configurationmodule.h"
 #include <QColor>
+#include <QVector3D>
 
 ConfigurationModule::ConfigurationModule(QObject *parent, QMap<QString, QVariant> defaults) : QObject(parent), m_defaults(defaults)
 {
@@ -18,18 +19,6 @@ ConfigurationModule::ConfigurationModule(QObject *parent, QMap<QString, QVariant
             };
         },
         [](QVariantMap map) -> QVariant {
-            ConfigurationModule::MinMax minMax = ConfigurationModule::MinMax{
-                map["min"].toInt(),
-                map["max"].toInt(),
-            };
-            qDebug() << "min" << minMax.min << "max" << minMax.max;
-            QVariant v = QVariant::fromValue(minMax);
-
-            qDebug() << v;
-
-            ConfigurationModule::MinMax minMax2 = v.value<ConfigurationModule::MinMax>();
-            qDebug() << "min" << minMax2.min << "max" << minMax2.max;
-
             return QVariant::fromValue(ConfigurationModule::MinMax{
                 map["min"].toInt(),
                 map["max"].toInt(),
@@ -47,17 +36,29 @@ ConfigurationModule::ConfigurationModule(QObject *parent, QMap<QString, QVariant
             };
         },
         [](QVariantMap map) -> QVariant {
-            MinMaxDouble minMax = ConfigurationModule::MinMaxDouble{
-                map["min"].toDouble(),
-                map["max"].toDouble(),
-            };
-            qDebug() << "min" << minMax.min << "max" << minMax.max;
-            QVariant v = QVariant::fromValue(minMax);
-            qDebug() << v;
             return QVariant::fromValue(ConfigurationModule::MinMaxDouble{
                 map["min"].toDouble(),
                 map["max"].toDouble(),
             });
+        }
+    );
+    ConfigurationRegistry::registerStruct(
+        "QVector3D",
+        [](const char* data) -> QVariantMap {
+            QVector3D *vec = (QVector3D*)data;
+
+            return {
+                {"x", (double)vec->x()},
+                {"y", (double)vec->y()},
+                {"z", (double)vec->z()},
+            };
+        },
+        [](QVariantMap map) -> QVariant {
+            return QVariant::fromValue(QVector3D(
+                map["x"].toFloat(),
+                map["y"].toFloat(),
+                map["z"].toFloat()
+            ));
         }
     );
     ConfigurationRegistry::registerValue(
