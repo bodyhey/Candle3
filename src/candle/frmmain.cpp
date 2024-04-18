@@ -2150,56 +2150,56 @@ void frmMain::placeVisualizerButtons()
 
 void frmMain::preloadSettings()
 {
-    QSettings set(m_settingsFileName, QSettings::IniFormat);
-    set.setIniCodec("UTF-8");
+    ConfigurationUI &uiConfiguration = m_configuration.uiModule();
+    ConfigurationVisualizer &visualizerConfiguration = m_configuration.visualizerModule();
 
-    qApp->setStyleSheet(QString(qApp->styleSheet()).replace(QRegExp("font-size:\\s*\\d+"), "font-size: " + set.value("fontSize", "8").toString()));
+    qApp->setStyleSheet(QString(qApp->styleSheet()).replace(QRegExp("font-size:\\s*\\d+"), QString("font-size: %1").arg(uiConfiguration.fontSize())));
 
     // Update v-sync in glformat
-    // QGLFormat fmt = QGLFormat::defaultFormat();
-    // fmt.setSwapInterval(set.value("vsync", false).toBool() ? 1 : 0);
-    // QGLFormat::setDefaultFormat(fmt);
+    QGLFormat fmt = QGLFormat::defaultFormat();
+    fmt.setSwapInterval(visualizerConfiguration.vsync() ? 1 : 0);
+    QGLFormat::setDefaultFormat(fmt);
 }
 
 void frmMain::applyHeightmapConfiguration(ConfigurationHeightmap &configurationHeightmap)
 {
     ui->txtHeightMapBorderX->setValue(configurationHeightmap.borderX());
-    ui->txtHeightMapBorderY->setValue(set.value("heightmapBorderY", 0).toDouble());
-    ui->txtHeightMapBorderWidth->setValue(set.value("heightmapBorderWidth", 1).toDouble());
-    ui->txtHeightMapBorderHeight->setValue(set.value("heightmapBorderHeight", 1).toDouble());
-    ui->chkHeightMapBorderShow->setChecked(set.value("heightmapBorderShow", false).toBool());
+    ui->txtHeightMapBorderY->setValue(configurationHeightmap.borderY());
+    ui->txtHeightMapBorderWidth->setValue(configurationHeightmap.borderWidth());
+    ui->txtHeightMapBorderHeight->setValue(configurationHeightmap.borderHeight());
+    ui->chkHeightMapBorderShow->setChecked(configurationHeightmap.borderShow());
 
-    ui->txtHeightMapGridX->setValue(set.value("heightmapGridX", 1).toDouble());
-    ui->txtHeightMapGridY->setValue(set.value("heightmapGridY", 1).toDouble());
-    ui->txtHeightMapGridZTop->setValue(set.value("heightmapGridZTop", 1).toDouble());
-    ui->txtHeightMapGridZBottom->setValue(set.value("heightmapGridZBottom", -1).toDouble());
-    ui->txtHeightMapProbeFeed->setValue(set.value("heightmapProbeFeed", 10).toDouble());
-    ui->chkHeightMapGridShow->setChecked(set.value("heightmapGridShow", false).toBool());
+    ui->txtHeightMapGridX->setValue(configurationHeightmap.gridX());
+    ui->txtHeightMapGridY->setValue(configurationHeightmap.gridY());
+    ui->txtHeightMapGridZTop->setValue(configurationHeightmap.gridZTop());
+    ui->txtHeightMapGridZBottom->setValue(configurationHeightmap.gridZBottom());
+    ui->txtHeightMapProbeFeed->setValue(configurationHeightmap.probeFeed());
+    ui->chkHeightMapGridShow->setChecked(configurationHeightmap.gridShow());
 
-    ui->txtHeightMapInterpolationStepX->setValue(set.value("heightmapInterpolationStepX", 1).toDouble());
-    ui->txtHeightMapInterpolationStepY->setValue(set.value("heightmapInterpolationStepY", 1).toDouble());
-    ui->cboHeightMapInterpolationType->setCurrentIndex(set.value("heightmapInterpolationType", 0).toInt());
-    ui->chkHeightMapInterpolationShow->setChecked(set.value("heightmapInterpolationShow", false).toBool());
+    ui->txtHeightMapInterpolationStepX->setValue(configurationHeightmap.interpolationStepX());
+    ui->txtHeightMapInterpolationStepY->setValue(configurationHeightmap.interpolationStepY());
+    ui->cboHeightMapInterpolationType->setCurrentIndex(configurationHeightmap.interpolationType());
+    ui->chkHeightMapInterpolationShow->setChecked(configurationHeightmap.interpolationShow());
 }
 
-void frmMain::applyOverridesConfiguration(QSettings &set)
+void frmMain::applyOverridesConfiguration(ConfigurationMachine &machineConfiguration)
 {
-    ui->slbFeedOverride->setChecked(set.value("feedOverride", false).toBool());
-    ui->slbFeedOverride->setValue(set.value("feedOverrideValue", 100).toInt());
+    ui->slbFeedOverride->setChecked(machineConfiguration.overrideFeed());
+    ui->slbFeedOverride->setValue(machineConfiguration.overrideFeedValue());
 
-    ui->slbRapidOverride->setChecked(set.value("rapidOverride", false).toBool());
-    ui->slbRapidOverride->setValue(set.value("rapidOverrideValue", 100).toInt());
+    ui->slbRapidOverride->setChecked(machineConfiguration.overrideRapid());
+    ui->slbRapidOverride->setValue(machineConfiguration.overrideRapidValue());
 
-    ui->slbSpindleOverride->setChecked(set.value("spindleOverride", false).toBool());
-    ui->slbSpindleOverride->setValue(set.value("spindleOverrideValue", 100).toInt());
+    ui->slbSpindleOverride->setChecked(machineConfiguration.overrideSpindleSpeed());
+    ui->slbSpindleOverride->setValue(machineConfiguration.overrideSpindleSpeedValue());
 }
 
-void frmMain::applySpindleConfiguration(QSettings &set)
+void frmMain::applySpindleConfiguration(ConfigurationMachine &machineConfiguration)
 {
-    ui->slbSpindle->setRatio(100);
-    ui->slbSpindle->setMinimum(m_configuration.machineModule().spindleSpeedRange().min);
-    ui->slbSpindle->setMaximum(m_configuration.machineModule().spindleSpeedRange().max);
-    ui->slbSpindle->setValue(set.value("spindleSpeed", 100).toInt());
+    ui->slbSpindle->setRatio(machineConfiguration.spindleSpeedRatio());
+    ui->slbSpindle->setMinimum(machineConfiguration.spindleSpeedRange().min);
+    ui->slbSpindle->setMaximum(machineConfiguration.spindleSpeedRange().max);
+    ui->slbSpindle->setValue(machineConfiguration.spindleSpeed());
 }
 
 void frmMain::applyRecentFilesConfiguration(QSettings &set)
@@ -2220,8 +2220,6 @@ void frmMain::loadSettings()
 
     ui->chkAutoScroll->setChecked(set.value("autoScroll", false).toBool());
 
-    applySpindleConfiguration(set);
-    applyOverridesConfiguration(set);
     applyRecentFilesConfiguration(set);
 
     this->restoreGeometry(set.value("formGeometry", QByteArray()).toByteArray());
@@ -2242,8 +2240,6 @@ void frmMain::loadSettings()
     ui->cboJogStep->setCurrentIndex(ui->cboJogStep->findText(set.value("jogStep").toString()));
     ui->cboJogFeed->setItems(set.value("jogFeeds").toStringList());
     ui->cboJogFeed->setCurrentIndex(ui->cboJogFeed->findText(set.value("jogFeed").toString()));
-
-    applyHeightmapConfiguration(set);
 
     // foreach (ColorPicker* pick, m_settings->colors()) {
     //     pick->setColor(QColor(set.value(pick->objectName().mid(3), "black").toString()));
@@ -2456,28 +2452,9 @@ void frmMain::initializeConnection(ConnectionMode mode)
     connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));
 }
 
-void frmMain::applySettings()
+void frmMain::applyVisualizerConfiguration(ConfigurationVisualizer &visualizerConfiguration)
 {
-    ConfigurationVisualizer &visualizerConfiguration = m_configuration.visualizerModule();
-
-    m_originDrawer->setLineWidth(visualizerConfiguration.lineWidth());
-    m_toolDrawer.setToolDiameter(visualizerConfiguration.toolDiameter());
-    m_toolDrawer.setToolLength(visualizerConfiguration.toolLength());
-    m_toolDrawer.setLineWidth(visualizerConfiguration.lineWidth());
-    m_codeDrawer->setLineWidth(visualizerConfiguration.lineWidth());
-    m_heightMapBorderDrawer.setLineWidth(visualizerConfiguration.lineWidth());
-    m_heightMapGridDrawer.setLineWidth(0.1);
-    m_heightMapInterpolationDrawer.setLineWidth(visualizerConfiguration.lineWidth());
     ui->glwVisualizer->setLineWidth(visualizerConfiguration.lineWidth());
-
-    // @TODO watch for changes is communicator?
-    m_communicator->stopUpdatingState();
-    m_communicator->startUpdatingState(m_configuration.connectionModule().queryStateInterval());
-
-    m_toolDrawer.setToolAngle(visualizerConfiguration.toolType() == ConfigurationVisualizer::ToolType::Conic ? 180 : visualizerConfiguration.toolAngle());
-    m_toolDrawer.setColor(visualizerConfiguration.toolColor());
-    m_toolDrawer.update();
-
     ui->glwVisualizer->setAntialiasing(visualizerConfiguration.antialiasing());
     ui->glwVisualizer->setMsaa(visualizerConfiguration.msaa());
     ui->glwVisualizer->setZBuffer(visualizerConfiguration.zBuffer());
@@ -2489,37 +2466,6 @@ void frmMain::applySettings()
     ui->glwVisualizer->setColorBackground(visualizerConfiguration.backgroundColor());
     ui->glwVisualizer->setColorText(visualizerConfiguration.textColor());
 
-    ui->slbSpindle->setRatio(m_configuration.machineModule().spindleSpeedRatio());
-    ui->slbSpindle->setMinimum(m_configuration.machineModule().spindleSpeedRange().min);
-    ui->slbSpindle->setMaximum(m_configuration.machineModule().spindleSpeedRange().max);
-
-    // ui->cboCommand->setAutoCompletion(m_configuration.consoleModule().commandAutoCompletion());
-
-    m_codeDrawer->setSimplify(visualizerConfiguration.simplifyGeometry());
-    m_codeDrawer->setSimplifyPrecision(visualizerConfiguration.simplifyGeometryPrecision());
-    m_codeDrawer->setColorNormal(visualizerConfiguration.normalToolpathColor());
-    m_codeDrawer->setColorDrawn(visualizerConfiguration.drawnToolpathColor());
-    m_codeDrawer->setColorHighlight(visualizerConfiguration.hightlightToolpathColor());
-    m_codeDrawer->setColorZMovement(visualizerConfiguration.zMovementColor());
-    m_codeDrawer->setColorStart(visualizerConfiguration.startPointColor());
-    m_codeDrawer->setColorEnd(visualizerConfiguration.endPointColor());
-    m_codeDrawer->setIgnoreZ(visualizerConfiguration.grayscaleSegments() || visualizerConfiguration.programDrawMode() != ConfigurationVisualizer::ProgramDrawMode::Vectors);
-    m_codeDrawer->setGrayscaleSegments(visualizerConfiguration.grayscaleSegments());
-    m_codeDrawer->setGrayscaleCode(visualizerConfiguration.grayscaleSegmentsBySCode() ? GcodeDrawer::S : GcodeDrawer::Z);
-    m_codeDrawer->setDrawMode(
-        visualizerConfiguration.programDrawMode() == ConfigurationVisualizer::ProgramDrawMode::Vectors
-        ? GcodeDrawer::Vectors
-        : GcodeDrawer::Raster
-    );
-    m_codeDrawer->setGrayscaleMin(m_configuration.machineModule().laserPowerRange().min);
-    m_codeDrawer->setGrayscaleMax(m_configuration.machineModule().laserPowerRange().max);
-    m_codeDrawer->update();    
-
-    m_selectionDrawer.setColor(visualizerConfiguration.hightlightToolpathColor());
-
-    m_tableSurfaceDrawer.setGridColor(visualizerConfiguration.tableSurfaceGridColor());
-    m_tableSurfaceDrawer.update();
-
     // Adapt visualizer buttons colors
     const int LIGHTBOUND = 127;
     const int NORMALSHIFT = 40;
@@ -2527,15 +2473,6 @@ void frmMain::applySettings()
 
     QColor base = visualizerConfiguration.backgroundColor();
     bool light = base.value() > LIGHTBOUND;
-    QColor normal, highlight;
-
-    normal.setHsv(base.hue(), base.saturation(), base.value() + (light ? -NORMALSHIFT : NORMALSHIFT));
-    highlight.setHsv(base.hue(), base.saturation(), base.value() + (light ? -HIGHLIGHTSHIFT : HIGHLIGHTSHIFT));
-
-    ui->glwVisualizer->setStyleSheet(QString("QToolButton {border: 1px solid %1; \
-                background-color: %3} QToolButton:hover {border: 1px solid %2;}")
-                .arg(normal.name()).arg(highlight.name())
-                .arg(base.name()));
 
     ui->cmdToggleProjection->setIcon(QIcon(":/images/toggle.png"));
     ui->cmdFit->setIcon(QIcon(":/images/fit_1.png"));
@@ -2553,12 +2490,86 @@ void frmMain::applySettings()
         Util::invertButtonIconColors(ui->cmdTop);
     }
 
-    // @TODO how to do it in console partial?? Is it important?
-    // int h = ui->cmdFileOpen->sizeHint().height();
-    // QSize s(h, h);
-    // ui->cboCommand->setMinimumHeight(h);
-    // ui->cmdClearConsole->setFixedSize(s);
-    // ui->cmdCommandSend->setFixedSize(s);
+    QColor normal, highlight;
+
+    normal.setHsv(base.hue(), base.saturation(), base.value() + (light ? -NORMALSHIFT : NORMALSHIFT));
+    highlight.setHsv(base.hue(), base.saturation(), base.value() + (light ? -HIGHLIGHTSHIFT : HIGHLIGHTSHIFT));
+
+    ui->glwVisualizer->setStyleSheet(QString("QToolButton {border: 1px solid %1; \
+                background-color: %3} QToolButton:hover {border: 1px solid %2;}")
+                .arg(normal.name()).arg(highlight.name())
+                .arg(base.name()));
+}
+
+void frmMain::applyCodeDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration)
+{
+    m_codeDrawer->setLineWidth(visualizerConfiguration.lineWidth());
+    m_codeDrawer->setSimplify(visualizerConfiguration.simplifyGeometry());
+    m_codeDrawer->setSimplifyPrecision(visualizerConfiguration.simplifyGeometryPrecision());
+    m_codeDrawer->setColorNormal(visualizerConfiguration.normalToolpathColor());
+    m_codeDrawer->setColorDrawn(visualizerConfiguration.drawnToolpathColor());
+    m_codeDrawer->setColorHighlight(visualizerConfiguration.hightlightToolpathColor());
+    m_codeDrawer->setColorZMovement(visualizerConfiguration.zMovementColor());
+    m_codeDrawer->setColorStart(visualizerConfiguration.startPointColor());
+    m_codeDrawer->setColorEnd(visualizerConfiguration.endPointColor());
+    m_codeDrawer->setIgnoreZ(visualizerConfiguration.grayscaleSegments() || visualizerConfiguration.programDrawMode() != ConfigurationVisualizer::ProgramDrawMode::Vectors);
+    m_codeDrawer->setGrayscaleSegments(visualizerConfiguration.grayscaleSegments());
+    m_codeDrawer->setGrayscaleCode(visualizerConfiguration.grayscaleSegmentsBySCode() ? GcodeDrawer::S : GcodeDrawer::Z);
+    m_codeDrawer->setDrawMode(
+        visualizerConfiguration.programDrawMode() == ConfigurationVisualizer::ProgramDrawMode::Vectors
+            ? GcodeDrawer::Vectors
+            : GcodeDrawer::Raster
+        );
+    m_codeDrawer->setGrayscaleMin(m_configuration.machineModule().laserPowerRange().min);
+    m_codeDrawer->setGrayscaleMax(m_configuration.machineModule().laserPowerRange().max);
+    m_codeDrawer->update();
+}
+
+void frmMain::applyToolDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration)
+{
+    m_toolDrawer.setToolDiameter(visualizerConfiguration.toolDiameter());
+    m_toolDrawer.setToolLength(visualizerConfiguration.toolLength());
+    m_toolDrawer.setLineWidth(visualizerConfiguration.lineWidth());
+    m_toolDrawer.setToolAngle(visualizerConfiguration.toolType() == ConfigurationVisualizer::ToolType::Conic ? 180 : visualizerConfiguration.toolAngle());
+    m_toolDrawer.setColor(visualizerConfiguration.toolColor());
+    m_toolDrawer.update();
+}
+
+void frmMain::appleTableSurfaceDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration)
+{
+    m_tableSurfaceDrawer.setGridColor(visualizerConfiguration.tableSurfaceGridColor());
+    m_tableSurfaceDrawer.update();
+}
+
+void frmMain::applyHeightmapDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration)
+{
+    m_heightmapBorderDrawer.setLineWidth(visualizerConfiguration.lineWidth());
+    m_heightmapGridDrawer.setLineWidth(0.1);
+    m_heightmapInterpolationDrawer.setLineWidth(visualizerConfiguration.lineWidth());
+}
+
+void frmMain::applySettings()
+{
+    ConfigurationVisualizer &visualizerConfiguration = m_configuration.visualizerModule();
+    ConfigurationHeightmap &heightmapConfiguration = m_configuration.heightmapModule();
+    ConfigurationMachine &machineConfiguration = m_configuration.machineModule();
+
+    m_originDrawer->setLineWidth(visualizerConfiguration.lineWidth());
+
+    // @TODO watch for changes is communicator?
+    m_communicator->stopUpdatingState();
+    m_communicator->startUpdatingState(m_configuration.connectionModule().queryStateInterval());
+
+    applyToolDrawerConfiguration(visualizerConfiguration);
+    applyCodeDrawerConfiguration(visualizerConfiguration);
+    applyVisualizerConfiguration(visualizerConfiguration);
+    appleTableSurfaceDrawerConfiguration(visualizerConfiguration);
+    applyHeightmapConfiguration(heightmapConfiguration);
+    applyHeightmapDrawerConfiguration(visualizerConfiguration);
+    applySpindleConfiguration(machineConfiguration);
+    applyOverridesConfiguration(machineConfiguration);
+
+    m_selectionDrawer.setColor(visualizerConfiguration.hightlightToolpathColor());
 
     if (m_connection->getSupportedMode() != m_configuration.connectionModule().connectionMode()) {
         initializeConnection(m_configuration.connectionModule().connectionMode());

@@ -412,10 +412,15 @@ private:
     void initializeConnection(ConnectionMode mode);
     void initializeVisualizer();
 
-    void applySpindleConfiguration(QSettings &set);
+    void applySpindleConfiguration(ConfigurationMachine &machineConfiguration);
     void applyRecentFilesConfiguration(QSettings &set);
-    void applyHeightMapConfiguration(QSettings &set);
-    void applyOverridesConfiguration(QSettings &set);
+    void applyHeightmapConfiguration(ConfigurationHeightmap &heightmapConfiguration);
+    void applyOverridesConfiguration(ConfigurationMachine &machineConfiguration);
+    void applyVisualizerConfiguration(ConfigurationVisualizer &visualizerConfiguration);
+    void applyCodeDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration);
+    void applyToolDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration);
+    void appleTableSurfaceDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration);
+    void applyHeightmapDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration);
 };
 
 typedef QMap<QString, QList<QKeySequence>> ShortcutsMap;
