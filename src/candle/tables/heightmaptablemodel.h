@@ -7,11 +7,11 @@
 #include <QObject>
 #include <QAbstractTableModel>
 
-class HeightMapTableModel : public QAbstractTableModel
+class HeightmapTableModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    explicit HeightMapTableModel(QObject *parent = 0);
+    explicit HeightmapTableModel(QObject *parent = 0);
 
     void resize(int cols, int rows);
 

@@ -3,12 +3,12 @@
 
 #include "heightmaptablemodel.h"
 
-HeightMapTableModel::HeightMapTableModel(QObject *parent) : QAbstractTableModel(parent)
+HeightmapTableModel::HeightmapTableModel(QObject *parent) : QAbstractTableModel(parent)
 {
     m_data.append(QVector<double>());
 }
 
-void HeightMapTableModel::resize(int cols, int rows)
+void HeightmapTableModel::resize(int cols, int rows)
 {
     foreach (QVector<double> row, m_data) row.clear();
 
@@ -23,7 +23,7 @@ void HeightMapTableModel::resize(int cols, int rows)
     }
 }
 
-QVariant HeightMapTableModel::data(const QModelIndex &index, int role) const
+QVariant HeightmapTableModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid()) return QVariant();
 
@@ -44,7 +44,7 @@ QVariant HeightMapTableModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool HeightMapTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool HeightmapTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     m_data[role == Qt::EditRole ? (m_data.count() - 1) - index.row() : index.row()][index.column()] = value.toDouble();
 
@@ -53,7 +53,7 @@ bool HeightMapTableModel::setData(const QModelIndex &index, const QVariant &valu
     return true;
 }
 
-bool HeightMapTableModel::insertRow(int row, const QModelIndex &parent)
+bool HeightmapTableModel::insertRow(int row, const QModelIndex &parent)
 {
     Q_UNUSED(parent)
 
@@ -61,7 +61,7 @@ bool HeightMapTableModel::insertRow(int row, const QModelIndex &parent)
     return true;
 }
 
-bool HeightMapTableModel::removeRow(int row, const QModelIndex &parent)
+bool HeightmapTableModel::removeRow(int row, const QModelIndex &parent)
 {
     Q_UNUSED(parent)
 
@@ -69,26 +69,26 @@ bool HeightMapTableModel::removeRow(int row, const QModelIndex &parent)
     return true;
 }
 
-void HeightMapTableModel::clear()
+void HeightmapTableModel::clear()
 {
     m_data.clear();
 }
 
-int HeightMapTableModel::rowCount(const QModelIndex &parent) const
+int HeightmapTableModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
 
     return m_data.count();
 }
 
-int HeightMapTableModel::columnCount(const QModelIndex &parent) const
+int HeightmapTableModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
 
     return m_data[0].count();
 }
 
-QVariant HeightMapTableModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant HeightmapTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     Q_UNUSED(orientation)
 
@@ -96,7 +96,7 @@ QVariant HeightMapTableModel::headerData(int section, Qt::Orientation orientatio
     return QString::number(section + 1);
 }
 
-Qt::ItemFlags HeightMapTableModel::flags(const QModelIndex &index) const
+Qt::ItemFlags HeightmapTableModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid()) return NULL;
     return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;

@@ -277,9 +277,9 @@ private:
     GcodeDrawer *m_probeDrawer;
     GcodeDrawer *m_currentDrawer;
     ToolDrawer m_toolDrawer;
-    HeightMapBorderDrawer m_heightMapBorderDrawer;
-    HeightMapGridDrawer m_heightMapGridDrawer;
-    HeightMapInterpolationDrawer m_heightMapInterpolationDrawer;
+    HeightMapBorderDrawer m_heightmapBorderDrawer;
+    HeightMapGridDrawer m_heightmapGridDrawer;
+    HeightMapInterpolationDrawer m_heightmapInterpolationDrawer;
     SelectionDrawer m_selectionDrawer;
     MachineBoundsDrawer m_machineBoundsDrawer;
 
@@ -288,7 +288,7 @@ private:
     GCodeTableModel m_probeModel;
     GCodeTableModel m_programHeightmapModel;
     GCodeTableModel *m_currentModel;
-    HeightMapTableModel m_heightMapModel;
+    HeightmapTableModel m_heightmapModel;
 
     // @TODO to be moved to separate core class
     ConnectionManager m_connectionManager;
@@ -309,7 +309,7 @@ private:
     // Filenames
     QString m_settingsFileName;
     QString m_programFileName;
-    QString m_heightMapFileName;
+    QString m_heightmapFileName;
     QString m_lastFolder;
     QStringList m_recentFiles;
     QStringList m_recentHeightmaps;
@@ -323,12 +323,12 @@ private:
     bool m_programLoading;
     bool m_settingsLoading;
     bool m_fileChanged;
-    bool m_heightMapChanged;
+    bool m_heightmapChanged;
 
     // bool m_updateSpindleSpeed;
     // bool m_updateParserStatus;
 
-    bool m_heightMapMode;
+    bool m_heightmapMode;
 
     // Current values
     int m_lastDrawnLineIndex;
@@ -365,10 +365,10 @@ private:
     // Files/models
     void loadFile(QString fileName);
     void loadFile(QList<std::string> data);
-    bool saveChanges(bool heightMapMode);
+    bool saveChanges(bool heightmapMode);
     bool saveProgramToFile(QString fileName, GCodeTableModel *model);
-    void loadHeightMap(QString fileName);
-    bool saveHeightMap(QString fileName);
+    void loadHeightmap(QString fileName);
+    bool saveHeightmap(QString fileName);
     void clearTable();
     void resetHeightmap();
     void newFile();
@@ -384,10 +384,10 @@ private:
     void addRecentHeightmap(QString fileName);
     QRectF borderRectFromTextboxes();
     QRectF borderRectFromExtremes();
-    void updateHeightMapBorderDrawer();
-    bool updateHeightMapGrid();
-    void updateHeightMapGrid(double arg1);
-    void resizeTableHeightMapSections();
+    void updateHeightmapBorderDrawer();
+    bool updateHeightmapGrid();
+    void updateHeightmapGrid(double arg1);
+    void resizeTableHeightmapSections();
     bool eventFilter(QObject *obj, QEvent *event) override;
 
     void updateCurrentModel(GCodeTableModel *m_currentModel);
