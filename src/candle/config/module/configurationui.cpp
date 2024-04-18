@@ -5,8 +5,11 @@
 #include "configurationui.h"
 
 const QMap<QString,QVariant> DEFAULTS = {
-    {"fontSize", 12},
-    {"language", "en"}    
+    {"fontSize", 8},
+    {"language", "en"},
+    {"recentFiles", QStringList()},
+    {"autoScrollGCode", true},
+    {"lastFileOpenDir", ""}
 };
 
 ConfigurationUI::ConfigurationUI(QObject *parent) : ConfigurationModule(parent, DEFAULTS)

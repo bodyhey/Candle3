@@ -283,9 +283,9 @@ QLabel[overrided=&quot;false&quot;] {
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <widget class="QCheckBox" name="chkAutoScroll">
+          <widget class="QCheckBox" name="chkAutoScrollGCode">
            <property name="text">
-            <string>Scroll</string>
+            <string>Auto scroll</string>
            </property>
           </widget>
          </item>
@@ -3097,7 +3097,7 @@ QLabel[overrided=&quot;false&quot;] {
   <connection>
    <sender>actProgramScroll</sender>
    <signal>triggered()</signal>
-   <receiver>chkAutoScroll</receiver>
+   <receiver>chkAutoScrollGCode</receiver>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">

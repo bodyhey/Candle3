@@ -421,6 +421,7 @@ private:
     void applyToolDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration);
     void appleTableSurfaceDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration);
     void applyHeightmapDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration);
+    void applyUIConfiguration(ConfigurationUI &uiConfiguration);
 };
 
 typedef QMap<QString, QList<QKeySequence>> ShortcutsMap;

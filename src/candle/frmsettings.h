@@ -45,7 +45,6 @@ private slots:
     void on_cboToolType_currentIndexChanged(int index);
     void on_listCategories_currentRowChanged(int currentRow);
     void onCmdDefaultsClicked();
-    void on_cboFontSize_currentTextChanged(const QString &arg1);
     void onDrawModeVectorsToggled(bool checked);
     void onArcApproximationModeChanged(bool checked);
     void onConnectionModeChanged(int);

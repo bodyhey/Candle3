@@ -220,6 +220,10 @@ void frmSettings::initializeWidgets()
     ui->txtMaxTravelX->setValue(machine.maxTravel().x());
     ui->txtMaxTravelY->setValue(machine.maxTravel().y());
     ui->txtMaxTravelZ->setValue(machine.maxTravel().z());
+
+    const ConfigurationUI &ui_ = m_configuration.uiModule();
+    ui->cboFontSize->setCurrentText(QString::number(ui_.fontSize()));
+    ui->cboLanguage->setCurrentIndex(ui->cboLanguage->findData(ui_.language()));
 }
 
 void frmSettings::applySettings()
@@ -298,6 +302,10 @@ void frmSettings::applySettings()
     machine.m_referencePositionDirZ = ui->radReferenceZMinus->isChecked() ? ConfigurationMachine::Negative : ConfigurationMachine::Positive;
     machine.m_overrideMaxTravel = ui->chkOverrideMaxTravel->isChecked();
     machine.m_maxTravel = QVector3D(ui->txtMaxTravelX->value(), ui->txtMaxTravelY->value(), ui->txtMaxTravelZ->value());
+
+    ConfigurationUI &ui_ = m_configuration.uiModule();
+    ui_.m_fontSize = ui->cboFontSize->currentText().toInt();
+    ui_.m_language = ui->cboLanguage->currentData().toString();
 }
 
 int frmSettings::exec()
@@ -512,11 +520,6 @@ void frmSettings::onCmdDefaultsClicked()
     ui->chkConfirmToolChangeCommandsExecution->setChecked(false);
 
     emit settingsSetToDefault();
-}
-
-void frmSettings::on_cboFontSize_currentTextChanged(const QString &arg1)
-{
-    qApp->setStyleSheet(QString(qApp->styleSheet()).replace(QRegExp("font-size:\\s*\\d+"), "font-size: " + arg1));
 }
 
 void frmSettings::onDrawModeVectorsToggled(bool checked)

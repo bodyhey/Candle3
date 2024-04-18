@@ -1784,7 +1784,7 @@ void frmMain::onCommandSent(CommandAttributes commandAttributes)
 
 void frmMain::onCommandProcessed(int tableIndex, QString response)
 {
-    if (ui->chkAutoScroll->isChecked()) {
+    if (ui->chkAutoScrollGCode->isChecked()) {
         // scroll to NEXT command (+1)
         ui->tblProgram->scrollTo(m_currentModel->index(tableIndex + 1, 0));      // TODO: Update by timer
         ui->tblProgram->setCurrentIndex(m_currentModel->index(tableIndex + 1, 1));
@@ -2085,7 +2085,7 @@ void frmMain::onScroolBarAction(int action)
     Q_UNUSED(action)
 
     if ((m_communicator->senderState() == SenderTransferring) || (m_communicator->senderState() == SenderStopping))
-        ui->chkAutoScroll->setChecked(false);
+        ui->chkAutoScrollGCode->setChecked(false);
 }
 
 void frmMain::onToolPos(QPointF pos)
@@ -2153,7 +2153,9 @@ void frmMain::preloadSettings()
     ConfigurationUI &uiConfiguration = m_configuration.uiModule();
     ConfigurationVisualizer &visualizerConfiguration = m_configuration.visualizerModule();
 
-    qApp->setStyleSheet(QString(qApp->styleSheet()).replace(QRegExp("font-size:\\s*\\d+"), QString("font-size: %1").arg(uiConfiguration.fontSize())));
+    qApp->setStyleSheet(
+        QString(qApp->styleSheet()).replace(QRegExp("font-size:[^;^\\}]+"), QString("font-size: %1pt").arg(uiConfiguration.fontSize()))
+    );
 
     // Update v-sync in glformat
     QGLFormat fmt = QGLFormat::defaultFormat();
@@ -2217,8 +2219,6 @@ void frmMain::loadSettings()
     m_settingsLoading = true;
 
     emit settingsAboutToLoad();
-
-    ui->chkAutoScroll->setChecked(set.value("autoScroll", false).toBool());
 
     applyRecentFilesConfiguration(set);
 
@@ -2349,8 +2349,12 @@ void frmMain::saveSettings()
 
     emit settingsAboutToSave();
 
-    set.setValue("spindleSpeed", ui->slbSpindle->value());
-    set.setValue("autoScroll", ui->chkAutoScroll->isChecked());
+    ConfigurationUI &uiConfiguration = m_configuration.uiModule();
+
+    m_configuration.machineModule().setSpindleSpeed(ui->slbSpindle->value());
+    uiConfiguration.setAutoScrollGCode(ui->chkAutoScrollGCode->isChecked());
+    uiConfiguration.setLastFileOpenDir(m_lastFolder);
+
     set.setValue("header", ui->tblProgram->horizontalHeader()->saveState());
     set.setValue("settingsSplitMain", m_settings->ui->splitMain->saveState());
     set.setValue("formGeometry", this->saveGeometry());
@@ -2358,37 +2362,12 @@ void frmMain::saveSettings()
 
     set.setValue("recentFiles", m_recentFiles);
     set.setValue("recentHeightmaps", m_recentHeightmaps);
-    set.setValue("lastFolder", m_lastFolder);
-
-    set.setValue("feedOverride", ui->slbFeedOverride->isChecked());
-    set.setValue("feedOverrideValue", ui->slbFeedOverride->value());
-    set.setValue("rapidOverride", ui->slbRapidOverride->isChecked());
-    set.setValue("rapidOverrideValue", ui->slbRapidOverride->value());
-    set.setValue("spindleOverride", ui->slbSpindleOverride->isChecked());
-    set.setValue("spindleOverrideValue", ui->slbSpindleOverride->value());
+//    set.setValue("lastFolder", m_lastFolder);
 
     set.setValue("jogSteps", (QStringList)ui->cboJogStep->items().mid(1, ui->cboJogStep->items().count() - 1));
     set.setValue("jogStep", ui->cboJogStep->currentText());
     set.setValue("jogFeeds", ui->cboJogFeed->items());
     set.setValue("jogFeed", ui->cboJogFeed->currentText());
-
-    set.setValue("heightmapBorderX", ui->txtHeightMapBorderX->value());
-    set.setValue("heightmapBorderY", ui->txtHeightMapBorderY->value());
-    set.setValue("heightmapBorderWidth", ui->txtHeightMapBorderWidth->value());
-    set.setValue("heightmapBorderHeight", ui->txtHeightMapBorderHeight->value());
-    set.setValue("heightmapBorderShow", ui->chkHeightMapBorderShow->isChecked());
-
-    set.setValue("heightmapGridX", ui->txtHeightMapGridX->value());
-    set.setValue("heightmapGridY", ui->txtHeightMapGridY->value());
-    set.setValue("heightmapGridZTop", ui->txtHeightMapGridZTop->value());
-    set.setValue("heightmapGridZBottom", ui->txtHeightMapGridZBottom->value());
-    set.setValue("heightmapProbeFeed", ui->txtHeightMapProbeFeed->value());
-    set.setValue("heightmapGridShow", ui->chkHeightMapGridShow->isChecked());
-
-    set.setValue("heightmapInterpolationStepX", ui->txtHeightMapInterpolationStepX->value());
-    set.setValue("heightmapInterpolationStepY", ui->txtHeightMapInterpolationStepY->value());
-    set.setValue("heightmapInterpolationType", ui->cboHeightMapInterpolationType->currentIndex());
-    set.setValue("heightmapInterpolationShow", ui->chkHeightMapInterpolationShow->isChecked());
 
     QStringList list;
 
@@ -2548,11 +2527,21 @@ void frmMain::applyHeightmapDrawerConfiguration(ConfigurationVisualizer &visuali
     m_heightmapInterpolationDrawer.setLineWidth(visualizerConfiguration.lineWidth());
 }
 
+void frmMain::applyUIConfiguration(ConfigurationUI &uiConfiguration)
+{
+    ui->chkAutoScrollGCode->setChecked(uiConfiguration.autoScrollGCode());
+    qApp->setStyleSheet(
+        QString(qApp->styleSheet()).replace(QRegExp("font-size:[^;^\\}]+"), QString("font-size: %1pt").arg(uiConfiguration.fontSize()))
+    );
+    qDebug() << QString(qApp->styleSheet());
+}
+
 void frmMain::applySettings()
 {
     ConfigurationVisualizer &visualizerConfiguration = m_configuration.visualizerModule();
     ConfigurationHeightmap &heightmapConfiguration = m_configuration.heightmapModule();
     ConfigurationMachine &machineConfiguration = m_configuration.machineModule();
+    ConfigurationUI &uiConfiguration = m_configuration.uiModule();
 
     m_originDrawer->setLineWidth(visualizerConfiguration.lineWidth());
 
@@ -2568,6 +2557,7 @@ void frmMain::applySettings()
     applyHeightmapDrawerConfiguration(visualizerConfiguration);
     applySpindleConfiguration(machineConfiguration);
     applyOverridesConfiguration(machineConfiguration);
+    applyUIConfiguration(uiConfiguration);
 
     m_selectionDrawer.setColor(visualizerConfiguration.hightlightToolpathColor());
 
@@ -2585,130 +2575,6 @@ void frmMain::openPort()
         //grblReset();
     }
 }
-
-// void frmMain::grblReset()
-// {
-//     m_communicator->reset();
-//     updateControlsState();
-// }
-
-// void frmMain::writeConsole(QString command)
-// {
-//     m_partConsole->append(command);
-//     //ui->txtConsole->appendPlainText(command);
-// }
-
-// SendCommandResult frmMain::sendCommand(QString command, int tableIndex, bool showInConsole, bool wait)
-// {
-//     // tableIndex:
-//     // 0...n - commands from g-code program
-//     // -1 - ui commands
-//     // -2 - utility commands
-//     // -3 - utility commands
-
-//     if (!m_connection->isConnected() || !m_communicator->m_resetCompleted) return SendDone;
-
-//     // Check command
-//     if (command.isEmpty()) return SendEmpty;
-
-//     // Place to queue on 'wait' flag
-//     if (wait) {
-//         m_communicator->m_queue.append(CommandQueue(command, tableIndex, showInConsole));
-//         return SendQueue;
-//     }
-    
-//     // Evaluate scripts in command
-//     if (tableIndex < 0) command = evaluateCommand(command);
-
-//     // Check evaluated command
-//     if (command.isEmpty()) return SendEmpty;
-
-//     // Place to queue if command buffer is full
-//     if ((bufferLength() + command.length() + 1) > BUFFERLENGTH) {
-//         m_communicator->m_queue.append(CommandQueue(command, tableIndex, showInConsole));
-//         return SendQueue;
-//     }
-
-//     command = command.toUpper();
-
-//     CommandAttributes ca;
-//     if (showInConsole) {
-//         writeConsole(command);
-//         ca.consoleIndex = ui->txtConsole->blockCount() - 1;
-//     } else {
-//         ca.consoleIndex = -1;
-//     }
-
-//     ca.command = command;
-//     ca.length = command.length() + 1;
-//     ca.tableIndex = tableIndex;
-
-//     m_communicator->m_commands.append(ca);
-
-//     QString uncomment = GcodePreprocessorUtils::removeComment(command);
-
-//     // Processing spindle speed only from g-code program
-//     static QRegExp s("[Ss]0*(\\d+)");
-//     if (s.indexIn(uncomment) != -1 && ca.tableIndex > -2) {
-//         int speed = s.cap(1).toInt();
-//         if (ui->slbSpindle->value() != speed) {
-//             ui->slbSpindle->setValue(speed);
-//         }
-//     }
-
-//     // Set M2 & M30 commands sent flag
-//     static QRegExp M230("(M0*2|M30|M0*6|M25)(?!\\d)");
-//     static QRegExp M6("(M0*6)(?!\\d)");
-//     if ((m_communicator->senderState() == SenderTransferring) && uncomment.contains(M230)) {
-//         if (!uncomment.contains(M6) || m_settings->toolChangeUseCommands() || m_settings->toolChangePause()) m_communicator->setSenderState(SenderPausing);
-//     }
-
-//     // Queue offsets request on G92, G10 commands
-//     static QRegExp G92("(G92|G10)(?!\\d)");
-//     if (uncomment.contains(G92)) sendCommand("$#", -3, showInConsole, true);
-
-//     m_connection->sendLine(command);
-
-//     return SendDone;
-// }
-
-// void frmMain::sendRealtimeCommand(QString command)
-// {
-//     if (command.length() != 1) return;
-//     if (!m_connection->isConnected() || !m_communicator->m_resetCompleted) return;
-
-//     m_connection->sendByteArray(QByteArray(command.toLatin1(), 1));
-// }
-
-// void frmMain::sendCommands(QString commands, int tableIndex)
-// {
-//     QStringList list = commands.split("\n");
-
-//     bool q = false;
-//     foreach (QString cmd, list) {
-//         SendCommandResult r = sendCommand(cmd.trimmed(), tableIndex, m_settings->showUICommands(), q);
-//         if (r == SendDone || r == SendQueue) q = true;
-//     }
-// }
-
-// void frmMain::sendNextFileCommands()
-// {
-//     if (m_communicator->m_queue.length() > 0) return;
-
-//     QString command = m_currentModel->data(m_currentModel->index(m_streamer->commandIndex(), 1)).toString();
-//     static QRegExp M230("(M0*2|M30|M0*6)(?!\\d)");
-
-//     while ((bufferLength() + command.length() + 1) <= BUFFERLENGTH
-//         && m_streamer->commandIndex() < m_currentModel->rowCount() - 1
-//         && !(!m_communicator->m_commands.isEmpty() && GcodePreprocessorUtils::removeComment(m_communicator->m_commands.last().command).contains(M230))
-//         )
-//     {
-//         m_currentModel->setData(m_currentModel->index(m_streamer->commandIndex(), 2), GCodeItem::Sent);
-//         m_communicator->sendCommand(command, m_streamer->commandIndex());
-//         m_streamer->advanceCommandIndex();
-//         command = m_currentModel->data(m_currentModel->index(m_streamer->commandIndex(), 1)).toString();
-//     }
-// }
 
 void frmMain::updateParser()
 {
@@ -3561,7 +3427,7 @@ bool frmMain::eventFilter(QObject *obj, QEvent *event)
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
         if (keyEvent->key() == Qt::Key_PageDown || keyEvent->key() == Qt::Key_PageUp
                     || keyEvent->key() == Qt::Key_Down || keyEvent->key() == Qt::Key_Up) {
-            ui->chkAutoScroll->setChecked(false);
+            ui->chkAutoScrollGCode->setChecked(false);
         }
     }
 

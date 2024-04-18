@@ -41,6 +41,7 @@ class ConfigurationMachine : public ConfigurationModule
         ConfigurationModule::MinMax spindleSpeedRange() const { return m_spindleSpeedRange; }
         double spindleSpeedRatio() const { return (m_spindleSpeedRange.max - m_spindleSpeedRange.min) / 100; }
         int spindleSpeed() const { return m_spindleSpeed; }
+        void setSpindleSpeed(int spindleSpeed) { m_spindleSpeed = spindleSpeed; emit changed(); }
         ConfigurationModule::MinMax laserPowerRange() const { return m_laserPowerRange; }
         ReferencePositionDir referencePositionDirX() const { return m_referencePositionDirX; }
         ReferencePositionDir referencePositionDirY() const { return m_referencePositionDirY; }
