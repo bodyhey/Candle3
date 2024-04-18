@@ -86,7 +86,7 @@ QSplitter::handle:horizontal {
          <x>0</x>
          <y>-1034</y>
          <width>642</width>
-         <height>2627</height>
+         <height>2367</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -831,24 +831,28 @@ QSplitter::handle:horizontal {
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">
            <item>
-            <widget class="QCheckBox" name="chkUseStartCommands">
-             <property name="text">
-              <string>Use program start commands:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPlainTextEdit" name="txtStartCommands"/>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="chkUseEndCommands">
-             <property name="text">
-              <string>Use program end commands:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPlainTextEdit" name="txtEndCommands"/>
+            <layout class="QGridLayout" name="gridLayout_4">
+             <item row="0" column="1">
+              <widget class="QCheckBox" name="chkUseEndCommands">
+               <property name="text">
+                <string>Use program end commands:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QCheckBox" name="chkUseStartCommands">
+               <property name="text">
+                <string>Use program start commands:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QPlainTextEdit" name="txtEndCommands"/>
+             </item>
+             <item row="1" column="1">
+              <widget class="QPlainTextEdit" name="txtStartCommands"/>
+             </item>
+            </layout>
            </item>
            <item>
             <widget class="QCheckBox" name="chkUsePauseCommands">
@@ -919,6 +923,9 @@ QSplitter::handle:horizontal {
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
             <layout class="QGridLayout" name="gridLayout_5">
+             <property name="horizontalSpacing">
+              <number>6</number>
+             </property>
              <item row="1" column="4">
               <widget class="QCheckBox" name="chkZBuffer">
                <property name="text">
@@ -966,7 +973,7 @@ QSplitter::handle:horizontal {
              <item row="1" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_7">
                <item>
-                <widget class="QLabel" name="label_7">
+                <widget class="QLabel" name="labFpsLock">
                  <property name="text">
                   <string>FPS lock:</string>
                  </property>
@@ -1170,10 +1177,6 @@ QSplitter::handle:horizontal {
                </property>
               </widget>
              </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_5">
              <item>
               <widget class="QLabel" name="label_8">
                <property name="text">
@@ -1200,10 +1203,6 @@ QSplitter::handle:horizontal {
                </property>
               </widget>
              </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_6">
              <item>
               <widget class="QLabel" name="label_9">
                <property name="text">
@@ -1845,7 +1844,7 @@ QSplitter::handle:horizontal {
   <connection>
    <sender>chkVSync</sender>
    <signal>toggled(bool)</signal>
-   <receiver>label_7</receiver>
+   <receiver>labFpsLock</receiver>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">

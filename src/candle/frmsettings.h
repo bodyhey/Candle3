@@ -10,8 +10,6 @@
 #include <QSettings>
 #include <QGroupBox>
 #include <QVector3D>
-#include "globals.h"
-#include "colorpicker.h"
 #include "config/configuration.h"
 
 namespace Ui {
@@ -30,7 +28,6 @@ public:
     Ui::frmSettings *ui;
 
     int exec();
-    void undo();
 
     void addCustomSettings(QGroupBox *box);
 
@@ -56,8 +53,6 @@ private slots:
 private:
     Configuration &m_configuration;
 
-    void searchForSerialPorts();
-
     QList<double> m_storedValues;
     QList<bool> m_storedChecks;
     QList<QString> m_storedCombos;
@@ -68,9 +63,11 @@ private:
     bool m_scrollingManuallyScrollBox;
 
     QIntValidator m_intValidator;
-
     QList<QWidget*> m_customSettings;
 
+    void searchForSerialPorts();
+
+    void undo();
     void initializeWidgets();
     void resetToDefaults();
     void applySettings();

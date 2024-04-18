@@ -17,6 +17,9 @@ bool IniPersister::open()
     }
 
     m_settings = new QSettings(qApp->applicationDirPath() + "/" + CONFIGURATION_FILE, QSettings::IniFormat);
+    m_settings->setIniCodec("UTF-8");
+
+    return true;
 }
 
 void IniPersister::close()

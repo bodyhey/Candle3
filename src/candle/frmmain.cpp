@@ -660,7 +660,8 @@ void frmMain::on_actServiceSettings_triggered()
         emit settingsAccepted();
 
     } else {
-        m_settings->undo();
+        // @TODO so weird!
+        // m_settings->undo();
 
         emit settingsRejected();
     }
@@ -2160,6 +2161,54 @@ void frmMain::preloadSettings()
     // QGLFormat::setDefaultFormat(fmt);
 }
 
+void frmMain::applyHeightMapConfiguration(QSettings &set)
+{
+    ui->txtHeightMapBorderX->setValue(set.value("heightmapBorderX", 0).toDouble());
+    ui->txtHeightMapBorderY->setValue(set.value("heightmapBorderY", 0).toDouble());
+    ui->txtHeightMapBorderWidth->setValue(set.value("heightmapBorderWidth", 1).toDouble());
+    ui->txtHeightMapBorderHeight->setValue(set.value("heightmapBorderHeight", 1).toDouble());
+    ui->chkHeightMapBorderShow->setChecked(set.value("heightmapBorderShow", false).toBool());
+
+    ui->txtHeightMapGridX->setValue(set.value("heightmapGridX", 1).toDouble());
+    ui->txtHeightMapGridY->setValue(set.value("heightmapGridY", 1).toDouble());
+    ui->txtHeightMapGridZTop->setValue(set.value("heightmapGridZTop", 1).toDouble());
+    ui->txtHeightMapGridZBottom->setValue(set.value("heightmapGridZBottom", -1).toDouble());
+    ui->txtHeightMapProbeFeed->setValue(set.value("heightmapProbeFeed", 10).toDouble());
+    ui->chkHeightMapGridShow->setChecked(set.value("heightmapGridShow", false).toBool());
+
+    ui->txtHeightMapInterpolationStepX->setValue(set.value("heightmapInterpolationStepX", 1).toDouble());
+    ui->txtHeightMapInterpolationStepY->setValue(set.value("heightmapInterpolationStepY", 1).toDouble());
+    ui->cboHeightMapInterpolationType->setCurrentIndex(set.value("heightmapInterpolationType", 0).toInt());
+    ui->chkHeightMapInterpolationShow->setChecked(set.value("heightmapInterpolationShow", false).toBool());
+}
+
+void frmMain::applyOverridesConfiguration(QSettings &set)
+{
+    ui->slbFeedOverride->setChecked(set.value("feedOverride", false).toBool());
+    ui->slbFeedOverride->setValue(set.value("feedOverrideValue", 100).toInt());
+
+    ui->slbRapidOverride->setChecked(set.value("rapidOverride", false).toBool());
+    ui->slbRapidOverride->setValue(set.value("rapidOverrideValue", 100).toInt());
+
+    ui->slbSpindleOverride->setChecked(set.value("spindleOverride", false).toBool());
+    ui->slbSpindleOverride->setValue(set.value("spindleOverrideValue", 100).toInt());
+}
+
+void frmMain::applySpindleConfiguration(QSettings &set)
+{
+    ui->slbSpindle->setRatio(100);
+    ui->slbSpindle->setMinimum(m_configuration.machineModule().spindleSpeedRange().min);
+    ui->slbSpindle->setMaximum(m_configuration.machineModule().spindleSpeedRange().max);
+    ui->slbSpindle->setValue(set.value("spindleSpeed", 100).toInt());
+}
+
+void frmMain::applyRecentFilesConfiguration(QSettings &set)
+{
+    m_recentFiles = set.value("recentFiles", QStringList()).toStringList();
+    m_recentHeightmaps = set.value("recentHeightmaps", QStringList()).toStringList();
+    m_lastFolder = set.value("lastFolder", QDir::homePath()).toString();
+}
+
 void frmMain::loadSettings()
 {
     QSettings set(m_settingsFileName, QSettings::IniFormat);
@@ -2171,23 +2220,9 @@ void frmMain::loadSettings()
 
     ui->chkAutoScroll->setChecked(set.value("autoScroll", false).toBool());
 
-    ui->slbSpindle->setRatio(100);
-    ui->slbSpindle->setMinimum(m_configuration.machineModule().spindleSpeedRange().min);
-    ui->slbSpindle->setMaximum(m_configuration.machineModule().spindleSpeedRange().max);
-    ui->slbSpindle->setValue(set.value("spindleSpeed", 100).toInt());
-
-    ui->slbFeedOverride->setChecked(set.value("feedOverride", false).toBool());
-    ui->slbFeedOverride->setValue(set.value("feedOverrideValue", 100).toInt());
-
-    ui->slbRapidOverride->setChecked(set.value("rapidOverride", false).toBool());
-    ui->slbRapidOverride->setValue(set.value("rapidOverrideValue", 100).toInt());
-
-    ui->slbSpindleOverride->setChecked(set.value("spindleOverride", false).toBool());
-    ui->slbSpindleOverride->setValue(set.value("spindleOverrideValue", 100).toInt());
-
-    m_recentFiles = set.value("recentFiles", QStringList()).toStringList();
-    m_recentHeightmaps = set.value("recentHeightmaps", QStringList()).toStringList();
-    m_lastFolder = set.value("lastFolder", QDir::homePath()).toString();
+    applySpindleConfiguration(set);
+    applyOverridesConfiguration(set);
+    applyRecentFilesConfiguration(set);
 
     this->restoreGeometry(set.value("formGeometry", QByteArray()).toByteArray());
 
@@ -2208,23 +2243,7 @@ void frmMain::loadSettings()
     ui->cboJogFeed->setItems(set.value("jogFeeds").toStringList());
     ui->cboJogFeed->setCurrentIndex(ui->cboJogFeed->findText(set.value("jogFeed").toString()));
 
-    ui->txtHeightMapBorderX->setValue(set.value("heightmapBorderX", 0).toDouble());
-    ui->txtHeightMapBorderY->setValue(set.value("heightmapBorderY", 0).toDouble());
-    ui->txtHeightMapBorderWidth->setValue(set.value("heightmapBorderWidth", 1).toDouble());
-    ui->txtHeightMapBorderHeight->setValue(set.value("heightmapBorderHeight", 1).toDouble());
-    ui->chkHeightMapBorderShow->setChecked(set.value("heightmapBorderShow", false).toBool());
-
-    ui->txtHeightMapGridX->setValue(set.value("heightmapGridX", 1).toDouble());
-    ui->txtHeightMapGridY->setValue(set.value("heightmapGridY", 1).toDouble());
-    ui->txtHeightMapGridZTop->setValue(set.value("heightmapGridZTop", 1).toDouble());
-    ui->txtHeightMapGridZBottom->setValue(set.value("heightmapGridZBottom", -1).toDouble());
-    ui->txtHeightMapProbeFeed->setValue(set.value("heightmapProbeFeed", 10).toDouble());
-    ui->chkHeightMapGridShow->setChecked(set.value("heightmapGridShow", false).toBool());
-
-    ui->txtHeightMapInterpolationStepX->setValue(set.value("heightmapInterpolationStepX", 1).toDouble());
-    ui->txtHeightMapInterpolationStepY->setValue(set.value("heightmapInterpolationStepY", 1).toDouble());
-    ui->cboHeightMapInterpolationType->setCurrentIndex(set.value("heightmapInterpolationType", 0).toInt());
-    ui->chkHeightMapInterpolationShow->setChecked(set.value("heightmapInterpolationShow", false).toBool());
+    applyHeightMapConfiguration(set);
 
     // foreach (ColorPicker* pick, m_settings->colors()) {
     //     pick->setColor(QColor(set.value(pick->objectName().mid(3), "black").toString()));
@@ -2562,11 +2581,11 @@ void frmMain::openPort()
 //     updateControlsState();
 // }
 
-void frmMain::writeConsole(QString command)
-{
-    m_partConsole->append(command);
-    //ui->txtConsole->appendPlainText(command);
-}
+// void frmMain::writeConsole(QString command)
+// {
+//     m_partConsole->append(command);
+//     //ui->txtConsole->appendPlainText(command);
+// }
 
 // SendCommandResult frmMain::sendCommand(QString command, int tableIndex, bool showInConsole, bool wait)
 // {
@@ -2685,7 +2704,7 @@ void frmMain::updateParser()
     GcodeViewParse *parser = m_currentDrawer->viewParser();
 
     GcodeParser gp;
-    gp.setTraverseSpeed(m_communicator->machineConfiguration().rapidSpeed());
+    gp.setTraverseSpeed(m_communicator->machineConfiguration().maxRate().x()); // uses only x axis speed
     if (m_codeDrawer->getIgnoreZ()) gp.reset(QVector3D(qQNaN(), qQNaN(), 0));
 
     ui->tblProgram->setUpdatesEnabled(false);
@@ -2835,7 +2854,7 @@ void frmMain::loadFile(QList<std::string> data)
 
     // Prepare parser
     GcodeParser gp;
-    gp.setTraverseSpeed(m_communicator->machineConfiguration().rapidSpeed());
+    gp.setTraverseSpeed(m_communicator->machineConfiguration().maxRate().x()); // uses only x axis speed
     if (m_codeDrawer->getIgnoreZ()) gp.reset(QVector3D(qQNaN(), qQNaN(), 0));
 
     // Block parser updates on table changes

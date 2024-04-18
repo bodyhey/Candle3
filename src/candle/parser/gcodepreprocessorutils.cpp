@@ -331,8 +331,6 @@ QStringList GcodePreprocessorUtils::splitCommand(const QString &command) {
 
     if (sb.length() > 0) l.append(sb);
 
-    qDebug() << l;
-
 //    QChar c;
 
 //    for (int i = 0; i < command.length(); i++) {

@@ -86,9 +86,9 @@ public:
     explicit frmMain(QWidget *parent = 0);
     ~frmMain();
     
-    void writeConsole(QString command);
+    //void writeConsole(QString command);
     void initializeCommunicator();
-
+        
 signals:
     void responseReceived(QString command, int tableIndex, QString response);
     void statusReceived(QString status);
@@ -357,8 +357,6 @@ private:
 
     // Communication
     void openPort();
-    //void grblReset() override;
-    //void sendNextFileCommands();
     QString evaluateCommand(QString command);
 
     // Parser
@@ -413,6 +411,11 @@ private:
 
     void initializeConnection(ConnectionMode mode);
     void initializeVisualizer();
+
+    void applySpindleConfiguration(QSettings &set);
+    void applyRecentFilesConfiguration(QSettings &set);
+    void applyHeightMapConfiguration(QSettings &set);
+    void applyOverridesConfiguration(QSettings &set);
 };
 
 typedef QMap<QString, QList<QKeySequence>> ShortcutsMap;

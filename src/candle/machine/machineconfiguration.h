@@ -23,7 +23,7 @@ class MachineConfiguration
         bool hardLimitsEnabled() { return m_hardLimitsEnabled; }
         bool laserMode() { return m_laserMode; }
         double homingPullOff() { return m_homingPullOff; }
-        float rapidSpeed() { return m_rapidSpeed; }
+        //float rapidSpeed() { return m_rapidSpeed; }
         QVector3D stepsPerMM() { return m_stepsPerMM; }
         QVector3D maxTravel() { return m_maxTravel; }
         QVector3D acceleration() { return m_acceleration; }
@@ -38,7 +38,7 @@ class MachineConfiguration
         bool m_hardLimitsEnabled = false;
         bool m_laserMode = false;
         double m_homingPullOff = 0;
-        float m_rapidSpeed = 0;
+        //float m_rapidSpeed = 0;
         QVector3D m_stepsPerMM = QVector3D(0,0,0);
         QVector3D m_maxTravel = QVector3D(0,0,0);
         QVector3D m_acceleration = QVector3D(0,0,0);
