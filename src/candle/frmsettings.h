@@ -11,6 +11,7 @@
 #include <QGroupBox>
 #include <QVector3D>
 #include "config/configuration.h"
+#include "utils/validators.h"
 
 namespace Ui {
 class frmSettings;
@@ -28,14 +29,10 @@ public:
     Ui::frmSettings *ui;
 
     int exec();
-
     void addCustomSettings(QGroupBox *box);
 
 signals:
     void settingsSetToDefault();
-
-protected:
-    void showEvent(QShowEvent *se);
 
 private slots:
     void onScrollBarValueChanged(int value);
@@ -62,6 +59,9 @@ private:
     bool m_scrollingManuallyScrollBox;
 
     QIntValidator m_intValidator;
+    QCommaSeparatedIntValidator m_commaSeparatedIntValidator;
+    QCommaSeparatedDoubleValidator m_commaSeparatedDoubleValidator;
+
     QList<QWidget*> m_customSettings;
 
     void searchForSerialPorts();
@@ -70,6 +70,9 @@ private:
     void initializeWidgets();
     void resetToDefaults();
     void applySettings();
+
+    int invalidWidgets;
+    void widgetValidity(bool valid);
 };
 
 #endif // FRMSETTINGS_H

@@ -560,7 +560,7 @@ void frmMain::on_actFileSave_triggered()
 void frmMain::on_actFileSaveAs_triggered()
 {
     if (!m_heightmapMode) {
-        QString fileName = (QFileDialog::getSaveFileName(this, tr("Save file as"), m_lastFolder, tr(FILE_FILTER_TEXT)));
+        QString fileName = (QFileDialog::getSaveFileName(this, tr("Save file as"), lastWorkingDirectory(), tr(FILE_FILTER_TEXT)));
 
         if (!fileName.isEmpty()) if (saveProgramToFile(fileName, &m_programModel)) {
             m_programFileName = fileName;
@@ -572,7 +572,7 @@ void frmMain::on_actFileSaveAs_triggered()
             updateControlsState();
         }
     } else {
-        QString fileName = (QFileDialog::getSaveFileName(this, tr("Save file as"), m_lastFolder, tr("Heightmap files (*.map)")));
+        QString fileName = (QFileDialog::getSaveFileName(this, tr("Save file as"), lastWorkingDirectory(), tr("Heightmap files (*.map)")));
 
         if (!fileName.isEmpty()) if (saveHeightmap(fileName)) {
             ui->txtHeightMap->setText(fileName.mid(fileName.lastIndexOf("/") + 1));
@@ -589,7 +589,7 @@ void frmMain::on_actFileSaveAs_triggered()
 
 void frmMain::on_actFileSaveTransformedAs_triggered()
 {
-    QString fileName = (QFileDialog::getSaveFileName(this, tr("Save file as"), m_lastFolder, tr(FILE_FILTER_TEXT)));
+    QString fileName = (QFileDialog::getSaveFileName(this, tr("Save file as"), lastWorkingDirectory(), tr(FILE_FILTER_TEXT)));
 
     if (!fileName.isEmpty()) {
         saveProgramToFile(fileName, &m_programHeightmapModel);
@@ -598,7 +598,9 @@ void frmMain::on_actFileSaveTransformedAs_triggered()
 
 void frmMain::on_actRecentClear_triggered()
 {
-    if (!m_heightmapMode) m_recentFiles.clear(); else m_recentHeightmaps.clear();
+    if (!m_heightmapMode) m_configuration.uiModule().clearRecentFiles();
+        else m_configuration.uiModule().clearRecentHeightmaps();
+    m_configuration.save();
     updateRecentFilesMenu();
 }
 
@@ -762,10 +764,12 @@ void frmMain::on_cmdFileOpen_clicked()
 
         if (!saveChanges(false)) return;
 
-        QString fileName  = QFileDialog::getOpenFileName(this, tr("Open"), m_lastFolder,
+        QString fileName  = QFileDialog::getOpenFileName(this, tr("Open"), lastWorkingDirectory(),
                                    tr(FILE_FILTER_TEXT";;All files (*.*)"));
 
-        if (!fileName.isEmpty()) m_lastFolder = fileName.left(fileName.lastIndexOf(QRegExp("[/\\\\]+")));
+        if (!fileName.isEmpty()) {
+            m_configuration.uiModule().currentWorkingDirectory(fileName.left(fileName.lastIndexOf(QRegExp("[/\\\\]+"))));
+        }
 
         if (fileName != "") {
             addRecentFile(fileName);
@@ -776,7 +780,7 @@ void frmMain::on_cmdFileOpen_clicked()
     } else {
         if (!saveChanges(true)) return;
 
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open"), m_lastFolder, tr("Heightmap files (*.map)"));
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open"), lastWorkingDirectory(), tr("Heightmap files (*.map)"));
 
         if (fileName != "") {
             addRecentHeightmap(fileName);
@@ -1461,7 +1465,7 @@ void frmMain::on_cmdHeightMapLoad_clicked()
         return;
     }
 
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open"), m_lastFolder, tr("Heightmap files (*.map)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open"), lastWorkingDirectory(), tr("Heightmap files (*.map)"));
 
     if (fileName != "") {
         addRecentHeightmap(fileName);
@@ -1685,6 +1689,8 @@ void frmMain::onDeviceStateReceived(DeviceState state)
         int elapsed = m_startTime.elapsed();
         ui->glwVisualizer->setSpendTime(time.addMSecs(elapsed));
     }
+
+    updateControlsState();
 }
 
 void frmMain::onSenderStateReceived(SenderState state)
@@ -2203,11 +2209,9 @@ void frmMain::applySpindleConfiguration(ConfigurationMachine &machineConfigurati
     ui->slbSpindle->setValue(machineConfiguration.spindleSpeed());
 }
 
-void frmMain::applyRecentFilesConfiguration(QSettings &set)
+void frmMain::applyRecentFilesConfiguration(ConfigurationUI &uiConfiguration)
 {
-    m_recentFiles = set.value("recentFiles", QStringList()).toStringList();
-    m_recentHeightmaps = set.value("recentHeightmaps", QStringList()).toStringList();
-    m_lastFolder = set.value("lastFolder", QDir::homePath()).toString();
+    updateRecentFilesMenu();
 }
 
 void frmMain::loadSettings()
@@ -2219,8 +2223,6 @@ void frmMain::loadSettings()
 
     emit settingsAboutToLoad();
 
-    applyRecentFilesConfiguration(set);
-
     this->restoreGeometry(set.value("formGeometry", QByteArray()).toByteArray());
 
     // ui->cboCommand->setMinimumHeight(ui->cboCommand->height());
@@ -2228,8 +2230,6 @@ void frmMain::loadSettings()
     // ui->cmdCommandSend->setFixedHeight(ui->cboCommand->height());
 
     m_storedKeyboardControl = set.value("keyboardControl", false).toBool();
-
-    // m_settings->setAutoCompletion(set.value("autoCompletion", true).toBool());
 
     QStringList steps = set.value("jogSteps").toStringList();
     if (steps.count() > 0) {
@@ -2243,8 +2243,6 @@ void frmMain::loadSettings()
     // foreach (ColorPicker* pick, m_settings->colors()) {
     //     pick->setColor(QColor(set.value(pick->objectName().mid(3), "black").toString()));
     // }
-
-    updateRecentFilesMenu();
 
     ui->tblProgram->horizontalHeader()->restoreState(set.value("header", QByteArray()).toByteArray());
 
@@ -2336,8 +2334,6 @@ void frmMain::loadSettings()
 
     m_settings->restoreGeometry(set.value("formSettingsGeometry", m_settings->saveGeometry()).toByteArray());
 
-    set.endGroup();
-
     m_settingsLoading = false;
 }
 
@@ -2349,29 +2345,25 @@ void frmMain::saveSettings()
     emit settingsAboutToSave();
 
     ConfigurationUI &uiConfiguration = m_configuration.uiModule();
+    ConfigurationJogging &joggingConfiguration = m_configuration.joggingModule();
 
     m_configuration.machineModule().setSpindleSpeed(ui->slbSpindle->value());
     uiConfiguration.setAutoScrollGCode(ui->chkAutoScrollGCode->isChecked());
-    uiConfiguration.setLastFileOpenDir(m_lastFolder);
 
     set.setValue("header", ui->tblProgram->horizontalHeader()->saveState());
     set.setValue("settingsSplitMain", m_settings->ui->splitMain->saveState());
     set.setValue("formGeometry", this->saveGeometry());
-    set.setValue("formSettingsGeometry", m_settings->saveGeometry()); 
+    set.setValue("formSettingsGeometry", m_settings->saveGeometry());
 
-    set.setValue("recentFiles", m_recentFiles);
-    set.setValue("recentHeightmaps", m_recentHeightmaps);
-//    set.setValue("lastFolder", m_lastFolder);
+    joggingConfiguration.setJogStep(ui->cboJogStep->currentText().toDouble());
+    joggingConfiguration.setJogFeed(ui->cboJogFeed->currentText().toInt());
 
     set.setValue("jogSteps", (QStringList)ui->cboJogStep->items().mid(1, ui->cboJogStep->items().count() - 1));
-    set.setValue("jogStep", ui->cboJogStep->currentText());
+    // set.setValue("jogStep", ui->cboJogStep->currentText());
     set.setValue("jogFeeds", ui->cboJogFeed->items());
-    set.setValue("jogFeed", ui->cboJogFeed->currentText());
+    // set.setValue("jogFeed", ui->cboJogFeed->currentText());
 
     QStringList list;
-
-    // for (int i = 0; i < ui->cboCommand->count(); i++) list.append(ui->cboCommand->itemText(i));
-    // set.setValue("recentCommands", list);
 
     // Docks
     set.setValue("formMainState", saveState());
@@ -2408,6 +2400,8 @@ void frmMain::saveSettings()
     // Menu
     set.setValue("lockWindows", ui->actViewLockWindows->isChecked());
     set.setValue("lockPanels", ui->actViewLockPanels->isChecked());
+
+    m_configuration.save();
 
     emit settingsSaved();
 }
@@ -2559,6 +2553,7 @@ void frmMain::applySettings()
     applySpindleConfiguration(machineConfiguration);
     applyOverridesConfiguration(machineConfiguration);
     applyUIConfiguration(uiConfiguration);
+    applyRecentFilesConfiguration(uiConfiguration);
 
     m_selectionDrawer.setColor(visualizerConfiguration.hightlightToolpathColor());
 
@@ -3115,8 +3110,9 @@ void frmMain::updateControlsState()
     ui->cmdFilePause->setEnabled(portOpened && (process || paused) && (m_communicator->senderState() != SenderPausing) && (m_communicator->senderState() != SenderPausing2));
     ui->cmdFilePause->setChecked(paused);
     ui->cmdFileAbort->setEnabled(m_communicator->senderState() != SenderStopped && m_communicator->senderState() != SenderStopping);
-    ui->mnuRecent->setEnabled((m_communicator->senderState() == SenderStopped) && ((m_recentFiles.count() > 0 && !m_heightmapMode)
-                                                      || (m_recentHeightmaps.count() > 0 && m_heightmapMode)));
+    ui->mnuRecent->setEnabled((m_communicator->senderState() == SenderStopped) &&
+                ((m_configuration.uiModule().hasAnyRecentFiles() && !m_heightmapMode) || (m_configuration.uiModule().hasAnyRecentHeightmaps() && m_heightmapMode))
+    );
     ui->actFileSave->setEnabled(m_programModel.rowCount() > 1);
     ui->actFileSaveAs->setEnabled(m_programModel.rowCount() > 1);
 
@@ -3201,7 +3197,8 @@ void frmMain::updateRecentFilesMenu()
         }
     }
 
-    foreach (QString file, !m_heightmapMode ? m_recentFiles : m_recentHeightmaps) {
+    QStringList files = !m_heightmapMode ? m_configuration.uiModule().recentFiles() : m_configuration.uiModule().recentHeightmaps();
+    foreach (QString file, files) {
         QAction *action = new QAction(file, this);
         connect(action, SIGNAL(triggered()), this, SLOT(onActRecentFileTriggered()));
         ui->mnuRecent->insertAction(ui->mnuRecent->actions()[0], action);
@@ -3237,16 +3234,14 @@ void frmMain::updateJogTitle()
 
 void frmMain::addRecentFile(QString fileName)
 {
-    m_recentFiles.removeAll(fileName);
-    m_recentFiles.append(fileName);
-    if (m_recentFiles.count() > 5) m_recentFiles.takeFirst();
+    m_configuration.uiModule().addRecentFile(fileName);
+    m_configuration.save();
 }
 
 void frmMain::addRecentHeightmap(QString fileName)
 {
-    m_recentHeightmaps.removeAll(fileName);
-    m_recentHeightmaps.append(fileName);
-    if (m_recentHeightmaps.count() > 5) m_recentHeightmaps.takeFirst();
+    m_configuration.uiModule().addRecentHeightmap(fileName);
+    m_configuration.save();
 }
 
 QRectF frmMain::borderRectFromTextboxes()
@@ -3551,7 +3546,10 @@ void frmMain::updateToolpathShadowingOnCheckMode()
     }
 }
 
-
+QString frmMain::lastWorkingDirectory()
+{
+    return m_configuration.uiModule().currentWorkingDirectory();
+}
 
 int frmMain::bufferLength()
 {

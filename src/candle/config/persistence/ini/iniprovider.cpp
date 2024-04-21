@@ -57,16 +57,7 @@ QVariant IniProvider::getVariant(const QString group, const QString key, QVarian
 
 QStringList IniProvider::getStringList(const QString group, const QString key, QStringList defaultValue)
 {
-    return QStringList("");
-    // QVariant variantValue = m_settings->value(group + '\\' + key);
-    // if (!variantValue.isValid()) {
-    //     return defaultValue;
-    // }
-
-    // QString value = variantValue.toString();
-    // static const QRegExp rx("\\s*,\\s*");
-    // value.replace()
-    // value.split()
+    return getVariant(group, key, defaultValue).toStringList();
 }
 
 QVariantMap IniProvider::getVariantMap(const QString group, const QString key, QVariantMap mapWithDefaultValues)

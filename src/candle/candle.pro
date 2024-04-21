@@ -48,6 +48,7 @@ SOURCES += main.cpp\
     config/module/configurationconnection.cpp \
     config/module/configurationconsole.cpp \
     config/module/configurationheightmap.cpp \
+    config/module/configurationjogging.cpp \
     config/module/configurationmachine.cpp \
     config/module/configurationmodule.cpp \
     config/module/configurationparser.cpp \
@@ -105,6 +106,7 @@ HEADERS  += frmmain.h \
     config/module/configurationconnection.h \
     config/module/configurationconsole.h \
     config/module/configurationheightmap.h \
+    config/module/configurationjogging.h \
     config/module/configurationmachine.h \
     config/module/configurationmodule.h \
     config/module/configurationparser.h \
@@ -154,6 +156,7 @@ HEADERS  += frmmain.h \
     tables/heightmaptablemodel.h \
     utils/interpolation.h \
     utils/util.h \
+    utils/validators.h \
     widgets/combobox.h \
     widgets/comboboxkey.h \
     widgets/glwidget.h \

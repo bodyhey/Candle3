@@ -231,20 +231,18 @@ private slots:
 //    void onCboCommandReturnPressed();
     void onDockTopLevelChanged(bool topLevel);
     void onScroolBarAction(int action);
-
-    void onToolPos(QPointF);
-
+    void onVisualizerCursorPosChanged(QPointF);
     void updateHeightMapInterpolationDrawer(bool reset = false);
     void placeVisualizerButtons();
 
 protected:
-    void showEvent(QShowEvent *se);
-    void hideEvent(QHideEvent *he);
-    void resizeEvent(QResizeEvent *re);
-    void timerEvent(QTimerEvent *);
-    void closeEvent(QCloseEvent *ce);
-    void dragEnterEvent(QDragEnterEvent *dee);
-    void dropEvent(QDropEvent *de);
+    void showEvent(QShowEvent *se) override;
+    void hideEvent(QHideEvent *he) override;
+    void resizeEvent(QResizeEvent *re) override;
+    void timerEvent(QTimerEvent *) override;
+    void closeEvent(QCloseEvent *ce) override;
+    void dragEnterEvent(QDragEnterEvent *dee) override;
+    void dropEvent(QDropEvent *de) override;
     QMenu *createPopupMenu() override;
 
 private:
@@ -312,9 +310,6 @@ private:
     QString m_settingsFileName;
     QString m_programFileName;
     QString m_heightmapFileName;
-    QString m_lastFolder;
-    QStringList m_recentFiles;
-    QStringList m_recentHeightmaps;
 
     // Timers
     QTimer m_timerConnection;
@@ -391,11 +386,10 @@ private:
     void updateHeightmapGrid(double arg1);
     void resizeTableHeightmapSections();
     bool eventFilter(QObject *obj, QEvent *event) override;
-
     void updateCurrentModel(GCodeTableModel *m_currentModel);
-
     void updateToolPositionAndToolpathShadowing(QVector3D toolPosition);
     void updateToolpathShadowingOnCheckMode();
+    QString lastWorkingDirectory();
 
     // Utility
     int bufferLength();
@@ -415,7 +409,7 @@ private:
     void initializeVisualizer();
 
     void applySpindleConfiguration(ConfigurationMachine &machineConfiguration);
-    void applyRecentFilesConfiguration(QSettings &set);
+    void applyRecentFilesConfiguration(ConfigurationUI &uiConfiguration);
     void applyHeightmapConfiguration(ConfigurationHeightmap &heightmapConfiguration);
     void applyOverridesConfiguration(ConfigurationMachine &machineConfiguration);
     void applyVisualizerConfiguration(ConfigurationVisualizer &visualizerConfiguration);

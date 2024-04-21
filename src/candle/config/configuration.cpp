@@ -14,6 +14,7 @@ Configuration::Configuration(QObject *parent)
     m_ui(parent),
     m_machine(parent),
     m_heightmap(parent),
+    m_jogging(parent),
     m_persister(parent),
     m_provider(parent)
 {
@@ -24,7 +25,8 @@ Configuration::Configuration(QObject *parent)
         << &m_parser
         << &m_ui
         << &m_machine
-        << &m_heightmap;
+        << &m_heightmap
+        << &m_jogging;
 }
 
 QString Configuration::language()
@@ -129,6 +131,8 @@ void Configuration::setModuleDefaults(ConfigurationModule *module)
             prop.write(module, defaults[prop.name()].toBool());
         } else if (type == "double" || type == "float") {
             prop.write(module, defaults[prop.name()].toDouble());
+        } else if (type == "QStringList") {
+            //m_persister.setStringList(module, name, value.toStringList());
         } else if (type == "QVariantMap") {
             prop.write(module, defaults[prop.name()].toMap());
         } else if (type == "QVariant") {
@@ -177,6 +181,8 @@ void Configuration::loadModule(ConfigurationModule *module)
             prop.write(module, m_provider.getBool(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toBool()));
         } else if (type == "double" || type == "float") {
             prop.write(module, m_provider.getDouble(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toDouble()));
+        } else if (type == "QStringList") {
+            prop.write(module, m_provider.getStringList(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toStringList()));
         } else {
             auto registryItem = ConfigurationRegistry::getInfo(prop.typeName());
 

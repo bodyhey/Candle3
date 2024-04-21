@@ -45,7 +45,7 @@ QSplitter::handle:horizontal {
   <property name="sizeGripEnabled">
    <bool>true</bool>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_10" stretch="1,0">
+  <layout class="QVBoxLayout" name="verticalLayout_10" stretch="0,0">
    <item>
     <widget class="QSplitter" name="splitMain">
      <property name="orientation">
@@ -84,9 +84,9 @@ QSplitter::handle:horizontal {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-1034</y>
+         <y>-1225</y>
          <width>642</width>
-         <height>2367</height>
+         <height>2491</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -916,6 +916,43 @@ QSplitter::handle:horizontal {
          </widget>
         </item>
         <item>
+         <widget class="QGroupBox" name="grpJogging">
+          <property name="title">
+           <string>Jogging</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_12">
+           <item row="0" column="0">
+            <layout class="QGridLayout" name="gridLayout_11">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_7">
+               <property name="text">
+                <string>Selectable steps:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="txtJoggingStepChoices">
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_14">
+               <property name="text">
+                <string>Selectable feeds:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="txtJoggingFeedChoices"/>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <widget class="QGroupBox" name="grpVisualizer">
           <property name="title">
            <string>Visualizer</string>
@@ -926,50 +963,6 @@ QSplitter::handle:horizontal {
              <property name="horizontalSpacing">
               <number>6</number>
              </property>
-             <item row="1" column="4">
-              <widget class="QCheckBox" name="chkZBuffer">
-               <property name="text">
-                <string>Z-buffer</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="4">
-              <widget class="QCheckBox" name="chkMSAA">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="text">
-                <string>MSAA</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <layout class="QHBoxLayout" name="horizontalLayout_4">
-               <item>
-                <widget class="QLabel" name="label_5">
-                 <property name="text">
-                  <string>Line width:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QDoubleSpinBox" name="txtLineWidth">
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
-                 </property>
-                 <property name="buttonSymbols">
-                  <enum>QAbstractSpinBox::NoButtons</enum>
-                 </property>
-                 <property name="decimals">
-                  <number>1</number>
-                 </property>
-                 <property name="maximum">
-                  <double>9.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
              <item row="1" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_7">
                <item>
@@ -1006,72 +999,14 @@ QSplitter::handle:horizontal {
                </item>
               </layout>
              </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_6">
-               <property name="text">
-                <string>Program draw mode:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="3">
-              <widget class="QRadioButton" name="radDrawModeVectors">
-               <property name="text">
-                <string>Vectors</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-               <property name="autoExclusive">
-                <bool>false</bool>
-               </property>
-               <attribute name="buttonGroup">
-                <string notr="true">grpProgramDrawMode</string>
-               </attribute>
-              </widget>
-             </item>
-             <item row="2" column="4">
-              <widget class="QRadioButton" name="radDrawModeRaster">
-               <property name="text">
-                <string>Raster</string>
-               </property>
-               <property name="autoExclusive">
-                <bool>false</bool>
-               </property>
-               <attribute name="buttonGroup">
-                <string notr="true">grpProgramDrawMode</string>
-               </attribute>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <spacer name="horizontalSpacer_5">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>6</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="4" column="4">
-              <widget class="QRadioButton" name="radGrayscaleSegmentsByZ">
+             <item row="0" column="4">
+              <widget class="QCheckBox" name="chkMSAA">
                <property name="enabled">
                 <bool>false</bool>
                </property>
                <property name="text">
-                <string>By 'Z'-code</string>
+                <string>MSAA</string>
                </property>
-               <property name="autoExclusive">
-                <bool>false</bool>
-               </property>
-               <attribute name="buttonGroup">
-                <string notr="true">grpGrayscaleSegments</string>
-               </attribute>
               </widget>
              </item>
              <item row="4" column="3">
@@ -1090,11 +1025,65 @@ QSplitter::handle:horizontal {
                </attribute>
               </widget>
              </item>
+             <item row="3" column="0">
+              <widget class="QCheckBox" name="chkSimplifyGeometry">
+               <property name="text">
+                <string>Simplify geometry</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="4">
+              <widget class="QCheckBox" name="chkZBuffer">
+               <property name="text">
+                <string>Z-buffer</string>
+               </property>
+              </widget>
+             </item>
              <item row="4" column="0">
               <widget class="QCheckBox" name="chkGrayscaleSegments">
                <property name="text">
                 <string>Grayscale segments</string>
                </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <item>
+                <widget class="QLabel" name="label_5">
+                 <property name="text">
+                  <string>Line width:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="txtLineWidth">
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                 <property name="buttonSymbols">
+                  <enum>QAbstractSpinBox::NoButtons</enum>
+                 </property>
+                 <property name="decimals">
+                  <number>1</number>
+                 </property>
+                 <property name="maximum">
+                  <double>9.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="2" column="4">
+              <widget class="QRadioButton" name="radDrawModeRaster">
+               <property name="text">
+                <string>Raster</string>
+               </property>
+               <property name="autoExclusive">
+                <bool>false</bool>
+               </property>
+               <attribute name="buttonGroup">
+                <string notr="true">grpProgramDrawMode</string>
+               </attribute>
               </widget>
              </item>
              <item row="3" column="4">
@@ -1116,11 +1105,27 @@ QSplitter::handle:horizontal {
                </property>
               </widget>
              </item>
-             <item row="3" column="0">
-              <widget class="QCheckBox" name="chkSimplifyGeometry">
+             <item row="1" column="3">
+              <widget class="QCheckBox" name="chkVSync">
                <property name="text">
-                <string>Simplify geometry</string>
+                <string>V-sync</string>
                </property>
+              </widget>
+             </item>
+             <item row="4" column="4">
+              <widget class="QRadioButton" name="radGrayscaleSegmentsByZ">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string>By 'Z'-code</string>
+               </property>
+               <property name="autoExclusive">
+                <bool>false</bool>
+               </property>
+               <attribute name="buttonGroup">
+                <string notr="true">grpGrayscaleSegments</string>
+               </attribute>
               </widget>
              </item>
              <item row="3" column="3">
@@ -1133,17 +1138,56 @@ QSplitter::handle:horizontal {
                </property>
               </widget>
              </item>
-             <item row="1" column="3">
-              <widget class="QCheckBox" name="chkVSync">
-               <property name="text">
-                <string>V-sync</string>
+             <item row="0" column="2">
+              <spacer name="horizontalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
                </property>
-              </widget>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>6</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
              </item>
              <item row="0" column="3">
               <widget class="QCheckBox" name="chkAntialiasing">
                <property name="text">
                 <string>Smoothing</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="3">
+              <widget class="QRadioButton" name="radDrawModeVectors">
+               <property name="text">
+                <string>Vectors</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+               <property name="autoExclusive">
+                <bool>false</bool>
+               </property>
+               <attribute name="buttonGroup">
+                <string notr="true">grpProgramDrawMode</string>
+               </attribute>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_6">
+               <property name="text">
+                <string>Program draw mode:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QCheckBox" name="chkShow3dCursor">
+               <property name="text">
+                <string>Show cursor on bottom surface</string>
                </property>
               </widget>
              </item>
@@ -1800,12 +1844,12 @@ QSplitter::handle:horizontal {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>765</x>
-     <y>575</y>
+     <x>757</x>
+     <y>290</y>
     </hint>
     <hint type="destinationlabel">
-     <x>943</x>
-     <y>575</y>
+     <x>956</x>
+     <y>290</y>
     </hint>
    </hints>
   </connection>
@@ -1816,12 +1860,12 @@ QSplitter::handle:horizontal {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>574</x>
-     <y>691</y>
+     <x>545</x>
+     <y>413</y>
     </hint>
     <hint type="destinationlabel">
-     <x>765</x>
-     <y>691</y>
+     <x>757</x>
+     <y>413</y>
     </hint>
    </hints>
   </connection>
@@ -1832,12 +1876,12 @@ QSplitter::handle:horizontal {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>574</x>
-     <y>691</y>
+     <x>545</x>
+     <y>413</y>
     </hint>
     <hint type="destinationlabel">
-     <x>943</x>
-     <y>691</y>
+     <x>956</x>
+     <y>413</y>
     </hint>
    </hints>
   </connection>
@@ -1848,12 +1892,12 @@ QSplitter::handle:horizontal {
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>765</x>
-     <y>606</y>
+     <x>757</x>
+     <y>323</y>
     </hint>
     <hint type="destinationlabel">
-     <x>485</x>
-     <y>605</y>
+     <x>446</x>
+     <y>322</y>
     </hint>
    </hints>
   </connection>
@@ -1864,12 +1908,12 @@ QSplitter::handle:horizontal {
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>765</x>
-     <y>606</y>
+     <x>757</x>
+     <y>323</y>
     </hint>
     <hint type="destinationlabel">
-     <x>573</x>
-     <y>605</y>
+     <x>544</x>
+     <y>322</y>
     </hint>
    </hints>
   </connection>
@@ -1880,12 +1924,12 @@ QSplitter::handle:horizontal {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>574</x>
-     <y>663</y>
+     <x>545</x>
+     <y>383</y>
     </hint>
     <hint type="destinationlabel">
-     <x>765</x>
-     <y>662</y>
+     <x>757</x>
+     <y>381</y>
     </hint>
    </hints>
   </connection>
@@ -1896,12 +1940,12 @@ QSplitter::handle:horizontal {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>574</x>
-     <y>663</y>
+     <x>545</x>
+     <y>383</y>
     </hint>
     <hint type="destinationlabel">
-     <x>943</x>
-     <y>662</y>
+     <x>956</x>
+     <y>381</y>
     </hint>
    </hints>
   </connection>
@@ -1912,12 +1956,12 @@ QSplitter::handle:horizontal {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>509</x>
-     <y>152</y>
+     <x>851</x>
+     <y>-182</y>
     </hint>
     <hint type="destinationlabel">
-     <x>580</x>
-     <y>376</y>
+     <x>922</x>
+     <y>44</y>
     </hint>
    </hints>
   </connection>

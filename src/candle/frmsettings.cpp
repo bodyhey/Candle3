@@ -89,12 +89,6 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
 
     //
 
-    this->setLocale(QLocale::C);
-    m_intValidator.setBottom(1);
-    m_intValidator.setTop(999);
-    ui->cboFpsLock->setValidator(&m_intValidator);
-    ui->cboFontSize->setValidator(&m_intValidator);
-
     foreach (QGroupBox *box, this->findChildren<QGroupBox*>()) {
         ui->listCategories->addItem(box->title());
         ui->listCategories->item(ui->listCategories->count() - 1)->setData(Qt::UserRole, box->objectName());
@@ -130,6 +124,45 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
 
     m_animatingScrollBox = false;
     m_scrollingManuallyScrollBox = false;
+
+    //Validators
+    this->setLocale(QLocale::C);
+    m_intValidator.setBottom(1);
+    m_intValidator.setTop(999);
+
+    ui->cboFpsLock->setValidator(&m_intValidator);
+    ui->cboFontSize->setValidator(&m_intValidator);
+
+    connect(ui->txtJoggingStepChoices, &QLineEdit::editingFinished, this, [=]() {
+        QLineEdit *sender = dynamic_cast<QLineEdit*>(QObject::sender());
+        QString text = sender->text();
+        int pos = 0;
+        auto state = m_commaSeparatedDoubleValidator.validate(text, pos);
+        QPalette pal = sender->palette();
+        if (state == QValidator::Invalid) {
+            pal.setColor(QPalette::Text, Qt::red);
+            this->widgetValidity(false);
+        } else {
+            pal.setColor(QPalette::Text, nullptr);
+            this->widgetValidity(true);
+        }
+        sender->setPalette(pal);
+    });
+    connect(ui->txtJoggingFeedChoices, &QLineEdit::editingFinished, this, [=]() {
+        QLineEdit *sender = dynamic_cast<QLineEdit*>(QObject::sender());
+        QString text = sender->text();
+        int pos = 0;
+        auto state = m_commaSeparatedIntValidator.validate(text, pos);
+        QPalette pal = sender->palette();
+        if (state == QValidator::Invalid) {
+            pal.setColor(QPalette::Text, Qt::red);
+            this->widgetValidity(false);
+        } else {
+            pal.setColor(QPalette::Text, nullptr);
+            this->widgetValidity(true);
+        }
+        sender->setPalette(pal);
+    });
 }
 
 frmSettings::~frmSettings()
@@ -225,6 +258,10 @@ void frmSettings::initializeWidgets()
     const ConfigurationUI &ui_ = m_configuration.uiModule();
     ui->cboFontSize->setCurrentText(QString::number(ui_.fontSize()));
     ui->cboLanguage->setCurrentIndex(ui->cboLanguage->findData(ui_.language()));
+
+    const ConfigurationJogging &jogging = m_configuration.joggingModule();
+    ui->txtJoggingStepChoices->setText(jogging.stepChoices().join(", "));
+    ui->txtJoggingFeedChoices->setText(jogging.feedChoices().join(", "));
 }
 
 void frmSettings::applySettings()
@@ -310,6 +347,16 @@ void frmSettings::applySettings()
     ui_.m_language = ui->cboLanguage->currentData().toString();
 }
 
+void frmSettings::widgetValidity(bool valid)
+{
+    if (valid) {
+        invalidWidgets--;
+    } else {
+        invalidWidgets++;
+    }
+    ui->cmdOK->setEnabled(invalidWidgets == 0);
+}
+
 int frmSettings::exec()
 {
     // Store settings to undo
@@ -338,6 +385,7 @@ int frmSettings::exec()
     foreach (QPlainTextEdit* o, this->findChildren<QPlainTextEdit*>())
         m_storedPlainTexts.append(o->toPlainText());
 
+    invalidWidgets = 0;
     initializeWidgets();
 
     return QDialog::exec();
@@ -433,11 +481,6 @@ void frmSettings::onScrollBarValueChanged(int value)
     }
 }
 
-void frmSettings::showEvent(QShowEvent *se)
-{
-    Q_UNUSED(se)
-}
-
 void frmSettings::searchForSerialPorts()
 {
     ui->cboSerialPort->clear();
@@ -473,6 +516,7 @@ void frmSettings::on_cboToolType_currentIndexChanged(int index)
 void frmSettings::resetToDefaults()
 {
     m_configuration.setDefaults();
+    invalidWidgets = 0;
     initializeWidgets();
 }
 
