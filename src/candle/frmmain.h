@@ -21,6 +21,7 @@
 #include "connection/connection.h"
 #include "communicator.h"
 #include "connection/connectionmanager.h"
+#include "drawers/cursordrawer.h"
 #include "drawers/tablesurfacedrawer.h"
 #include "streamer.h"
 #include "globals.h"
@@ -277,6 +278,7 @@ private:
     GcodeDrawer *m_probeDrawer;
     GcodeDrawer *m_currentDrawer;
     ToolDrawer m_toolDrawer;
+    CursorDrawer m_cursorDrawer;
     HeightMapBorderDrawer m_heightmapBorderDrawer;
     HeightMapGridDrawer m_heightmapGridDrawer;
     HeightMapInterpolationDrawer m_heightmapInterpolationDrawer;

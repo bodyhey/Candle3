@@ -63,6 +63,7 @@ SOURCES += main.cpp\
     connection/rawtcpconnection.cpp \
     connection/serialconnection.cpp \
     connection/virtualucncconnection.cpp \
+    drawers/cursordrawer.cpp \
     drawers/tablesurfacedrawer.cpp \
     form_partial/main/console.cpp \
     form_partial/main/control.cpp \
@@ -122,6 +123,7 @@ HEADERS  += frmmain.h \
     connection/rawtcpconnection.h \
     connection/serialconnection.h \
     connection/virtualucncconnection.h \
+    drawers/cursordrawer.h \
     drawers/tablesurfacedrawer.h \
     form_partial/main/console.h \
     form_partial/main/control.h \

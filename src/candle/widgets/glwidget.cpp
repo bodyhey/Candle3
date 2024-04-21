@@ -66,6 +66,8 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent), m_shaderProgram(0)
     m_targetFps = 60;
 
     QTimer::singleShot(1000, this, SLOT(onFramesTimer()));
+
+    setMouseTracking(true);
 }
 
 GLWidget::~GLWidget()
@@ -473,9 +475,16 @@ void GLWidget::updateView()
     m_viewMatrix.translate(-m_lookAt);
 }
 
+void GLWidget::drawText(QPainter &painter, QPoint &pos, QString text, int lineHeight)
+{
+    painter.drawText(pos, text);
+    pos.setY(pos.y() + lineHeight);
+}
+
 #ifdef GLES
 void GLWidget::paintGL() {
 #else
+
 void GLWidget::paintEvent(QPaintEvent *pe) {
     Q_UNUSED(pe)
 #endif
@@ -536,33 +545,40 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
 
     painter.endNativePainting();
 
+    QString str;
+    QPoint pos;
+
     QPen pen(m_colorText);
     painter.setPen(pen);
 
-    double x = 10;
-    double y = this->height() - 60;
+    // left side
+    pos = QPoint(10, this->height() - 80);
 
-    painter.drawText(QPoint(x, y), QString("X: %1 ... %2").arg(m_xMin, 0, 'f', 3).arg(m_xMax, 0, 'f', 3));
-    painter.drawText(QPoint(x, y + 15), QString("Y: %1 ... %2").arg(m_yMin, 0, 'f', 3).arg(m_yMax, 0, 'f', 3));
-    painter.drawText(QPoint(x, y + 30), QString("Z: %1 ... %2").arg(m_zMin, 0, 'f', 3).arg(m_zMax, 0, 'f', 3));
-    painter.drawText(QPoint(x, y + 45), QString("%1 / %2 / %3").arg(m_xSize, 0, 'f', 3).arg(m_ySize, 0, 'f', 3).arg(m_zSize, 0, 'f', 3));
+    if (!qIsNaN(m_bottomSurfaceCursorPos.x())) {
+        drawText(painter, pos, QString("Cursor: %1, %2").arg(m_bottomSurfaceCursorPos.x(), 0, 'f', 2).arg(m_bottomSurfaceCursorPos.y(), 0, 'f', 2), 15);
+    } else {
+        drawText(painter, pos, "Cursor: ??", 15);
+    }
+    drawText(painter, pos, QString("X: %1 ... %2").arg(m_xMin, 0, 'f', 3).arg(m_xMax, 0, 'f', 3), 15);
+    drawText(painter, pos, QString("Y: %1 ... %2").arg(m_yMin, 0, 'f', 3).arg(m_yMax, 0, 'f', 3), 15);
+    drawText(painter, pos, QString("Z: %1 ... %2").arg(m_zMin, 0, 'f', 3).arg(m_zMax, 0, 'f', 3), 15);
+    drawText(painter, pos, QString("%1 / %2 / %3").arg(m_xSize, 0, 'f', 3).arg(m_ySize, 0, 'f', 3).arg(m_zSize, 0, 'f', 3), 15);
 
     QFontMetrics fm(painter.font());
 
-    painter.drawText(QPoint(x, fm.height() + 10), m_parserState);
-    painter.drawText(QPoint(x, fm.height() * 2 + 10), m_speedState);
-    painter.drawText(QPoint(x, fm.height() * 3 + 10), m_pinState);
+    pos.setY(fm.height() + 10);
 
-    QString str = QString(tr("Vertices: %1")).arg(vertices);
-    painter.drawText(QPoint(this->width() - fm.width(str) - 10, y + 30), str);
-    str = QString("FPS: %1").arg(m_fps);
-    painter.drawText(QPoint(this->width() - fm.width(str) - 10, y + 45), str);
+    drawText(painter, pos, m_parserState, 10);
+    drawText(painter, pos, m_speedState, 10);
+    drawText(painter, pos, m_pinState, 10);
 
-    str = m_spendTime.toString("hh:mm:ss") + " / " + m_estimatedTime.toString("hh:mm:ss");
-    painter.drawText(QPoint(this->width() - fm.width(str) - 10, y), str);
+    // right side
+    pos = QPoint(this->width() - fm.width(str) - 10, this->height() - 60);
 
-    str = m_bufferState;
-    painter.drawText(QPoint(this->width() - fm.width(str) - 10, y + 15), str);
+    drawText(painter, pos, m_spendTime.toString("hh:mm:ss") + " / " + m_estimatedTime.toString("hh:mm:ss"), 15);
+    drawText(painter, pos, m_bufferState, 15);
+    drawText(painter, pos, QString(tr("Vertices: %1")).arg(vertices), 15);
+    drawText(painter, pos, QString("FPS: %1").arg(m_fps), 15);
 
     m_frames++;
 
@@ -604,12 +620,17 @@ QPointF GLWidget::getClickPositionOnXYPlane(QVector2D mouseClickPosition, QMatri
     // If the direction is parallel to the XY plane, then the click is not on the XY plane
     if (direction.z() == 0)
     {
-        return QPointF(-1000000, -1000000);
+        return QPointF(NAN, NAN);
     }
 
     // Calculate the intersection of the line with the XY plane (Z = 0)
     float t = -nearPlaneWorldPosition.z() / direction.z();
     QVector3D intersection = nearPlaneWorldPosition + direction * t;
+
+    // Limit XY range
+    if (abs(intersection.x()) > 3000 || abs(intersection.y()) > 3000) {
+        return QPointF(NAN, NAN);
+    }
 
     return intersection.toPointF();
 }
@@ -617,15 +638,15 @@ QPointF GLWidget::getClickPositionOnXYPlane(QVector2D mouseClickPosition, QMatri
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     QPoint pos = event->pos();
-    // QVector2D normalizedPos(
-    //     pos.x() / (width()  * 0.5f) - 1.0f,
-    //     -(pos.y() / (height() * 0.5f) - 1.0f)
-    // );
-    // QPointF clickPos = getClickPositionOnXYPlane(normalizedPos, m_projectionMatrix, m_viewMatrix);
+    QVector2D normalizedPos(
+        pos.x() / (width()  * 0.5f) - 1.0f,
+        -(pos.y() / (height() * 0.5f) - 1.0f)
+    );
 
-    // if (clickPos.x() != -1000000) {
-    //     emit toolPos(clickPos);
-    // }
+    m_bottomSurfaceCursorPos = getClickPositionOnXYPlane(normalizedPos, m_projectionMatrix, m_viewMatrix);
+    if (!qIsNaN(m_bottomSurfaceCursorPos.x())) {
+        emit cursorPosChanged(m_bottomSurfaceCursorPos);
+    }
 
     if ((event->buttons() & Qt::MiddleButton && !(event->modifiers() & Qt::ShiftModifier)) 
         || (event->buttons() & Qt::LeftButton && !(event->modifiers() & Qt::ShiftModifier))) {

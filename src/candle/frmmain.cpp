@@ -256,7 +256,6 @@ frmMain::frmMain(QWidget *parent) :
     m_probeDrawer->setVisible(false);
     m_heightmapGridDrawer.setModel(&m_heightmapModel);
     m_currentDrawer = m_codeDrawer;
-    m_toolDrawer.setToolPosition(QVector3D(0, 0, 0));
 
     m_tableMenu = new QMenu(this);
     m_tableMenu->addAction(tr("&Insert line"), this, SLOT(onTableInsertLine()), QKeySequence(Qt::Key_Insert));
@@ -265,7 +264,7 @@ frmMain::frmMain(QWidget *parent) :
     initializeVisualizer();
 
     connect(ui->glwVisualizer, SIGNAL(resized()), this, SLOT(placeVisualizerButtons()));
-    connect(ui->glwVisualizer, SIGNAL(toolPos(QPointF)), this, SLOT(onToolPos(QPointF)));
+    connect(ui->glwVisualizer, &GLWidget::cursorPosChanged, this, &frmMain::onVisualizerCursorPosChanged);
     connect(&m_programModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(onTableCellChanged(QModelIndex,QModelIndex)));
     connect(&m_programHeightmapModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(onTableCellChanged(QModelIndex,QModelIndex)));
     connect(&m_probeModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(onTableCellChanged(QModelIndex,QModelIndex)));
@@ -337,6 +336,7 @@ frmMain::frmMain(QWidget *parent) :
 
     // Start timers
     m_timerConnection.start(1000);
+    m_timerToolAnimation.start(25, this);
 }
 
 frmMain::~frmMain()
@@ -381,15 +381,16 @@ void frmMain::initializeCommunicator()
 void frmMain::initializeVisualizer()
 {
     *ui->glwVisualizer << &m_tableSurfaceDrawer
-                      << m_originDrawer
-                      << m_codeDrawer
-                      << m_probeDrawer
-                      << &m_toolDrawer
+                       << m_originDrawer
+                       << m_codeDrawer
+                       << m_probeDrawer
+                       << &m_toolDrawer
+                       << &m_cursorDrawer
                        << &m_heightmapBorderDrawer
                        << &m_heightmapGridDrawer
                        << &m_heightmapInterpolationDrawer
-                      << &m_selectionDrawer
-                      << &m_machineBoundsDrawer;
+                       << &m_selectionDrawer
+                       << &m_machineBoundsDrawer;
 
     ui->glwVisualizer->fitDrawable();
 }
@@ -429,6 +430,7 @@ void frmMain::timerEvent(QTimerEvent *te)
     if (te->timerId() == m_timerToolAnimation.timerId()) {
         m_toolDrawer.rotate((m_communicator->m_spindleCW ? -40 : 40) * (double)(ui->slbSpindle->currentValue())
                             / (ui->slbSpindle->maximum()));
+        m_cursorDrawer.rotate();
     } else {
         QMainWindow::timerEvent(te);
     }
@@ -1700,7 +1702,7 @@ void frmMain::onSpindleStateReceived(bool state)
             ui->cmdSpindle->setChecked(true);
             break;
         default:
-            m_timerToolAnimation.stop();
+            //m_timerToolAnimation.stop();
             ui->cmdSpindle->setChecked(false);
             break;
     }
@@ -2088,12 +2090,9 @@ void frmMain::onScroolBarAction(int action)
         ui->chkAutoScrollGCode->setChecked(false);
 }
 
-void frmMain::onToolPos(QPointF pos)
+void frmMain::onVisualizerCursorPosChanged(QPointF pos)
 {
-    m_toolDrawer.setToolPosition(
-        QVector3D(pos.x(), pos.y(), 0)
-    );
-    qDebug() << "Tool position" << pos;
+    m_cursorDrawer.setPosition(pos);
 }
 
 void frmMain::updateHeightMapInterpolationDrawer(bool reset)
@@ -2478,6 +2477,8 @@ void frmMain::applyVisualizerConfiguration(ConfigurationVisualizer &visualizerCo
                 background-color: %3} QToolButton:hover {border: 1px solid %2;}")
                 .arg(normal.name()).arg(highlight.name())
                 .arg(base.name()));
+
+    m_cursorDrawer.setVisible(visualizerConfiguration.show3dCursor());
 }
 
 void frmMain::applyCodeDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration)

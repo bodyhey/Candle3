@@ -33,7 +33,8 @@ const QMap<QString, QVariant> DEFAULTS = {
     {"toolDiameter", 3.175},
     {"toolLength", 30.0},
     {"toolType", ConfigurationVisualizer::ToolType::Flat},
-    {"toolAngle", 15.0}
+    {"toolAngle", 15.0},
+    {"show3dCursor", false},
 };
 
 ConfigurationVisualizer::ConfigurationVisualizer(QObject *parent) : ConfigurationModule(parent, DEFAULTS)

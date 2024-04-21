@@ -43,6 +43,7 @@ class ConfigurationVisualizer : public ConfigurationModule
     Q_PROPERTY(double toolLength MEMBER m_toolLength NOTIFY changed);
     Q_PROPERTY(ToolType toolType MEMBER m_toolType NOTIFY changed);
     Q_PROPERTY(double toolAngle MEMBER m_toolAngle NOTIFY changed);
+    Q_PROPERTY(bool show3dCursor MEMBER m_show3dCursor NOTIFY changed);
 
     public:
         explicit ConfigurationVisualizer(QObject *parent);
@@ -87,6 +88,7 @@ class ConfigurationVisualizer : public ConfigurationModule
         QColor startPointColor() const { return m_startPointColor; }
         QColor endPointColor() const { return m_endPointColor; }
         QColor tableSurfaceGridColor() const { return m_tableSurfaceGridColor; }
+        bool show3dCursor() const { return m_show3dCursor; }
         // tool
         double toolDiameter() const { return m_toolDiameter; }
         double toolLength() const { return m_toolLength; }
@@ -109,6 +111,7 @@ class ConfigurationVisualizer : public ConfigurationModule
         double m_fieldOfView;
         double m_nearPlane;
         double m_farPlane;
+        bool m_show3dCursor;
         // colors
         QColor m_backgroundColor;
         QColor m_toolColor;

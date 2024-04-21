@@ -95,7 +95,7 @@ public:
 
 signals:
     void rotationChanged();
-    void toolPos(QPointF);
+    void cursorPosChanged(QPointF);
     void resized();
 
 public slots:
@@ -132,6 +132,7 @@ private:
     QString m_speedState;
     QString m_pinState;
     QString m_bufferState;
+    QPointF m_bottomSurfaceCursorPos;
     bool m_updatesEnabled;
 
     double normalizeAngle(double angle);
@@ -148,6 +149,8 @@ private:
     QColor m_colorText;
 
     QPointF getClickPositionOnXYPlane(QVector2D mouseClickPosition, QMatrix4x4 projectionMatrix, QMatrix4x4 viewMatrix);
+    void drawText(QPainter &painter, QPoint &pos, QString text, int lineHeight);
+
 protected:
     void initializeGL();
     void resizeGL(int width, int height);
