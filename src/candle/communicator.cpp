@@ -40,8 +40,6 @@ Communicator::Communicator(
     m_aborting = false;
     m_statusReceived = false;
     m_spindleCW = true;
-    // temporary !!!
-    m_communicator = this;
 
     resetStateVariables();
 
@@ -236,16 +234,16 @@ void Communicator::reset()
     if (m_streamer != nullptr) {
         m_streamer->reset();
     }
-    m_communicator->m_updateSpindleSpeed = true;
+    m_updateSpindleSpeed = true;
 }
 
 void Communicator::abort()
 {
     // @TODO is CommandSource::Program correct here??
-    if ((m_communicator->senderState() == SenderPaused) || (m_communicator->senderState() == SenderChangingTool)) {
-        m_communicator->sendCommand(CommandSource::Program, "M2", COMMAND_TI_UI, false);
+    if ((senderState() == SenderPaused) || (senderState() == SenderChangingTool)) {
+        sendCommand(CommandSource::Program, "M2", COMMAND_TI_UI, false);
     } else {
-        m_communicator->sendCommand(CommandSource::Program, "M2", COMMAND_TI_UI, true);
+        sendCommand(CommandSource::Program, "M2", COMMAND_TI_UI, true);
     }
 }
 
@@ -254,7 +252,7 @@ void Communicator::abort()
 */
 void Communicator::replaceConnection(Connection *newConnection)
 {
-    if (m_connection == newConnection) return;
+    if (!m_connection || m_connection == newConnection) return;
 
     disconnect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
     m_connection->disconnect();
@@ -436,7 +434,7 @@ void Communicator::onTimerStateQuery()
     }
 
     // @todo find some other way to update buffer state
-    //ui->glwVisualizer->setBufferState(QString(tr("Buffer: %1 / %2 / %3")).arg(bufferLength()).arg(m_communicator->m_commands.length()).arg(m_communicator->m_queue.length()));
+    //ui->glwVisualizer->setBufferState(QString(tr("Buffer: %1 / %2 / %3")).arg(bufferLength()).arg(m_commands.length()).arg(m_queue.length()));
 }
 
 // detects first line of communication?
@@ -502,21 +500,21 @@ void Communicator::completeTransfer()
 
     // Send end commands
     if (m_configuration->senderModule().useProgramEndCommands())
-        m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_configuration->senderModule().programEndCommands());
+        sendCommands(CommandSource::ProgramAdditionalCommands, m_configuration->senderModule().programEndCommands());
 
     emit transferCompleted();
 
     // Show message box
     //qApp->beep();
 
-    // m_communicator->stopUpdatingState();
+    // stopUpdatingState();
     // m_timerConnection.stop();
 
     // QMessageBox::information(this, qApp->applicationDisplayName(), tr("Job done.\nTime elapsed: %1")
     //                                                                    .arg(ui->glwVisualizer->spendTime().toString("hh:mm:ss")));
 
     // m_timerConnection.start();
-    // m_communicator->startUpdatingState(m_settings->queryStateTime());
+    // startUpdatingState(m_settings->queryStateTime());
 }
 
 void Communicator::onConnectionError(QString message)

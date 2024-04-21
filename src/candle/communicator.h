@@ -50,7 +50,6 @@ class Communicator : public QObject
 
         Connection *m_connection;
         Configuration *m_configuration;
-        Communicator *m_communicator;
         Streamer *m_streamer = nullptr;
         MachineConfiguration *m_machineConfiguration = nullptr;
 
