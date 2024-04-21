@@ -27,6 +27,7 @@ private:
 VirtualUCNCConnection::VirtualUCNCConnection(QObject *parent) : Connection(parent)
 {
     m_connected = false;
+    m_readyForConnection = false;
     m_socket = nullptr;
     m_server = nullptr;
 }
@@ -39,6 +40,10 @@ VirtualUCNCConnection::~VirtualUCNCConnection()
 bool VirtualUCNCConnection::openConnection()
 {
     if (m_server != nullptr) {
+        if (m_readyForConnection && !m_connected) {
+            m_connected = true;
+        }
+
         return m_connected;
     }
 
@@ -102,7 +107,7 @@ void VirtualUCNCConnection::onNewConnection()
     m_socket = m_server->nextPendingConnection();
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 
-    m_connected = true;
+    m_readyForConnection = true;
 
     qDebug() << "Virtual uCNC connection established!";
 }
