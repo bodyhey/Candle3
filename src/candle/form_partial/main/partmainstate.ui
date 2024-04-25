@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>State</class>
- <widget class="QWidget" name="State">
+ <class>partMainState</class>
+ <widget class="QWidget" name="partMainState">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -58,9 +58,6 @@
          <property name="toolTip">
           <string>X</string>
          </property>
-         <property name="locale">
-          <locale language="C" country="AnyCountry"/>
-         </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
          </property>
@@ -95,9 +92,6 @@
          <property name="toolTip">
           <string>Y</string>
          </property>
-         <property name="locale">
-          <locale language="C" country="AnyCountry"/>
-         </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
          </property>
@@ -131,9 +125,6 @@
          </property>
          <property name="toolTip">
           <string>Z</string>
-         </property>
-         <property name="locale">
-          <locale language="C" country="AnyCountry"/>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -188,9 +179,6 @@
          <property name="toolTip">
           <string>X</string>
          </property>
-         <property name="locale">
-          <locale language="C" country="AnyCountry"/>
-         </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
          </property>
@@ -225,9 +213,6 @@
          <property name="toolTip">
           <string>Y</string>
          </property>
-         <property name="locale">
-          <locale language="C" country="AnyCountry"/>
-         </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
          </property>
@@ -261,9 +246,6 @@
          </property>
          <property name="toolTip">
           <string>Z</string>
-         </property>
-         <property name="locale">
-          <locale language="C" country="AnyCountry"/>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

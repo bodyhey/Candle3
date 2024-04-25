@@ -33,8 +33,6 @@ Communicator::Communicator(
         {DeviceSleep, "Sleep"}
     })
 {
-    assert(m_connection != nullptr);
-
     m_reseting = false;
     m_resetCompleted = true;
     m_aborting = false;
@@ -44,7 +42,9 @@ Communicator::Communicator(
     resetStateVariables();
 
     // this->connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));
-    connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
+    if (m_connection) {
+        connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
+    }
 
     setSenderStateAndEmitSignal(SenderStopped);
 
@@ -427,6 +427,10 @@ bool Communicator::dataIsEnd(QString data)
 
 void Communicator::onTimerStateQuery()
 {
+    if (!m_connection) {
+        return;
+    }
+
     // qDebug() << m_connection->isConnected() << m_resetCompleted << m_statusReceived;
     if (m_connection->isConnected() && m_resetCompleted && m_statusReceived) {
         m_connection->sendByteArray(QByteArray(1, '?'));

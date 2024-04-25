@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>widgetJog</class>
- <widget class="QWidget" name="widgetJog">
+ <class>partMainJog</class>
+ <widget class="QWidget" name="partMainJog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -278,6 +278,13 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout_2">
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_22">
+       <property name="text">
+        <string>Feed:</string>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="label_20">
        <property name="text">
@@ -323,13 +330,6 @@
          <string>2000</string>
         </property>
        </item>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_22">
-       <property name="text">
-        <string>Feed:</string>
-       </property>
       </widget>
      </item>
      <item row="0" column="1">
@@ -407,7 +407,7 @@
   <connection>
    <sender>cmdYPlus</sender>
    <signal>pressed()</signal>
-   <receiver>widgetJog</receiver>
+   <receiver>partMainJog</receiver>
    <slot>onCmdYPlusPressed()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -423,7 +423,7 @@
   <connection>
    <sender>cmdYPlus</sender>
    <signal>released()</signal>
-   <receiver>widgetJog</receiver>
+   <receiver>partMainJog</receiver>
    <slot>onCmdYPlusReleased()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -439,7 +439,7 @@
   <connection>
    <sender>cmdZPlus</sender>
    <signal>pressed()</signal>
-   <receiver>widgetJog</receiver>
+   <receiver>partMainJog</receiver>
    <slot>onCmdZPlusPressed()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -455,7 +455,7 @@
   <connection>
    <sender>cmdZPlus</sender>
    <signal>released()</signal>
-   <receiver>widgetJog</receiver>
+   <receiver>partMainJog</receiver>
    <slot>onCmdZPlusReleased()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -471,7 +471,7 @@
   <connection>
    <sender>cmdZMinus</sender>
    <signal>pressed()</signal>
-   <receiver>widgetJog</receiver>
+   <receiver>partMainJog</receiver>
    <slot>onCmdZMinusPressed()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -487,12 +487,12 @@
   <connection>
    <sender>cmdZMinus</sender>
    <signal>released()</signal>
-   <receiver>widgetJog</receiver>
+   <receiver>partMainJog</receiver>
    <slot>onCmdZMinusReleased()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>184</x>
-     <y>137</y>
+     <x>223</x>
+     <y>132</y>
     </hint>
     <hint type="destinationlabel">
      <x>223</x>
@@ -503,7 +503,7 @@
   <connection>
    <sender>cmdXMinus</sender>
    <signal>pressed()</signal>
-   <receiver>widgetJog</receiver>
+   <receiver>partMainJog</receiver>
    <slot>onCmdXMinusPressed()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -519,7 +519,7 @@
   <connection>
    <sender>cmdXMinus</sender>
    <signal>released()</signal>
-   <receiver>widgetJog</receiver>
+   <receiver>partMainJog</receiver>
    <slot>onCmdXMinusReleased()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -535,7 +535,7 @@
   <connection>
    <sender>cmdXPlus</sender>
    <signal>pressed()</signal>
-   <receiver>widgetJog</receiver>
+   <receiver>partMainJog</receiver>
    <slot>onCmdXPlusPressed()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -551,12 +551,12 @@
   <connection>
    <sender>cmdXPlus</sender>
    <signal>released()</signal>
-   <receiver>widgetJog</receiver>
+   <receiver>partMainJog</receiver>
    <slot>onCmdXPlusReleased()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>138</x>
-     <y>71</y>
+     <x>132</x>
+     <y>86</y>
     </hint>
     <hint type="destinationlabel">
      <x>110</x>
@@ -567,7 +567,7 @@
   <connection>
    <sender>cmdYMinus</sender>
    <signal>pressed()</signal>
-   <receiver>widgetJog</receiver>
+   <receiver>partMainJog</receiver>
    <slot>onCmdYMinusPressed()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -583,12 +583,12 @@
   <connection>
    <sender>cmdYMinus</sender>
    <signal>released()</signal>
-   <receiver>widgetJog</receiver>
+   <receiver>partMainJog</receiver>
    <slot>onCmdYMinusReleased()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>83</x>
-     <y>136</y>
+     <x>86</x>
+     <y>132</y>
     </hint>
     <hint type="destinationlabel">
      <x>7</x>
@@ -597,25 +597,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>chkKeyboardControl</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>widgetJog</receiver>
-   <slot>onChkKeyboardControlToggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>64</x>
-     <y>228</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>4</x>
-     <y>216</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>cmdStop</sender>
    <signal>clicked()</signal>
-   <receiver>widgetJog</receiver>
+   <receiver>partMainJog</receiver>
    <slot>onCmdStopClicked()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -625,6 +609,38 @@
     <hint type="destinationlabel">
      <x>58</x>
      <y>144</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cboJogFeed</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>partMainJog</receiver>
+   <slot>onCmdFeedRateChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>149</x>
+     <y>196</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>179</x>
+     <y>215</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cboJogStep</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>partMainJog</receiver>
+   <slot>onCmdStepSizeChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>177</x>
+     <y>159</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>122</x>
+     <y>215</y>
     </hint>
    </hints>
   </connection>
@@ -644,5 +660,7 @@
   <slot>onCmdZMinusReleased()</slot>
   <slot>onChkKeyboardControlToggled(bool)</slot>
   <slot>onCmdStopClicked()</slot>
+  <slot>onCmdFeedRateChanged(int)</slot>
+  <slot>onCmdStepSizeChanged(int)</slot>
  </slots>
 </ui>

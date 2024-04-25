@@ -1,5 +1,5 @@
-#ifndef OVERRIDE_H
-#define OVERRIDE_H
+#ifndef PARTMAINOVERRIDE_H
+#define PARTMAINOVERRIDE_H
 
 #include <QWidget>
 
@@ -19,4 +19,4 @@ private:
     Ui::partMainOverride *ui;
 };
 
-#endif // OVERRIDE_H
+#endif // PARTMAINOVERRIDE_H

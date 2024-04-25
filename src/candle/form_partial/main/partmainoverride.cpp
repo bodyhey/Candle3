@@ -1,4 +1,4 @@
-#include "override.h"
+#include "partmainoverride.h"
 #include "ui_override.h"
 
 partMainOverride::partMainOverride(QWidget *parent)

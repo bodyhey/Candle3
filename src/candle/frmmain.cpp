@@ -18,8 +18,8 @@
 #include <QTranslator>
 #include <QDockWidget>
 #include "frmmain.h"
-#include "form_partial/main/jog.h"
-#include "form_partial/main/control.h"
+#include "form_partial/main/partmainjog.h"
+#include "form_partial/main/partmaincontrol.h"
 #include "ui_frmmain.h"
 #include "ui_frmsettings.h"
 #include "widgets/widgetmimedata.h"
@@ -46,7 +46,6 @@ frmMain::frmMain(QWidget *parent) :
 
     m_settings = new frmSettings(this, m_configuration);
 
-    initializeConnection(ConnectionMode::VIRTUAL);
     initializeCommunicator();
 
     // Initializing variables
@@ -351,7 +350,7 @@ void frmMain::initializeCommunicator()
 {
     m_communicator = new Communicator(
         this,
-        m_connection,
+        nullptr,
         &m_configuration
     );
     m_streamer = new Streamer();
@@ -2408,17 +2407,7 @@ void frmMain::saveSettings()
 
 void frmMain::initializeConnection(ConnectionMode mode)
 {
-    switch (mode) {
-        case ConnectionMode::SERIAL:
-            m_connection = new SerialConnection(this);
-            break;
-        case ConnectionMode::RAW_TCP:
-            m_connection = new RawTcpConnection(this);
-            break;
-        case ConnectionMode::VIRTUAL:
-            m_connection = new VirtualUCNCConnection(this);
-            break;
-    }
+    m_connection = m_connectionManager.createConnection(mode);
 
     //connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
     connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));

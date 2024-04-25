@@ -27,9 +27,9 @@
 #include "globals.h"
 
 #include "connection/connection.h"
-#include "form_partial/main/jog.h"
-#include "form_partial/main/state.h"
-#include "form_partial/main/console.h"
+#include "form_partial/main/partmainjog.h"
+#include "form_partial/main/partmainstate.h"
+#include "form_partial/main/partmainconsole.h"
 #include "frmgrblconfigurator.h"
 #include "parser/gcodeviewparse.h"
 

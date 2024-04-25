@@ -1,4 +1,4 @@
-#include "control.h"
+#include "partmaincontrol.h"
 #include "ui_control.h"
 #include <QDebug>
 

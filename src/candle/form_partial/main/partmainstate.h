@@ -1,5 +1,5 @@
-#ifndef STATE_H
-#define STATE_H
+#ifndef PARTMAINSTATE_H
+#define PARTMAINSTATE_H
 
 #include "globals.h"
 #include "../../config/configuration.h"
@@ -7,7 +7,7 @@
 #include <QVector3D>
 
 namespace Ui {
-class State;
+class partMainState;
 }
 
 class partMainState : public QWidget
@@ -24,7 +24,7 @@ class partMainState : public QWidget
         void setUnits(Units units);
 
     private:
-        Ui::State *ui;
+        Ui::partMainState *ui;
         const Configuration &m_configuration;
 
     signals:
@@ -32,4 +32,4 @@ class partMainState : public QWidget
 
 };
 
-#endif // STATE_H
+#endif // PARTMAINSTATE_H

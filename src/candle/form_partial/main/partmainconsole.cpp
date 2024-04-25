@@ -2,20 +2,15 @@
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
 // Copyright 2024 BTS
 
-#include "console.h"
+#include "partmainconsole.h"
 #include "ui_console.h"
 #include <QScrollBar>
 
-partMainConsole::partMainConsole(QWidget *parent, const ConfigurationConsole &configurationConsole)
+partMainConsole::partMainConsole(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::partMainConsole)
-    , m_configurationConsole(configurationConsole)
 {
     ui->setupUi(this);
-
-    if (m_configurationConsole.darkBackgroundMode()) {
-        applyDarkBackgroundMode();
-    }
 
     #ifndef UNIX
         ui->cboCommand->setStyleSheet("QComboBox {padding: 2;} QComboBox::drop-down {width: 0; border-style: none;} QComboBox::down-arrow {image: url(noimg);	border-width: 0;}");
@@ -24,12 +19,21 @@ partMainConsole::partMainConsole(QWidget *parent, const ConfigurationConsole &co
     ui->cboCommand->setMinimumHeight(ui->cboCommand->height());
     ui->cmdClearConsole->setFixedHeight(ui->cboCommand->height());
     ui->cmdCommandSend->setFixedHeight(ui->cboCommand->height());
+}
 
-    ui->cboCommand->setAutoCompletion(m_configurationConsole.commandAutoCompletion());
+void partMainConsole::initialize(ConfigurationConsole &configurationConsole)
+{
+    m_configurationConsole = &configurationConsole;
+
+    ui->cboCommand->setAutoCompletion(m_configurationConsole->commandAutoCompletion());
 
     // restore command history
-    ui->cboCommand->addItems(m_configurationConsole.commandHistory());
+    ui->cboCommand->addItems(m_configurationConsole->commandHistory());
     ui->cboCommand->setCurrentIndex(-1);
+
+    if (m_configurationConsole->darkBackgroundMode()) {
+        applyDarkBackgroundMode();
+    }
 }
 
 partMainConsole::~partMainConsole()

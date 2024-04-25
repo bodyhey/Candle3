@@ -2,8 +2,8 @@
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
 // Copyright 2024 BTS
 
-#ifndef CONSOLE_H
-#define CONSOLE_H
+#ifndef PARTMAINCONSOLE_H
+#define PARTMAINCONSOLE_H
 
 #include <QWidget>
 #include <QTextBlock>
@@ -19,7 +19,8 @@ class partMainConsole : public QWidget
     Q_OBJECT
 
     public:
-        explicit partMainConsole(QWidget *parent, const ConfigurationConsole &configurationConsole);
+        explicit partMainConsole(QWidget *parent);
+        void initialize(ConfigurationConsole &configurationConsole);
         ~partMainConsole();
         int append(QString text);
         int append(CommandAttributes commandAttributes);
@@ -33,7 +34,7 @@ class partMainConsole : public QWidget
 
     private:
         Ui::partMainConsole *ui;
-        const ConfigurationConsole &m_configurationConsole;
+        ConfigurationConsole *m_configurationConsole;
         void send();
         bool isScrolledToEnd();
         void scrollToEnd();
@@ -51,8 +52,6 @@ class partMainConsole : public QWidget
                 int m_commandIndex;
         };
 
-//        int m_commandIndex = 0; // won't be cleared even if the console is cleared
-
         void applyDarkBackgroundMode();
 
     private slots:
@@ -60,4 +59,4 @@ class partMainConsole : public QWidget
         void onSendClicked();
 };
 
-#endif // CONSOLE_H
+#endif // PARTMAINCONSOLE_H

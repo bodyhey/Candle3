@@ -66,11 +66,12 @@ SOURCES += main.cpp\
     connection/virtualucncconnection.cpp \
     drawers/cursordrawer.cpp \
     drawers/tablesurfacedrawer.cpp \
-    form_partial/main/console.cpp \
-    form_partial/main/control.cpp \
-    form_partial/main/jog.cpp \
-    form_partial/main/override.cpp \
-    form_partial/main/state.cpp \
+    form_partial/main/partmainconsole.cpp \
+    form_partial/main/partmaincontrol.cpp \
+    form_partial/main/partmainheightmap.cpp \
+    form_partial/main/partmainjog.cpp \
+    form_partial/main/partmainoverride.cpp \
+    form_partial/main/partmainstate.cpp \
     frmgrblconfigurator.cpp \
     frmmain.cpp \
     frmsettings.cpp \
@@ -127,11 +128,12 @@ HEADERS  += frmmain.h \
     connection/virtualucncconnection.h \
     drawers/cursordrawer.h \
     drawers/tablesurfacedrawer.h \
-    form_partial/main/console.h \
-    form_partial/main/control.h \
-    form_partial/main/jog.h \
-    form_partial/main/override.h \
-    form_partial/main/state.h \
+    form_partial/main/partmainconsole.h \
+    form_partial/main/partmaincontrol.h \
+    form_partial/main/partmainheightmap.h \
+    form_partial/main/partmainjog.h \
+    form_partial/main/partmainoverride.h \
+    form_partial/main/partmainstate.h \
     frmgrblconfigurator.h \
     frmsettings.h \
     frmabout.h \
@@ -165,11 +167,12 @@ HEADERS  += frmmain.h \
     widgets/dropwidget.h
 
 FORMS    += frmmain.ui \
-    form_partial/main/console.ui \
-    form_partial/main/control.ui \
-    form_partial/main/jog.ui \
-    form_partial/main/override.ui \
-    form_partial/main/state.ui \
+    form_partial/main/partmainconsole.ui \
+    form_partial/main/partmaincontrol.ui \
+    form_partial/main/partmainheightmap.ui \
+    form_partial/main/partmainjog.ui \
+    form_partial/main/partmainoverride.ui \
+    form_partial/main/partmainstate.ui \
     frmdebug.ui \
     frmgrblconfigurator.ui \
     frmsettings.ui \

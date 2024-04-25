@@ -2,8 +2,8 @@
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
 // Copyright 2024 BTS
 
-#ifndef CONTROL_H
-#define CONTROL_H
+#ifndef PARTMAINCONTROL_H
+#define PARTMAINCONTROL_H
 
 #include "globals.h"
 #include <QWidget>
@@ -45,4 +45,4 @@ private slots:
 
 };
 
-#endif // CONTROL_H
+#endif // PARTMAINCONTROL_H
