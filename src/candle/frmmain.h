@@ -116,10 +116,10 @@ private slots:
     void on_actServiceSettings_triggered();
     void on_actServiceConfigureGRBL_triggered();
     void on_actAbout_triggered();
-    void on_actJogStepNext_triggered();
-    void on_actJogStepPrevious_triggered();
-    void on_actJogFeedNext_triggered();
-    void on_actJogFeedPrevious_triggered();
+    // void on_actJogStepNext_triggered();
+    // void on_actJogStepPrevious_triggered();
+    // void on_actJogFeedNext_triggered();
+    // void on_actJogFeedPrevious_triggered();
     void on_actSpindleSpeedPlus_triggered();
     void on_actSpindleSpeedMinus_triggered();
     void on_actOverrideFeedPlus_triggered();
@@ -175,19 +175,19 @@ private slots:
     void on_cmdHeightMapCreate_clicked();
     void on_cmdHeightMapLoad_clicked();
     void on_cmdHeightMapBorderAuto_clicked();
-    void on_cmdYPlus_pressed();
-    void on_cmdYPlus_released();
-    void on_cmdYMinus_pressed();
-    void on_cmdYMinus_released();
-    void on_cmdXPlus_pressed();
-    void on_cmdXPlus_released();
-    void on_cmdXMinus_pressed();
-    void on_cmdXMinus_released();
-    void on_cmdZPlus_pressed();
-    void on_cmdZPlus_released();
-    void on_cmdZMinus_pressed();
-    void on_cmdZMinus_released();
-    void on_cmdStop_clicked();
+    // void on_cmdYPlus_pressed();
+    // void on_cmdYPlus_released();
+    // void on_cmdYMinus_pressed();
+    // void on_cmdYMinus_released();
+    // void on_cmdXPlus_pressed();
+    // void on_cmdXPlus_released();
+    // void on_cmdXMinus_pressed();
+    // void on_cmdXMinus_released();
+    // void on_cmdZPlus_pressed();
+    // void on_cmdZPlus_released();
+    // void on_cmdZMinus_pressed();
+    // void on_cmdZMinus_released();
+    // void on_cmdStop_clicked();
     void on_tblProgram_customContextMenuRequested(const QPoint &pos);
     void on_mnuViewWindows_aboutToShow();
     void on_mnuViewPanels_aboutToShow();
@@ -302,9 +302,8 @@ private:
     frmGrblConfigurator *m_grblConfigurator;
 
     // Partials
-    partMainJog *m_partJog;
+    // partMainJog *m_partJog;
     partMainState *m_partState;
-    partMainConsole *m_partConsole;
 
     // Filenames
     QString m_settingsFileName;
@@ -332,10 +331,7 @@ private:
 
     // Keyboard
     bool m_absoluteCoordinates;
-    bool m_storedKeyboardControl;
-
-    // Jog
-    QVector3D m_jogVector;
+    //bool m_storedKeyboardControl;
 
     Configuration m_configuration;
     ScriptVars m_scriptVars;
@@ -413,9 +409,10 @@ private:
     void applyVisualizerConfiguration(ConfigurationVisualizer &visualizerConfiguration);
     void applyCodeDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration);
     void applyToolDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration);
-    void appleTableSurfaceDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration);
+    void applyTableSurfaceDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration);
     void applyHeightmapDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration);
     void applyUIConfiguration(ConfigurationUI &uiConfiguration);
+    void applyJoggingConfiguration(ConfigurationJogging &joggingConfiguration);
 };
 
 typedef QMap<QString, QList<QKeySequence>> ShortcutsMap;

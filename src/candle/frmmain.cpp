@@ -135,12 +135,14 @@ frmMain::frmMain(QWidget *parent) :
 
     ui->setupUi(this);
 
-    ui->widgetJog->setParent(nullptr);
-    static_cast<QVBoxLayout*>(ui->grpJog->layout())->removeWidget(ui->widgetJog);
+    // ui->jog->setParent(nullptr);
+    // static_cast<QVBoxLayout*>(ui->grpJog->layout())->removeWidget(ui->jog);
 
-    ui->widgetJog = new partMainJog(this);
-    static_cast<QVBoxLayout*>(ui->grpJog->layout())->insertWidget(0, ui->widgetJog);
-    ui->widgetJog->show();
+    // ui->widgetJog = new partMainJog(this);
+    // static_cast<QVBoxLayout*>(ui->grpJog->layout())->insertWidget(0, ui->widgetJog);
+    // ui->widgetJog->show();
+
+    ui->jog->initialize(m_configuration.joggingModule());
 
     QWidget *widgetControl = new partMainControl(this);
     static_cast<QVBoxLayout*>(ui->grpControl->layout())->insertWidget(0, widgetControl);
@@ -149,14 +151,10 @@ frmMain::frmMain(QWidget *parent) :
     m_partState = new partMainState(this, &m_configuration);
     static_cast<QVBoxLayout*>(ui->grpState->layout())->insertWidget(0, this->m_partState);
 
-    m_partConsole = new partMainConsole(this, m_configuration.consoleModule());
-    connect(this->m_partConsole, SIGNAL(newCommand(QString)), this, SLOT(onConsoleNewCommand(QString)));
-    m_partConsole->append(QString("G-Candle %1 started").arg( qApp->applicationVersion()));
-    m_partConsole->append("---");
-
-    QLayout *layout = ui->dockConsole->widget()->layout();
-    layout->takeAt(0);
-    layout->addWidget(this->m_partConsole);
+    ui->console->initialize(m_configuration.consoleModule());
+    connect(ui->console, SIGNAL(newCommand(QString)), this, SLOT(onConsoleNewCommand(QString)));
+    ui->console->append(QString("G-Candle %1 started").arg( qApp->applicationVersion()));
+    ui->console->append("---");
 
     // Drag&drop placeholders
     ui->fraDropDevice->setVisible(false);
@@ -186,11 +184,6 @@ frmMain::frmMain(QWidget *parent) :
 
     ui->widgetHeightmapSettings->setVisible(false);
 
-    ui->cmdXMinus->setBackColor(QColor(153, 180, 209));
-    ui->cmdXPlus->setBackColor(ui->cmdXMinus->backColor());
-    ui->cmdYMinus->setBackColor(ui->cmdXMinus->backColor());
-    ui->cmdYPlus->setBackColor(ui->cmdXMinus->backColor());
-
     ui->cmdToggleProjection->setParent(ui->glwVisualizer);
     ui->cmdFit->setParent(ui->glwVisualizer);
     ui->cmdIsometric->setParent(ui->glwVisualizer);
@@ -203,10 +196,10 @@ frmMain::frmMain(QWidget *parent) :
     ui->cmdHeightMapLoad->setMinimumHeight(ui->cmdFileOpen->sizeHint().height());
     ui->cmdHeightMapMode->setMinimumHeight(ui->cmdFileOpen->sizeHint().height());
 
-    ui->cboJogStep->setValidator(new QDoubleValidator(0, 10000, 2));
-    ui->cboJogFeed->setValidator(new QIntValidator(0, 100000));
-    connect(ui->cboJogStep, &ComboBoxKey::currentTextChanged, this, &frmMain::updateJogTitle);
-    connect(ui->cboJogFeed, &ComboBoxKey::currentTextChanged, this, &frmMain::updateJogTitle);
+    // ui->cboJogStep->setValidator(new QDoubleValidator(0, 10000, 2));
+    // ui->cboJogFeed->setValidator(new QIntValidator(0, 100000));
+    // connect(ui->cboJogStep, &ComboBoxKey::currentTextChanged, this, &frmMain::updateJogTitle);
+    // connect(ui->cboJogFeed, &ComboBoxKey::currentTextChanged, this, &frmMain::updateJogTitle);
 
     // Prepare "Send"-button
     ui->cmdFileSend->setMinimumWidth(qMax(ui->cmdFileSend->width(), ui->cmdFileOpen->width()));
@@ -286,8 +279,6 @@ frmMain::frmMain(QWidget *parent) :
     ui->tblProgram->hideColumn(4);
     ui->tblProgram->hideColumn(5);
 
-    // to communicator
-    //setSenderState(SenderStopped);
     updateControlsState();
 
     // Prepare jog buttons
@@ -311,7 +302,7 @@ frmMain::frmMain(QWidget *parent) :
     foreach (QAction* a, findChildren<QAction*>()) if (!noActions.contains(a)) addAction(a);
 
     // Handle file drop
-    if (qApp->arguments().count() > 1 && isGCodeFile(qApp->arguments().last())) {
+    if (qApp->arguments().count() > 1 && Util::isGCodeFile(qApp->arguments().last())) {
         loadFile(qApp->arguments().last());
     }
     
@@ -669,25 +660,25 @@ void frmMain::on_actAbout_triggered()
     m_frmAbout.exec();
 }
 
-void frmMain::on_actJogStepNext_triggered()
-{
-    ui->cboJogStep->setCurrentNext();
-}
+// void frmMain::on_actJogStepNext_triggered()
+// {
+//     ui->cboJogStep->setCurrentNext();
+// }
 
-void frmMain::on_actJogStepPrevious_triggered()
-{
-    ui->cboJogStep->setCurrentPrevious();
-}
+// void frmMain::on_actJogStepPrevious_triggered()
+// {
+//     ui->cboJogStep->setCurrentPrevious();
+// }
 
-void frmMain::on_actJogFeedNext_triggered()
-{
-    ui->cboJogFeed->setCurrentNext();
-}
+// void frmMain::on_actJogFeedNext_triggered()
+// {
+//     ui->cboJogFeed->setCurrentNext();
+// }
 
-void frmMain::on_actJogFeedPrevious_triggered()
-{
-    ui->cboJogFeed->setCurrentPrevious();
-}
+// void frmMain::on_actJogFeedPrevious_triggered()
+// {
+//     ui->cboJogFeed->setCurrentPrevious();
+// }
 
 void frmMain::on_actSpindleSpeedPlus_triggered()
 {
@@ -786,8 +777,9 @@ void frmMain::on_cmdFileSend_clicked()
 
     m_communicator->setSenderStateAndEmitSignal(SenderTransferring);
 
-    m_storedKeyboardControl = ui->chkKeyboardControl->isChecked();
-    ui->chkKeyboardControl->setChecked(false);
+    ui->jog->storeAndResetKeyboardControl();
+    // m_storedKeyboardControl = ui->chkKeyboardControl->isChecked();
+    // ui->chkKeyboardControl->setChecked(false);
 
     m_communicator->storeParserState();
 
@@ -1034,7 +1026,7 @@ void frmMain::on_grpJog_toggled(bool checked)
     updateJogTitle();
     updateLayouts();
 
-    ui->widgetJog->setVisible(checked);
+    ui->jog->setVisible(checked);
 }
 
 void frmMain::on_grpHeightMap_toggled(bool arg1)
@@ -1056,7 +1048,7 @@ void frmMain::on_chkKeyboardControl_toggled(bool checked)
     }
 
     if ((m_communicator->senderState() != SenderTransferring) && (m_communicator->senderState() != SenderStopping))
-        m_storedKeyboardControl = checked;
+        ui->jog->setKeyboardControl(checked);
 
     updateJogTitle();
     updateControlsState();
@@ -1482,84 +1474,84 @@ void frmMain::on_cmdHeightMapBorderAuto_clicked()
     }
 }
 
-void frmMain::on_cmdYPlus_pressed()
-{
-    m_jogVector += QVector3D(0, 1, 0);
-    jogStep();
-}
+// void frmMain::on_cmdYPlus_pressed()
+// {
+//     m_jogVector += QVector3D(0, 1, 0);
+//     jogStep();
+// }
 
-void frmMain::on_cmdYPlus_released()
-{
-    m_jogVector -= QVector3D(0, 1, 0);
-    jogStep();
-}
+// void frmMain::on_cmdYPlus_released()
+// {
+//     m_jogVector -= QVector3D(0, 1, 0);
+//     jogStep();
+// }
 
-void frmMain::on_cmdYMinus_pressed()
-{
-    m_jogVector += QVector3D(0, -1, 0);
-    jogStep();
-}
+// void frmMain::on_cmdYMinus_pressed()
+// {
+//     m_jogVector += QVector3D(0, -1, 0);
+//     jogStep();
+// }
 
-void frmMain::on_cmdYMinus_released()
-{
-    m_jogVector -= QVector3D(0, -1, 0);
-    jogStep();
-}
+// void frmMain::on_cmdYMinus_released()
+// {
+//     m_jogVector -= QVector3D(0, -1, 0);
+//     jogStep();
+// }
 
-void frmMain::on_cmdXPlus_pressed()
-{
-    m_jogVector += QVector3D(1, 0, 0);
-    jogStep();
-}
+// void frmMain::on_cmdXPlus_pressed()
+// {
+//     m_jogVector += QVector3D(1, 0, 0);
+//     jogStep();
+// }
 
-void frmMain::on_cmdXPlus_released()
-{
-    m_jogVector -= QVector3D(1, 0, 0);
-    jogStep();
-}
+// void frmMain::on_cmdXPlus_released()
+// {
+//     m_jogVector -= QVector3D(1, 0, 0);
+//     jogStep();
+// }
 
-void frmMain::on_cmdXMinus_pressed()
-{
-    m_jogVector += QVector3D(-1, 0, 0);
-    jogStep();
-}
+// void frmMain::on_cmdXMinus_pressed()
+// {
+//     m_jogVector += QVector3D(-1, 0, 0);
+//     jogStep();
+// }
 
-void frmMain::on_cmdXMinus_released()
-{
-    m_jogVector -= QVector3D(-1, 0, 0);
-    jogStep();
-}
+// void frmMain::on_cmdXMinus_released()
+// {
+//     m_jogVector -= QVector3D(-1, 0, 0);
+//     jogStep();
+// }
 
-void frmMain::on_cmdZPlus_pressed()
-{
-    m_jogVector += QVector3D(0, 0, 1);
-    jogStep();
-}
+// void frmMain::on_cmdZPlus_pressed()
+// {
+//     m_jogVector += QVector3D(0, 0, 1);
+//     jogStep();
+// }
 
-void frmMain::on_cmdZPlus_released()
-{
-    m_jogVector -= QVector3D(0, 0, 1);
-    jogStep();
-}
+// void frmMain::on_cmdZPlus_released()
+// {
+//     m_jogVector -= QVector3D(0, 0, 1);
+//     jogStep();
+// }
 
-void frmMain::on_cmdZMinus_pressed()
-{
-    m_jogVector += QVector3D(0, 0, -1);
-    jogStep();
-}
+// void frmMain::on_cmdZMinus_pressed()
+// {
+//     m_jogVector += QVector3D(0, 0, -1);
+//     jogStep();
+// }
 
-void frmMain::on_cmdZMinus_released()
-{
-    m_jogVector -= QVector3D(0, 0, -1);
-    jogStep();
-}
+// void frmMain::on_cmdZMinus_released()
+// {
+//     m_jogVector -= QVector3D(0, 0, -1);
+//     jogStep();
+// }
 
-void frmMain::on_cmdStop_clicked()
-{
-    m_jogVector = QVector3D(0, 0, 0);
-    m_communicator->clearQueue();
-    m_connection->sendByteArray(QByteArray(1, char(0x85)));
-}
+// void frmMain::on_cmdStop_clicked()
+// {
+//     m_jogVector = QVector3D(0, 0, 0);
+//     m_communicator->clearQueue();
+//     m_connection->sendByteArray(QByteArray(1, char(0x85)));
+// }
 
 void frmMain::on_tblProgram_customContextMenuRequested(const QPoint &pos)
 {
@@ -1636,7 +1628,7 @@ void frmMain::onConnectionError(QString error)
     //         updateControlsState();
     //     }
     // }
-    m_partConsole->append(tr("Connection error ") + error);
+    ui->console->append(tr("Connection error ") + error);
     updateControlsState();
 }
 
@@ -1766,14 +1758,14 @@ void frmMain::onResponseReceived(QString command, int tableIndex, QString respon
 
 void frmMain::onCommandResponseReceived(CommandAttributes commandAttributes)
 {
-    m_partConsole->appendResponse(commandAttributes);
+    ui->console->appendResponse(commandAttributes);
 }
 
 void frmMain::onCommandSent(CommandAttributes commandAttributes)
 {
     if (isCommandFromUi(commandAttributes.source) && !m_configuration.consoleModule().showUiCommands()) return;
     if (isCommandFromProgram(commandAttributes.source) && !m_configuration.consoleModule().showProgramCommands()) return;
-    m_partConsole->append(commandAttributes);
+    ui->console->append(commandAttributes);
 }
 
 void frmMain::onCommandProcessed(int tableIndex, QString response)
@@ -2026,8 +2018,9 @@ void frmMain::onActSendFromLineTriggered()
 
     m_communicator->setSenderStateAndEmitSignal(SenderTransferring);
 
-    m_storedKeyboardControl = ui->chkKeyboardControl->isChecked();
-    ui->chkKeyboardControl->setChecked(false);
+    ui->jog->storeAndResetKeyboardControl();
+    // m_storedKeyboardControl = ui->chkKeyboardControl->isChecked();
+    // ui->chkKeyboardControl->setChecked(false);
 
     m_communicator->storeParserState();
 
@@ -2215,16 +2208,16 @@ void frmMain::loadSettings()
     // ui->cmdClearConsole->setFixedHeight(ui->cboCommand->height());
     // ui->cmdCommandSend->setFixedHeight(ui->cboCommand->height());
 
-    m_storedKeyboardControl = set.value("keyboardControl", false).toBool();
+    // m_storedKeyboardControl = set.value("keyboardControl", false).toBool();
 
-    QStringList steps = set.value("jogSteps").toStringList();
-    if (steps.count() > 0) {
-        steps.insert(0, ui->cboJogStep->items().first());
-        ui->cboJogStep->setItems(steps);
-    }
-    ui->cboJogStep->setCurrentIndex(ui->cboJogStep->findText(set.value("jogStep").toString()));
-    ui->cboJogFeed->setItems(set.value("jogFeeds").toStringList());
-    ui->cboJogFeed->setCurrentIndex(ui->cboJogFeed->findText(set.value("jogFeed").toString()));
+    // QStringList steps = set.value("jogSteps").toStringList();
+    // if (steps.count() > 0) {
+    //     steps.insert(0, ui->cboJogStep->items().first());
+    //     ui->cboJogStep->setItems(steps);
+    // }
+    // ui->cboJogStep->setCurrentIndex(ui->cboJogStep->findText(set.value("jogStep").toString()));
+    // ui->cboJogFeed->setItems(set.value("jogFeeds").toStringList());
+    // ui->cboJogFeed->setCurrentIndex(ui->cboJogFeed->findText(set.value("jogFeed").toString()));
 
     // foreach (ColorPicker* pick, m_settings->colors()) {
     //     pick->setColor(QColor(set.value(pick->objectName().mid(3), "black").toString()));
@@ -2341,12 +2334,12 @@ void frmMain::saveSettings()
     set.setValue("formGeometry", this->saveGeometry());
     set.setValue("formSettingsGeometry", m_settings->saveGeometry());
 
-    joggingConfiguration.setJogStep(ui->cboJogStep->currentText().toDouble());
-    joggingConfiguration.setJogFeed(ui->cboJogFeed->currentText().toInt());
+    // joggingConfiguration.setJogStep(ui->cboJogStep->currentText().toDouble());
+    // joggingConfiguration.setJogFeed(ui->cboJogFeed->currentText().toInt());
 
-    set.setValue("jogSteps", (QStringList)ui->cboJogStep->items().mid(1, ui->cboJogStep->items().count() - 1));
+    // set.setValue("jogSteps", (QStringList)ui->cboJogStep->items().mid(1, ui->cboJogStep->items().count() - 1));
     // set.setValue("jogStep", ui->cboJogStep->currentText());
-    set.setValue("jogFeeds", ui->cboJogFeed->items());
+    // set.setValue("jogFeeds", ui->cboJogFeed->items());
     // set.setValue("jogFeed", ui->cboJogFeed->currentText());
 
     QStringList list;
@@ -2485,7 +2478,7 @@ void frmMain::applyToolDrawerConfiguration(ConfigurationVisualizer &visualizerCo
     m_toolDrawer.update();
 }
 
-void frmMain::appleTableSurfaceDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration)
+void frmMain::applyTableSurfaceDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration)
 {
     m_tableSurfaceDrawer.setGridColor(visualizerConfiguration.tableSurfaceGridColor());
     m_tableSurfaceDrawer.update();
@@ -2507,12 +2500,18 @@ void frmMain::applyUIConfiguration(ConfigurationUI &uiConfiguration)
     qDebug() << QString(qApp->styleSheet());
 }
 
+void frmMain::applyJoggingConfiguration(ConfigurationJogging &joggingConfiguration)
+{
+    ui->jog->configurationUpdated();
+}
+
 void frmMain::applySettings()
 {
     ConfigurationVisualizer &visualizerConfiguration = m_configuration.visualizerModule();
     ConfigurationHeightmap &heightmapConfiguration = m_configuration.heightmapModule();
     ConfigurationMachine &machineConfiguration = m_configuration.machineModule();
     ConfigurationUI &uiConfiguration = m_configuration.uiModule();
+    ConfigurationJogging &joggingConfiguration = m_configuration.joggingModule();
 
     m_originDrawer->setLineWidth(visualizerConfiguration.lineWidth());
 
@@ -2523,10 +2522,11 @@ void frmMain::applySettings()
     applyToolDrawerConfiguration(visualizerConfiguration);
     applyCodeDrawerConfiguration(visualizerConfiguration);
     applyVisualizerConfiguration(visualizerConfiguration);
-    appleTableSurfaceDrawerConfiguration(visualizerConfiguration);
+    applyTableSurfaceDrawerConfiguration(visualizerConfiguration);
     applyHeightmapConfiguration(heightmapConfiguration);
     applyHeightmapDrawerConfiguration(visualizerConfiguration);
     applySpindleConfiguration(machineConfiguration);
+    applyJoggingConfiguration(joggingConfiguration);
     applyOverridesConfiguration(machineConfiguration);
     applyUIConfiguration(uiConfiguration);
     applyRecentFilesConfiguration(uiConfiguration);
@@ -3052,10 +3052,10 @@ void frmMain::updateControlsState()
     ui->grpState->setEnabled(portOpened);
     ui->grpControl->setEnabled(portOpened);
     ui->widgetSpindle->setEnabled(portOpened);
-    ui->widgetJog->setEnabled(portOpened && ((m_communicator->senderState() == SenderStopped)
+    ui->jog->setEnabled(portOpened && ((m_communicator->senderState() == SenderStopped)
         || (m_communicator->senderState() == SenderChangingTool)));
 
-    m_partConsole->setEnabled(portOpened && (!ui->chkKeyboardControl->isChecked()));
+    ui->console->setEnabled(portOpened && (!ui->jog->keyboardControl()));
     // ui->cmdCommandSend->setEnabled(portOpened);
 
     ui->cmdCheck->setEnabled(portOpened && !process);
@@ -3104,7 +3104,7 @@ void frmMain::updateControlsState()
     this->setWindowTitle(m_programFileName.isEmpty() ? qApp->applicationDisplayName()
                                                      : m_programFileName.mid(m_programFileName.lastIndexOf("/") + 1) + " - " + qApp->applicationDisplayName());
 
-    if (!process) ui->chkKeyboardControl->setChecked(m_storedKeyboardControl);
+    if (!process) ui->jog->restoreKeyboardControl();
 
 #ifdef WINDOWS
     if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7 && m_taskBarProgress) {
@@ -3134,12 +3134,12 @@ void frmMain::updateControlsState()
     style()->unpolish(ui->grpProgram);
     ui->grpProgram->ensurePolished();
 
-    ui->cboJogStep->setEditable(!ui->chkKeyboardControl->isChecked());
-    ui->cboJogFeed->setEditable(!ui->chkKeyboardControl->isChecked());
-    ui->cboJogStep->setEnabled(!ui->chkKeyboardControl->isChecked());
-    ui->cboJogFeed->setEnabled(!ui->chkKeyboardControl->isChecked());
-    ui->cboJogStep->setStyleSheet(QString("font-size: %1").arg(m_configuration.uiModule().fontSize()));
-    ui->cboJogFeed->setStyleSheet(ui->cboJogStep->styleSheet());
+    // ui->cboJogStep->setEditable(!ui->chkKeyboardControl->isChecked());
+    // ui->cboJogFeed->setEditable(!ui->chkKeyboardControl->isChecked());
+    // ui->cboJogStep->setEnabled(!ui->chkKeyboardControl->isChecked());
+    // ui->cboJogFeed->setEnabled(!ui->chkKeyboardControl->isChecked());
+    // ui->cboJogStep->setStyleSheet(QString("font-size: %1").arg(m_configuration.uiModule().fontSize()));
+    // ui->cboJogFeed->setStyleSheet(ui->cboJogStep->styleSheet());
 
     ui->tblHeightMap->setVisible(m_heightmapMode);
     ui->tblProgram->setVisible(!m_heightmapMode);
@@ -3199,12 +3199,12 @@ void frmMain::updateOverride(SliderBox *slider, int value, char command)
 
 void frmMain::updateJogTitle()
 {
-    if (ui->grpJog->isChecked() || !ui->chkKeyboardControl->isChecked()) {
+    if (ui->grpJog->isChecked() || !ui->jog->keyboardControl()) {
         ui->grpJog->setTitle(tr("Jog"));
-    } else if (ui->chkKeyboardControl->isChecked()) {
+    } else if (ui->jog->keyboardControl()) {
         ui->grpJog->setTitle(tr("Jog") + QString(tr(" (%1/%2)"))
-                             .arg(ui->cboJogStep->currentText().toDouble() > 0 ? ui->cboJogStep->currentText() : tr("C"))
-                             .arg(ui->cboJogFeed->currentText()));
+                                             .arg((ui->jog->stepSize() != ui->jog->CONTINUOUS) ? QString::number(ui->jog->stepSize()) : tr("C"))
+                            .arg(ui->jog->feedRate()));
     }
 }
 
@@ -3365,35 +3365,36 @@ bool frmMain::eventFilter(QObject *obj, QEvent *event)
         }
 
         if ((m_communicator->senderState() != SenderTransferring) && (m_communicator->senderState() != SenderStopping)
-            && ui->chkKeyboardControl->isChecked() && !ev->isAutoRepeat()) 
+            && ui->jog->keyboardControl() && !ev->isAutoRepeat())
         {
             static QList<QAction*> acts;
             if (acts.isEmpty()) acts << ui->actJogXMinus << ui->actJogXPlus 
                                      << ui->actJogYMinus << ui->actJogYPlus
                                      << ui->actJogZMinus << ui->actJogZPlus;
 
-            static QList<QAbstractButton*> buttons;
-            if (buttons.isEmpty()) buttons << ui->cmdXMinus << ui->cmdXPlus
-                                           << ui->cmdYMinus << ui->cmdYPlus
-                                           << ui->cmdZMinus << ui->cmdZPlus;
+            // @TODO is this for keyboard jogging??
+            // static QList<QAbstractButton*> buttons;
+            // if (buttons.isEmpty()) buttons << ui->cmdXMinus << ui->cmdXPlus
+            //                                << ui->cmdYMinus << ui->cmdYPlus
+            //                                << ui->cmdZMinus << ui->cmdZPlus;
 
-            for (int i = 0; i < acts.count(); i++) {
-                if ((!buttons.at(i)->isDown()) && (event->type() == QEvent::ShortcutOverride)) {
-                    if (acts.at(i)->shortcut().matches(ks) == QKeySequence::ExactMatch) {
-                        buttons.at(i)->pressed();
-                        buttons.at(i)->setDown(true);
-                    }
-                } else if (buttons.at(i)->isDown() && (event->type() == QEvent::KeyRelease)) {
-                    if ((acts.at(i)->shortcut().matches(ks) == QKeySequence::ExactMatch) 
-                        || (acts.at(i)->shortcut().toString().contains(ks.toString()))
-                        || (ks.toString().contains(acts.at(i)->shortcut().toString()))
-                        ) 
-                    {
-                        buttons.at(i)->released();
-                        buttons.at(i)->setDown(false);
-                    }
-                }
-            }
+            // for (int i = 0; i < acts.count(); i++) {
+            //     if ((!buttons.at(i)->isDown()) && (event->type() == QEvent::ShortcutOverride)) {
+            //         if (acts.at(i)->shortcut().matches(ks) == QKeySequence::ExactMatch) {
+            //             buttons.at(i)->pressed();
+            //             buttons.at(i)->setDown(true);
+            //         }
+            //     } else if (buttons.at(i)->isDown() && (event->type() == QEvent::KeyRelease)) {
+            //         if ((acts.at(i)->shortcut().matches(ks) == QKeySequence::ExactMatch)
+            //             || (acts.at(i)->shortcut().toString().contains(ks.toString()))
+            //             || (ks.toString().contains(acts.at(i)->shortcut().toString()))
+            //             )
+            //         {
+            //             buttons.at(i)->released();
+            //             buttons.at(i)->setDown(false);
+            //         }
+            //     }
+            // }
         }
     } else if (obj == ui->tblProgram && ((m_communicator->senderState() == SenderTransferring) || (m_communicator->senderState() == SenderStopping))) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
@@ -3615,8 +3616,8 @@ QList<LineSegment*> frmMain::subdivideSegment(LineSegment* segment)
 
 void frmMain::jogStep()
 {
-    if (ui->cboJogStep->currentText().toDouble() != 0) {
-        QVector3D vec = m_jogVector * ui->cboJogStep->currentText().toDouble();
+    if (ui->jog->stepSize() != ui->jog->CONTINUOUS) {
+        QVector3D vec = ui->jog->jogVector() * ui->jog->stepSize();
 
         if (vec.length()) {
             bool unitsInches = m_communicator->machineConfiguration().unitsInches();
@@ -3626,7 +3627,7 @@ void frmMain::jogStep()
                     .arg(vec.x(), 0, 'f', unitsInches ? 4 : 3)
                     .arg(vec.y(), 0, 'f', unitsInches ? 4 : 3)
                     .arg(vec.z(), 0, 'f', unitsInches ? 4 : 3)
-                    .arg(ui->cboJogFeed->currentText().toDouble())
+                    .arg(m_configuration.joggingModule().jogFeed())
                     .arg(unitsInches ? "G20" : "G21"),
                 -3
             );
@@ -3639,12 +3640,12 @@ void frmMain::jogContinuous()
     static bool block = false;
     static QVector3D v;
 
-    if ((ui->cboJogStep->currentText().toDouble() == 0) && !block) {
+    if ((ui->jog->stepSize() == ui->jog->CONTINUOUS) && !block) {
         bool unitsInches = m_communicator->machineConfiguration().unitsInches();
 
-        if (m_jogVector != v) {
+        if (ui->jog->jogVector() != v) {
             // Store jog vector before block
-            QVector3D j = m_jogVector;
+            QVector3D j = ui->jog->jogVector();
 
             if (v.length()) {
                 block = true;
@@ -3685,7 +3686,7 @@ void frmMain::jogContinuous()
                             .arg(vec.x(), 0, 'f', unitsInches ? 4 : 3)
                             .arg(vec.y(), 0, 'f', unitsInches ? 4 : 3)
                             .arg(vec.z(), 0, 'f', unitsInches ? 4 : 3)
-                            .arg(ui->cboJogFeed->currentText().toDouble())
+                            .arg(m_configuration.joggingModule().jogFeed())
                             .arg(unitsInches ? "G20" : "G21")
                             , -2);
             }
