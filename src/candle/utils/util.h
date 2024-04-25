@@ -56,6 +56,22 @@ public:
     {
         button->setIcon(invertIconColors(button->icon()));
     }
+
+    static bool isHeightmapFile(QString fileName)
+    {
+        return fileName.endsWith(".map", Qt::CaseInsensitive);
+    }
+
+    static bool isGCodeFile(QString fileName)
+    {
+        return fileName.endsWith(".txt", Qt::CaseInsensitive)
+               || fileName.endsWith(".nc", Qt::CaseInsensitive)
+               || fileName.endsWith(".ncc", Qt::CaseInsensitive)
+               || fileName.endsWith(".ngc", Qt::CaseInsensitive)
+               || fileName.endsWith(".tap", Qt::CaseInsensitive)
+               || fileName.endsWith(".gc", Qt::CaseInsensitive)
+               || fileName.endsWith(".gcode", Qt::CaseInsensitive);
+    }
 };
 
 #endif // UTIL

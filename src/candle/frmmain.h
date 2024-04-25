@@ -397,8 +397,6 @@ private:
     QList<LineSegment *> subdivideSegment(LineSegment *segment);
     void jogStep();
     void jogContinuous();
-    bool isGCodeFile(QString fileName);
-    bool isHeightmapFile(QString fileName);
     int buttonSize();
     QString getLineInitCommands(int row);
 

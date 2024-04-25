@@ -466,8 +466,7 @@ void frmMain::dragEnterEvent(QDragEnterEvent *dee)
     else if (dee->mimeData()->hasFormat("text/uri-list") && dee->mimeData()->urls().count() == 1) {
         QString fileName = dee->mimeData()->urls().at(0).toLocalFile();
 
-        if ((!m_heightmapMode && isGCodeFile(fileName))
-        || (m_heightmapMode && isHeightmapFile(fileName)))
+        if ((!m_heightmapMode && Util::isGCodeFile(fileName)) || (m_heightmapMode && Util::isHeightmapFile(fileName)))
             dee->acceptProposedAction();
     }
 }
@@ -3693,22 +3692,6 @@ void frmMain::jogContinuous()
             v = j;
         }
     }
-}
-
-bool frmMain::isGCodeFile(QString fileName)
-{
-    return fileName.endsWith(".txt", Qt::CaseInsensitive)
-          || fileName.endsWith(".nc", Qt::CaseInsensitive)
-          || fileName.endsWith(".ncc", Qt::CaseInsensitive)
-          || fileName.endsWith(".ngc", Qt::CaseInsensitive)
-          || fileName.endsWith(".tap", Qt::CaseInsensitive)
-          || fileName.endsWith(".gc", Qt::CaseInsensitive)
-          || fileName.endsWith(".gcode", Qt::CaseInsensitive);
-}
-
-bool frmMain::isHeightmapFile(QString fileName)
-{
-    return fileName.endsWith(".map", Qt::CaseInsensitive);
 }
 
 int frmMain::buttonSize()
