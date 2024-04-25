@@ -27,25 +27,25 @@ private:
 VirtualUCNCConnection::VirtualUCNCConnection(QObject *parent) : Connection(parent)
 {
     m_connected = false;
-    m_readyForConnection = false;
+    m_connecting = false;
     m_socket = nullptr;
     m_server = nullptr;
 }
 
 VirtualUCNCConnection::~VirtualUCNCConnection()
 {
-
 }
 
 bool VirtualUCNCConnection::openConnection()
 {
-    if (m_server != nullptr) {
-        if (m_readyForConnection && !m_connected) {
-            m_connected = true;
-        }
-
-        return m_connected;
+    if (!m_connecting) {
+        return false;
     }
+    if (m_connected) {
+        return true;
+    }
+
+    m_connecting = true;
 
     m_server = new QLocalServer(this);
     connect(m_server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
@@ -54,7 +54,7 @@ bool VirtualUCNCConnection::openConnection()
     WorkerThread* thread = new WorkerThread(m_server->serverName());
     thread->start();
 
-    return false;
+    return true;
 }
 
 void VirtualUCNCConnection::flushOutgoingData()
@@ -107,9 +107,9 @@ void VirtualUCNCConnection::onNewConnection()
     m_socket = m_server->nextPendingConnection();
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 
-    m_readyForConnection = true;
-
-    qDebug() << "Virtual uCNC connection established!";
+    m_connecting = false;
+    m_connected = true;
+    emit connected();
 }
 
 void VirtualUCNCConnection::onReadyRead()

@@ -7,6 +7,9 @@
 
 #include <QObject>
 #include "config/module/configurationconnection.h"
+#include "serialconnection.h"
+#include "rawtcpconnection.h"
+#include "virtualucncconnection.h"
 #include "connection.h"
 
 class ConnectionManager : public QObject
@@ -15,14 +18,12 @@ class ConnectionManager : public QObject
 
     public:
         ConnectionManager(QObject *parent, const ConfigurationConnection &configurationConnection);
-        //~ConnectionManager();
-
-        Connection* getConnection();
+        Connection* createConnection(ConnectionMode mode);
 
     private:
-        Connection* initializeSerialConnection();
-        Connection* initializeVirtualConnection();
-        Connection* initializeRawTcpConnection();
+        SerialConnection* initializeSerialConnection();
+        VirtualUCNCConnection* initializeVirtualConnection();
+        RawTcpConnection* initializeRawTcpConnection();
         const ConfigurationConnection& m_configurationConnection;
 };
 

@@ -21,7 +21,6 @@ class SerialConnection : public Connection
         void setPortName(QString);
         void setBaudRate(int);
         void sendByteArray(QByteArray) override;
-        // void sendChar(QChar) override;
         bool isConnected() override;
         void sendLine(QString) override;
         void closeConnection() override;

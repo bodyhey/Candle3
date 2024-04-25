@@ -23,9 +23,6 @@ class RawTcpConnection : public Connection
         void sendLine(QString) override;
         void closeConnection() override;
         ConnectionMode getSupportedMode() override { return ConnectionMode::RAW_TCP; };
-
-    // private slots:
-
 };
 
 #endif // RAWTCPCONNECTION_H

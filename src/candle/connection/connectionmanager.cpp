@@ -11,10 +11,8 @@ ConnectionManager::ConnectionManager(QObject *parent, const ConfigurationConnect
 {
 }
 
-Connection *ConnectionManager::getConnection()
+Connection *ConnectionManager::createConnection(ConnectionMode mode)
 {
-    ConnectionMode mode = ConnectionMode::SERIAL;
-
     switch (mode) {
         case ConnectionMode::SERIAL:
             return initializeSerialConnection();
@@ -25,7 +23,7 @@ Connection *ConnectionManager::getConnection()
     }
 }
 
-Connection *ConnectionManager::initializeSerialConnection()
+SerialConnection *ConnectionManager::initializeSerialConnection()
 {
     SerialConnection* serialConnection = new SerialConnection(this);
     serialConnection->setPortName(m_configurationConnection.serialPort());
@@ -34,14 +32,14 @@ Connection *ConnectionManager::initializeSerialConnection()
     return serialConnection;
 }
 
-Connection *ConnectionManager::initializeVirtualConnection()
+VirtualUCNCConnection *ConnectionManager::initializeVirtualConnection()
 {
     VirtualUCNCConnection* virtualConnection = new VirtualUCNCConnection(this);
 
     return virtualConnection;
 }
 
-Connection *ConnectionManager::initializeRawTcpConnection()
+RawTcpConnection *ConnectionManager::initializeRawTcpConnection()
 {
     RawTcpConnection* rawTcpConnection = new RawTcpConnection(this);
     rawTcpConnection->setHost(m_configurationConnection.rawTcpHost());

@@ -29,14 +29,12 @@ private:
     QLocalServer* m_server;
     QString m_incoming;
     bool m_connected;
-    bool m_readyForConnection;
     void flushOutgoingData();
     void processIncomingData();
 
 private slots:
     void onNewConnection();
     void onReadyRead();
-
 };
 
 #endif // VIRTUALUCNCCONNECTION_H

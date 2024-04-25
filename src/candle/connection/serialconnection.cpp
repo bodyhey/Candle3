@@ -1,13 +1,10 @@
 #include "serialconnection.h"
 #include <QDebug>
+#include <QTimer>
 
-SerialConnection::SerialConnection(QObject *parent) : Connection(parent) {
+SerialConnection::SerialConnection(QObject *parent) : Connection(parent)
+{
     setupSerialPort();
-
-    // if (m_settings->port() != "") {
-    //     m_serialPort.setPortName(m_settings->port());
-    //     m_serialPort.setBaudRate(m_settings->baud());
-    // }
 }
 
 SerialConnection::~SerialConnection()
@@ -17,7 +14,24 @@ SerialConnection::~SerialConnection()
 
 bool SerialConnection::openConnection()
 {
-    return m_serialPort.open(QIODevice::ReadWrite);
+    if (m_connecting) {
+        return false;
+    }
+    if (m_serialPort.isOpen()) {
+        return true;
+    }
+
+    if (!m_serialPort.open(QIODevice::ReadWrite)) {
+        return false;
+    }
+
+    m_connecting = true;
+    QTimer::singleShot(100, this, [this]() {
+        m_connecting = false;
+        emit this->connected();
+    });
+
+    return true;
 }
 
 void SerialConnection::setPortName(QString portName)
@@ -37,11 +51,15 @@ void SerialConnection::sendByteArray(QByteArray data)
 
 bool SerialConnection::isConnected()
 {
-    return m_serialPort.isOpen();
+    return !m_connecting && m_serialPort.isOpen();
 }
 
 void SerialConnection::sendLine(QString data)
 {
+    if (!isConnected()) {
+        return;
+    }
+
     m_serialPort.write((data + "\n").toLatin1());
 }
 
@@ -58,8 +76,8 @@ void SerialConnection::setupSerialPort()
     m_serialPort.setStopBits(QSerialPort::OneStop);
 
     // Signals/slots
-    connect(&m_serialPort, SIGNAL(readyRead()), this, SLOT(onSerialPortReadyRead()), Qt::QueuedConnection);
-    connect(&m_serialPort, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(onSerialPortError(QSerialPort::SerialPortError)));
+    connect(&m_serialPort, &QIODevice::readyRead, this, &SerialConnection::onSerialPortReadyRead, Qt::QueuedConnection);
+    connect(&m_serialPort, &QSerialPort::errorOccurred, this, &SerialConnection::onSerialPortError);
 }
 
 void SerialConnection::onSerialPortReadyRead()

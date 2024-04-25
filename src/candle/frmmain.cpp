@@ -31,9 +31,11 @@ frmMain::frmMain(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::frmMain),
     m_connectionManager(this, m_configuration.connectionModule()),
+    m_connection(nullptr),
     m_configuration(this)
 {
     m_configuration.load();
+
 //    setDefaults();
     // m_configuration.save();
 
@@ -300,20 +302,6 @@ frmMain::frmMain(QWidget *parent) :
     ui->slbSpindle->setChecked(true);
     connect(ui->slbSpindle, &SliderBox::valueUserChanged, this, &frmMain::onSlbSpindleValueUserChanged);
     connect(ui->slbSpindle, &SliderBox::valueChanged, this, &frmMain::onSlbSpindleValueChanged);
-
-    // Setup serial port
-    // m_serialPort.setParity(QSerialPort::NoParity);
-    // m_serialPort.setDataBits(QSerialPort::Data8);
-    // m_serialPort.setFlowControl(QSerialPort::NoFlowControl);
-    // m_serialPort.setStopBits(QSerialPort::OneStop);
-
-    // if (m_settings->port() != "") {
-    //     SerialConnection *connection = qobject_cast<SerialConnection*>(m_connection);
-    //     if (connection != nullptr) {
-    //         connection->setPortName(m_settings->port());
-    //         connection->setBaudRate(m_settings->baud());
-    //     }
-    // }
 
     // Enable form actions
     QList<QAction*> noActions;
@@ -2546,7 +2534,7 @@ void frmMain::applySettings()
 
     m_selectionDrawer.setColor(visualizerConfiguration.hightlightToolpathColor());
 
-    if (m_connection->getSupportedMode() != m_configuration.connectionModule().connectionMode()) {
+    if (!m_connection || m_connection->getSupportedMode() != m_configuration.connectionModule().connectionMode()) {
         initializeConnection(m_configuration.connectionModule().connectionMode());
         m_communicator->replaceConnection(m_connection);
     }
@@ -3058,7 +3046,7 @@ void frmMain::newHeightmap()
 
 void frmMain::updateControlsState()
 {
-    bool portOpened = m_connection->isConnected();
+    bool portOpened = m_connection && m_connection->isConnected();
     bool process = (m_communicator->senderState() == SenderTransferring) || (m_communicator->senderState() == SenderStopping);
     bool paused = (m_communicator->senderState() == SenderPausing) || (m_communicator->senderState() == SenderPausing2) || (m_communicator->senderState() == SenderPaused) || (m_communicator->senderState() == SenderChangingTool);
 

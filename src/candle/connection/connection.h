@@ -13,24 +13,27 @@ class Connection : public QObject
     Q_OBJECT
 
     public:
-        Connection(QObject *parent = nullptr);
+        Connection(QObject *parent);
         virtual ~Connection() {}
 
+        // true = waiting for connection, false = already connected or failed to connect
         virtual bool openConnection() = 0;
-        //virtual void sendChar(QChar) = 0;
+        virtual void sendChar(QChar);
+        virtual void sendChar(char);
         virtual void sendByteArray(QByteArray) = 0;
         virtual bool isConnected() = 0;
+        virtual bool isConnecting() { return m_connecting; }
         virtual void sendLine(QString) = 0;
         virtual void closeConnection() = 0;
         virtual ConnectionMode getSupportedMode() = 0;
 
+    protected:
+        bool m_connecting = false;
+
     signals:
         void lineReceived(const QString &line);
+        void connected();
         void error(const QString &text);
 };
-
-#include "serialconnection.h"
-#include "rawtcpconnection.h"
-#include "virtualucncconnection.h"
 
 #endif
