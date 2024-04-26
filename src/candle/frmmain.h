@@ -252,11 +252,6 @@ private:
     // Ui
     Ui::frmMain *ui;
 
-    //QMap<DeviceState, QString> m_deviceStatuses;
-    QMap<DeviceState, QString> m_statusCaptions;
-    QMap<DeviceState, QString> m_statusBackColors;
-    QMap<DeviceState, QString> m_statusForeColors;
-
     QMenu *m_tableMenu;
     QMessageBox* m_senderErrorBox;
 #ifdef WINDOWS

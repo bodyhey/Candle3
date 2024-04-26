@@ -17,15 +17,20 @@ class partMainState : public QWidget
     public:
         explicit partMainState(QWidget *parent, const Configuration &configuration);
         ~partMainState();
-        void setStatusText(QString, QString bgColor, QString fgColor);
         void setState(DeviceState);
         void setWorkCoordinates(QVector3D);
         void setMachineCoordinates(QVector3D);
         void setUnits(Units units);
+        void setStatusText(QString, QString bgColor, QString fgColor);
 
     private:
         Ui::partMainState *ui;
         const Configuration &m_configuration;
+        QMap<DeviceState, QString> m_statusCaptions;
+        QMap<DeviceState, QString> m_statusBackColors;
+        QMap<DeviceState, QString> m_statusForeColors;
+
+        void initializeColorsAndCaptions();
 
     signals:
         void grblCommand(GRBLCommand command);
