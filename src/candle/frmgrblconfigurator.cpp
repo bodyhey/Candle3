@@ -347,9 +347,9 @@ void frmGrblConfigurator::onConfigurationReceived(MachineConfiguration configura
             switch (entry.type) {
                 case Axes:
                     properties = entry.properties;
-                    (dynamic_cast<CSwitchProperty*>(properties[X]))->setValue(((int) setting) & 1);
-                    (dynamic_cast<CSwitchProperty*>(properties[Y]))->setValue(((int) setting) & 2);
-                    (dynamic_cast<CSwitchProperty*>(properties[Z]))->setValue(((int) setting) & 4);
+                    (dynamic_cast<CSwitchProperty*>(properties[Axis::X]))->setValue(((int) setting) & 1);
+                    (dynamic_cast<CSwitchProperty*>(properties[Axis::Y]))->setValue(((int) setting) & 2);
+                    (dynamic_cast<CSwitchProperty*>(properties[Axis::Z]))->setValue(((int) setting) & 4);
                     break;
                 case Boolean:
                     CSwitchProperty *boolProperty;
@@ -396,7 +396,7 @@ void frmGrblConfigurator::itemChanged(QTreeWidgetItem *item, int column)
         setSettingsBit(10, REPORT_BUFFER_SETTING_BIT, property->getVariantValue().toBool());
     } else
     if (axis != Axis::None) {
-        setSettingsBit(entryIndex, 1 << axis, property->getVariantValue().toBool());
+        setSettingsBit(entryIndex, 1 << (int) axis, property->getVariantValue().toBool());
     } else {
         m_currentSettings[entryIndex] = property->getVariantValue().toDouble();
     }
@@ -426,9 +426,9 @@ void frmGrblConfigurator::setInfo(QString text, QColor color)
 QMap<Axis, CBaseProperty*> frmGrblConfigurator::addAxesProperty(CPropertyHeader *header, ConfigEntry entry)
 {
     return {
-        {X, addAxisProperty(header, entry, Axis::X)},
-        {Y, addAxisProperty(header, entry, Axis::Y)},
-        {Z, addAxisProperty(header, entry, Axis::Z)},
+        {Axis::X, addAxisProperty(header, entry, Axis::X)},
+        {Axis::Y, addAxisProperty(header, entry, Axis::Y)},
+        {Axis::Z, addAxisProperty(header, entry, Axis::Z)},
     };
 }
 
@@ -436,19 +436,19 @@ CBaseProperty* frmGrblConfigurator::addAxisProperty(CPropertyHeader *header, Con
 {
     // @TODO ...
     QMap<Axis, QString> axisNames = {
-        {X, "X"},
-        {Y, "Y"},
-        {Z, "Z"},
+        {Axis::X, "X"},
+        {Axis::Y, "Y"},
+        {Axis::Z, "Z"},
     };
 
     CSwitchProperty* property = new CSwitchProperty(
         header,
-        QByteArray::fromStdString(QString("#%1_%2").arg(entry.index).arg(axis).toStdString()),
+        QByteArray::fromStdString(QString("#%1_%2").arg(entry.index).arg((int) axis).toStdString()),
         entry.description.arg(axisNames[axis]),
         0,
         0
     );
-    property->setData(0, Qt::UserRole, entry.index * 10000 + axis);
+    property->setData(0, Qt::UserRole, entry.index * 10000 + (int) axis);
 
     ui->editor->add(property);
 

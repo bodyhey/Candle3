@@ -81,6 +81,7 @@ void partMainJog::stopJogging()
 {
     m_jogVector = QVector3D(0, 0, 0);
     emit stop();
+    emit this->jog(None, m_jogVector);
     emit this->command(GRBLCommand::JogStop);
 }
 

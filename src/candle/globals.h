@@ -54,7 +54,8 @@ enum GRBLCommand {
     JogStop,
 };
 
-enum JoggindDir {
+enum class JoggindDir {
+    None,
     XPlus,
     XMinus,
     YPlus,

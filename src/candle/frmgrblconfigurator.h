@@ -17,7 +17,7 @@ enum Type {
     Axes,
 };
 
-enum Axis {
+enum class Axis : int {
     None = -1,
     X = 0,
     Y = 1,
