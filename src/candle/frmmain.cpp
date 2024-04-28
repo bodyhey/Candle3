@@ -72,21 +72,7 @@ frmMain::frmMain(QWidget *parent) :
 
     ui->setupUi(this);
 
-    // ui->jog->setParent(nullptr);
-    // static_cast<QVBoxLayout*>(ui->grpJog->layout())->removeWidget(ui->jog);
-
-    // ui->widgetJog = new partMainJog(this);
-    // static_cast<QVBoxLayout*>(ui->grpJog->layout())->insertWidget(0, ui->widgetJog);
-    // ui->widgetJog->show();
-
     ui->jog->initialize(m_configuration.joggingModule());
-
-    QWidget *widgetControl = new partMainControl(this);
-    static_cast<QVBoxLayout*>(ui->grpControl->layout())->insertWidget(0, widgetControl);
-    widgetControl->show();
-
-    m_partState = new partMainState(this, &m_configuration);
-    static_cast<QVBoxLayout*>(ui->grpState->layout())->insertWidget(0, this->m_partState);
 
     ui->console->initialize(m_configuration.consoleModule());
     connect(ui->console, SIGNAL(newCommand(QString)), this, SLOT(onConsoleNewCommand(QString)));
@@ -893,7 +879,7 @@ void frmMain::on_cmdSpindle_toggled(bool checked)
 
 void frmMain::on_cmdSpindle_clicked(bool checked)
 {
-    if (ui->cmdHold->isChecked()) {
+    if (ui->control->hold()) {
         m_connection->sendByteArray(QByteArray(1, char(0x9e)));
     } else {
         m_communicator->sendCommand(CommandSource::GeneralUI, checked ? QString("M3 S%1").arg(ui->slbSpindle->value()) : "M5", COMMAND_TI_UI);
@@ -1571,33 +1557,33 @@ void frmMain::onConnectionError(QString error)
 
 void frmMain::onMachinePosChanged(QVector3D pos)
 {
-    this->m_partState->setMachineCoordinates(pos);
+    ui->state->setMachineCoordinates(pos);
 }
 
 void frmMain::onWorkPosChanged(QVector3D pos)
 {
-    this->m_partState->setWorkCoordinates(pos);
+    ui->state->setWorkCoordinates(pos);
 }
 
 void frmMain::onDeviceStateChanged(DeviceState state)
 {
-    this->m_partState->setState(state);
+    ui->state->setState(state);
 
-    ui->cmdCheck->setEnabled(state != DeviceRun && (m_communicator->senderState() == SenderStopped));
-    ui->cmdCheck->setChecked(state == DeviceCheck);
-    ui->cmdHold->setChecked(state == DeviceHold0 || state == DeviceHold1 || state == DeviceQueue);
-    ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_communicator->senderState() != SenderTransferring) &&
-                                                        (m_communicator->senderState() != SenderStopping)));
+    ui->control->updateControlsState(m_communicator->senderState(), state);
+
+    // ui->spindle->...
+    ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_communicator->senderState() != SenderTransferring) &&                                                        (m_communicator->senderState() != SenderStopping)));
 }
 
 void frmMain::onDeviceStateReceived(DeviceState state)
 {
     // Update controls state
-    ui->cmdCheck->setEnabled(state != DeviceRun && (m_communicator->senderState() == SenderStopped));
-    ui->cmdCheck->setChecked(state == DeviceCheck);
-    ui->cmdHold->setChecked(state == DeviceHold0 || state == DeviceHold1 || state == DeviceQueue);
+    ui->control->updateControlsState(state, m_communicator->deviceState());
+
+    // ui->spindle->...
     ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_communicator->senderState() != SenderTransferring) &&
                                                         (m_communicator->senderState() != SenderStopping)));
+
     // Update "elapsed time" timer
     if ((m_communicator->senderState() == SenderTransferring) || (m_communicator->senderState() == SenderStopping)) {
         QTime time(0, 0, 0);
@@ -1631,7 +1617,7 @@ void frmMain::onSpindleStateReceived(bool state)
 
 void frmMain::onFloodStateReceived(bool state)
 {
-    ui->cmdFlood->setChecked(state);
+    ui->control->setFlood(state);
 }
 
 void frmMain::onParserStateReceived(QString state)
@@ -1721,7 +1707,7 @@ void frmMain::onCommandProcessed(int tableIndex, QString response)
 
 void frmMain::onConfigurationReceived(MachineConfiguration configuration, QMap<int, double>)
 {
-    m_partState->setUnits(configuration.units());
+    ui->state->setUnits(configuration.units());
 }
 
 void frmMain::onToolPositionReceived(QVector3D pos)
@@ -2479,9 +2465,8 @@ void frmMain::applySettings()
 void frmMain::openPort()
 {
     if (m_connection->openConnection()) {
-        m_partState->setStatusText(tr("Port opened"), "palette(button)", "palette(text)");
+        ui->state->setStatusText(tr("Port opened"), "palette(button)", "palette(text)");
         m_communicator->reset();
-        //grblReset();
     }
 }
 
@@ -2995,12 +2980,10 @@ void frmMain::updateControlsState()
     ui->console->setEnabled(portOpened && (!ui->jog->keyboardControl()));
     // ui->cmdCommandSend->setEnabled(portOpened);
 
-    ui->cmdCheck->setEnabled(portOpened && !process);
-    ui->cmdHome->setEnabled(!process);
-    ui->cmdCheck->setEnabled(!process);
-    ui->cmdUnlock->setEnabled(!process);
+    ui->control->updateControlsState(portOpened, process);
+
+    //ui->spindle->...
     ui->cmdSpindle->setEnabled(!process);
-    ui->cmdSleep->setEnabled(!process);
 
     ui->actFileNew->setEnabled(m_communicator->senderState() == SenderStopped);
     ui->actFileOpen->setEnabled(m_communicator->senderState() == SenderStopped);
@@ -3023,8 +3006,9 @@ void frmMain::updateControlsState()
     ui->cmdFilePause->setEnabled(portOpened && (process || paused) && (m_communicator->senderState() != SenderPausing) && (m_communicator->senderState() != SenderPausing2));
     ui->cmdFilePause->setChecked(paused);
     ui->cmdFileAbort->setEnabled(m_communicator->senderState() != SenderStopped && m_communicator->senderState() != SenderStopping);
-    ui->mnuRecent->setEnabled((m_communicator->senderState() == SenderStopped) &&
-                ((m_configuration.uiModule().hasAnyRecentFiles() && !m_heightmapMode) || (m_configuration.uiModule().hasAnyRecentHeightmaps() && m_heightmapMode))
+    ui->mnuRecent->setEnabled(
+        (m_communicator->senderState() == SenderStopped) &&
+        ((m_configuration.uiModule().hasAnyRecentFiles() && !m_heightmapMode) || (m_configuration.uiModule().hasAnyRecentHeightmaps() && m_heightmapMode))
     );
     ui->actFileSave->setEnabled(m_programModel.rowCount() > 1);
     ui->actFileSaveAs->setEnabled(m_programModel.rowCount() > 1);
@@ -3034,7 +3018,7 @@ void frmMain::updateControlsState()
         QAbstractItemView::EditKeyPressed | QAbstractItemView::AnyKeyPressed);
 
     if (!portOpened) {
-        this->m_partState->setStatusText(tr("Not connected"), "palette(button)", "palette(text)");
+        ui->state->setStatusText(tr("Not connected"), "palette(button)", "palette(text)");
         emit deviceStateChanged(-1);
     }
 
@@ -3632,10 +3616,10 @@ void frmMain::jogContinuous()
     }
 }
 
-int frmMain::buttonSize()
-{
-    return ui->cmdHome->minimumWidth();
-}
+// int frmMain::buttonSize()
+// {
+//     return ui->cmdHome->minimumWidth();
+// }
 
 void frmMain::onTransferCompleted()
 {

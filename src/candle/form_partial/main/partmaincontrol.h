@@ -21,6 +21,10 @@ public:
     ~partMainControl();
     void enable();
     void disable();
+    void updateControlsState(bool portOpened, bool process);
+    void updateControlsState(SenderState senderState, DeviceState deviceState);
+    bool hold();
+    void setFlood(bool);
 
 signals:
     void home();

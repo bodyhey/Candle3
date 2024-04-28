@@ -3,7 +3,7 @@
 // Copyright 2024 BTS
 
 #include "partmainconsole.h"
-#include "ui_console.h"
+#include "ui_partmainconsole.h"
 #include <QScrollBar>
 
 partMainConsole::partMainConsole(QWidget *parent)

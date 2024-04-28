@@ -296,10 +296,6 @@ private:
     frmAbout m_frmAbout;
     frmGrblConfigurator *m_grblConfigurator;
 
-    // Partials
-    // partMainJog *m_partJog;
-    partMainState *m_partState;
-
     // Filenames
     QString m_settingsFileName;
     QString m_programFileName;
@@ -388,7 +384,7 @@ private:
     QList<LineSegment *> subdivideSegment(LineSegment *segment);
     void jogStep();
     void jogContinuous();
-    int buttonSize();
+    // int buttonSize();
     QString getLineInitCommands(int row);
 
     static bool actionLessThan(const QAction *a1, const QAction *a2);

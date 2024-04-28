@@ -1,5 +1,5 @@
 #include "partmainoverride.h"
-#include "ui_override.h"
+#include "ui_partmainoverride.h"
 
 partMainOverride::partMainOverride(QWidget *parent)
     : QWidget(parent)

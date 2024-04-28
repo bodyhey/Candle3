@@ -1,5 +1,5 @@
 #include "partmainjog.h"
-#include "ui_jog.h"
+#include "ui_partmainjog.h"
 
 void partMainJog::updateControls()
 {
@@ -29,13 +29,17 @@ void partMainJog::configurationUpdated()
 {
     m_storedKeyboardControl = m_configurationJogging->keyboardControl();
 
-    QStringList steps = m_configurationJogging->stepChoices();
-    if (steps.count() > 0) {
-        //steps.insert(0, ui->cboJogStep->items().first());
-        ui->cboJogStep->setItems(steps);
-    }
-    // ui->cboJogStep->setCurrentIndex(ui->cboJogStep->findText(set.value("jogStep").toString()));
-    ui->cboJogFeed->setItems(m_configurationJogging->feedChoices());
+    auto cas =
+        ui->cboJogStep;
+    cas->setItems({});
+
+    // QStringList steps = m_configurationJogging->stepChoices();
+    // if (steps.count() > 0) {
+    //     //steps.insert(0, ui->cboJogStep->items().first());
+    //     ui->cboJogStep->setItems(steps);
+    // }
+    // // ui->cboJogStep->setCurrentIndex(ui->cboJogStep->findText(set.value("jogStep").toString()));
+    // ui->cboJogFeed->setItems(m_configurationJogging->feedChoices());
     // ui->cboJogFeed->setCurrentIndex(ui->cboJogFeed->findText(set.value("jogFeed").toString()));
 }
 
@@ -74,14 +78,14 @@ void partMainJog::setKeyboardControl(bool value)
 void partMainJog::onCmdYPlusPressed()
 {
     m_jogVector = JoggingVector(0, 1, 0);
-    emit this->jog(YPlus, m_jogVector);
+    emit this->jog(JoggindDir::YPlus, m_jogVector);
 }
 
 void partMainJog::stopJogging()
 {
     m_jogVector = QVector3D(0, 0, 0);
     emit stop();
-    emit this->jog(None, m_jogVector);
+    emit this->jog(JoggindDir::None, m_jogVector);
     emit this->command(GRBLCommand::JogStop);
 }
 
@@ -93,7 +97,7 @@ void partMainJog::onCmdYPlusReleased()
 void partMainJog::onCmdYMinusPressed()
 {
     m_jogVector = JoggingVector(0, -1, 0);
-    emit this->jog(YMinus, m_jogVector);
+    emit this->jog(JoggindDir::YMinus, m_jogVector);
 }
 
 void partMainJog::onCmdYMinusReleased()
@@ -104,7 +108,7 @@ void partMainJog::onCmdYMinusReleased()
 void partMainJog::onCmdXPlusPressed()
 {
     m_jogVector = JoggingVector(1, 0, 0);
-    emit this->jog(XPlus, m_jogVector);
+    emit this->jog(JoggindDir::XPlus, m_jogVector);
 }
 
 void partMainJog::onCmdXPlusReleased()
@@ -115,7 +119,7 @@ void partMainJog::onCmdXPlusReleased()
 void partMainJog::onCmdXMinusPressed()
 {
     m_jogVector = JoggingVector(-1, 0, 0);
-    emit this->jog(XMinus, m_jogVector);
+    emit this->jog(JoggindDir::XMinus, m_jogVector);
 }
 
 void partMainJog::onCmdXMinusReleased()
@@ -126,7 +130,7 @@ void partMainJog::onCmdXMinusReleased()
 void partMainJog::onCmdZPlusPressed()
 {
     m_jogVector = JoggingVector(0, 0, 1);
-    emit this->jog(ZPlus, m_jogVector);
+    emit this->jog(JoggindDir::ZPlus, m_jogVector);
 }
 
 void partMainJog::onCmdZPlusReleased()
@@ -137,7 +141,7 @@ void partMainJog::onCmdZPlusReleased()
 void partMainJog::onCmdZMinusPressed()
 {
     m_jogVector = JoggingVector(-1, 0, 0);
-    emit this->jog(ZMinus, m_jogVector);
+    emit this->jog(JoggindDir::ZMinus, m_jogVector);
 }
 
 void partMainJog::onCmdZMinusReleased()

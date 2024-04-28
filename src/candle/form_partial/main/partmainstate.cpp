@@ -1,10 +1,10 @@
 #include "partmainstate.h"
-#include "ui_state.h"
+#include "ui_partmainstate.h"
 
-partMainState::partMainState(QWidget *parent, const Configuration &configuration)
+partMainState::partMainState(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::partMainState)
-    , m_configuration(configuration)
+    // , m_configuration(configuration)
 {
     ui->setupUi(this);
 

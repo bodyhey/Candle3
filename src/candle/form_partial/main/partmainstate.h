@@ -15,7 +15,8 @@ class partMainState : public QWidget
     Q_OBJECT
 
     public:
-        explicit partMainState(QWidget *parent, const Configuration &configuration);
+        explicit partMainState(QWidget *parent);
+        void initialize(const Configuration &configuration);
         ~partMainState();
         void setState(DeviceState);
         void setWorkCoordinates(QVector3D);
@@ -25,7 +26,7 @@ class partMainState : public QWidget
 
     private:
         Ui::partMainState *ui;
-        const Configuration &m_configuration;
+      //  const Configuration &m_configuration;
         QMap<DeviceState, QString> m_statusCaptions;
         QMap<DeviceState, QString> m_statusBackColors;
         QMap<DeviceState, QString> m_statusForeColors;

@@ -3,7 +3,7 @@
 // Copyright 2024 BTS
 
 #include "partmainheightmap.h"
-#include "ui_heightmap.h"
+#include "ui_partmainheightmap.h"
 
 partMainHeightmap::partMainHeightmap(QWidget *parent)
     : QWidget(parent)
