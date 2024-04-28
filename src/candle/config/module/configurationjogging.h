@@ -17,6 +17,7 @@ class ConfigurationJogging : public ConfigurationModule
     Q_PROPERTY(QStringList stepChoices MEMBER m_stepChoices NOTIFY changed)
     Q_PROPERTY(int feed MEMBER m_feed NOTIFY changed)
     Q_PROPERTY(QStringList feedChoices MEMBER m_feedChoices NOTIFY changed)
+    Q_PROPERTY(bool keyboardControl MEMBER m_keyboardControl NOTIFY changed)
 
     public:
         explicit ConfigurationJogging(QObject *parent = nullptr);
@@ -28,12 +29,15 @@ class ConfigurationJogging : public ConfigurationModule
         int jogFeed() const { return m_feed; }
         void setJogFeed(int feed) { m_feed = feed; emit changed(); }
         QStringList feedChoices() const { return m_feedChoices; }
+        bool keyboardControl() const { return m_keyboardControl; }
+        void setKeyboardControl(bool keyboardControl) { m_keyboardControl = keyboardControl; emit changed(); }
 
     private:
         double m_step;
         QStringList m_stepChoices;
         int m_feed;
         QStringList m_feedChoices;
+        bool m_keyboardControl;
 };
 
 #endif // CONFIGURATIONJOGGING_H
