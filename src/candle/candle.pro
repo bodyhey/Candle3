@@ -84,6 +84,7 @@ SOURCES += main.cpp\
     drawers/shaderdrawable.cpp \
     drawers/tooldrawer.cpp \
     drawers/machineboundsdrawer.cpp \
+    heightmap.cpp \
     machine/machineconfiguration.cpp \
     parser/arcproperties.cpp \
     parser/gcodeparser.cpp \
@@ -146,6 +147,7 @@ HEADERS  += frmmain.h \
     drawers/tooldrawer.h \
     drawers/machineboundsdrawer.h \
     globals.h \
+    heightmap.h \
     machine/machineconfiguration.h \
     parser/arcproperties.h \
     parser/gcodeparser.h \
