@@ -122,12 +122,12 @@ private slots:
     // void on_actJogFeedPrevious_triggered();
     void on_actSpindleSpeedPlus_triggered();
     void on_actSpindleSpeedMinus_triggered();
-    void on_actOverrideFeedPlus_triggered();
-    void on_actOverrideFeedMinus_triggered();
-    void on_actOverrideRapidPlus_triggered();
-    void on_actOverrideRapidMinus_triggered();
-    void on_actOverrideSpindlePlus_triggered();
-    void on_actOverrideSpindleMinus_triggered();
+    // void on_actOverrideFeedPlus_triggered();
+    // void on_actOverrideFeedMinus_triggered();
+    // void on_actOverrideRapidPlus_triggered();
+    // void on_actOverrideRapidMinus_triggered();
+    // void on_actOverrideSpindlePlus_triggered();
+    // void on_actOverrideSpindleMinus_triggered();
     void on_actViewLockWindows_toggled(bool checked);
     void on_cmdFileOpen_clicked();
     void on_cmdFileSend_clicked();

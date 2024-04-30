@@ -46,7 +46,6 @@ private slots:
     void onCmdSleepClicked();
     void onCmdDoorClicked();
     void onCmdFloodClicked(bool checked);
-
 };
 
 #endif // PARTMAINCONTROL_H

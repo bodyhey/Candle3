@@ -22,6 +22,7 @@
 #include "form_partial/main/partmaincontrol.h"
 #include "ui_frmmain.h"
 #include "ui_frmsettings.h"
+#include "ui_partmainoverride.h"
 #include "widgets/widgetmimedata.h"
 #include "connection/connectionmanager.h"
 
@@ -136,34 +137,6 @@ frmMain::frmMain(QWidget *parent) :
         connect(button, SIGNAL(clicked(bool)), this, SLOT(onCmdUserClicked(bool)));
     }
 
-    // Setting up slider boxes
-    ui->slbFeedOverride->setRatio(1);
-    ui->slbFeedOverride->setMinimum(10);
-    ui->slbFeedOverride->setMaximum(200);
-    ui->slbFeedOverride->setCurrentValue(100);
-    ui->slbFeedOverride->setTitle(tr("Feed rate:"));
-    ui->slbFeedOverride->setSuffix("%");
-    connect(ui->slbFeedOverride, SIGNAL(toggled(bool)), this, SLOT(onOverridingToggled(bool)));
-    connect(ui->slbFeedOverride, &SliderBox::toggled, this, &frmMain::onOverrideChanged);
-    connect(ui->slbFeedOverride, &SliderBox::valueChanged, this, &frmMain::onOverrideChanged);
-
-    ui->slbRapidOverride->setRatio(50);
-    ui->slbRapidOverride->setMinimum(25);
-    ui->slbRapidOverride->setMaximum(100);
-    ui->slbRapidOverride->setCurrentValue(100);
-    ui->slbRapidOverride->setTitle(tr("Rapid speed:"));
-    ui->slbRapidOverride->setSuffix("%");
-    connect(ui->slbRapidOverride, SIGNAL(toggled(bool)), this, SLOT(onOverridingToggled(bool)));
-    connect(ui->slbRapidOverride, &SliderBox::toggled, this, &frmMain::onOverrideChanged);
-    connect(ui->slbRapidOverride, &SliderBox::valueChanged, this, &frmMain::onOverrideChanged);   
-
-    ui->slbSpindleOverride->setRatio(1);
-    ui->slbSpindleOverride->setMinimum(50);
-    ui->slbSpindleOverride->setMaximum(200);
-    ui->slbSpindleOverride->setCurrentValue(100);
-    ui->slbSpindleOverride->setTitle(tr("Spindle speed:"));
-    ui->slbSpindleOverride->setSuffix("%");
-    connect(ui->slbSpindleOverride, SIGNAL(toggled(bool)), this, SLOT(onOverridingToggled(bool)));
 
     m_originDrawer = new OriginDrawer();
     m_codeDrawer = new GcodeDrawer();
@@ -613,35 +586,35 @@ void frmMain::on_actSpindleSpeedMinus_triggered()
     ui->slbSpindle->setSliderPosition(ui->slbSpindle->sliderPosition() - 1);
 }
 
-void frmMain::on_actOverrideFeedPlus_triggered()
-{
-    ui->slbFeedOverride->setSliderPosition(ui->slbFeedOverride->sliderPosition() + 1);
-}
+// void frmMain::on_actOverrideFeedPlus_triggered()
+// {
+//     ui->slbFeedOverride->setSliderPosition(ui->slbFeedOverride->sliderPosition() + 1);
+// }
 
-void frmMain::on_actOverrideFeedMinus_triggered()
-{
-    ui->slbFeedOverride->setSliderPosition(ui->slbFeedOverride->sliderPosition() - 1);
-}
+// void frmMain::on_actOverrideFeedMinus_triggered()
+// {
+//     ui->slbFeedOverride->setSliderPosition(ui->slbFeedOverride->sliderPosition() - 1);
+// }
 
-void frmMain::on_actOverrideRapidPlus_triggered()
-{
-    ui->slbRapidOverride->setSliderPosition(ui->slbRapidOverride->sliderPosition() + 1);
-}
+// void frmMain::on_actOverrideRapidPlus_triggered()
+// {
+//     ui->slbRapidOverride->setSliderPosition(ui->slbRapidOverride->sliderPosition() + 1);
+// }
 
-void frmMain::on_actOverrideRapidMinus_triggered()
-{
-    ui->slbRapidOverride->setSliderPosition(ui->slbRapidOverride->sliderPosition() - 1);
-}
+// void frmMain::on_actOverrideRapidMinus_triggered()
+// {
+//     ui->slbRapidOverride->setSliderPosition(ui->slbRapidOverride->sliderPosition() - 1);
+// }
 
-void frmMain::on_actOverrideSpindlePlus_triggered()
-{
-    ui->slbSpindleOverride->setSliderPosition(ui->slbSpindleOverride->sliderPosition() + 1);
-}
+// void frmMain::on_actOverrideSpindlePlus_triggered()
+// {
+//     ui->slbSpindleOverride->setSliderPosition(ui->slbSpindleOverride->sliderPosition() + 1);
+// }
 
-void frmMain::on_actOverrideSpindleMinus_triggered()
-{
-    ui->slbSpindleOverride->setSliderPosition(ui->slbSpindleOverride->sliderPosition() - 1);
-}
+// void frmMain::on_actOverrideSpindleMinus_triggered()
+// {
+//     ui->slbSpindleOverride->setSliderPosition(ui->slbSpindleOverride->sliderPosition() - 1);
+// }
 
 void frmMain::on_actViewLockWindows_toggled(bool checked)
 {
@@ -918,17 +891,19 @@ void frmMain::on_cmdFit_clicked()
 
 void frmMain::on_grpOverriding_toggled(bool checked)
 {
+    partMainOverride::Overrides overrides = ui->overrides->overrides();
+
     if (checked) {
         ui->grpOverriding->setTitle(tr("Overriding"));
-    } else if (ui->slbFeedOverride->isChecked() | ui->slbRapidOverride->isChecked() | ui->slbSpindleOverride->isChecked()) {
+    } else if (overrides.feedOverridden | overrides.rapidOverridden | overrides.spindleOverridden) {
         ui->grpOverriding->setTitle(tr("Overriding") + QString(tr(" (%1/%2/%3)"))
-                                    .arg(ui->slbFeedOverride->isChecked() ? QString::number(ui->slbFeedOverride->value()) : "-")
-                                    .arg(ui->slbRapidOverride->isChecked() ? QString::number(ui->slbRapidOverride->value()) : "-")
-                                    .arg(ui->slbSpindleOverride->isChecked() ? QString::number(ui->slbSpindleOverride->value()) : "-"));
+                                    .arg(overrides.feedOverridden ? QString::number(overrides.feed) : "-")
+                                    .arg(overrides.rapidOverridden ? QString::number(overrides.rapid) : "-")
+                                    .arg(overrides.spindleOverridden ? QString::number(overrides.spindleOverridden) : "-"));
     }
     updateLayouts();
 
-    ui->widgetFeed->setVisible(checked);
+    ui->overrides->setVisible(checked);
 }
 
 void frmMain::on_grpSpindle_toggled(bool checked)
@@ -1642,12 +1617,14 @@ void frmMain::onSpindleSpeedReceived(int spindleSpeed)
 
 void frmMain::onOverridesReceived(int feedOverride, int spindleOverride, int rapidOverride)
 {
-    updateOverride(ui->slbFeedOverride, feedOverride, '\x91');
-    updateOverride(ui->slbSpindleOverride, spindleOverride, '\x9a');
+    updateOverride(ui->overrides->ui->slbFeed, feedOverride, '\x91');
+    updateOverride(ui->overrides->ui->slbSpindle, spindleOverride, '\x9a');
 
-    ui->slbRapidOverride->setCurrentValue(rapidOverride);
+    partMainOverride::Overrides overrides = ui->overrides->overrides();
 
-    int target = ui->slbRapidOverride->isChecked() ? ui->slbRapidOverride->value() : 100;
+    ui->overrides->setRapid(rapidOverride);
+
+    int target = overrides.rapidOverridden ? overrides.rapid : 100;
 
     if (rapidOverride != target) {
         switch (target) {
@@ -1865,8 +1842,9 @@ void frmMain::onOverridingToggled(bool checked)
 {
     Q_UNUSED(checked)
 
-    ui->grpOverriding->setProperty("overrided", ui->slbFeedOverride->isChecked()
-                                   || ui->slbRapidOverride->isChecked() || ui->slbSpindleOverride->isChecked());
+    partMainOverride::Overrides overrides = ui->overrides->overrides();
+
+    ui->grpOverriding->setProperty("overrided", overrides.feedOverridden | overrides.rapidOverridden | overrides.spindleOverridden);
     style()->unpolish(ui->grpOverriding);
     ui->grpOverriding->ensurePolished();
 }
@@ -2093,14 +2071,14 @@ void frmMain::applyHeightmapConfiguration(ConfigurationHeightmap &configurationH
 
 void frmMain::applyOverridesConfiguration(ConfigurationMachine &machineConfiguration)
 {
-    ui->slbFeedOverride->setChecked(machineConfiguration.overrideFeed());
-    ui->slbFeedOverride->setValue(machineConfiguration.overrideFeedValue());
+    // ui->slbFeedOverride->setChecked(machineConfiguration.overrideFeed());
+    // ui->slbFeedOverride->setValue(machineConfiguration.overrideFeedValue());
 
-    ui->slbRapidOverride->setChecked(machineConfiguration.overrideRapid());
-    ui->slbRapidOverride->setValue(machineConfiguration.overrideRapidValue());
+    // ui->slbRapid->setChecked(machineConfiguration.overrideRapid());
+    // ui->slbRapid->setValue(machineConfiguration.overrideRapidValue());
 
-    ui->slbSpindleOverride->setChecked(machineConfiguration.overrideSpindleSpeed());
-    ui->slbSpindleOverride->setValue(machineConfiguration.overrideSpindleSpeedValue());
+    // ui->slbSpindle->setChecked(machineConfiguration.overrideSpindleSpeed());
+    // ui->slbSpindle->setValue(machineConfiguration.overrideSpindleSpeedValue());
 }
 
 void frmMain::applySpindleConfiguration(ConfigurationMachine &machineConfiguration)
@@ -3463,16 +3441,17 @@ int frmMain::bufferLength()
 QTime frmMain::updateProgramEstimatedTime(QList<LineSegment*> lines)
 {
     double time = 0;
+    partMainOverride::Overrides overrides = ui->overrides->overrides();
 
     for (int i = 0; i < lines.count(); i++) {
         LineSegment *ls = lines[i];
         double length = (ls->getEnd() - ls->getStart()).length();
 
         if (!qIsNaN(length) && !qIsNaN(ls->getSpeed()) && ls->getSpeed() != 0) time +=
-                length / ((ui->slbFeedOverride->isChecked() && !ls->isFastTraverse())
-                          ? (ls->getSpeed() * ui->slbFeedOverride->value() / 100) :
-                            (ui->slbRapidOverride->isChecked() && ls->isFastTraverse())
-                             ? (ls->getSpeed() * ui->slbRapidOverride->value() / 100) : ls->getSpeed());
+                length / ((overrides.feedOverridden && !ls->isFastTraverse())
+                          ? (ls->getSpeed() * overrides.feed / 100) :
+                            (overrides.rapidOverridden && ls->isFastTraverse())
+                             ? (ls->getSpeed() * overrides.rapid / 100) : ls->getSpeed());
     }
 
     time *= 60;

@@ -6,14 +6,81 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>299</width>
+    <height>187</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="SliderBox" name="slbFeed" native="true"/>
+   </item>
+   <item>
+    <widget class="SliderBox" name="slbRapid" native="true"/>
+   </item>
+   <item>
+    <widget class="SliderBox" name="slbSpindle" native="true"/>
+   </item>
+  </layout>
+  <action name="actOverrideFeedPlus">
+   <property name="text">
+    <string>Feed override +</string>
+   </property>
+  </action>
+  <action name="actOverrideFeedMinus">
+   <property name="text">
+    <string>Feed override -</string>
+   </property>
+  </action>
+  <action name="actOverrideRapidPlus">
+   <property name="text">
+    <string>Rapid override +</string>
+   </property>
+  </action>
+  <action name="actOverrideRapidMinus">
+   <property name="text">
+    <string>Rapid override -</string>
+   </property>
+  </action>
+  <action name="actOverrideSpindlePlus">
+   <property name="text">
+    <string>Spindle override +</string>
+   </property>
+  </action>
+  <action name="actOverrideSpindleMinus">
+   <property name="text">
+    <string>Spindle override -</string>
+   </property>
+  </action>
+  <action name="actOverrideFeed">
+   <property name="text">
+    <string>Feed override</string>
+   </property>
+  </action>
+  <action name="actOverrideRapid">
+   <property name="text">
+    <string>Rapid speed override</string>
+   </property>
+  </action>
+  <action name="actOverrideSpindle">
+   <property name="text">
+    <string>Spindle speed override</string>
+   </property>
+  </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SliderBox</class>
+   <extends>QWidget</extends>
+   <header>sliderbox.h</header>
+   <container>1</container>
+   <slots>
+    <slot>click()</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
