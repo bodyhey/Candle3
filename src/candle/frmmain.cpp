@@ -556,26 +556,6 @@ void frmMain::on_actAbout_triggered()
     m_frmAbout.exec();
 }
 
-// void frmMain::on_actJogStepNext_triggered()
-// {
-//     ui->cboJogStep->setCurrentNext();
-// }
-
-// void frmMain::on_actJogStepPrevious_triggered()
-// {
-//     ui->cboJogStep->setCurrentPrevious();
-// }
-
-// void frmMain::on_actJogFeedNext_triggered()
-// {
-//     ui->cboJogFeed->setCurrentNext();
-// }
-
-// void frmMain::on_actJogFeedPrevious_triggered()
-// {
-//     ui->cboJogFeed->setCurrentPrevious();
-// }
-
 void frmMain::on_actSpindleSpeedPlus_triggered()
 {
     ui->slbSpindle->setSliderPosition(ui->slbSpindle->sliderPosition() + 1);
@@ -585,36 +565,6 @@ void frmMain::on_actSpindleSpeedMinus_triggered()
 {
     ui->slbSpindle->setSliderPosition(ui->slbSpindle->sliderPosition() - 1);
 }
-
-// void frmMain::on_actOverrideFeedPlus_triggered()
-// {
-//     ui->slbFeedOverride->setSliderPosition(ui->slbFeedOverride->sliderPosition() + 1);
-// }
-
-// void frmMain::on_actOverrideFeedMinus_triggered()
-// {
-//     ui->slbFeedOverride->setSliderPosition(ui->slbFeedOverride->sliderPosition() - 1);
-// }
-
-// void frmMain::on_actOverrideRapidPlus_triggered()
-// {
-//     ui->slbRapidOverride->setSliderPosition(ui->slbRapidOverride->sliderPosition() + 1);
-// }
-
-// void frmMain::on_actOverrideRapidMinus_triggered()
-// {
-//     ui->slbRapidOverride->setSliderPosition(ui->slbRapidOverride->sliderPosition() - 1);
-// }
-
-// void frmMain::on_actOverrideSpindlePlus_triggered()
-// {
-//     ui->slbSpindleOverride->setSliderPosition(ui->slbSpindleOverride->sliderPosition() + 1);
-// }
-
-// void frmMain::on_actOverrideSpindleMinus_triggered()
-// {
-//     ui->slbSpindleOverride->setSliderPosition(ui->slbSpindleOverride->sliderPosition() - 1);
-// }
 
 void frmMain::on_actViewLockWindows_toggled(bool checked)
 {
