@@ -71,6 +71,7 @@ SOURCES += main.cpp\
     form_partial/main/partmainheightmap.cpp \
     form_partial/main/partmainjog.cpp \
     form_partial/main/partmainoverride.cpp \
+    form_partial/main/partmainspindle.cpp \
     form_partial/main/partmainstate.cpp \
     frmgrblconfigurator.cpp \
     frmmain.cpp \
@@ -134,6 +135,7 @@ HEADERS  += frmmain.h \
     form_partial/main/partmainheightmap.h \
     form_partial/main/partmainjog.h \
     form_partial/main/partmainoverride.h \
+    form_partial/main/partmainspindle.h \
     form_partial/main/partmainstate.h \
     frmgrblconfigurator.h \
     frmsettings.h \
@@ -174,6 +176,7 @@ FORMS    += frmmain.ui \
     form_partial/main/partmainheightmap.ui \
     form_partial/main/partmainjog.ui \
     form_partial/main/partmainoverride.ui \
+    form_partial/main/partmainspindle.ui \
     form_partial/main/partmainstate.ui \
     frmdebug.ui \
     frmgrblconfigurator.ui \

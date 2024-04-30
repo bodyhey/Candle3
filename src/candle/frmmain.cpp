@@ -915,8 +915,8 @@ void frmMain::on_grpSpindle_toggled(bool checked)
         ui->grpSpindle->setTitle(tr("Spindle") + QString(tr(" (%1)")).arg(ui->slbSpindle->value()));
     }
     updateLayouts();
-
-    ui->widgetSpindle->setVisible(checked);
+    
+    ui->spindle->setVisible(checked);
 }
 
 void frmMain::on_grpJog_toggled(bool checked)
@@ -2951,7 +2951,7 @@ void frmMain::updateControlsState()
 
     ui->grpState->setEnabled(portOpened);
     ui->grpControl->setEnabled(portOpened);
-    ui->widgetSpindle->setEnabled(portOpened);
+    ui->spindle->setEnabled(portOpened);
     ui->jog->setEnabled(portOpened && ((m_communicator->senderState() == SenderStopped)
         || (m_communicator->senderState() == SenderChangingTool)));
 

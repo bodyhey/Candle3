@@ -1347,7 +1347,7 @@ QLabel[overrided=&quot;false&quot;] {
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <widget class="QWidget" name="widgetSpindle" native="true">
+             <widget class="QWidget" name="spindle" native="true">
               <layout class="QHBoxLayout" name="horizontalLayout_5">
                <property name="spacing">
                 <number>10</number>
