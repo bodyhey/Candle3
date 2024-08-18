@@ -80,6 +80,10 @@ frmMain::frmMain(QWidget *parent) :
     ui->console->append(QString("G-Candle %1 started").arg( qApp->applicationVersion()));
     ui->console->append("---");
 
+    connect(ui->control, &partMainControl::home, this, [=]() {
+
+    });
+
     // Drag&drop placeholders
     ui->fraDropDevice->setVisible(false);
     ui->fraDropModification->setVisible(false);
@@ -736,56 +740,55 @@ void frmMain::on_cmdFileReset_clicked()
 //     ui->txtConsole->clear();
 // }
 
-void frmMain::on_cmdHome_clicked()
-{
-    m_communicator->m_homing = true;
-    m_communicator->m_updateSpindleSpeed = true;
-    m_communicator->sendCommand(CommandSource::GeneralUI, "$H", COMMAND_TI_UI);
-}
+// void frmMain::on_cmdHome_clicked()
+// {
+//     m_communicator->m_homing = true;
+//     m_communicator->m_updateSpindleSpeed = true;
+//     m_communicator->sendCommand(CommandSource::GeneralUI, "$H", COMMAND_TI_UI);
+// }
 
-void frmMain::on_cmdCheck_clicked(bool checked)
-{
-    if (checked) {
-        m_communicator->storeParserState();
-        m_communicator->sendCommand(CommandSource::GeneralUI, "$C", COMMAND_TI_UI);
-    } else {
-        m_communicator->m_aborting = true;
-        m_communicator->reset();
-//        grblReset();
-    };
-}
+// void frmMain::on_cmdCheck_clicked(bool checked)
+// {
+//     if (checked) {
+//         m_communicator->storeParserState();
+//         m_communicator->sendCommand(CommandSource::GeneralUI, "$C", COMMAND_TI_UI);
+//     } else {
+//         m_communicator->m_aborting = true;
+//         m_communicator->reset();
+//     };
+// }
 
-void frmMain::on_cmdReset_clicked()
-{
-    m_communicator->reset();
-    //grblReset();
-}
+// void frmMain::on_cmdReset_clicked()
+// {
+//     m_communicator->reset();
+//     //grblReset();
+// }
 
-void frmMain::on_cmdUnlock_clicked()
-{
-    m_communicator->m_updateSpindleSpeed = true;
-    m_communicator->sendCommand(CommandSource::GeneralUI, "$X", COMMAND_TI_UI);
-}
+// void frmMain::on_cmdUnlock_clicked()
+// {
+//     m_communicator->m_updateSpindleSpeed = true;
+//     m_communicator->sendCommand(CommandSource::GeneralUI, "$X", COMMAND_TI_UI);
+// }
 
-void frmMain::on_cmdHold_clicked(bool checked)
-{
-    m_connection->sendByteArray(QByteArray(1, checked ? (char)'!' : (char)'~'));
-}
+// void frmMain::on_cmdHold_clicked(bool checked)
+// {
+//     m_connection->sendByteArray(QByteArray(1, checked ? (char)'!' : (char)'~'));
+// }
 
-void frmMain::on_cmdSleep_clicked()
-{
-    m_communicator->sendCommand(CommandSource::GeneralUI, "$SLP", COMMAND_TI_UI);
-}
+// void frmMain::on_cmdSleep_clicked()
+// {
+//     m_communicator->sendCommand(CommandSource::GeneralUI, "$SLP", COMMAND_TI_UI);
+// }
 
-void frmMain::on_cmdDoor_clicked()
-{
-    m_connection->sendByteArray(QByteArray(1, (char)0x84));
-}
+// void frmMain::on_cmdDoor_clicked()
+// {
+//     m_connection->sendByteArray(QByteArray(1, (char)0x84));
+// }
 
-void frmMain::on_cmdFlood_clicked()
-{
-    m_connection->sendByteArray(QByteArray(1, (char)0xa0));
-}
+// void frmMain::on_cmdFlood_clicked()
+// {
+//     m_connection->sendByteArray(QByteArray(1, (char)0xa0));
+// }
 
 void frmMain::on_cmdSpindle_toggled(bool checked)
 {

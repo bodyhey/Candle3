@@ -128,16 +128,6 @@ private slots:
     void on_cmdFilePause_clicked(bool checked);
     void on_cmdFileAbort_clicked();
     void on_cmdFileReset_clicked();
-//    void on_cmdCommandSend_clicked();
-//    void on_cmdClearConsole_clicked();
-    void on_cmdHome_clicked();
-    void on_cmdCheck_clicked(bool checked);
-    void on_cmdReset_clicked();
-    void on_cmdUnlock_clicked();
-    void on_cmdHold_clicked(bool checked);
-    void on_cmdSleep_clicked();
-    void on_cmdDoor_clicked();
-    void on_cmdFlood_clicked();
     void on_cmdSpindle_toggled(bool checked);
     void on_cmdSpindle_clicked(bool checked);
     void on_cmdTop_clicked();
