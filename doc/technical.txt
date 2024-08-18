@@ -4,4 +4,19 @@ Technical information for my use:
 To check .a and .dll versions I used objdump and readelf
 
 SFML-2.6.1 compiled from sources. CMake was needed and the rest
-happens in QTCreator 12. joystickplugin is created and SFML-2.6.1-Released.
+happens in QTCreator. joystickplugin is created and SFML-2.6.1-Released.
+
+QT Creator 14 and Python 2
+
+https://bugreports.qt.io/browse/QTCREATORBUG-31370
+
+MinGW 8.1 comes with a GDB that uses Python 2.7 for scripting. This is not supported anymore.
+
+You have several options:
+1. Use a newer MinGW
+2. Copy all the *.py files from
+https://code.qt.io/cgit/qt-creator/qt-creator.git/tree/share/qtcreator/debugger-with-python2?h=14.0
+(python2_debugger_for_qt_14.zip)
+into your
+C:/Qt/Tools/QtCreator/share/qtcreator/debugger/
+3. Use Creator 13.x
