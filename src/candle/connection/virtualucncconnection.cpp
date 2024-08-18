@@ -38,7 +38,7 @@ VirtualUCNCConnection::~VirtualUCNCConnection()
 
 bool VirtualUCNCConnection::openConnection()
 {
-    if (!m_connecting) {
+    if (m_connecting) {
         return false;
     }
     if (m_connected) {
@@ -54,7 +54,8 @@ bool VirtualUCNCConnection::openConnection()
     WorkerThread* thread = new WorkerThread(m_server->serverName());
     thread->start();
 
-    return true;
+    // still waiting for connection, return 'not connected'
+    return false;
 }
 
 void VirtualUCNCConnection::flushOutgoingData()
@@ -70,6 +71,8 @@ void VirtualUCNCConnection::flushOutgoingData()
 
 void VirtualUCNCConnection::sendByteArray(QByteArray byteArray)
 {
+    assert(m_socket != nullptr);
+
     flushOutgoingData();
 
     m_socket->write(byteArray.data(), 1);
@@ -99,7 +102,7 @@ void VirtualUCNCConnection::closeConnection()
 
 void VirtualUCNCConnection::onNewConnection()
 {
-    if (m_socket) {
+    if (m_socket != nullptr) {
         qDebug() << "Virtual uCNC connection already exists!";
         return;
     }

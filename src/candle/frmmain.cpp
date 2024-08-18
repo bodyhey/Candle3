@@ -2392,6 +2392,8 @@ void frmMain::applySettings()
 
 void frmMain::openPort()
 {
+    assert(m_communicator != nullptr);
+
     if (m_connection->openConnection()) {
         ui->state->setStatusText(tr("Port opened"), "palette(button)", "palette(text)");
         m_communicator->reset();

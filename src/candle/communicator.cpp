@@ -198,6 +198,8 @@ void Communicator::clearQueue()
 
 void Communicator::reset()
 {
+    assert(m_connection != nullptr);
+
     m_connection->sendByteArray(QByteArray(1, GRBL_LIVE_SOFT_RESET));
 
     resetStateVariables();
@@ -252,7 +254,7 @@ void Communicator::abort()
 */
 void Communicator::replaceConnection(Connection *newConnection)
 {
-    if (!m_connection || m_connection == newConnection) return;
+    if (m_connection != nullptr || m_connection == newConnection) return;
 
     disconnect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
     m_connection->disconnect();
