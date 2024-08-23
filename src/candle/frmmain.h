@@ -311,7 +311,7 @@ private:
     void loadPlugins();
 
     // Communication
-    void openPort();
+    void openPortIfNeeded();
     QString evaluateCommand(QString command);
 
     // Parser

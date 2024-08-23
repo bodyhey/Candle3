@@ -256,10 +256,14 @@ void Communicator::replaceConnection(Connection *newConnection)
 {
     if (m_connection != nullptr || m_connection == newConnection) return;
 
-    disconnect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
+    disconnect(m_connection, &Connection::lineReceived, this, &Communicator::onConnectionLineReceived);
+    disconnect(m_connection, &Connection::connected, this, &Communicator::onConnectionConnected);
+
     m_connection->disconnect();
     m_connection = newConnection;
-    connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
+
+    connect(m_connection, &Connection::lineReceived, this, &Communicator::onConnectionLineReceived);
+    connect(m_connection, &Connection::connected, this, &Communicator::onConnectionConnected);
 }
 
 void Communicator::stopUpdatingState()
@@ -346,7 +350,7 @@ bool Communicator::isMachineConfigurationReady() const
 
 void Communicator::processConnectionTimer()
 {
-    if (!m_connection || !m_connection->isConnected()) {
+    if (m_connection == nullptr || !m_connection->isConnected()) {
         return;
     }
 

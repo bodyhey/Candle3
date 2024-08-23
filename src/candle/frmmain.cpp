@@ -17,9 +17,12 @@
 #include <QMimeData>
 #include <QTranslator>
 #include <QDockWidget>
+#include <QTcpServer>
+#include <QTcpSocket>
 #include "frmmain.h"
 #include "form_partial/main/partmainjog.h"
 #include "form_partial/main/partmaincontrol.h"
+#include "module/pendant/pendant.h"
 #include "ui_frmmain.h"
 #include "ui_frmsettings.h"
 #include "ui_partmainoverride.h"
@@ -80,9 +83,18 @@ frmMain::frmMain(QWidget *parent) :
     ui->console->append(QString("G-Candle %1 started").arg( qApp->applicationVersion()));
     ui->console->append("---");
 
-    connect(ui->control, &partMainControl::home, this, [=]() {
-
+    connect(ui->control, &partMainControl::unlock, this, [=]() {
+        m_communicator->m_updateSpindleSpeed = true;
+        m_communicator->sendCommand(CommandSource::GeneralUI, "$X", COMMAND_TI_UI);
     });
+    connect(ui->control, &partMainControl::home, this, [=]() {
+        m_communicator->m_homing = true;
+        m_communicator->m_updateSpindleSpeed = true;
+        m_communicator->sendCommand(CommandSource::GeneralUI, "$H", COMMAND_TI_UI);
+    });
+    // connect(ui->control, &partMainControl::command, this, [=](GRBLCommand command) {
+    //     qDebug() << "Command: " << command;
+    // });
 
     // Drag&drop placeholders
     ui->fraDropDevice->setVisible(false);
@@ -215,6 +227,8 @@ frmMain::frmMain(QWidget *parent) :
     // Start timers
     m_timerConnection.start(1000);
     m_timerToolAnimation.start(25, this);
+
+    Pendant *pendant = new Pendant(this);
 }
 
 frmMain::~frmMain()
@@ -1652,11 +1666,7 @@ void frmMain::onConsoleNewCommand(QString command)
 
 void frmMain::onTimerConnection()
 {
-    if (!m_connection->isConnected()) {
-        openPort();
-
-        return;
-    }
+    openPortIfNeeded();
 
     // @TODO move it completely to communicator
     m_communicator->processConnectionTimer();
@@ -2393,13 +2403,16 @@ void frmMain::applySettings()
     }
 }
 
-void frmMain::openPort()
+void frmMain::openPortIfNeeded()
 {
     assert(m_communicator != nullptr);
 
+    if (m_connection->isConnecting() || m_connection->isConnected()) {
+        return;
+    }
+
     if (m_connection->openConnection()) {
         ui->state->setStatusText(tr("Port opened"), "palette(button)", "palette(text)");
-        m_communicator->reset();
     }
 }
 

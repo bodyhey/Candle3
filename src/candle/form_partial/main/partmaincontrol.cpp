@@ -26,12 +26,12 @@ void partMainControl::disable()
 
 void partMainControl::updateControlsState(bool portOpened, bool process)
 {
-    ui->cmdCheck->setEnabled(portOpened && !process);
-    ui->cmdHome->setEnabled(!process);
-    ui->cmdCheck->setEnabled(!process);
-    ui->cmdUnlock->setEnabled(!process);
-    //ui->cmdSpindle->setEnabled(!process);
-    ui->cmdSleep->setEnabled(!process);
+    // ui->cmdCheck->setEnabled(portOpened && !process);
+    // ui->cmdHome->setEnabled(!process);
+    // ui->cmdCheck->setEnabled(!process);
+    // ui->cmdUnlock->setEnabled(!process);
+    // //ui->cmdSpindle->setEnabled(!process);
+    // ui->cmdSleep->setEnabled(!process);
 }
 
 void partMainControl::updateControlsState(SenderState senderState, DeviceState deviceState)

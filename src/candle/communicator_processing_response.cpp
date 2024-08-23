@@ -51,6 +51,11 @@ void Communicator::onConnectionLineReceived(QString data)
     processUnhandledResponse(data);
 }
 
+void Communicator::onConnectionConnected()
+{
+    reset();
+}
+
 void Communicator::processFeedSpindleSpeed(QString data)
 {
     static QRegExp fs("FS:([^,]*),([^,^|^>]*)");

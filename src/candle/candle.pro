@@ -87,6 +87,7 @@ SOURCES += main.cpp\
     drawers/machineboundsdrawer.cpp \
     heightmap.cpp \
     machine/machineconfiguration.cpp \
+    module/pendant/pendant.cpp \
     parser/arcproperties.cpp \
     parser/gcodeparser.cpp \
     parser/gcodepreprocessorutils.cpp \
@@ -151,6 +152,7 @@ HEADERS  += frmmain.h \
     globals.h \
     heightmap.h \
     machine/machineconfiguration.h \
+    module/pendant/pendant.h \
     parser/arcproperties.h \
     parser/gcodeparser.h \
     parser/gcodepreprocessorutils.h \
@@ -191,6 +193,7 @@ RESOURCES += \
 
 INCLUDEPATH += ../designerplugins/customwidgetsplugin
 INCLUDEPATH += ../vendor/PropertyEditor
+INCLUDEPATH += ../vendor/CircularBuffer
 
 LIBS += -L../designerplugins/customwidgetsplugin -lcustomwidgets
 LIBS += -L../vendor/PropertyEditor -lPropertyEditor

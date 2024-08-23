@@ -112,6 +112,7 @@ void VirtualUCNCConnection::onNewConnection()
 
     m_connecting = false;
     m_connected = true;
+
     emit connected();
 }
 
