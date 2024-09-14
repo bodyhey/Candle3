@@ -141,11 +141,10 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
         QPalette pal = sender->palette();
         if (state == QValidator::Invalid) {
             pal.setColor(QPalette::Text, Qt::red);
-            this->widgetValidity(false);
         } else {
             pal.setColor(QPalette::Text, nullptr);
-            this->widgetValidity(true);
         }
+        this->widgetValidity("JoggingStepChoices", state != QValidator::Invalid);
         sender->setPalette(pal);
     });
     connect(ui->txtJoggingFeedChoices, &QLineEdit::editingFinished, this, [=]() {
@@ -156,11 +155,10 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
         QPalette pal = sender->palette();
         if (state == QValidator::Invalid) {
             pal.setColor(QPalette::Text, Qt::red);
-            this->widgetValidity(false);
         } else {
             pal.setColor(QPalette::Text, nullptr);
-            this->widgetValidity(true);
         }
+        this->widgetValidity("JoggingFeedChoices", state != QValidator::Invalid);
         sender->setPalette(pal);
     });
 }
@@ -347,16 +345,22 @@ void frmSettings::applySettings()
     ConfigurationUI &ui_ = m_configuration.uiModule();
     ui_.m_fontSize = ui->cboFontSize->currentText().toInt();
     ui_.m_language = ui->cboLanguage->currentData().toString();
+
+    ConfigurationJogging &jogging = m_configuration.joggingModule();
+    QRegularExpression nonDigits("[^\\d^.]");
+    jogging.m_stepChoices = ui->txtJoggingStepChoices->text().split(",").replaceInStrings(nonDigits, "");
+    jogging.m_feedChoices = ui->txtJoggingFeedChoices->text().split(",").replaceInStrings(nonDigits, "");
 }
 
-void frmSettings::widgetValidity(bool valid)
+void frmSettings::widgetValidity(QString widgetName, bool valid)
 {
     if (valid) {
-        invalidWidgets--;
-    } else {
-        invalidWidgets++;
+        invalidWidgets.removeOne(widgetName);
+    } else if (invalidWidgets.indexOf(widgetName) == -1) {
+        invalidWidgets.append(widgetName);
     }
-    ui->cmdOK->setEnabled(invalidWidgets == 0);
+    qDebug() << "Invalid widgets: " << invalidWidgets;
+    ui->cmdOK->setEnabled(invalidWidgets.empty());
 }
 
 int frmSettings::exec()
@@ -387,7 +391,7 @@ int frmSettings::exec()
     foreach (QPlainTextEdit* o, this->findChildren<QPlainTextEdit*>())
         m_storedPlainTexts.append(o->toPlainText());
 
-    invalidWidgets = 0;
+    invalidWidgets.clear();
     initializeWidgets();
 
     return QDialog::exec();
@@ -518,7 +522,7 @@ void frmSettings::on_cboToolType_currentIndexChanged(int index)
 void frmSettings::resetToDefaults()
 {
     m_configuration.setDefaults();
-    invalidWidgets = 0;
+    invalidWidgets.clear();
     initializeWidgets();
 }
 

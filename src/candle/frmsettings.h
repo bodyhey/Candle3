@@ -71,8 +71,8 @@ private:
     void resetToDefaults();
     void applySettings();
 
-    int invalidWidgets;
-    void widgetValidity(bool valid);
+    QStringList invalidWidgets;
+    void widgetValidity(QString widgetName, bool valid);
 };
 
 #endif // FRMSETTINGS_H
