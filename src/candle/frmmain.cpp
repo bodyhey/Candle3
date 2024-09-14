@@ -3497,21 +3497,25 @@ QList<LineSegment*> frmMain::subdivideSegment(LineSegment* segment)
 
 void frmMain::jogStep(QVector3D vector)
 {
-    if (ui->jog->stepSize() != ui->jog->CONTINUOUS) {
-        assert(m_communicator->isMachineConfigurationReady());
+    assert(m_communicator->isMachineConfigurationReady());
 
-        bool unitsInches = m_communicator->machineConfiguration().unitsInches();
-        m_communicator->sendCommand(
-            CommandSource::System,
-            QString("$J=%5G91X%1Y%2Z%3F%4")
-                .arg(vector.x(), 0, 'f', unitsInches ? 4 : 3)
-                .arg(vector.y(), 0, 'f', unitsInches ? 4 : 3)
-                .arg(vector.z(), 0, 'f', unitsInches ? 4 : 3)
-                .arg(m_configuration.joggingModule().jogFeed())
-                .arg(unitsInches ? "G20" : "G21"),
-            -3
-        );
+    if (ui->jog->stepSize() == ui->jog->CONTINUOUS) {
+        return;
     }
+
+    bool unitsInches = m_communicator->machineConfiguration().unitsInches();
+    vector *= ui->jog->stepSize();
+
+    m_communicator->sendCommand(
+        CommandSource::System,
+        QString("$J=%5G91X%1Y%2Z%3F%4")
+            .arg(vector.x(), 0, 'f', unitsInches ? 4 : 3)
+            .arg(vector.y(), 0, 'f', unitsInches ? 4 : 3)
+            .arg(vector.z(), 0, 'f', unitsInches ? 4 : 3)
+            .arg(m_configuration.joggingModule().jogFeed())
+            .arg(unitsInches ? "G20" : "G21"),
+        -3
+    );
 }
 
 void frmMain::jogContinuous()

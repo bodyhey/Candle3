@@ -25,10 +25,10 @@ class ConfigurationJogging : public ConfigurationModule
 
         double jogStep() const { return m_step; }
         void setJogStep(double step) { m_step = step; emit changed(); }
-        QStringList stepChoices() const { return m_stepChoices; }
+        const QStringList &stepChoices() const { return m_stepChoices; }
         int jogFeed() const { return m_feed; }
         void setJogFeed(int feed) { m_feed = feed; emit changed(); }
-        QStringList feedChoices() const { return m_feedChoices; }
+        const QStringList &feedChoices() const { return m_feedChoices; }
         bool keyboardControl() const { return m_keyboardControl; }
         void setKeyboardControl(bool keyboardControl) { m_keyboardControl = keyboardControl; emit changed(); }
 

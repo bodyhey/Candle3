@@ -29,18 +29,9 @@ void partMainJog::configurationUpdated()
 {
     m_storedKeyboardControl = m_configurationJogging->keyboardControl();
 
-    auto cas =
-        ui->cboJogStep;
-    cas->setItems({});
+    ui->cboJogStep->setItems(QStringList("Continuous") + m_configurationJogging->stepChoices());
 
-    // QStringList steps = m_configurationJogging->stepChoices();
-    // if (steps.count() > 0) {
-    //     //steps.insert(0, ui->cboJogStep->items().first());
-    //     ui->cboJogStep->setItems(steps);
-    // }
-    // // ui->cboJogStep->setCurrentIndex(ui->cboJogStep->findText(set.value("jogStep").toString()));
-    // ui->cboJogFeed->setItems(m_configurationJogging->feedChoices());
-    // ui->cboJogFeed->setCurrentIndex(ui->cboJogFeed->findText(set.value("jogFeed").toString()));
+    ui->cboJogFeed->setItems(m_configurationJogging->feedChoices());
 }
 
 void partMainJog::restoreKeyboardControl()
@@ -156,17 +147,34 @@ void partMainJog::onCmdStopClicked()
 
 void partMainJog::onCmdFeedRateChanged(int index)
 {
+    // should not happen in real life, only during initialization (clear old items)
+    if (index <= 0 || index >= m_configurationJogging->feedChoices().count()) {
+        return;
+    }
+
+   \
     // joggingConfiguration.setJogStep(ui->cboJogStep->currentText().toDouble());
     // joggingConfiguration.setJogFeed(ui->cboJogFeed->currentText().toInt());
 
-    qDebug() << "Feed rate changed" << index << m_configurationJogging->feedChoices().at(index);
+    qDebug() << "Feed rate changed" << index << m_feedRate;
 
-    emit this->parametersChanged(ui->cboJogFeed->currentText().toInt(), ui->cboJogStep->currentText().toDouble());
+    emit this->parametersChanged(m_feedRate, m_stepSize);
 }
 
 void partMainJog::onCmdStepSizeChanged(int index)
 {
-    qDebug() << "Step size changed" << index << m_configurationJogging->stepChoices().at(index);
+    // should not happen in real life, only during initialization (clear old items)
+    if (index <= 0 || index > m_configurationJogging->stepChoices().count()) {
+        return;
+    }
 
-    emit this->parametersChanged(ui->cboJogFeed->currentText().toInt(), ui->cboJogStep->currentText().toDouble());
+    if (index == 0) {
+        m_stepSize = CONTINUOUS;
+    } else {
+        m_stepSize = m_configurationJogging->stepChoices().at(index - 1).toDouble();
+    }
+
+    qDebug() << "Step size changed" << index << m_stepSize;
+
+    emit this->parametersChanged(m_feedRate, m_stepSize);
 }
