@@ -80,7 +80,7 @@ void VirtualUCNCConnection::sendByteArray(QByteArray byteArray)
         qDebug() << "uCNC (byte) >> " << byteArray.toHex();
     #endif
 
-    //m_socket->write(byteArray.data(), 1);
+    m_socket->write(byteArray.data(), 1);
     m_socket->flush();
 }
 
@@ -105,7 +105,14 @@ void VirtualUCNCConnection::sendLine(QString line)
 
 void VirtualUCNCConnection::closeConnection()
 {
-
+    m_connected = false;
+    if (m_socket != nullptr) {
+        m_socket->close();
+        m_socket->deleteLater();
+        m_socket = nullptr;
+    }
+    m_server->close();
+    m_server->deleteLater();
 }
 
 void VirtualUCNCConnection::onNewConnection()
@@ -117,6 +124,7 @@ void VirtualUCNCConnection::onNewConnection()
 
     m_socket = m_server->nextPendingConnection();
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+    connect(m_socket, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
 
     m_connecting = false;
     m_connected = true;
@@ -124,13 +132,15 @@ void VirtualUCNCConnection::onNewConnection()
     emit connected();
 }
 
+void VirtualUCNCConnection::onDisconnected()
+{
+    closeConnection();
+}
+
 void VirtualUCNCConnection::onReadyRead()
 {
     while (m_socket->bytesAvailable() > 0) {
         m_incoming += m_socket->readAll();
-        #ifdef DEBUG_UCNC_COMMUNICATION
-            qDebug() << "uCNC (ready read) << " << m_incoming;
-        #endif
         processIncomingData();
     }
 }

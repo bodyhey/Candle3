@@ -34,6 +34,7 @@ private:
 
 private slots:
     void onNewConnection();
+    void onDisconnected();
     void onReadyRead();
 };
 
