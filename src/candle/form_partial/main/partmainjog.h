@@ -59,6 +59,7 @@ private slots:
 signals:
     void jog(JoggindDir dir, JoggingVector vector);
     void command(GRBLCommand command);
+    void parametersChanged(int feed, double step);
     void stop();
 };
 

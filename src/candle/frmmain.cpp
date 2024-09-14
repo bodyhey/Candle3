@@ -92,9 +92,21 @@ frmMain::frmMain(QWidget *parent) :
         m_communicator->m_updateSpindleSpeed = true;
         m_communicator->sendCommand(CommandSource::GeneralUI, "$H", COMMAND_TI_UI);
     });
+    connect(ui->control, &partMainControl::reset, this, [=]() {
+        m_communicator->reset();
+    });
     // connect(ui->control, &partMainControl::command, this, [=](GRBLCommand command) {
     //     qDebug() << "Command: " << command;
     // });
+
+    connect(ui->jog, &partMainJog::jog, this, [=](JoggindDir dir, QVector3D jog) {
+        Q_UNUSED(dir)
+        qDebug() << "Jog: " << jog;
+        jogStep(jog);
+    });
+    connect(ui->jog, &partMainJog::stop, this, [=]() {
+        qDebug() << "Stop jog";
+    });
 
     // Drag&drop placeholders
     ui->fraDropDevice->setVisible(false);
@@ -3482,24 +3494,22 @@ QList<LineSegment*> frmMain::subdivideSegment(LineSegment* segment)
     return list;
 }
 
-void frmMain::jogStep()
+void frmMain::jogStep(QVector3D vector)
 {
     if (ui->jog->stepSize() != ui->jog->CONTINUOUS) {
-        QVector3D vec = ui->jog->jogVector() * ui->jog->stepSize();
+        assert(m_communicator->isMachineConfigurationReady());
 
-        if (vec.length()) {
-            bool unitsInches = m_communicator->machineConfiguration().unitsInches();
-            m_communicator->sendCommand(
-                CommandSource::System,
-                QString("$J=%5G91X%1Y%2Z%3F%4")
-                    .arg(vec.x(), 0, 'f', unitsInches ? 4 : 3)
-                    .arg(vec.y(), 0, 'f', unitsInches ? 4 : 3)
-                    .arg(vec.z(), 0, 'f', unitsInches ? 4 : 3)
-                    .arg(m_configuration.joggingModule().jogFeed())
-                    .arg(unitsInches ? "G20" : "G21"),
-                -3
-            );
-        }
+        bool unitsInches = m_communicator->machineConfiguration().unitsInches();
+        m_communicator->sendCommand(
+            CommandSource::System,
+            QString("$J=%5G91X%1Y%2Z%3F%4")
+                .arg(vector.x(), 0, 'f', unitsInches ? 4 : 3)
+                .arg(vector.y(), 0, 'f', unitsInches ? 4 : 3)
+                .arg(vector.z(), 0, 'f', unitsInches ? 4 : 3)
+                .arg(m_configuration.joggingModule().jogFeed())
+                .arg(unitsInches ? "G20" : "G21"),
+            -3
+        );
     }
 }
 
