@@ -2928,12 +2928,13 @@ void frmMain::updateControlsState()
     bool portOpened = m_connection && m_connection->isConnected();
     bool process = (m_communicator->senderState() == SenderTransferring) || (m_communicator->senderState() == SenderStopping);
     bool paused = (m_communicator->senderState() == SenderPausing) || (m_communicator->senderState() == SenderPausing2) || (m_communicator->senderState() == SenderPaused) || (m_communicator->senderState() == SenderChangingTool);
+    SenderState senderState = m_communicator->senderState();
 
     ui->grpState->setEnabled(portOpened);
     ui->grpControl->setEnabled(portOpened);
     ui->spindle->setEnabled(portOpened);
-    ui->jog->setEnabled(portOpened && ((m_communicator->senderState() == SenderStopped)
-        || (m_communicator->senderState() == SenderChangingTool)));
+    ui->jog->setEnabled(portOpened && ((senderState == SenderStopped)
+        || (senderState == SenderChangingTool)));
 
     ui->console->setEnabled(portOpened && (!ui->jog->keyboardControl()));
     // ui->cmdCommandSend->setEnabled(portOpened);
@@ -2943,12 +2944,12 @@ void frmMain::updateControlsState()
     //ui->spindle->...
     ui->cmdSpindle->setEnabled(!process);
 
-    ui->actFileNew->setEnabled(m_communicator->senderState() == SenderStopped);
-    ui->actFileOpen->setEnabled(m_communicator->senderState() == SenderStopped);
-    ui->cmdFileOpen->setEnabled(m_communicator->senderState() == SenderStopped);
-    ui->cmdFileReset->setEnabled((m_communicator->senderState() == SenderStopped) && m_programModel.rowCount() > 1);
-    ui->cmdFileSend->setEnabled(portOpened && (m_communicator->senderState() == SenderStopped) && m_programModel.rowCount() > 1);
-    switch (m_communicator->senderState()) {
+    ui->actFileNew->setEnabled(senderState == SenderStopped);
+    ui->actFileOpen->setEnabled(senderState == SenderStopped);
+    ui->cmdFileOpen->setEnabled(senderState == SenderStopped);
+    ui->cmdFileReset->setEnabled((senderState == SenderStopped) && m_programModel.rowCount() > 1);
+    ui->cmdFileSend->setEnabled(portOpened && (senderState == SenderStopped) && m_programModel.rowCount() > 1);
+    switch (senderState) {
         case SenderPausing:
         case SenderPausing2:
             ui->cmdFilePause->setText(tr("Pausing..."));
@@ -2961,17 +2962,17 @@ void frmMain::updateControlsState()
             ui->cmdFilePause->setText(tr("Pause"));
             break;
     }
-    ui->cmdFilePause->setEnabled(portOpened && (process || paused) && (m_communicator->senderState() != SenderPausing) && (m_communicator->senderState() != SenderPausing2));
+    ui->cmdFilePause->setEnabled(portOpened && (process || paused) && (senderState != SenderPausing) && (senderState != SenderPausing2));
     ui->cmdFilePause->setChecked(paused);
-    ui->cmdFileAbort->setEnabled(m_communicator->senderState() != SenderStopped && m_communicator->senderState() != SenderStopping);
+    ui->cmdFileAbort->setEnabled(senderState != SenderStopped && senderState != SenderStopping);
     ui->mnuRecent->setEnabled(
-        (m_communicator->senderState() == SenderStopped) &&
+        (senderState == SenderStopped) &&
         ((m_configuration.uiModule().hasAnyRecentFiles() && !m_heightmapMode) || (m_configuration.uiModule().hasAnyRecentHeightmaps() && m_heightmapMode))
     );
     ui->actFileSave->setEnabled(m_programModel.rowCount() > 1);
     ui->actFileSaveAs->setEnabled(m_programModel.rowCount() > 1);
 
-    ui->tblProgram->setEditTriggers((m_communicator->senderState() != SenderStopped) ? QAbstractItemView::NoEditTriggers :
+    ui->tblProgram->setEditTriggers((senderState != SenderStopped) ? QAbstractItemView::NoEditTriggers :
         QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked | 
         QAbstractItemView::EditKeyPressed | QAbstractItemView::AnyKeyPressed);
 
