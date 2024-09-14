@@ -130,28 +130,15 @@ void GLWidget::fitDrawable(ShaderDrawable *drawable)
 
 void GLWidget::updateExtremes(ShaderDrawable *drawable)
 {
-    QVector3D extremes = drawable->getMinimumExtremes();
-    if (!qIsNaN(extremes.x())) {
-        m_xMin = extremes.x();
-        m_xMax = extremes.x();
-    } else {
-        m_xMin = 0;
-        m_xMax = 0;
-    }
-    if (!qIsNaN(extremes.y())) {
-        m_yMin = extremes.y();
-        m_yMax = extremes.y();
-    } else {
-        m_yMin = 0;
-        m_yMax = 0;
-    }
-    if (!qIsNaN(extremes.z())) {
-        m_zMin = extremes.z();
-        m_zMax = extremes.z();
-    } else {
-        m_zMin = 0;
-        m_zMax = 0;
-    }
+    QVector3D minExtremes = drawable->getMinimumExtremes();
+    QVector3D maxExtremes = drawable->getMaximumExtremes();
+
+    m_xMin = !qIsNaN(minExtremes.x()) ? minExtremes.x() : 0;
+    m_xMax = !qIsNaN(maxExtremes.x()) ? maxExtremes.x() : 0;
+    m_yMin = !qIsNaN(minExtremes.y()) ? minExtremes.y() : 0;
+    m_yMax = !qIsNaN(maxExtremes.y()) ? maxExtremes.y() : 0;
+    m_zMin = !qIsNaN(minExtremes.z()) ? minExtremes.z() : 0;
+    m_zMax = !qIsNaN(maxExtremes.z()) ? maxExtremes.z() : 0;
 
     m_xSize = m_xMax - m_xMin;
     m_ySize = m_yMax - m_yMin;
