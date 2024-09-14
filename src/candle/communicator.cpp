@@ -297,12 +297,13 @@ void Communicator::restoreOffsets()
 
 void Communicator::setSenderStateAndEmitSignal(SenderState state)
 {
-    emit senderStateReceived(state);
-
     if (m_senderState != state) {
         m_senderState = state;
         emit senderStateChanged(state);
     }
+
+    // make sure state is updated before emitting signal, is it correct?
+    emit senderStateReceived(state);
 }
 
 void Communicator::setDeviceStateAndEmitSignal(DeviceState state)
