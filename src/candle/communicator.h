@@ -98,9 +98,9 @@ class Communicator : public QObject
         void restoreOffsets();
         int bufferLength();
         void processOffsetsVars(QString response);
-        bool dataIsFloating(QString data);
-        bool dataIsEnd(QString data);
-        bool dataIsReset(QString data);
+        static bool dataIsFloating(QString data);
+        static bool dataIsEnd(QString data);
+        static bool dataIsReset(QString data);
         bool compareCoordinates(double x, double y, double z);
         double toMetric(double value);
         double toInches(double value);

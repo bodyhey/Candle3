@@ -46,6 +46,7 @@ CONFIG -= debug_and_release
 SOURCES += main.cpp\
     communicator.cpp \
     communicator_processing_response.cpp \
+    communicator_utils.cpp \
     config/configuration.cpp \
     config/module/configurationconnection.cpp \
     config/module/configurationconsole.cpp \
