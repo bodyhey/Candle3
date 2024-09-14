@@ -30,17 +30,14 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent), m_shaderProgram(0)
     m_animateView = false;
     m_updatesEnabled = false;
 
-    m_xRot = 90;
-    m_yRot = 0;
-
-    m_xRotTarget = 90;
-    m_yRotTarget = 0;
+    m_xRot = m_xRotTarget = 35.264;
+    m_yRot = m_yRotTarget = m_yRot > 180 ? 405 : 45;
 
     m_zoomDistance = DEFAULT_ZOOM;
 
     m_lookAt = QVector3D(0,0,0);
 
-    m_perspective = true;
+    m_perspective = false;
 
     m_fov = 30;
     m_near = 0.5;
