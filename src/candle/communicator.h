@@ -112,6 +112,7 @@ class Communicator : public QObject
         void processFeedSpindleSpeed(QString data);
         void processOverrides(QString data);
         void processNewToolPosition();
+        void processWelcomeMessageDetected();
         void storeParserState();
         void restoreParserState();
         void completeTransfer();

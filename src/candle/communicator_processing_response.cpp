@@ -693,29 +693,37 @@ void Communicator::processCommandResponse(QString data)
 
 void Communicator::processUnhandledResponse(QString data)
 {
-    // Unprocessed responses
-    // Handle hardware reset
     if (dataIsReset(data)) {
-        setSenderStateAndEmitSignal(SenderStopped);
-        setDeviceStateAndEmitSignal(DeviceUnknown);
-
-        m_streamer->reset();
-        //m_form->fileCommandIndex() = 0;
-
-        m_reseting = false;
-        m_homing = false;
-
-        m_updateParserState = true;
-        m_statusReceived = true;
-
-        clearCommandsAndQueue();
-
-        // @TODO moved to senderStateReceived handler, is it too soon??
-        // m_form->updateControlsState();
+        // Welcome message, hardware reset occurred?
+        this->processWelcomeMessageDetected();
     }
 
     // @TODO do we want to log it here?
     //m_form->partConsole().append(data);
+}
+
+void Communicator::processWelcomeMessageDetected()
+{
+    setSenderStateAndEmitSignal(SenderStopped);
+    setDeviceStateAndEmitSignal(DeviceUnknown);
+
+    m_streamer->reset();
+    //m_form->fileCommandIndex() = 0;
+
+    m_reseting = false;
+    m_homing = false;
+
+    m_updateParserState = true;
+    m_statusReceived = true;
+
+    clearCommandsAndQueue();
+
+    sendCommand(CommandSource::System, "$$", COMMAND_TI_UTIL1);
+    sendCommand(CommandSource::System, "$#", COMMAND_TI_UTIL1, true);
+
+    // @TODO moved to senderStateReceived handler, is it too soon??
+    // m_form->updateControlsState();
+
 }
 
 void Communicator::processMessage(QString data)
