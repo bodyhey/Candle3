@@ -1663,9 +1663,7 @@ void frmMain::onCommandResponseReceived(CommandAttributes commandAttributes)
 
 void frmMain::onCommandSent(CommandAttributes commandAttributes)
 {
-    if (isCommandFromUi(commandAttributes.source) && !m_configuration.consoleModule().showUiCommands()) return;
-    if (isCommandFromProgram(commandAttributes.source) && !m_configuration.consoleModule().showProgramCommands()) return;
-    ui->console->append(commandAttributes);
+    ui->console->appendFiltered(commandAttributes);
 }
 
 void frmMain::onCommandProcessed(int tableIndex, QString response)

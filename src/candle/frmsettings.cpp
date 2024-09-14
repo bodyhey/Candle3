@@ -177,6 +177,7 @@ void frmSettings::initializeWidgets()
     ui->chkConsoleDarkMode->setChecked(console.darkBackgroundMode());
     ui->chkConsoleShowProgramCommands->setChecked(console.showProgramCommands());
     ui->chkConsoleShowUICommands->setChecked(console.showUiCommands());
+    ui->chkConsoleShowSystemCommands->setChecked(console.showSystemCommands());
 
     const ConfigurationConnection &connection = m_configuration.connectionModule();
     ui->cboConnectionMode->setCurrentIndex(connection.connectionMode());
@@ -271,6 +272,7 @@ void frmSettings::applySettings()
     console.m_darkBackgroundMode = ui->chkConsoleDarkMode->isChecked();
     console.m_showProgramCommands = ui->chkConsoleShowProgramCommands->isChecked();
     console.m_showUiCommands = ui->chkConsoleShowUICommands->isChecked();
+    console.m_showSystemCommands = ui->chkConsoleShowSystemCommands->isChecked();
 
     ConfigurationConnection &connection = m_configuration.connectionModule();
     connection.m_connectionMode = static_cast<ConnectionMode>(ui->cboConnectionMode->currentIndex());

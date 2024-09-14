@@ -15,6 +15,7 @@ class ConfigurationConsole : public ConfigurationModule
     Q_OBJECT
     Q_PROPERTY(bool showProgramCommands MEMBER m_showProgramCommands NOTIFY changed)
     Q_PROPERTY(bool showUiCommands MEMBER m_showUiCommands NOTIFY changed)
+    Q_PROPERTY(bool showSystemCommands MEMBER m_showSystemCommands NOTIFY changed)
     Q_PROPERTY(bool commandAutoCompletion MEMBER m_commandAutoCompletion NOTIFY changed)
     Q_PROPERTY(bool darkBackgroundMode MEMBER m_darkBackgroundMode NOTIFY changed)
     Q_PROPERTY(QStringList commandHistory MEMBER m_commandHistory NOTIFY changed)
@@ -26,6 +27,7 @@ class ConfigurationConsole : public ConfigurationModule
 
         bool showProgramCommands() const { return m_showProgramCommands; }
         bool showUiCommands() const { return m_showUiCommands; }
+        bool showSystemCommands() const { return m_showSystemCommands; }
         bool commandAutoCompletion() const { return m_commandAutoCompletion; }
         bool darkBackgroundMode() const { return m_darkBackgroundMode; }
         QStringList commandHistory() const { return m_commandHistory; }
@@ -33,6 +35,7 @@ class ConfigurationConsole : public ConfigurationModule
     private:
         bool m_showProgramCommands;
         bool m_showUiCommands;
+        bool m_showSystemCommands;
         bool m_commandAutoCompletion;
         bool m_darkBackgroundMode;
         QStringList m_commandHistory;

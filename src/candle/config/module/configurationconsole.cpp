@@ -7,6 +7,7 @@
 const QMap<QString, QVariant> DEFAULTS = {
     {"showProgramCommands", false},
     {"showUiCommands", true},
+    {"showSystemCommands", false},
     {"commandAutoCompletion", true},
     {"darkBackgroundMode", false},
 };

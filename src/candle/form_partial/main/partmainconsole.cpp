@@ -46,22 +46,39 @@ void partMainConsole::applyDarkBackgroundMode()
     ui->txtConsole->setStyleSheet("QPlainTextEdit { background-color: #000000; color: #FFFFFF; }");
 }
 
-int partMainConsole::append(QString text)
+void partMainConsole::append(QString text)
 {
     ui->txtConsole->appendPlainText(text);
 
-    return ui->txtConsole->document()->blockCount() - 1;
+    //return ui->txtConsole->document()->blockCount() - 1;
 }
 
-int partMainConsole::append(CommandAttributes commandAttributes)
+void partMainConsole::append(CommandAttributes commandAttributes)
 {
-    int blockNumber = append(">> " + commandAttributes.command);
+    append(">> " + commandAttributes.command);
 
     QTextBlock block = lastBlock();
     BlockData *blockData = new BlockData(block.blockNumber(), commandAttributes.commandIndex);
     block.setUserData(blockData);
+}
 
-    return blockNumber;
+void partMainConsole::appendFiltered(CommandAttributes commandAttributes)
+{
+    switch (commandAttributes.source) {
+        case CommandSource::System:
+            if (!m_configurationConsole->showSystemCommands()) return;
+            break;
+        case CommandSource::Program:
+        case CommandSource::ProgramAdditionalCommands:
+            if (!m_configurationConsole->showProgramCommands()) return;
+            break;
+        case CommandSource::Console:
+        case CommandSource::GeneralUI:
+            if (!m_configurationConsole->showUiCommands()) return;
+            break;
+    }
+
+    append(commandAttributes);
 }
 
 void partMainConsole::appendResponse(int consoleIndex, QString command, QString response)

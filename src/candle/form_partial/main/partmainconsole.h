@@ -22,8 +22,9 @@ class partMainConsole : public QWidget
         explicit partMainConsole(QWidget *parent);
         void initialize(ConfigurationConsole &configurationConsole);
         ~partMainConsole();
-        int append(QString text);
-        int append(CommandAttributes commandAttributes);
+        void append(QString text);
+        void append(CommandAttributes commandAttributes);
+        void appendFiltered(CommandAttributes commandAttributes);
         void appendResponse(int consoleIndex, QString command, QString response);
         void appendResponse(CommandAttributes commandAttributes);
         void clear();

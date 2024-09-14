@@ -109,10 +109,6 @@ enum CommandSource : uint8_t {
     ProgramAdditionalCommands,
     System,
 };
-#define isCommandFromUi(source) \
-    ((source == CommandSource::Console) || (source == CommandSource::GeneralUI))
-#define isCommandFromProgram(source) \
-    ((source == Program) || (source == ProgramAdditionalCommands))
 
 struct CommandAttributes {
     CommandSource source;

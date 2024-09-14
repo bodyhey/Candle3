@@ -1615,6 +1615,13 @@ QSplitter::handle:horizontal {
             </widget>
            </item>
            <item>
+            <widget class="QCheckBox" name="chkConsoleShowSystemCommands">
+             <property name="text">
+              <string>Show system commands</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QCheckBox" name="chkConsoleAutocompletion">
              <property name="text">
               <string>Command auto-completion</string>
