@@ -7,6 +7,8 @@
 QT       = core gui opengl serialport uitools
 equals(QT_MAJOR_VERSION, 5): QT += widgets network
 
+DEFINES += DEBUG_UCNC_COMMUNICATION=1
+
 win32: {
     QT += winextras
     DEFINES += WINDOWS

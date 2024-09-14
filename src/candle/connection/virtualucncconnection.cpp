@@ -4,6 +4,7 @@
 
 #include "virtualucncconnection.h"
 #include <QThread>
+#include <QDebug>
 
 extern "C" {
 Q_DECL_IMPORT
@@ -75,8 +76,11 @@ void VirtualUCNCConnection::sendByteArray(QByteArray byteArray)
 
     flushOutgoingData();
 
-    m_socket->write(byteArray.data(), 1);
+    #ifdef DEBUG_UCNC_COMMUNICATION
+        qDebug() << "uCNC (byte) >> " << byteArray.toHex();
+    #endif
 
+    //m_socket->write(byteArray.data(), 1);
     m_socket->flush();
 }
 
@@ -88,6 +92,10 @@ bool VirtualUCNCConnection::isConnected()
 void VirtualUCNCConnection::sendLine(QString line)
 {
     flushOutgoingData();
+
+    #ifdef DEBUG_UCNC_COMMUNICATION
+        qDebug() << "uCNC >> " << line;
+    #endif
 
     std::string str = QString(line + "\n").toStdString();
     m_socket->write(str.c_str(), str.length());
@@ -120,6 +128,9 @@ void VirtualUCNCConnection::onReadyRead()
 {
     while (m_socket->bytesAvailable() > 0) {
         m_incoming += m_socket->readAll();
+        #ifdef DEBUG_UCNC_COMMUNICATION
+            qDebug() << "uCNC (ready read) << " << m_incoming;
+        #endif
         processIncomingData();
     }
 }
@@ -137,6 +148,10 @@ void VirtualUCNCConnection::processIncomingData()
 
         QString line = m_incoming.left(pos).trimmed();
         m_incoming.remove(0, pos + 1);
+
+        #ifdef DEBUG_UCNC_COMMUNICATION
+            qDebug() << "uCNC << " << line;
+        #endif
 
         emit this->lineReceived(line);
     }
