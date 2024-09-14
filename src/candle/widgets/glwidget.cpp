@@ -16,6 +16,9 @@
 #define ZOOMSTEP 1.1
 #define DEFAULT_ZOOM 200
 #define MIN_ZOOM  0.2
+#define ONE_DEG_IN_RAD 0.0174533
+// what is this value? oryginally was 1.25
+#define MAGIC_ZOOM_MULTIPLIER 1.9
 
 #ifdef GLES
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent), m_shaderProgram(0)
@@ -101,7 +104,7 @@ void GLWidget::fitDrawable(ShaderDrawable *drawable)
 
         double largestSize = qMax(qMax(m_xSize, m_ySize), m_zSize);
 
-        double newZoom = largestSize / (1.25 * tan((m_fov * 0.0174533) / 2.0));
+        double newZoom = largestSize / (MAGIC_ZOOM_MULTIPLIER * tan((m_fov * ONE_DEG_IN_RAD) / 2.0));
         m_zoomDistance = newZoom > 0 ? qMax(newZoom, MIN_ZOOM) : DEFAULT_ZOOM;
 
         m_lookAt = QVector3D(
