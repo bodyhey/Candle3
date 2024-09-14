@@ -22,7 +22,7 @@ enum class PacketType: uint8_t {
     PING = 2,
 };
 
-enum class CommunicationMode {
+enum class CommunicationMode: uint8_t {
     NONE = 0,
     SERIAL_,
     WIFI,
@@ -46,6 +46,7 @@ struct __attribute__ ((packed)) StateMessage
     float x;
     float y;
     float z;
+    uint8_t machineState;
     CommunicationMode mode;
     char selectedAxis;
     Footer footer;
@@ -65,7 +66,7 @@ class Queue {
     //CircularBuffer<char, 256> buffer;
 };
 
-Pendant::Pendant(QObject *parent) : QObject{parent}
+Pendant::Pendant(QObject *parent, Communicator &communicator) : QObject{parent}, m_communicator{communicator}
 {
     qDebug() << "Pendant created";
 
@@ -90,17 +91,22 @@ Pendant::Pendant(QObject *parent) : QObject{parent}
         });
 
         timer->setInterval(50);
-        connect(timer, &QTimer::timeout, [socket]() {
-            //qDebug() << "Sending state message";
+        connect(timer, &QTimer::timeout, [socket, this]() {
             StateMessage message;
             message.header.start = 0xAA55;
             message.header.size = sizeof(StateMessage);
             message.header.type = static_cast<uint8_t>(PacketType::STATE);
-            message.x = 1.0f;
-            message.y = ((float) (rand() % 1000)) / 100.0f;
-            message.z = rand() % 100;
+
+            QVector3D pos = m_communicator.machinePos();
+            message.x = pos.x();
+            message.y = pos.y();
+            message.z = pos.z();
+
+            message.machineState = (uint8_t) m_communicator.deviceState();
+
             message.footer.crc = calcCRC8((uint8_t*)&message, sizeof(StateMessage) - sizeof(Footer));
 
+            //qDebug() << "Sending state message " << message.footer.crc << " " << message.header.size;
             socket->write((char*)&message, sizeof(StateMessage));
 
             // WifiConfigMessage wifiMessage;

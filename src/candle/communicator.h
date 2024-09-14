@@ -38,6 +38,7 @@ class Communicator : public QObject
         const SenderState& senderState() const { return m_senderState; }
         const DeviceState& deviceState() const { return m_deviceState; }
         MachineConfiguration& machineConfiguration() const { return *m_machineConfiguration; }
+        QVector3D machinePos() const { return m_machinePos; }
         void processWorkOffset(QString data);
         void sendStreamerCommandsUntilBufferIsFull();
         bool isMachineConfigurationReady() const;

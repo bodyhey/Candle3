@@ -7,15 +7,17 @@
 
 #include <QObject>
 #include <QTcpServer>
+#include "communicator.h"
 
 class Pendant : public QObject
 {
         Q_OBJECT
     public:
-        explicit Pendant(QObject *parent = nullptr);
+        explicit Pendant(QObject *parent, Communicator &communicator);
 
     private:
         QTcpServer *server;
+        Communicator &m_communicator;
 
     signals:
 };

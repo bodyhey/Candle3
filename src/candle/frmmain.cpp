@@ -240,7 +240,7 @@ frmMain::frmMain(QWidget *parent) :
     m_timerConnection.start(1000);
     m_timerToolAnimation.start(25, this);
 
-    Pendant *pendant = new Pendant(this);
+    Pendant *pendant = new Pendant(this, *m_communicator);
 }
 
 frmMain::~frmMain()

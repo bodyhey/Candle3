@@ -78,7 +78,7 @@ enum SenderState {
 };
 
 enum DeviceState {
-    DeviceUnknown = -1,
+    DeviceUnknown = 0,
     DeviceIdle = 1,
     DeviceAlarm = 2,
     DeviceRun = 3,
@@ -92,7 +92,7 @@ enum DeviceState {
     DeviceDoor2 = 11,
     DeviceDoor3 = 12,
     DeviceJog = 13,
-    DeviceSleep =14
+    DeviceSleep = 14
 };
 
 enum SendCommandResult {
