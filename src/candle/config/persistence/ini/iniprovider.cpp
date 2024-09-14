@@ -14,6 +14,8 @@ bool IniProvider::open()
         return false;
     }
 
+    qDebug() << "Open configuration file: " << qApp->applicationDirPath() + "/" + CONFIGURATION_FILE;
+
     m_settings = new QSettings(qApp->applicationDirPath() + "/" + CONFIGURATION_FILE, QSettings::IniFormat);
     m_settings->setIniCodec("UTF-8");
 
@@ -32,27 +34,29 @@ void IniProvider::close()
 
 int IniProvider::getInt(const QString group, const QString key, int defaultValue)
 {
-    return m_settings->value(group + '\\' + key, defaultValue).toInt();
+    return m_settings->value(group + "/" + key, defaultValue).toInt();
 }
 
 bool IniProvider::getBool(const QString group, const QString key, bool defaultValue)
 {
-    return m_settings->value(group + '\\' + key, defaultValue).toBool();
+    return m_settings->value(group + "/" + key, defaultValue).toBool();
 }
 
 QString IniProvider::getString(const QString group, const QString key, QString defaultValue)
 {
-    return m_settings->value(group + '\\' + key, defaultValue).toString();
+    // qDebug() << m_settings->allKeys() << m_settings->fileName();
+    // qDebug() << group + "/" + key << m_settings->value(group + "/" + key, defaultValue);
+    return m_settings->value(group + "/" + key, defaultValue).toString();
 }
 
 double IniProvider::getDouble(const QString group, const QString key, double defaultValue)
 {
-    return m_settings->value(group + '\\' + key, defaultValue).toDouble();
+    return m_settings->value(group + "/" + key, defaultValue).toDouble();
 }
 
 QVariant IniProvider::getVariant(const QString group, const QString key, QVariant defaultValue)
 {
-    return m_settings->value(group + '\\' + key, defaultValue);
+    return m_settings->value(group + "/" + key, defaultValue);
 }
 
 QStringList IniProvider::getStringList(const QString group, const QString key, QStringList defaultValue)
@@ -66,7 +70,7 @@ QVariantMap IniProvider::getVariantMap(const QString group, const QString key, Q
     QVariantMap result;
     while (it.hasNext()) {
         it.next();
-        result[it.key()] = m_settings->value(group + '/' + key + "." + it.key(), it.value());
+        result[it.key()] = m_settings->value(group + "/" + key + "." + it.key(), it.value());
     }
 
     //qDebug() << "abc" << group << key << mapWithDefaultValues << result;

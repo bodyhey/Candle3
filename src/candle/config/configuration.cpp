@@ -165,6 +165,8 @@ void Configuration::loadModule(ConfigurationModule *module)
 {
     QMap<QString, QVariant> defaults = module->getDefaults();
 
+    qDebug() << "Loading config module" << module->getSectionName();
+
     const QMetaObject *metaObj = module->metaObject();
 
     for (int i = 0; i < metaObj->propertyCount(); ++i) {
@@ -173,16 +175,17 @@ void Configuration::loadModule(ConfigurationModule *module)
         if (QString(prop.name()) == "objectName" || QString(prop.name()) == "DEFAULTS") continue;
 
         QString type(prop.typeName());
+        QString name(prop.name());
         if (type == "QString") {
-            prop.write(module, m_provider.getString(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toString()));
+            prop.write(module, m_provider.getString(module->getSectionName(), name, defaults[prop.name()].toString()));
         } else if (type == "int") {
-            prop.write(module, m_provider.getInt(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toInt()));
+            prop.write(module, m_provider.getInt(module->getSectionName(), name, defaults[prop.name()].toInt()));
         } else if (type == "bool") {
-            prop.write(module, m_provider.getBool(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toBool()));
+            prop.write(module, m_provider.getBool(module->getSectionName(), name, defaults[prop.name()].toBool()));
         } else if (type == "double" || type == "float") {
-            prop.write(module, m_provider.getDouble(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toDouble()));
+            prop.write(module, m_provider.getDouble(module->getSectionName(), name, defaults[prop.name()].toDouble()));
         } else if (type == "QStringList") {
-            prop.write(module, m_provider.getStringList(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toStringList()));
+            prop.write(module, m_provider.getStringList(module->getSectionName(), name, defaults[prop.name()].toStringList()));
         } else {
             auto registryItem = ConfigurationRegistry::getInfo(prop.typeName());
 

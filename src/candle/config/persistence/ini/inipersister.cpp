@@ -37,7 +37,7 @@ bool IniPersister::setInt(const QString group, const QString key, const int valu
     if (!m_settings) {
         return false;
     }
-    m_settings->setValue(group + '/' + key, value);
+    m_settings->setValue(group + "/" + key, value);
 
     return true;
 }
@@ -47,7 +47,7 @@ bool IniPersister::setString(const QString group, const QString key, const QStri
     if (!m_settings) {
         return false;
     }
-    m_settings->setValue(group + '/' + key, value);
+    m_settings->setValue(group + "/" + key, value);
 
     return true;
 }
@@ -57,7 +57,7 @@ bool IniPersister::setDouble(const QString group, const QString key, const doubl
     if (!m_settings) {
         return false;
     }
-    m_settings->setValue(group + '/' + key, value);
+    m_settings->setValue(group + "/" + key, value);
 
     return true;
 }
@@ -67,7 +67,7 @@ bool IniPersister::setBool(const QString group, const QString key, const bool va
     if (!m_settings) {
         return false;
     }
-    m_settings->setValue(group + '/' + key, value);
+    m_settings->setValue(group + "/" + key, value);
 
     return true;
 }
@@ -80,7 +80,7 @@ bool IniPersister::setStringList(const QString group, const QString key, const Q
 
     QStringList list = value;
 
-    m_settings->setValue(group + '/' + key, list);//.replaceInStrings(",", "\\,").join(","));
+    m_settings->setValue(group + "/" + key, list);//.replaceInStrings(",", "\\,").join(","));
 
     return true;
 }
@@ -96,12 +96,11 @@ bool IniPersister::setVariantMap(const QString group, const QString key, const Q
     while (it.hasNext()) {
         it.next();
         obj[it.key()] = it.value().toJsonValue();
-        m_settings->setValue(group + '/' + key + "." + it.key(), it.value());
+        m_settings->setValue(group + "/" + key + "." + it.key(), it.value());
     }
     QJsonDocument doc(obj);
 
-    //qDebug() << "Set variant: " << value << doc.toJson(QJsonDocument::Indented);
-    m_settings->setValue(group + '/' + key, QString(doc.toJson(QJsonDocument::Compact)));
+    m_settings->setValue(group + "/" + key, QString(doc.toJson(QJsonDocument::Compact)));
 
     return true;
 }
@@ -112,7 +111,7 @@ bool IniPersister::setVariant(const QString group, const QString key, const QVar
         return false;
     }
 
-    m_settings->setValue(group + '/' + key, value);
+    m_settings->setValue(group + "/" + key, value);
 
     return true;
 }
