@@ -3,7 +3,9 @@ TEMPLATE = subdirs
 SUBDIRS =   uCNC \
             PropertyEditor
 
-SOURCES += CircularBuffer/CircularBuffer.hpp
-INCLUDEPATH += CircularBuffer
-HEADERS += CircularBuffer/CircularBuffer.h
+SOURCES += CRC/src/CRC.cpp \
+           CRC/src/CRC8.cpp
+INCLUDEPATH += CRC
+HEADERS += CRC/src/CRC.h \
+           CRC/src/CRC8.h
 
