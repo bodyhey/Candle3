@@ -165,7 +165,7 @@ QMainWindow::separator:horizontal {
    <bool>true</bool>
   </property>
   <property name="dockOptions">
-   <set>QMainWindow::AllowNestedDocks|QMainWindow::AnimatedDocks</set>
+   <set>QMainWindow::DockOption::AllowNestedDocks|QMainWindow::DockOption::AnimatedDocks</set>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -228,19 +228,19 @@ QLabel[overrided=&quot;false&quot;] {
             </font>
            </property>
            <property name="contextMenuPolicy">
-            <enum>Qt::CustomContextMenu</enum>
+            <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
            </property>
            <property name="editTriggers">
-            <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+            <set>QAbstractItemView::EditTrigger::AnyKeyPressed|QAbstractItemView::EditTrigger::DoubleClicked|QAbstractItemView::EditTrigger::EditKeyPressed|QAbstractItemView::EditTrigger::SelectedClicked</set>
            </property>
            <property name="selectionMode">
-            <enum>QAbstractItemView::ContiguousSelection</enum>
+            <enum>QAbstractItemView::SelectionMode::ContiguousSelection</enum>
            </property>
            <property name="selectionBehavior">
-            <enum>QAbstractItemView::SelectRows</enum>
+            <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
            </property>
            <property name="gridStyle">
-            <enum>Qt::DashLine</enum>
+            <enum>Qt::PenStyle::DashLine</enum>
            </property>
            <attribute name="horizontalHeaderMinimumSectionSize">
             <number>50</number>
@@ -259,10 +259,10 @@ QLabel[overrided=&quot;false&quot;] {
             <bool>true</bool>
            </property>
            <property name="selectionMode">
-            <enum>QAbstractItemView::SingleSelection</enum>
+            <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
            </property>
            <property name="gridStyle">
-            <enum>Qt::DashLine</enum>
+            <enum>Qt::PenStyle::DashLine</enum>
            </property>
            <attribute name="horizontalHeaderVisible">
             <bool>false</bool>
@@ -292,7 +292,7 @@ QLabel[overrided=&quot;false&quot;] {
          <item>
           <spacer name="spacerBot_2">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -429,7 +429,7 @@ QLabel[overrided=&quot;false&quot;] {
   </widget>
   <widget class="QDockWidget" name="dockModification">
    <property name="allowedAreas">
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+    <set>Qt::DockWidgetArea::LeftDockWidgetArea|Qt::DockWidgetArea::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
     <string>Modification</string>
@@ -448,7 +448,7 @@ QLabel[overrided=&quot;false&quot;] {
      <item>
       <widget class="QScrollArea" name="scrollArea">
        <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
+        <enum>QFrame::Shape::NoFrame</enum>
        </property>
        <property name="widgetResizable">
         <bool>true</bool>
@@ -532,10 +532,10 @@ QLabel[overrided=&quot;false&quot;] {
             <string notr="true">border: 2px solid blue;</string>
            </property>
            <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
+            <enum>QFrame::Shape::StyledPanel</enum>
            </property>
            <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
+            <enum>QFrame::Shadow::Raised</enum>
            </property>
           </widget>
          </item>
@@ -576,7 +576,7 @@ QLabel[overrided=&quot;false&quot;] {
                <item>
                 <widget class="QLineEdit" name="txtHeightMap">
                  <property name="focusPolicy">
-                  <enum>Qt::NoFocus</enum>
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="acceptDrops">
                   <bool>false</bool>
@@ -585,7 +585,7 @@ QLabel[overrided=&quot;false&quot;] {
                   <string/>
                  </property>
                  <property name="alignment">
-                  <set>Qt::AlignCenter</set>
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
                  </property>
                  <property name="readOnly">
                   <bool>true</bool>
@@ -694,10 +694,10 @@ QLabel[overrided=&quot;false&quot;] {
                          </sizepolicy>
                         </property>
                         <property name="alignment">
-                         <set>Qt::AlignCenter</set>
+                         <set>Qt::AlignmentFlag::AlignCenter</set>
                         </property>
                         <property name="buttonSymbols">
-                         <enum>QAbstractSpinBox::NoButtons</enum>
+                         <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                         </property>
                         <property name="minimum">
                          <double>-9999.000000000000000</double>
@@ -716,10 +716,10 @@ QLabel[overrided=&quot;false&quot;] {
                          </sizepolicy>
                         </property>
                         <property name="alignment">
-                         <set>Qt::AlignCenter</set>
+                         <set>Qt::AlignmentFlag::AlignCenter</set>
                         </property>
                         <property name="buttonSymbols">
-                         <enum>QAbstractSpinBox::NoButtons</enum>
+                         <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                         </property>
                         <property name="minimum">
                          <double>-9999.000000000000000</double>
@@ -748,10 +748,10 @@ QLabel[overrided=&quot;false&quot;] {
                          </sizepolicy>
                         </property>
                         <property name="alignment">
-                         <set>Qt::AlignCenter</set>
+                         <set>Qt::AlignmentFlag::AlignCenter</set>
                         </property>
                         <property name="buttonSymbols">
-                         <enum>QAbstractSpinBox::NoButtons</enum>
+                         <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                         </property>
                         <property name="minimum">
                          <double>-9999.000000000000000</double>
@@ -784,10 +784,10 @@ QLabel[overrided=&quot;false&quot;] {
                          </sizepolicy>
                         </property>
                         <property name="alignment">
-                         <set>Qt::AlignCenter</set>
+                         <set>Qt::AlignmentFlag::AlignCenter</set>
                         </property>
                         <property name="buttonSymbols">
-                         <enum>QAbstractSpinBox::NoButtons</enum>
+                         <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                         </property>
                         <property name="minimum">
                          <double>-9999.000000000000000</double>
@@ -865,10 +865,10 @@ QLabel[overrided=&quot;false&quot;] {
                          </sizepolicy>
                         </property>
                         <property name="alignment">
-                         <set>Qt::AlignCenter</set>
+                         <set>Qt::AlignmentFlag::AlignCenter</set>
                         </property>
                         <property name="buttonSymbols">
-                         <enum>QAbstractSpinBox::NoButtons</enum>
+                         <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                         </property>
                         <property name="decimals">
                          <number>0</number>
@@ -893,10 +893,10 @@ QLabel[overrided=&quot;false&quot;] {
                          </sizepolicy>
                         </property>
                         <property name="alignment">
-                         <set>Qt::AlignCenter</set>
+                         <set>Qt::AlignmentFlag::AlignCenter</set>
                         </property>
                         <property name="buttonSymbols">
-                         <enum>QAbstractSpinBox::NoButtons</enum>
+                         <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                         </property>
                         <property name="minimum">
                          <double>-999.000000000000000</double>
@@ -918,10 +918,10 @@ QLabel[overrided=&quot;false&quot;] {
                          </sizepolicy>
                         </property>
                         <property name="alignment">
-                         <set>Qt::AlignCenter</set>
+                         <set>Qt::AlignmentFlag::AlignCenter</set>
                         </property>
                         <property name="buttonSymbols">
-                         <enum>QAbstractSpinBox::NoButtons</enum>
+                         <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                         </property>
                         <property name="minimum">
                          <double>-999.000000000000000</double>
@@ -957,10 +957,10 @@ QLabel[overrided=&quot;false&quot;] {
                          </sizepolicy>
                         </property>
                         <property name="alignment">
-                         <set>Qt::AlignCenter</set>
+                         <set>Qt::AlignmentFlag::AlignCenter</set>
                         </property>
                         <property name="buttonSymbols">
-                         <enum>QAbstractSpinBox::NoButtons</enum>
+                         <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                         </property>
                         <property name="decimals">
                          <number>0</number>
@@ -992,10 +992,10 @@ QLabel[overrided=&quot;false&quot;] {
                          </sizepolicy>
                         </property>
                         <property name="alignment">
-                         <set>Qt::AlignCenter</set>
+                         <set>Qt::AlignmentFlag::AlignCenter</set>
                         </property>
                         <property name="buttonSymbols">
-                         <enum>QAbstractSpinBox::NoButtons</enum>
+                         <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                         </property>
                         <property name="decimals">
                          <number>0</number>
@@ -1028,7 +1028,7 @@ QLabel[overrided=&quot;false&quot;] {
                       <item>
                        <spacer name="horizontalSpacer_6">
                         <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
+                         <enum>Qt::Orientation::Horizontal</enum>
                         </property>
                         <property name="sizeHint" stdset="0">
                          <size>
@@ -1076,10 +1076,10 @@ QLabel[overrided=&quot;false&quot;] {
                          </sizepolicy>
                         </property>
                         <property name="alignment">
-                         <set>Qt::AlignCenter</set>
+                         <set>Qt::AlignmentFlag::AlignCenter</set>
                         </property>
                         <property name="buttonSymbols">
-                         <enum>QAbstractSpinBox::NoButtons</enum>
+                         <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                         </property>
                         <property name="decimals">
                          <number>0</number>
@@ -1104,10 +1104,10 @@ QLabel[overrided=&quot;false&quot;] {
                          </sizepolicy>
                         </property>
                         <property name="alignment">
-                         <set>Qt::AlignCenter</set>
+                         <set>Qt::AlignmentFlag::AlignCenter</set>
                         </property>
                         <property name="buttonSymbols">
-                         <enum>QAbstractSpinBox::NoButtons</enum>
+                         <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                         </property>
                         <property name="decimals">
                          <number>0</number>
@@ -1166,7 +1166,7 @@ QLabel[overrided=&quot;false&quot;] {
                       <item>
                        <spacer name="horizontalSpacer_8">
                         <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
+                         <enum>Qt::Orientation::Horizontal</enum>
                         </property>
                         <property name="sizeHint" stdset="0">
                          <size>
@@ -1216,7 +1216,7 @@ QLabel[overrided=&quot;false&quot;] {
   </widget>
   <widget class="QDockWidget" name="dockDevice">
    <property name="allowedAreas">
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+    <set>Qt::DockWidgetArea::LeftDockWidgetArea|Qt::DockWidgetArea::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
     <string>Device</string>
@@ -1235,7 +1235,7 @@ QLabel[overrided=&quot;false&quot;] {
      <item>
       <widget class="QScrollArea" name="scrollArea_2">
        <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
+        <enum>QFrame::Shape::NoFrame</enum>
        </property>
        <property name="widgetResizable">
         <bool>true</bool>
@@ -1270,6 +1270,12 @@ QLabel[overrided=&quot;false&quot;] {
            <property name="title">
             <string>State</string>
            </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
            <property name="overrided" stdset="0">
             <bool>false</bool>
            </property>
@@ -1299,10 +1305,10 @@ QLabel[overrided=&quot;false&quot;] {
             <string notr="true">border: 2px solid blue;</string>
            </property>
            <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
+            <enum>QFrame::Shape::StyledPanel</enum>
            </property>
            <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
+            <enum>QFrame::Shadow::Raised</enum>
            </property>
           </widget>
          </item>
@@ -1477,10 +1483,10 @@ QLabel[overrided=&quot;false&quot;] {
         <string notr="true">border: 1px solid gray;</string>
        </property>
        <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
+        <enum>QFrame::Shape::StyledPanel</enum>
        </property>
        <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+        <enum>QFrame::Shadow::Raised</enum>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_8">
         <property name="leftMargin">
@@ -1662,7 +1668,7 @@ QLabel[overrided=&quot;false&quot;] {
   </widget>
   <widget class="QDockWidget" name="dockConsole">
    <property name="features">
-    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetFloatable</set>
+    <set>QDockWidget::DockWidgetFeature::DockWidgetClosable|QDockWidget::DockWidgetFeature::DockWidgetFloatable</set>
    </property>
    <property name="windowTitle">
     <string>Console</string>
@@ -1681,10 +1687,10 @@ QLabel[overrided=&quot;false&quot;] {
      <item>
       <widget class="QFrame" name="frame">
        <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
+        <enum>QFrame::Shape::StyledPanel</enum>
        </property>
        <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+        <enum>QFrame::Shadow::Raised</enum>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_14">
         <property name="leftMargin">
@@ -1721,7 +1727,7 @@ QLabel[overrided=&quot;false&quot;] {
   </widget>
   <widget class="QToolBar" name="_spacerTop">
    <property name="contextMenuPolicy">
-    <enum>Qt::PreventContextMenu</enum>
+    <enum>Qt::ContextMenuPolicy::PreventContextMenu</enum>
    </property>
    <property name="windowTitle">
     <string>_spacerTop</string>
@@ -1738,7 +1744,7 @@ QLabel[overrided=&quot;false&quot;] {
   </widget>
   <widget class="QToolBar" name="_spacerLeft">
    <property name="contextMenuPolicy">
-    <enum>Qt::PreventContextMenu</enum>
+    <enum>Qt::ContextMenuPolicy::PreventContextMenu</enum>
    </property>
    <property name="windowTitle">
     <string>_spacerLeft</string>
@@ -1755,7 +1761,7 @@ QLabel[overrided=&quot;false&quot;] {
   </widget>
   <widget class="QToolBar" name="_spacerRight">
    <property name="contextMenuPolicy">
-    <enum>Qt::PreventContextMenu</enum>
+    <enum>Qt::ContextMenuPolicy::PreventContextMenu</enum>
    </property>
    <property name="windowTitle">
     <string>_spacerRight</string>
@@ -1778,7 +1784,7 @@ QLabel[overrided=&quot;false&quot;] {
     </size>
    </property>
    <property name="allowedAreas">
-    <set>Qt::AllDockWidgetAreas</set>
+    <set>Qt::DockWidgetArea::AllDockWidgetAreas</set>
    </property>
    <property name="windowTitle">
     <string>User</string>
@@ -1797,7 +1803,7 @@ QLabel[overrided=&quot;false&quot;] {
      <item>
       <widget class="QScrollArea" name="scrollArea_3">
        <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
+        <enum>QFrame::Shape::NoFrame</enum>
        </property>
        <property name="widgetResizable">
         <bool>true</bool>
@@ -1839,10 +1845,10 @@ QLabel[overrided=&quot;false&quot;] {
             <string notr="true">border: 2px solid blue;</string>
            </property>
            <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
+            <enum>QFrame::Shape::StyledPanel</enum>
            </property>
            <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
+            <enum>QFrame::Shadow::Raised</enum>
            </property>
           </widget>
          </item>

@@ -99,6 +99,27 @@ frmMain::frmMain(QWidget *parent) :
     //     qDebug() << "Command: " << command;
     // });
 
+    // toggle section visibility
+    connect(ui->grpControl, &QGroupBox::toggled, this, [=](bool checked) {
+        updateLayouts();
+        ui->control->setVisible(checked);
+    });
+    connect(ui->grpState, &QGroupBox::toggled, this, [=](bool checked) {
+        updateLayouts();
+        ui->state->setVisible(checked);
+    });
+    connect(ui->grpSpindle, &QGroupBox::toggled, this, [=](bool checked) {
+        ui->grpSpindle->setProperty("overrided", checked);
+        style()->unpolish(ui->grpSpindle);
+        ui->grpSpindle->ensurePolished();
+
+        if (checked) {
+            if (!ui->grpSpindle->isChecked()) ui->grpSpindle->setTitle(tr("Spindle") + QString(tr(" (%1)")).arg(ui->slbSpindle->value()));
+        } else {
+            ui->grpSpindle->setTitle(tr("Spindle"));
+        }
+    });
+
     connect(ui->jog, &partMainJog::jog, this, [=](JoggindDir dir, QVector3D jog) {
         Q_UNUSED(dir)
         qDebug() << "Jog: " << jog;
@@ -816,18 +837,18 @@ void frmMain::on_cmdFileReset_clicked()
 //     m_connection->sendByteArray(QByteArray(1, (char)0xa0));
 // }
 
-void frmMain::on_cmdSpindle_toggled(bool checked)
-{
-    ui->grpSpindle->setProperty("overrided", checked);
-    style()->unpolish(ui->grpSpindle);
-    ui->grpSpindle->ensurePolished();
+// void frmMain::on_cmdSpindle_toggled(bool checked)
+// {
+//     ui->grpSpindle->setProperty("overrided", checked);
+//     style()->unpolish(ui->grpSpindle);
+//     ui->grpSpindle->ensurePolished();
 
-    if (checked) {
-        if (!ui->grpSpindle->isChecked()) ui->grpSpindle->setTitle(tr("Spindle") + QString(tr(" (%1)")).arg(ui->slbSpindle->value()));
-    } else {
-        ui->grpSpindle->setTitle(tr("Spindle"));
-    }
-}
+//     if (checked) {
+//         if (!ui->grpSpindle->isChecked()) ui->grpSpindle->setTitle(tr("Spindle") + QString(tr(" (%1)")).arg(ui->slbSpindle->value()));
+//     } else {
+//         ui->grpSpindle->setTitle(tr("Spindle"));
+//     }
+// }
 
 void frmMain::on_cmdSpindle_clicked(bool checked)
 {
@@ -2931,7 +2952,7 @@ void frmMain::updateControlsState()
     SenderState senderState = m_communicator->senderState();
 
     ui->grpState->setEnabled(portOpened);
-    ui->grpControl->setEnabled(portOpened);
+    ui->control->setEnabled(portOpened);
     ui->spindle->setEnabled(portOpened);
     ui->jog->setEnabled(portOpened && ((senderState == SenderStopped)
         || (senderState == SenderChangingTool)));

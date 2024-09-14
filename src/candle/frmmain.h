@@ -128,7 +128,7 @@ private slots:
     void on_cmdFilePause_clicked(bool checked);
     void on_cmdFileAbort_clicked();
     void on_cmdFileReset_clicked();
-    void on_cmdSpindle_toggled(bool checked);
+    // void on_cmdSpindle_toggled(bool checked);
     void on_cmdSpindle_clicked(bool checked);
     void on_cmdTop_clicked();
     void on_cmdFront_clicked();
