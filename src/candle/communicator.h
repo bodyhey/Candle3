@@ -35,9 +35,9 @@ class Communicator : public QObject
         void replaceConnection(Connection *);
         void stopUpdatingState();
         void startUpdatingState(int interval = -1);
-        SenderState senderState() const { return m_senderState; }
-        DeviceState deviceState() const { return m_deviceState; }
-        MachineConfiguration machineConfiguration() const { return *m_machineConfiguration; }
+        const SenderState& senderState() const { return m_senderState; }
+        const DeviceState& deviceState() const { return m_deviceState; }
+        MachineConfiguration& machineConfiguration() const { return *m_machineConfiguration; }
         void processWorkOffset(QString data);
         void sendStreamerCommandsUntilBufferIsFull();
         bool isMachineConfigurationReady() const;
