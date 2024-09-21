@@ -103,8 +103,6 @@ SendCommandResult Communicator::sendCommand(CommandSource source, QString comman
 
     CommandAttributes commandAttributes(
         source,
-        command.length() + 1,
-        -1,
         m_commandIndex++,
         tableIndex,
         command
@@ -223,15 +221,13 @@ void Communicator::reset()
 
     // Prepare reset response catch
     QString command = "[CTRL+X]";
-    CommandAttributes ca(
+    CommandAttributes commandAttributes(
         CommandSource::System,
-        command.length() + 1,
-        -1,
         m_commandIndex++,
         -1,
         command
     );
-    m_commands.append(ca);
+    m_commands.append(commandAttributes);
 
     if (m_streamer != nullptr) {
         m_streamer->reset();

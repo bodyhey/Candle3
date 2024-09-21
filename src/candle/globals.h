@@ -113,7 +113,6 @@ enum CommandSource : uint8_t {
 struct CommandAttributes {
     CommandSource source;
     int length;
-    int consoleIndex;
     int commandIndex;
     int tableIndex;
     QString command;
@@ -125,17 +124,15 @@ struct CommandAttributes {
     CommandAttributes(const CommandAttributes& other) {
         source = other.source;
         length = other.length;
-        consoleIndex = other.consoleIndex;
         commandIndex = other.commandIndex;
         tableIndex = other.tableIndex;
         command = other.command;
         response = other.response;
     }
 
-    CommandAttributes(CommandSource source, int length, int consoleIndex, int commandIndex, int tableIndex, QString command) {
+    CommandAttributes(CommandSource source, int commandIndex, int tableIndex, QString command) {
         this->source = source;
-        this->length = length;
-        this->consoleIndex = consoleIndex;
+        this->length = command.length() + 1;
         this->commandIndex = commandIndex;
         this->tableIndex = tableIndex;
         this->command = command;
