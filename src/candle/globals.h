@@ -37,10 +37,10 @@
 // -1 - ui commands
 // -2 - utility commands
 // -3 - utility commands
-#define COMMAND_TI_MIN_GCODE 0
-#define COMMAND_TI_UI -1
-#define COMMAND_TI_UTIL1 -2
-#define COMMAND_TI_UTIL2 -3
+#define TABLE_INDEX_MIN_GCODE 0
+#define TABLE_INDEX_UI -1
+#define TABLE_INDEX_UTIL1 -2
+#define TABLE_INDEX_UTIL2 -3
 
 enum Units {
     Inches,

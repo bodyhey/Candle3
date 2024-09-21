@@ -176,8 +176,7 @@ void Communicator::processStatus(QString data)
             mpx.cap(2).toDouble(),
             mpx.cap(3).toDouble()
         );
-        bool changed = newPos != m_machinePos;
-        if (changed) {
+        if (newPos != m_machinePos) {
             m_machinePos = newPos;
             m_storedVars.setCoords("M", newPos);
             emit machinePosChanged(newPos);
@@ -302,10 +301,11 @@ void Communicator::processCommandResponse(QString data)
     //QTextBlock tb = ui->txtConsole->document()->findBlockByNumber(ca.consoleIndex);
     //QTextCursor tc(tb);
 
-    QString uncomment = GcodePreprocessorUtils::removeComment(commandAttributes.command).toUpper();
+    QString command = GcodePreprocessorUtils::removeComment(commandAttributes.command).toUpper();
+
 
     // Store current coordinate system
-    if (uncomment == "$G") {
+    if (command == "$G") {
         static QRegExp g("G5[4-9]");
         if (g.indexIn(response) != -1) {
             m_storedVars.setCS(g.cap(0));
@@ -324,49 +324,49 @@ void Communicator::processCommandResponse(QString data)
         if (t.indexIn(response) != -1) {
             m_storedVars.setTool(g.cap(1).toInt());
         }
-    }
 
-    // TODO: Store firmware version, features, buffer size on $I command
-    // [VER:1.1d.20161014:Some string]
-    // [OPT:VL,15,128]
+        // TODO: Store firmware version, features, buffer size on $I command
+        // [VER:1.1d.20161014:Some string]
+        // [OPT:VL,15,128]
 
-    // Restore absolute/relative coordinate system after jog
-    if (uncomment == "$G" && commandAttributes.tableIndex == -2) {
-        // @TODO how to handle keyboard control?? not like this!
-        // if (ui->chkKeyboardControl->isChecked()) m_form->absoluteCoordinates() = response.contains("G90");
-        // else if (response.contains("G90")) sendCommand(CommandSource::System, "G90", COMMAND_TI_UI);
-        if (response.contains("G90")) sendCommand(CommandSource::System, "G90", COMMAND_TI_UI);
-    }
-
-    // Process GCore parser state
-    if (uncomment == "$G" && commandAttributes.tableIndex == -3) {
-        // @TODO what is this ; for? is it '; ok'?
-        m_lastParserState = response.left(response.indexOf("; "));
-
-        // Update status in visualizer window
-        emit parserStateReceived(m_lastParserState);
-
-        // Store parser status
-        if ((m_senderState == SenderTransferring) || (m_senderState == SenderStopping)) {
-            storeParserState();
+        // Restore absolute/relative coordinate system after jog
+        if (commandAttributes.tableIndex == TABLE_INDEX_UTIL1) {
+            // @TODO how to handle keyboard control?? not like this!
+            // if (ui->chkKeyboardControl->isChecked()) m_form->absoluteCoordinates() = response.contains("G90");
+            // else if (response.contains("G90")) sendCommand(CommandSource::System, "G90", COMMAND_TI_UI);
+            if (response.contains("G90")) sendCommand(CommandSource::System, "G90", TABLE_INDEX_UI);
         }
 
-        // Spindle speed
-        // @TODO what is the difference between this and processFeedSpindleSpeed??
-        QRegExp rx(".*S([\\d\\.]+)");
-        if (rx.indexIn(response) != -1) {
-            double spindleSpeed = rx.cap(1).toDouble();
-            emit spindleSpeedReceived(spindleSpeed);
-        }
+        // Process GCore parser state
+        if (commandAttributes.tableIndex == TABLE_INDEX_UTIL2) {
+            // @TODO what is this ; for? is it '; ok'?
+            m_lastParserState = response.left(response.indexOf("; "));
 
-        m_updateParserState = true;
+            // Update status in visualizer window
+            emit parserStateReceived(m_lastParserState);
+
+            // Store parser status
+            if ((m_senderState == SenderTransferring) || (m_senderState == SenderStopping)) {
+                storeParserState();
+            }
+
+            // Spindle speed
+            // @TODO what is the difference between this and processFeedSpindleSpeed??
+            QRegExp rx(".*S([\\d\\.]+)");
+            if (rx.indexIn(response) != -1) {
+                double spindleSpeed = rx.cap(1).toDouble();
+                emit spindleSpeedReceived(spindleSpeed);
+            }
+
+            m_updateParserState = true;
+        }
     }
 
     // Offsets
-    if (uncomment == "$#") processOffsetsVars(response);
+    if (command == "$#") processOffsetsVars(response);
 
     // Settings response
-    if (uncomment == "$$") {
+    if (command == "$$") {
         static QRegExp gs("\\$(\\d+)\\=([^;]+)\\; ");
         QMap<int, double> rawMachineConfiguration;
         int p = 0;
@@ -432,21 +432,21 @@ void Communicator::processCommandResponse(QString data)
     }
 
     // Homing response
-    if ((uncomment == "$H" || uncomment == "$T") && m_homing) m_homing = false;
+    if ((command == "$H" || command == "$T") && m_homing) m_homing = false;
 
     // Reset complete response
-    if (uncomment == "[CTRL+X]") {
+    if (command == "[CTRL+X]") {
         m_resetCompleted = true;
         m_updateParserState = true;
 
         // Query grbl settings
-        sendCommand(CommandSource::System, "$$", COMMAND_TI_UTIL1);
-        sendCommand(CommandSource::System, "$#", COMMAND_TI_UTIL1, true);
+        sendCommand(CommandSource::System, "$$", TABLE_INDEX_UTIL1);
+        sendCommand(CommandSource::System, "$#", TABLE_INDEX_UTIL1, true);
     }
 
     // Clear command buffer on "M2" & "M30" command (old firmwares)
     static QRegExp M230("(M0*2|M30)(?!\\d)");
-    if (uncomment.contains(M230) && response.contains("ok") && !response.contains("Pgm End")) {
+    if (command.contains(M230) && response.contains("ok") && !response.contains("Pgm End")) {
         m_commands.clear();
         m_queue.clear();
 
@@ -454,7 +454,7 @@ void Communicator::processCommandResponse(QString data)
     }
 
     // Update probe coords on user commands
-    if (uncomment.contains("G38.2") && commandAttributes.tableIndex < 0) {
+    if (command.contains("G38.2") && commandAttributes.tableIndex < 0) {
         static QRegExp PRB(".*PRB:([^,]*),([^,]*),([^,:]*)");
         if (PRB.indexIn(response) != -1) {
             m_storedVars.setCoords("PRB", QVector3D(
@@ -500,7 +500,7 @@ void Communicator::processCommandResponse(QString data)
     // }
 
     // Change state query time on check mode on
-    if (uncomment.contains(QRegExp("$[cC]"))) {
+    if (command.contains(QRegExp("$[cC]"))) {
         m_timerStateQuery.setInterval(response.contains("Enable") ? 1000 : m_configuration->connectionModule().queryStateInterval());
     }
 
@@ -582,7 +582,7 @@ void Communicator::processCommandResponse(QString data)
                 holding = true;         // Hold transmit while messagebox is visible
                 response.clear();
 
-                sendRealtimeCommand("!");
+                sendRealtimeCommand(GRBL_LIVE_FEED_HOLD);
                 // @TODO move to UI
                 // m_form->senderErrorBox().checkBox()->setChecked(false);
                 // qApp->beep();
@@ -594,9 +594,9 @@ void Communicator::processCommandResponse(QString data)
                 // @TODO move to UI
                 // if (m_form->senderErrorBox().checkBox()->isChecked()) m_settings->setIgnoreErrors(true);
                 if (result == QMessageBox::Ignore) {
-                    sendRealtimeCommand("~");
+                    sendRealtimeCommand(GRBL_LIVE_CYCLE_START);
                 } else {
-                    sendRealtimeCommand("~");
+                    sendRealtimeCommand(GRBL_LIVE_CYCLE_START);
 
                     emit aborted();
                 }
@@ -605,13 +605,13 @@ void Communicator::processCommandResponse(QString data)
 
         // Check transfer complete (last row always blank, last command row = rowcount - 2)
 //        if ((m_streamer->processedCommandIndex() == m_form->currentModel().rowCount() - 2) || uncomment.contains(QRegExp("(M0*2|M30)(?!\\d)"))) {
-        if (m_streamer->isLastCommandProcessed() || uncomment.contains(QRegExp("(M0*2|M30)(?!\\d)"))) {
+        if (m_streamer->isLastCommandProcessed() || command.contains(QRegExp("(M0*2|M30)(?!\\d)"))) {
             if (m_deviceState == DeviceRun) {
                 setSenderStateAndEmitSignal(SenderStopping);
             } else {
                 completeTransfer();
             }
-        } else if (m_streamer->isLastCommand()  // /*(m_streamer->commandIndex() < m_form->currentModel().rowCount())
+        } else if (m_streamer->hasMoreCommands()  // /*(m_streamer->commandIndex() < m_form->currentModel().rowCount())
                    && (m_senderState == SenderTransferring)
                    && !holding)
         {
@@ -623,7 +623,7 @@ void Communicator::processCommandResponse(QString data)
 
     // Tool change mode
     static QRegExp M6("(M0*6)(?!\\d)");
-    if ((m_senderState == SenderPausing) && uncomment.contains(M6)) {
+    if ((m_senderState == SenderPausing) && command.contains(M6)) {
         response.clear();
         
         if (m_configuration->senderModule(). pauseSenderOnToolChange()) {
@@ -653,7 +653,7 @@ void Communicator::processCommandResponse(QString data)
     }
 
     // Pausing on button?
-    if ((m_senderState == SenderPausing) && !uncomment.contains(M6)) {
+    if ((m_senderState == SenderPausing) && !command.contains(M6)) {
         if (m_configuration->senderModule().usePauseCommands()) {
             sendCommands(CommandSource::ProgramAdditionalCommands, m_configuration->senderModule().beforePauseCommands());
             setSenderStateAndEmitSignal(SenderPausing2);
@@ -666,13 +666,15 @@ void Communicator::processCommandResponse(QString data)
     }
 
     // Switch to pause mode
-    if ((m_senderState == SenderPausing || m_senderState == SenderPausing2) && m_commands.isEmpty()) {
-        setSenderStateAndEmitSignal(SenderPaused);
+    if (isSenderState(SenderPausing, SenderPausing2)) {
+        if (m_commands.isEmpty()) {
+            setSenderStateAndEmitSignal(SenderPaused);
+        }
     }
 
     // Same as M2, Program End, turn off spindle/laser and stops the machine.
     // Scroll to first line on "M30" command
-    if (uncomment.contains("M30")) {
+    if (command.contains("M30")) {
         // @TODO new signal here?
         emit commandProcessed(-1, "");
     }
@@ -718,8 +720,8 @@ void Communicator::processWelcomeMessageDetected()
 
     clearCommandsAndQueue();
 
-    sendCommand(CommandSource::System, "$$", COMMAND_TI_UTIL1);
-    sendCommand(CommandSource::System, "$#", COMMAND_TI_UTIL1, true);
+    sendCommand(CommandSource::System, "$$", TABLE_INDEX_UTIL1);
+    sendCommand(CommandSource::System, "$#", TABLE_INDEX_UTIL1, true);
 
     // @TODO moved to senderStateReceived handler, is it too soon??
     // m_form->updateControlsState();

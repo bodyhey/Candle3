@@ -85,12 +85,12 @@ frmMain::frmMain(QWidget *parent) :
 
     connect(ui->control, &partMainControl::unlock, this, [=]() {
         m_communicator->m_updateSpindleSpeed = true;
-        m_communicator->sendCommand(CommandSource::GeneralUI, "$X", COMMAND_TI_UI);
+        m_communicator->sendCommand(CommandSource::GeneralUI, "$X", TABLE_INDEX_UI);
     });
     connect(ui->control, &partMainControl::home, this, [=]() {
         m_communicator->m_homing = true;
         m_communicator->m_updateSpindleSpeed = true;
-        m_communicator->sendCommand(CommandSource::GeneralUI, "$H", COMMAND_TI_UI);
+        m_communicator->sendCommand(CommandSource::GeneralUI, "$H", TABLE_INDEX_UI);
     });
     connect(ui->control, &partMainControl::reset, this, [=]() {
         m_communicator->reset();
@@ -855,7 +855,7 @@ void frmMain::on_cmdSpindle_clicked(bool checked)
     if (ui->control->hold()) {
         m_connection->sendByteArray(QByteArray(1, char(0x9e)));
     } else {
-        m_communicator->sendCommand(CommandSource::GeneralUI, checked ? QString("M3 S%1").arg(ui->slbSpindle->value()) : "M5", COMMAND_TI_UI);
+        m_communicator->sendCommand(CommandSource::GeneralUI, checked ? QString("M3 S%1").arg(ui->slbSpindle->value()) : "M5", TABLE_INDEX_UI);
     }
 }
 
@@ -942,7 +942,7 @@ void frmMain::on_chkKeyboardControl_toggled(bool checked)
     if (checked) {
         //m_communicator->sendCommand(CommandSource::System, "$G", COMMAND_TI_UTIL1);
     } else {
-        if (m_absoluteCoordinates) m_communicator->sendCommand(CommandSource::System, "G90", COMMAND_TI_UI);
+        if (m_absoluteCoordinates) m_communicator->sendCommand(CommandSource::System, "G90", TABLE_INDEX_UI);
     }
 
     if ((m_communicator->senderState() != SenderTransferring) && (m_communicator->senderState() != SenderStopping))
@@ -1692,7 +1692,7 @@ void frmMain::onToolPositionReceived(QVector3D pos)
 
 void frmMain::onConsoleNewCommand(QString command)
 {
-    m_communicator->sendCommand(CommandSource::Console, command, COMMAND_TI_UI);
+    m_communicator->sendCommand(CommandSource::Console, command, TABLE_INDEX_UI);
 }
 
 void frmMain::onTimerConnection()
@@ -1883,7 +1883,7 @@ void frmMain::onActSendFromLineTriggered()
             // foreach (QString command, commands) {
             //     sendCommand(command, COMMAND_TI_UI);
             // }
-            m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, commands, COMMAND_TI_UI);
+            m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, commands, TABLE_INDEX_UI);
         }
     }
 
@@ -2563,11 +2563,10 @@ void frmMain::loadFile(QString fileName)
 
     qDebug() << "Lines: " << data.count();
 
-    // Load lines
-    loadFile(data);
+    loadLines(data);
 }
 
-void frmMain::loadFile(QList<std::string> data)
+void frmMain::loadLines(QList<std::string> data)
 {
     assert(m_communicator->isMachineConfigurationReady());
     if (!m_communicator->isMachineConfigurationReady()) {

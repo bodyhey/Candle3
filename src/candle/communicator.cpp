@@ -65,7 +65,7 @@ void Communicator::resetStateVariables()
 /**
  * @param tableIndex -1 - ui commands, -2 - utility commands, -3 - utility commands
  */
-SendCommandResult Communicator::sendCommand(CommandSource source, QString command, int tableIndex, bool wait)
+SendCommandResult Communicator::sendCommand(CommandSource source, QString commandLine, int tableIndex, bool wait)
 {
     // tableIndex:
     // 0...n - commands from g-code program
@@ -76,11 +76,11 @@ SendCommandResult Communicator::sendCommand(CommandSource source, QString comman
     if (!m_connection->isConnected() || !m_resetCompleted) return SendDone;
 
     // Check command
-    if (command.isEmpty()) return SendEmpty;
+    if (commandLine.isEmpty()) return SendEmpty;
 
     // Place to queue on 'wait' flag
     if (wait) {
-        m_queue.append(CommandQueue(source, command, tableIndex));
+        m_queue.append(CommandQueue(source, commandLine, tableIndex));
 
         return SendQueue;
     }
@@ -90,31 +90,31 @@ SendCommandResult Communicator::sendCommand(CommandSource source, QString comman
     //if (tableIndex < 0) command = evaluateCommand(command);
 
     // Check evaluated command
-    if (command.isEmpty()) return SendEmpty;
+    if (commandLine.isEmpty()) return SendEmpty;
 
     // Place to queue if command buffer is full
-    if ((bufferLength() + command.length() + 1) > BUFFERLENGTH) {
-        m_queue.append(CommandQueue(source, command, tableIndex));
+    if ((bufferLength() + commandLine.length() + 1) > BUFFERLENGTH) {
+        m_queue.append(CommandQueue(source, commandLine, tableIndex));
 
         return SendQueue;
     }
 
-    command = command.toUpper();
+    commandLine = commandLine.toUpper();
 
     CommandAttributes commandAttributes(
         source,
         m_commandIndex++,
         tableIndex,
-        command
+        commandLine
     );
 
     m_commands.append(commandAttributes);
 
-    QString uncomment = GcodePreprocessorUtils::removeComment(command);
+    QString command = GcodePreprocessorUtils::removeComment(commandLine);
 
     // Processing spindle speed only from g-code program
     static QRegExp s("[Ss]0*(\\d+)");
-    if (s.indexIn(uncomment) != -1 && commandAttributes.tableIndex > -2) {
+    if (s.indexIn(command) != -1 && commandAttributes.tableIndex > -2) {
         int speed = s.cap(1).toInt();
         // @TODO we are about to send new spindle speed, should we update UI now or wait for response?? or
         // maybe in onFeedSpindleSpeedReceived ??
@@ -126,19 +126,21 @@ SendCommandResult Communicator::sendCommand(CommandSource source, QString comman
     // Set M2 & M30 commands sent flag
     static QRegExp M230("(M0*2|M30|M0*6|M25)(?!\\d)");
     static QRegExp M6("(M0*6)(?!\\d)");
-    if ((m_senderState == SenderTransferring) && uncomment.contains(M230)) {
+    if ((m_senderState == SenderTransferring) && command.contains(M230)) {
         if (
-            !uncomment.contains(M6) ||
+            !command.contains(M6) ||
             m_configuration->senderModule().useToolChangeCommands() ||
             m_configuration->senderModule().pauseSenderOnToolChange()
-        ) setSenderStateAndEmitSignal(SenderPausing);
+        ) {
+            setSenderStateAndEmitSignal(SenderPausing);
+        }
     }
 
     // Queue offsets request on G92, G10 commands
     static QRegExp G92("(G92|G10)(?!\\d)");
-    if (uncomment.contains(G92)) sendCommand(source, "$#", COMMAND_TI_UTIL2, true);
+    if (command.contains(G92)) sendCommand(source, "$#", TABLE_INDEX_UTIL2, true);
 
-    m_connection->sendLine(command);
+    m_connection->sendLine(commandLine);
 
     emit commandSent(commandAttributes);
 
@@ -224,7 +226,7 @@ void Communicator::reset()
     CommandAttributes commandAttributes(
         CommandSource::System,
         m_commandIndex++,
-        -1,
+        TABLE_INDEX_UI, // why UI ??
         command
     );
     m_commands.append(commandAttributes);
@@ -281,13 +283,13 @@ void Communicator::restoreOffsets()
     sendCommand(
         CommandSource::System,
         QString("%4G53G90X%1Y%2Z%3").arg(m_machinePos.x()).arg(m_machinePos.y()).arg(m_machinePos.z()).arg(m_machineConfiguration->unitsInches() ? "G20" : "G21"),
-        COMMAND_TI_UTIL1
+        TABLE_INDEX_UTIL1
     );
 
     sendCommand(
         CommandSource::System,
         QString("%4G92X%1Y%2Z%3").arg(m_workPos.x()).arg(m_workPos.y()).arg(m_workPos.z()).arg(m_machineConfiguration->unitsInches() ? "G20" : "G21"),
-        COMMAND_TI_UTIL1
+        TABLE_INDEX_UTIL1
     );
 }
 
@@ -360,7 +362,7 @@ void Communicator::processConnectionTimer()
         }
         if (m_updateParserState) {
             m_updateParserState = false;
-            sendCommand(CommandSource::System, "$G", COMMAND_TI_UTIL2, false);
+            sendCommand(CommandSource::System, "$G", TABLE_INDEX_UTIL2, false);
         }
     }
 }
@@ -453,7 +455,7 @@ void Communicator::storeParserState()
 void Communicator::restoreParserState()
 {
     if (!m_storedParserState.isEmpty()) {
-        sendCommand(CommandSource::System, m_storedParserState, COMMAND_TI_UI);
+        sendCommand(CommandSource::System, m_storedParserState, TABLE_INDEX_UI);
     }
 }
 
