@@ -240,10 +240,10 @@ void Communicator::reset()
 void Communicator::abort()
 {
     // @TODO is CommandSource::Program correct here??
-    if ((senderState() == SenderPaused) || (senderState() == SenderChangingTool)) {
-        sendCommand(CommandSource::Program, "M2", COMMAND_TI_UI, false);
+    if (isSenderState(SenderPaused, SenderChangingTool)) {
+        sendCommand(CommandSource::GeneralUI, "M2", TABLE_INDEX_UI, false);
     } else {
-        sendCommand(CommandSource::Program, "M2", COMMAND_TI_UI, true);
+        sendCommand(CommandSource::GeneralUI, "M2", TABLE_INDEX_UI, true);
     }
 }
 
@@ -332,7 +332,7 @@ void Communicator::sendStreamerCommandsUntilBufferIsFull()
     static QRegExp M230("(M0*2|M30|M0*6)(?!\\d)");
 
     while ((bufferLength() + command.length() + 1) <= BUFFERLENGTH
-           && !m_streamer->noMoreCommands() /* commandIndex() < m_form->currentModel().rowCount() - 1 */
+           && m_streamer->hasMoreCommands() /* commandIndex() < m_form->currentModel().rowCount() - 1 */
            && !(!m_commands.isEmpty() && GcodePreprocessorUtils::removeComment(m_commands.last().command).contains(M230))
     ) {
         m_streamer->commandSent();
@@ -345,6 +345,11 @@ void Communicator::sendStreamerCommandsUntilBufferIsFull()
 bool Communicator::isMachineConfigurationReady() const
 {
     return m_machineConfiguration != nullptr;
+}
+
+bool Communicator::isSenderState(SenderState state) const
+{
+    return m_senderState == state;
 }
 
 void Communicator::processConnectionTimer()

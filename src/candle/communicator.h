@@ -42,6 +42,11 @@ class Communicator : public QObject
         void processWorkOffset(QString data);
         void sendStreamerCommandsUntilBufferIsFull();
         bool isMachineConfigurationReady() const;
+        bool isSenderState(SenderState state) const;
+        template<typename... Args>
+        bool isSenderState(SenderState state, Args... args) const {
+            return isSenderState(state) || isSenderState(args...);
+        }
 
         // @TODO to be removed!! another local timer? how it works??
         void processConnectionTimer();

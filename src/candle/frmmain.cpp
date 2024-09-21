@@ -696,6 +696,8 @@ void frmMain::on_cmdFileSend_clicked()
     if (m_configuration.senderModule().useProgramStartCommands())
         m_communicator->sendCommands(CommandSource::ProgramAdditionalCommands, m_configuration.senderModule().programStartCommands());
 
+    // rather temporary solution
+    m_streamer->setModel(&m_programModel);
     m_communicator->sendStreamerCommandsUntilBufferIsFull();
 }
 
@@ -726,6 +728,7 @@ void frmMain::on_cmdFilePause_clicked(bool checked)
 
 void frmMain::on_cmdFileAbort_clicked()
 {
+    ui->cmdFileAbort->setEnabled(false);
     m_communicator->abort();
 }
 
@@ -2559,7 +2562,9 @@ void frmMain::loadFile(QString fileName)
 
     // Read lines
     QList<std::string> data;
-    while (!textStream.atEnd()) data.append(textStream.readLine().toStdString());
+    while (!textStream.atEnd()) {
+        data.append(textStream.readLine().toStdString());
+    }
 
     qDebug() << "Lines: " << data.count();
 

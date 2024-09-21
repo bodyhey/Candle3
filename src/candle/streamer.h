@@ -32,11 +32,13 @@ class Streamer : public QObject
         void pause();        
         bool isLastCommand();
         bool noMoreCommands();
+        bool hasMoreCommands();
         bool isLastCommandProcessed();
         // @TODO remove this method??
         void setModel(GCodeTableModel *model) {
             m_currentModel = model;
             m_commandsCount = model->rowCount() - 1;
+            reset();
         }
         void commandSent();
     private:

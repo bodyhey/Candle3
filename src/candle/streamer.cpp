@@ -40,6 +40,11 @@ bool Streamer::noMoreCommands()
     return m_commandIndex > m_commandsCount - 1;
 }
 
+bool Streamer::hasMoreCommands()
+{
+    return m_commandIndex <= m_commandsCount - 1;
+}
+
 bool Streamer::isLastCommandProcessed()
 {
     return m_processedCommandIndex == m_commandsCount - 1;
