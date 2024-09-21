@@ -1375,85 +1375,6 @@ void frmMain::on_cmdHeightMapBorderAuto_clicked()
     }
 }
 
-// void frmMain::on_cmdYPlus_pressed()
-// {
-//     m_jogVector += QVector3D(0, 1, 0);
-//     jogStep();
-// }
-
-// void frmMain::on_cmdYPlus_released()
-// {
-//     m_jogVector -= QVector3D(0, 1, 0);
-//     jogStep();
-// }
-
-// void frmMain::on_cmdYMinus_pressed()
-// {
-//     m_jogVector += QVector3D(0, -1, 0);
-//     jogStep();
-// }
-
-// void frmMain::on_cmdYMinus_released()
-// {
-//     m_jogVector -= QVector3D(0, -1, 0);
-//     jogStep();
-// }
-
-// void frmMain::on_cmdXPlus_pressed()
-// {
-//     m_jogVector += QVector3D(1, 0, 0);
-//     jogStep();
-// }
-
-// void frmMain::on_cmdXPlus_released()
-// {
-//     m_jogVector -= QVector3D(1, 0, 0);
-//     jogStep();
-// }
-
-// void frmMain::on_cmdXMinus_pressed()
-// {
-//     m_jogVector += QVector3D(-1, 0, 0);
-//     jogStep();
-// }
-
-// void frmMain::on_cmdXMinus_released()
-// {
-//     m_jogVector -= QVector3D(-1, 0, 0);
-//     jogStep();
-// }
-
-// void frmMain::on_cmdZPlus_pressed()
-// {
-//     m_jogVector += QVector3D(0, 0, 1);
-//     jogStep();
-// }
-
-// void frmMain::on_cmdZPlus_released()
-// {
-//     m_jogVector -= QVector3D(0, 0, 1);
-//     jogStep();
-// }
-
-// void frmMain::on_cmdZMinus_pressed()
-// {
-//     m_jogVector += QVector3D(0, 0, -1);
-//     jogStep();
-// }
-
-// void frmMain::on_cmdZMinus_released()
-// {
-//     m_jogVector -= QVector3D(0, 0, -1);
-//     jogStep();
-// }
-
-// void frmMain::on_cmdStop_clicked()
-// {
-//     m_jogVector = QVector3D(0, 0, 0);
-//     m_communicator->clearQueue();
-//     m_connection->sendByteArray(QByteArray(1, char(0x85)));
-// }
-
 void frmMain::on_tblProgram_customContextMenuRequested(const QPoint &pos)
 {
     if (m_communicator->senderState() != SenderStopped) return;
@@ -3429,17 +3350,6 @@ void frmMain::updateToolpathShadowingOnCheckMode()
 QString frmMain::lastWorkingDirectory()
 {
     return m_configuration.uiModule().currentWorkingDirectory();
-}
-
-int frmMain::bufferLength()
-{
-    int length = 0;
-
-    foreach (CommandAttributes ca, m_communicator->m_commands) {
-        length += ca.length;
-    }
-
-    return length;
 }
 
 QTime frmMain::updateProgramEstimatedTime(QList<LineSegment*> lines)

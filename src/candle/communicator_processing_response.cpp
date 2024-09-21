@@ -389,42 +389,7 @@ void Communicator::processCommandResponse(QString data)
         // if (ca.tableIndex == -2) {
         //     QList<int> keys = rawMachineConfiguration.keys();
         //     if (keys.contains(13)) m_settings->setUnits(rawMachineConfiguration[13]);
-        //     if (keys.contains(20)) m_settings->setSoftLimitsEnabled(rawMachineConfiguration[20]);
-        //     if (keys.contains(22)) {
-        //         m_settings->setHomingEnabled(rawMachineConfiguration[22]);
-        //         m_machineBoundsDrawer.setVisible(rawMachineConfiguration[22]);
-        //     }
-        //     if (keys.contains(110)) m_settings->setRapidSpeed(rawMachineConfiguration[110]);
-        //     if (keys.contains(120)) m_settings->setAcceleration(rawMachineConfiguration[120]);
-        //     if (keys.contains(130) && keys.contains(131) && keys.contains(132)) {
-        //         QVector3D bounds = QVector3D(
-        //             m_settings->referenceXPlus() ? -rawMachineConfiguration[130] : rawMachineConfiguration[130],
-        //             m_settings->referenceYPlus() ? -rawMachineConfiguration[131] : rawMachineConfiguration[131],
-        //             m_settings->referenceZPlus() ? -rawMachineConfiguration[132] : rawMachineConfiguration[132]
-        //         );
-        //         m_settings->setMachineBounds(bounds);
-        //         m_machineBoundsDrawer.setBorderRect(QRectF(0, 0,
-        //                                                    m_settings->referenceXPlus() ? -rawMachineConfiguration[130] : rawMachineConfiguration[130],
-        //                                                    m_settings->referenceYPlus() ? -rawMachineConfiguration[131] : rawMachineConfiguration[131]));
-        //         qDebug() << "Machine bounds (3-axis)" << bounds;
-        //     } else if (keys.contains(130) && keys.contains(131)) {
-        //         // 2 axis
-        //         QVector3D bounds = QVector3D(
-        //             m_settings->referenceXPlus() ? -rawMachineConfiguration[130] : rawMachineConfiguration[130],
-        //             m_settings->referenceYPlus() ? -rawMachineConfiguration[131] : rawMachineConfiguration[131],
-        //             0
-        //         );
-        //         m_settings->setMachineBounds(QVector3D(
-        //             m_settings->referenceXPlus() ? -rawMachineConfiguration[130] : rawMachineConfiguration[130],
-        //             m_settings->referenceYPlus() ? -rawMachineConfiguration[131] : rawMachineConfiguration[131],
-        //             0
-        //         ));
-        //         m_machineBoundsDrawer.setBorderRect(QRectF(0, 0,
-        //             m_settings->referenceXPlus() ? -rawMachineConfiguration[130] : rawMachineConfiguration[130],
-        //             m_settings->referenceYPlus() ? -rawMachineConfiguration[131] : rawMachineConfiguration[131]
-        //         ));
-        //         qDebug() << "Machine bounds (2-axis)" << bounds;
-        //     }
+        //     {...}
 
         //     //moved to settingsReceived signal handler
         //     //setupCoordsTextboxes();
@@ -513,22 +478,7 @@ void Communicator::processCommandResponse(QString data)
         // bool scrolledDown = ui->txtConsole->verticalScrollBar()->value()
         //                     == ui->txtConsole->verticalScrollBar()->maximum();
 
-        // // Update text block numbers
-        // int blocksAdded = response.count("; ");
-
-        // if (blocksAdded > 0) for (int i = 0; i < m_commands.count(); i++) {
-        //         if (m_commands[i].consoleIndex != -1) m_commands[i].consoleIndex += blocksAdded;
-        //     }
-
-        // tc.beginEditBlock();
-        // tc.movePosition(QTextCursor::EndOfBlock);
-
-        // // @TODO response is added as multiple lines, do we have to do this?
-        // tc.insertText(" < " + QString(response).replace("; ", "\r\n"));
-        // tc.endEditBlock();
-
-        // if (scrolledDown) ui->txtConsole->verticalScrollBar()->setValue(
-        //         ui->txtConsole->verticalScrollBar()->maximum());
+        // removed appending to console
     // }
 
     // Check queue
