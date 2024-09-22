@@ -20,7 +20,7 @@ varying vec4 v_color;
 varying vec2 v_position;
 varying vec2 v_start;
 varying vec2 v_texture;
-varying vec3 vWorldPosition;
+varying vec3 v_world_pos;
 
 bool isNan(float val)
 {
@@ -30,14 +30,8 @@ bool isNan(float val)
 void main()
 {
     // Calculate interpolated vertex position & line start point
-    // if (isNan(a_position.x))  {
-    //     v_position = (mv_matrix * vec4(eye, 0.0)).xy;
-    // } else {
-    //     v_position = (mv_matrix * a_position).xy;
-    // }
-
     v_position = (mv_matrix * a_position).xy;
-    vWorldPosition = a_position.xyz;
+    v_world_pos = a_position.xyz;
 
     if (!isNan(a_start.x) && !isNan(a_start.y)) {
         v_start = (mv_matrix * a_start).xy;
@@ -53,37 +47,10 @@ void main()
         if (isNan(a_start.y) && !isNan(a_start.z)) gl_PointSize = a_start.z;
     }
 
-    // if (isNan(a_position.x)) {
-    //     gl_Position = vec4(-110, -10, 0, 1) * mvp_matrix;
-    // } else {
-    // }
-        // Calculate vertex position in screen space
-        gl_Position = mvp_matrix * a_position;
-
-    // float d = distance(a_position.xyz, eye.xyz) / 10000.0;
-    // float alpha = getFogFactor(d);
-
-    float distance = (length(a_position.xyz - eye) / 150.0);
-
-    float fogDensity = 0.05;
-    float fogFactor = exp(-distance * fogDensity);
-    fogFactor = clamp(fogFactor, 0.0, 1.0);
-
-    // if (distance < 10.0) {
-    //     fogFactor = 1.0;
-    // } else {
-    //     fogFactor = 0.0;
-    // }
+    // Calculate vertex position in screen space
+    gl_Position = mvp_matrix * a_position;
 
     v_color = a_color;
-    //v_color = vec4(d, d, d, d2);
-
-    // vec4 fogColor = vec4(1.0, 0.0, 0.0, 1.0); // Kolor mgły
-    // vec4 objectColor = vec4(0.0, 1.0, 0.0, 1.0); // Kolor obiektu
-
-    // v_color = mix(fogColor, objectColor, fogFactor); // Mieszanie kolorów w zależności od odległości
-
-    //v_color.a = d;
 }
 
     `;
@@ -108,7 +75,7 @@ uniform sampler2D texture;
 uniform mat4 mvp_matrix;
 uniform mat4 mv_matrix;
 uniform vec3 eye;
-varying vec3 vWorldPosition;   // Pozycja punktu w przestrzeni świata
+varying vec3 v_world_pos;   // Pozycja punktu w przestrzeni świata
 
 bool isNan(float val)
 {
@@ -131,7 +98,7 @@ void main()
     {
         vec3 eye2 = (mvp_matrix * vec4(eye, 1.0)).xyz;
 
-        float distance = length(vWorldPosition - eye2) * 0.01; // Obliczenie odległości
+        float distance = length(v_world_pos - eye2) * 0.01; // Obliczenie odległości
 
         // Efekt mgły
         float fogDensity = 0.3;
@@ -139,11 +106,7 @@ void main()
         fogFactor = clamp(fogFactor, 0.0, 1.0);
 
         vec4 fogColor = vec4(1.0, 1.0, 1.0, 1.0); // Kolor mgły
-        // vec4 objectColor = vec4(1.0, 1.0, 1.0, 1.0); // Kolor obiektu
-
         gl_FragColor = mix(fogColor, v_color, fogFactor); // Mieszanie ko
-
-        // gl_FragColor = v_color;
     }
 }
 
