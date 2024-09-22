@@ -1,0 +1,70 @@
+<html>
+    <body>
+        <canvas id="glcanvas" width="640" height="480"></canvas>
+    </body>
+    <head>
+        <style>
+            body { margin: 0; }
+            canvas { border: 1px solid black; }
+        </style>
+        <script src="shaders.js"></script>
+        <script src="gl-matrix.js"></script>
+        <script src="webgl-debug.js"></script>
+        <script>
+
+            const ZOOMSTEP = 1.1;
+            const DEFAULT_ZOOM = 1050;
+            const MIN_ZOOM = 0.2;
+            const ONE_DEG_IN_RAD = 0.0174533;
+            const MAGIC_ZOOM_MULTIPLIER = 1.9;
+            const M_PI = Math.PI;
+
+            const GL_FLOAT_SIZE = 4;
+            const VECTOR3D_SIZE = 3 * GL_FLOAT_SIZE;
+            const VERTEX_SIZE = 3 * VECTOR3D_SIZE;
+
+            window.toRadians = glMatrix.glMatrix.toRadian;
+
+            function qIsNaN(value) {
+                return isNaN(value);
+            }
+
+        </script>
+        <script src="color.js"></script>
+        <script src="vertex.js"></script>
+        <script src="shaderprogram.js"></script>
+        <script src="shaderdrawable.js"></script>
+        <script src="glwidget.js"></script>
+        <script>
+
+            const canvas = document.querySelector("#glcanvas");
+            if (!canvas) {
+                alert("Failed to retrieve the <canvas> element");
+            }
+
+            let gl = canvas.getContext("webgl2");
+
+            // gl = WebGLDebugUtils.makeDebugContext(gl,
+            //     function (err, funcName, args) {
+            //         throw(WebGLDebugUtils.glEnumToString(err) + " was caused by call to " + funcName);
+            //     }
+            // );
+
+            const glWidget = new GLWidget();
+            setInterval(() => {
+                glWidget.paintEvent();
+                glWidget.rotate();
+            }, 10);
+
+            function fit() {
+                glWidget.fit();
+            }
+
+        </script><br/>
+        <button onClick="fit();">Fit</button>
+        <button onClick="glWidget.setLeftView();">Left</button>
+        <button onClick="glWidget.setTopView();">Top</button>
+        <button onClick="glWidget.setFrontView();">Front</button>
+        <button onClick="glWidget.setIsometricView();">Isometric</button>
+    </head>
+</html>
