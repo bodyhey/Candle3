@@ -1,6 +1,15 @@
 <html>
     <body>
-        <canvas id="glcanvas" width="640" height="480"></canvas>
+        <canvas
+            id="glcanvas"
+            width="940"
+            height="640"
+            onmousewheel="glWidget.zoom(event);"
+            onmousedown="glWidget.onMouseDown(event);"
+            onmouseup="glWidget.onMouseUp(event);"
+            onmousemove="glWidget.onMouseMove(event);"
+        >
+        </canvas>
     </body>
     <head>
         <style>
@@ -13,7 +22,7 @@
         <script>
 
             const ZOOMSTEP = 1.1;
-            const DEFAULT_ZOOM = 1050;
+            const DEFAULT_ZOOM = 500.0;
             const MIN_ZOOM = 0.2;
             const ONE_DEG_IN_RAD = 0.0174533;
             const MAGIC_ZOOM_MULTIPLIER = 1.9;
@@ -32,6 +41,7 @@
         </script>
         <script src="color.js"></script>
         <script src="vertex.js"></script>
+        <script src="test.js"></script>
         <script src="shaderprogram.js"></script>
         <script src="shaderdrawable.js"></script>
         <script src="glwidget.js"></script>

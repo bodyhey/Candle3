@@ -87,4 +87,12 @@ class ShaderProgram {
         }
         gl.vertexAttrib1f(location, value);
     }
+
+    setUniformValue(name, value) {
+        const location = gl.getUniformLocation(this.m_program, name);
+        if (location == -1) {
+            throw "Could not find " + name;
+        }
+        gl.uniform1f(location, value);
+    }
 }

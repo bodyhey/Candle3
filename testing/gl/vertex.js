@@ -27,6 +27,7 @@ class Vertexes extends Array {
             raw.push(...vertex.m_color);
             raw.push(...vertex.m_start);
         }
+        return raw;
         return new Float32Array(raw)    ;
     }
 }

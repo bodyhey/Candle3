@@ -12,20 +12,22 @@ class GLWidget {
     m_viewMatrix = glMatrix.mat4.create();// new QMatrix4x4();
     m_xRot;
     m_yRot;
-    m_xRotTarget;
-    m_yRotTarget;
+    // m_xRotTarget;
+    // m_yRotTarget;
     m_zoomDistance;
+    m_lastPos = {x: 0, y: 0};
     m_lookAt = glMatrix.vec3.create(0, 0, 0);
     m_eye = glMatrix.vec3.create();
+    m_eye2 = glMatrix.vec3.create();
     m_perspective = false;
-    m_fov = 30; m_near = 0.5; m_far = 5000.0;
+    m_fov = 30; m_near = 0.5; m_far = 15000.0;
     m_xMin = 0; m_xMax = 0;
     m_yMin = 0; m_yMax = 0;
     m_zMin = 0; m_zMax = 0;
     m_xSize = 0; m_ySize = 0; m_zSize = 0;
 
     constructor() {
-        this.m_xRot = this.m_xRotTarget = 35;
+        this.m_xRot = this.m_xRotTarget = 10;
         this.m_yRot = this.m_yRotTarget = 0;
 
         this.m_zoomDistance = DEFAULT_ZOOM;
@@ -36,7 +38,7 @@ class GLWidget {
 
     rotate() {
         //this.m_xRot++;
-        this.m_yRot+=0.2;
+        //this.m_yRot+=0.2;
         this.updateView();
         this.updateProjection();
     }
@@ -65,6 +67,12 @@ class GLWidget {
         else
             //export function ortho(out, left, right, bottom, top, near, far) {
             glMatrix.mat4.ortho(this.m_projectionMatrix, -orthoSize * aspectRatio, orthoSize * aspectRatio, -orthoSize, orthoSize, -this.m_far/2.0, this.m_far/2.0);
+
+        //const m = glMatrix.mat4.create();
+//        glMatrix.mat4.invert(m, this.m_projectionMatrix);
+        //glMatrix.mat4.identity(m);
+        //glMatrix.vec3.transformMat4(this.m_eye2, this.m_eye, m);
+        this.m_eye2 = this.m_eye;
     }
 
     updateView()
@@ -87,20 +95,18 @@ class GLWidget {
         );
 
         // zamiast `eye * m_zoomDistance`
-        //const eye2 = glMatrix.vec3.create();
+        const eye2 = glMatrix.vec3.create();
         glMatrix.vec3.multiply(eye, eye, glMatrix.vec3.fromValues(this.m_zoomDistance, this.m_zoomDistance, this.m_zoomDistance));
 
         glMatrix.mat4.lookAt(this.m_viewMatrix, eye, glMatrix.vec3.create(), glMatrix.vec3.normalize(up, up));
         //this.m_viewMatrix.lookAt(eye * m_zoomDistance, QVector3D(0,0,0), up.normalized());
         glMatrix.mat4.rotate(this.m_viewMatrix, this.m_viewMatrix, toRadians(-90), glMatrix.vec3.fromValues(1.0, 0.0, 0.0));
         // this.m_viewMatrix.rotate(-90, 1.0, 0.0, 0.0);
-        glMatrix.mat4.translate(this.m_viewMatrix, this.m_viewMatrix, this.m_lookAt);
-        // this.m_viewMatrix.translate(-m_lookAt);
+        const lookAt = glMatrix.vec3.create();
+        glMatrix.vec3.multiply(lookAt, this.m_lookAt, glMatrix.vec3.fromValues(-1, -1, -1));
+        glMatrix.mat4.translate(this.m_viewMatrix, this.m_viewMatrix, lookAt);
 
-        //console.log('vm', this.m_viewMatrix);
-//        const eye2 = glMatrix.vec3.create();
         this.m_eye = eye;
-        //console.log('eye', up);
     }
 
     fitDrawable(drawable)
@@ -172,6 +178,109 @@ class GLWidget {
         this.fitDrawable(this.m_shaderDrawables[0]);
     }
 
+    zoom(event) {
+        event.preventDefault();
+
+        if (this.m_zoomDistance > MIN_ZOOM && event.deltaY < 0)
+            this.m_zoomDistance /= ZOOMSTEP;
+        else if (event.deltaY > 0)
+            this.m_zoomDistance *= ZOOMSTEP;
+
+        if (!this.m_perspective) this.updateProjection();
+        else this.updateView();
+    }
+
+    btn = -1;
+
+    onMouseDown(event) {
+        event.preventDefault();
+
+        this.btn = event.button;
+        this.m_lastPos = {x: event.clientX, y: event.clientY};
+        this.m_xLastRot = this.m_xRot;
+        this.m_yLastRot = this.m_yRot;
+    }
+
+    normalizeAngle(angle)
+    {
+        while (angle < 0) angle += 360;
+        while (angle > 360) angle -= 360;
+
+        return angle;
+    }
+
+    onMouseMove(event) {
+        event.preventDefault();
+
+        if (this.btn == -1) return;
+
+        if (this.btn == 0 && !event.ctrlKey) {
+            this.m_yRot = this.normalizeAngle(this.m_yLastRot - (event.clientX - this.m_lastPos.x) * 0.5);
+            this.m_xRot = this.m_xLastRot + (event.clientY - this.m_lastPos.y) * 0.5;
+
+            if (this.m_xRot < -90) this.m_xRot = -90;
+            if (this.m_xRot > 90) this.m_xRot = 90;
+
+            this.updateView();
+        }
+
+        if (this.btn == 0 && event.ctrlKey) {
+            // Get world to clip
+            const mvp = glMatrix.mat4.create();
+            glMatrix.mat4.multiply(mvp, this.m_projectionMatrix, this.m_viewMatrix);
+            // Get clip to world
+            const mvpi = glMatrix.mat4.create();
+            glMatrix.mat4.invert(mvpi, mvp);
+
+            const centerVector = glMatrix.vec4.create();
+            glMatrix.vec4.transformMat4(centerVector, glMatrix.vec4.fromValues(...this.m_lookAt, 1.0), mvp);
+
+            // Get last mouse XY in clip
+            const lastMouseInWorld = glMatrix.vec4.fromValues(
+                (this.m_lastPos.x / this.width()) * 2.0 - 1.0,
+                -((this.m_lastPos.y / this.height()) * 2.0 - 1.0),
+                0,
+                1.0
+            );
+
+            // Project last mouse pos to world
+            // lastMouseInWorld = mvpi * lastMouseInWorld * centerVector.w();
+            glMatrix.vec4.multiply(lastMouseInWorld, lastMouseInWorld, glMatrix.vec4.fromValues(centerVector[3], centerVector[3], centerVector[3], centerVector[3]));
+            glMatrix.vec4.transformMat4(lastMouseInWorld, lastMouseInWorld, mvp);
+
+            // Get current mouse XY in clip
+            const currentMouseInWorld = glMatrix.vec4.fromValues(
+                (event.clientX / this.width()) * 2.0 - 1.0,
+                -((event.clientY / this.height()) * 2.0 - 1.0),
+                0,
+                1.0
+            );
+            // Project current mouse pos to world
+            glMatrix.vec4.multiply(currentMouseInWorld, currentMouseInWorld, glMatrix.vec4.fromValues(centerVector[3], centerVector[3], centerVector[3], centerVector[3]));
+            glMatrix.vec4.transformMat4(currentMouseInWorld, currentMouseInWorld, mvpi);
+            // currentMouseInWorld = mvpi * currentMouseInWorld * centerVector.w();
+
+            // Get difference
+            const difference = glMatrix.vec4.create();
+            glMatrix.vec4.subtract(difference, currentMouseInWorld, lastMouseInWorld);
+
+            //console.log(difference);
+
+            // Subtract difference from center point
+            glMatrix.vec3.subtract(this.m_lookAt, this.m_lookAt, glMatrix.vec3.fromValues(...difference));
+
+            this.m_lastPos = {x: event.clientX, y: event.clientY};
+
+            this.updateView();
+        }
+    }
+
+    onMouseUp(event) {
+        event.preventDefault();
+
+        this.btn = -1;
+    }
+
     updateExtremes(drawable) {
         const minExtremes = drawable.getMinimumExtremes();
         const maxExtremes = drawable.getMaximumExtremes();
@@ -187,6 +296,8 @@ class GLWidget {
         this.m_ySize = this.m_yMax - this.m_yMin;
         this.m_zSize = this.m_zMax - this.m_zMin;
     }
+
+    lightRot = 0;
 
     paintEvent() {
         let vertices = 0;
@@ -212,7 +323,7 @@ class GLWidget {
                 gl.enable(gl.BLEND);
             }
         }
-        if (this.m_zBuffer) gl.enable(gl.DEPTH_TEST);
+//        if (this.m_zBuffer) gl.enable(gl.DEPTH_TEST);
 
         if (this.m_shaderProgram) {
             // Draw 3d
@@ -228,6 +339,18 @@ class GLWidget {
             this.m_shaderProgram.setUniformValueMatrix("mvp_matrix", mvpMatrix);
             this.m_shaderProgram.setUniformValueMatrix("mv_matrix", this.m_viewMatrix);
             this.m_shaderProgram.setUniformValueVec3("eye", this.m_eye);
+            this.m_shaderProgram.setUniformValueVec3("u_light_color", glMatrix.vec3.fromValues(0.9, 0.6, 0.9));
+            this.m_shaderProgram.setUniformValueVec3("u_object_color", glMatrix.vec3.fromValues(1.0, 1.0, 1.0));
+
+            const light_pos = glMatrix.vec3.fromValues(1110, 1111, 11);
+            //console.log(light_pos);
+            const light_matrix = glMatrix.mat4.create();
+            glMatrix.mat4.identity(light_matrix);
+            glMatrix.mat4.rotateZ(light_matrix, light_matrix, this.lightRot);
+            this.lightRot += 0.01;
+            glMatrix.vec3.transformMat4(light_pos, light_pos, light_matrix);
+            this.m_shaderProgram.setUniformValueVec3("u_light_position", light_pos);
+            //console.log(light_pos);
 
             // Update geometries in current opengl context
             for (const drawable of this.m_shaderDrawables)
@@ -235,7 +358,7 @@ class GLWidget {
 
             // Draw geometries
             for (const drawable of this.m_shaderDrawables) {
-                drawable.draw(this.m_shaderProgram);
+                drawable.draw(this.m_shaderProgram, this.m_eye2);
                 //console.log(this.m_eye);
                 if (drawable.visible()) vertices += drawable.getVertexCount();
             }
