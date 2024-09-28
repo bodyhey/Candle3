@@ -7,6 +7,8 @@
 
 #include <QObject>
 #include "connection.h"
+#include <QTcpServer>
+#include <QTcpSocket>
 
 class RawTcpConnection : public Connection
 {
@@ -23,6 +25,16 @@ class RawTcpConnection : public Connection
         void sendLine(QString) override;
         void closeConnection() override;
         ConnectionMode getSupportedMode() override { return ConnectionMode::RAW_TCP; };
+
+    private:
+        QString m_host;
+        int m_port;
+        bool m_connected = false;
+        QString m_incoming = "";
+        QTcpSocket* m_socket = nullptr;
+        QTcpServer* m_server = nullptr;
+        void flushOutgoingData();
+        void processIncomingData();
 };
 
 #endif // RAWTCPCONNECTION_H
