@@ -21,6 +21,9 @@ bool Communicator::dataIsFloating(QString data)
     return false;
 }
 
+/**
+ * ok or error
+ */
 bool Communicator::dataIsEnd(QString data)
 {
     QStringList ends;

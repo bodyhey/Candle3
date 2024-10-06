@@ -74,10 +74,6 @@ public:
     DrawMode drawMode() const;
     void setDrawMode(const DrawMode &drawMode);
 
-signals:
-
-public slots:
-
 private slots:
     void onTimerVertexUpdate();
 

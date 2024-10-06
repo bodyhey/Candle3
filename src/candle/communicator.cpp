@@ -173,7 +173,7 @@ void Communicator::sendCommands(CommandSource source, QString commands, int tabl
     }
 }
 
-bool Communicator::streamCommands(Streamer *streamer)
+bool Communicator::streamCommands(GCode *streamer)
 {
     // if (cannot be streamed) {
     //     return false;
@@ -333,7 +333,7 @@ void Communicator::sendStreamerCommandsUntilBufferIsFull()
 
     while ((bufferLength() + command.length() + 1) <= BUFFERLENGTH
            && m_streamer->hasMoreCommands() /* commandIndex() < m_form->currentModel().rowCount() - 1 */
-           && !(!m_commands.isEmpty() && GcodePreprocessorUtils::removeComment(m_commands.last().command).contains(M230))
+           && !(!m_commands.isEmpty() && GcodePreprocessorUtils::removeComment(m_commands.last().commandLine).contains(M230))
     ) {
         m_streamer->commandSent();
         sendCommand(CommandSource::Program, command, m_streamer->commandIndex());

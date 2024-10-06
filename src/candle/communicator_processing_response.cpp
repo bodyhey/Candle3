@@ -40,7 +40,7 @@ void Communicator::onConnectionLineReceived(QString data)
     //     qDebug() << "< RST <" << data;
     // }
 
-    if (m_commands.length() > 0 && !dataIsFloating(data) && !(m_commands[0].command != "[CTRL+X]" && dataIsReset(data))) {
+    if (m_commands.length() > 0 && !dataIsFloating(data) && !(m_commands[0].commandLine != "[CTRL+X]" && dataIsReset(data))) {
         processCommandResponse(data);
 
         return;
@@ -286,8 +286,12 @@ void Communicator::processCommandResponse(QString data)
     // @TODO why static?? what is this for???
     static QString response; // Full response string
 
-    // Was opposite: if ((m_commands[0].command != "[CTRL+X]" && dataIsEnd(data)) || (m_commands[0].command == "[CTRL+X]" && dataIsReset(data))) {
-    QString firstCommand = m_commands[0].command;
+    qDebug() << "< CMD <" << data;
+
+    assert(m_commands.length() > 0);
+
+    // Was opposite: if ((m_commands[0].commandLine != "[CTRL+X]" && dataIsEnd(data)) || (m_commands[0].commandLine == "[CTRL+X]" && dataIsReset(data))) {
+    QString firstCommand = m_commands[0].commandLine;
     if ((firstCommand == "[CTRL+X]" || !dataIsEnd(data)) && (firstCommand != "[CTRL+X]" || !dataIsReset(data))) {
         response.append(data + "; ");
 
@@ -298,11 +302,8 @@ void Communicator::processCommandResponse(QString data)
 
     // Take command from buffer
     CommandAttributes commandAttributes = m_commands.takeFirst();
-    //QTextBlock tb = ui->txtConsole->document()->findBlockByNumber(ca.consoleIndex);
-    //QTextCursor tc(tb);
 
-    QString command = GcodePreprocessorUtils::removeComment(commandAttributes.command).toUpper();
-
+    QString command = GcodePreprocessorUtils::removeComment(commandAttributes.commandLine).toUpper();
 
     // Store current coordinate system
     if (command == "$G") {
@@ -481,13 +482,13 @@ void Communicator::processCommandResponse(QString data)
         // removed appending to console
     // }
 
-    // Check queue
+    // Check queue, try to send queued commands
     static bool processingQueue = false;
     if (m_queue.length() > 0 && !processingQueue) {
         processingQueue = true;
         while (m_queue.length() > 0) {
-            CommandQueue cq = m_queue.takeFirst();
-            SendCommandResult r = sendCommand(cq.source, cq.command, cq.tableIndex);
+            CommandQueue command = m_queue.takeFirst();
+            SendCommandResult r = sendCommand(command.source, command.commandLine, command.tableIndex, false, command.callback);
             if (r == SendDone) {
                 break;
             } else if (r == SendQueue) {
@@ -523,7 +524,7 @@ void Communicator::processCommandResponse(QString data)
             response.toUpper().contains("ERROR") &&
             !m_configuration->senderModule().ignoreErrorResponses()
         ) {
-            errors.append(QString::number(commandAttributes.tableIndex + 1) + ": " + commandAttributes.command + " < " + response + "\n");
+            errors.append(QString::number(commandAttributes.tableIndex + 1) + ": " + commandAttributes.commandLine + " < " + response + "\n");
 
             // @TODO move to UI
             // m_form->senderErrorBox().setText(tr("Error message(s) received:\n") + errors);
@@ -638,7 +639,7 @@ void Communicator::processCommandResponse(QString data)
 
     // @TODO is it necessary?? does it duplicate the commandResponseReceived signal???
     // Emit response signal
-    emit responseReceived(commandAttributes.command, commandAttributes.tableIndex, response);
+    emit responseReceived(commandAttributes.commandLine, commandAttributes.tableIndex, response);
 
     response.clear();
 }

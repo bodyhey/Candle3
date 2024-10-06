@@ -5,7 +5,6 @@
 #include <QDebug>
 #include <QVector3D>
 #include <QString>
-#include "config/registry.h"
 
 #define GRBL_LIVE_SOFT_RESET 0x18
 #define GRBL_LIVE_STATUS_REPORT '?'
@@ -110,47 +109,50 @@ enum CommandSource : uint8_t {
     System,
 };
 
-struct CommandAttributes {
-    CommandSource source;
-    int length;
-    int commandIndex;
-    int tableIndex;
-    QString command;
-    QString response = "";    
-
-    CommandAttributes() {
-    }
-
-    CommandAttributes(const CommandAttributes& other) {
-        source = other.source;
-        length = other.length;
-        commandIndex = other.commandIndex;
-        tableIndex = other.tableIndex;
-        command = other.command;
-        response = other.response;
-    }
-
-    CommandAttributes(CommandSource source, int commandIndex, int tableIndex, QString command) {
-        this->source = source;
-        this->length = command.length() + 1;
-        this->commandIndex = commandIndex;
-        this->tableIndex = tableIndex;
-        this->command = command;
-    }
-};
+typedef std::function<void(void *)> CommandCallback;
 
 struct CommandQueue {
-    QString command;
+    QString commandLine;
     int tableIndex;
     CommandSource source;
+    CommandCallback callback;
 
     CommandQueue() {
     }
 
-    CommandQueue(CommandSource source, QString command, int tableIndex) {
-        this->command = command;
+    CommandQueue(CommandSource source, QString commandLine, int tableIndex, CommandCallback callback = nullptr) {
+        this->commandLine = commandLine;
         this->tableIndex = tableIndex;
         this->source = source;
+        this->callback = callback;
+    }
+};
+
+struct CommandAttributes : CommandQueue {
+    int length;
+    int commandIndex; // used for console
+    QString command;
+    QString response = "";
+
+    CommandAttributes() : CommandQueue() {
+    }
+
+    CommandAttributes(const CommandAttributes& other) : CommandQueue() {
+        CommandAttributes(other.source, other.commandIndex, other.tableIndex, other.commandLine);
+        source = other.source;
+        length = other.length;
+        commandIndex = other.commandIndex;
+        tableIndex = other.tableIndex;
+        commandLine = other.commandLine;
+        response = other.response;
+        callback = other.callback;
+    }
+
+    CommandAttributes(CommandSource source, int commandIndex, int tableIndex, QString commandLine, CommandCallback callback = nullptr)
+        : CommandQueue(source, commandLine, tableIndex, callback)
+    {
+        this->length = commandLine.length() + 1;
+        this->commandIndex = commandIndex;
     }
 };
 

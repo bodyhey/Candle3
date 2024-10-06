@@ -297,7 +297,7 @@ frmGrblConfigurator::frmGrblConfigurator(QWidget *parent, Communicator *communic
 
     ui->editor->adjustToContents();
 
-    connect(ui->editor, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(itemChanged(QTreeWidgetItem*,int)));
+    connect(ui->editor, &QTreeWidget::itemChanged, this, &frmGrblConfigurator::itemChanged);
 
     update();
 }
@@ -313,9 +313,9 @@ void frmGrblConfigurator::onConfigurationReceived(MachineConfiguration configura
 
     disconnect(
         m_communicator,
-        SIGNAL(configurationReceived(MachineConfiguration,QMap<int,double>)),
+        &Communicator::configurationReceived,
         this,
-        SLOT(onConfigurationReceived(MachineConfiguration,QMap<int,double>))
+        &frmGrblConfigurator::onConfigurationReceived
     );
 
     if (m_isSaving) {
@@ -408,9 +408,9 @@ void frmGrblConfigurator::update()
 
     connect(
         m_communicator,
-        SIGNAL(configurationReceived(MachineConfiguration,QMap<int,double>)),
+        &Communicator::configurationReceived,
         this,
-        SLOT(onConfigurationReceived(MachineConfiguration,QMap<int,double>))
+        &frmGrblConfigurator::onConfigurationReceived
     );
     QTimer::singleShot(200, this, [this]() {
         m_communicator->sendCommand(CommandSource::System, "$$");

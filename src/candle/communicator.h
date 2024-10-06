@@ -2,7 +2,7 @@
 #define COMMUNICATOR_H
 
 #include "globals.h"
-#include "streamer.h"
+#include "gcode/gcode.h"
 #include "config/configuration.h"
 #include "connection/connection.h"
 #include "machine/machineconfiguration.h"
@@ -21,11 +21,11 @@ class Communicator : public QObject
             Connection *connection,
             Configuration *configuration
         );
-        SendCommandResult sendCommand(CommandSource source, QString commandLine, int tableIndex = -1, bool wait = false);
+        SendCommandResult sendCommand(CommandSource source, QString commandLine, int tableIndex = TABLE_INDEX_UI, bool wait = false, CommandCallback callback = nullptr);
         void sendRealtimeCommand(QString command);
         void sendRealtimeCommand(int command);
         void sendCommands(CommandSource source, QString commands, int tableIndex = -1);
-        bool streamCommands(Streamer *streamer);
+        bool streamCommands(GCode *streamer);
         void clearCommandsAndQueue();
         void clearQueue();
         void reset();
@@ -56,7 +56,7 @@ class Communicator : public QObject
 
         Connection *m_connection;
         Configuration *m_configuration;
-        Streamer *m_streamer = nullptr;
+        GCode *m_streamer = nullptr;
         MachineConfiguration *m_machineConfiguration = nullptr;
 
         // Queues

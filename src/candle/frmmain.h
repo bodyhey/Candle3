@@ -23,7 +23,7 @@
 #include "connection/connectionmanager.h"
 #include "drawers/cursordrawer.h"
 #include "drawers/tablesurfacedrawer.h"
-#include "streamer.h"
+#include "gcode/gcode.h"
 #include "globals.h"
 
 #include "connection/connection.h"
@@ -260,7 +260,7 @@ private:
     ConnectionManager m_connectionManager;
     Connection *m_connection;
     Communicator *m_communicator;
-    Streamer *m_streamer;
+    GCode *m_streamer;
 
     // Forms
     frmSettings *m_settings;

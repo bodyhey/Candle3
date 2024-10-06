@@ -9,7 +9,6 @@
 
 GCodeExporter::GCodeExporter()
 {
-
 }
 
 void GCodeExporter::exportToFile(GCode &gcode, const QString fileName)

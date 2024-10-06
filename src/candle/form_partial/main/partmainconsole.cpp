@@ -55,7 +55,7 @@ void partMainConsole::append(QString text)
 
 void partMainConsole::append(CommandAttributes commandAttributes)
 {
-    append(">> " + commandAttributes.command);
+    append(">> " + commandAttributes.commandLine);
 
     QTextBlock block = lastBlock();
     BlockData *blockData = new BlockData(block.blockNumber(), commandAttributes.commandIndex);

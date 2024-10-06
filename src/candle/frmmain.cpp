@@ -279,7 +279,7 @@ void frmMain::initializeCommunicator()
         nullptr,
         &m_configuration
     );
-    m_streamer = new Streamer();
+    m_streamer = new GCode();
     // @TODO temporary!
     m_communicator->streamCommands(m_streamer);
 
@@ -2373,11 +2373,11 @@ void frmMain::openPortIfNeeded()
 
 void frmMain::updateParser()
 {
-    GcodeViewParse *parser = m_currentDrawer->viewParser();
+    GcodeViewParse *viewParse = m_currentDrawer->viewParser();
 
-    GcodeParser gp;
-    gp.setTraverseSpeed(m_communicator->machineConfiguration().maxRate().x()); // uses only x axis speed
-    if (m_codeDrawer->getIgnoreZ()) gp.reset(QVector3D(qQNaN(), qQNaN(), 0));
+    GcodeParser parser;
+    parser.setTraverseSpeed(m_communicator->machineConfiguration().maxRate().x()); // uses only x axis speed
+    if (m_codeDrawer->getIgnoreZ()) parser.reset(QVector3D(qQNaN(), qQNaN(), 0));
 
     ui->tblProgram->setUpdatesEnabled(false);
 
@@ -2405,12 +2405,12 @@ void frmMain::updateParser()
         }
 
         // Add command to parser
-        gp.addCommand(args);
+        parser.addCommand(args);
 
         // Update table model
         m_currentModel->data()[i].state = GCodeItem::InQueue;
         m_currentModel->data()[i].response = QString();
-        m_currentModel->data()[i].line = gp.getCommandNumber();
+        m_currentModel->data()[i].line = parser.getCommandNumber();
 
         if (progress.isVisible() && (i % PROGRESSSTEP == 0)) {
             progress.setValue(i);
@@ -2422,13 +2422,13 @@ void frmMain::updateParser()
 
     ui->tblProgram->setUpdatesEnabled(true);
 
-    parser->reset();
+    viewParse->reset();
 
     ConfigurationParser &configurationParser = m_configuration.parserModule();
 
     updateProgramEstimatedTime(
-        parser->getLinesFromParser(
-            &gp,
+        viewParse->getLinesFromParser(
+            &parser,
             configurationParser.arcApproximationValue(),
             configurationParser.arcApproximationMode() == ConfigurationParser::ParserArcApproximationMode::ByAngle
         )

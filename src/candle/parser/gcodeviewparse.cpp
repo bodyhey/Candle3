@@ -8,8 +8,7 @@
 #include <QDebug>
 #include "gcodeviewparse.h"
 
-GcodeViewParse::GcodeViewParse(QObject *parent) :
-    QObject(parent)
+GcodeViewParse::GcodeViewParse()
 {
     absoluteMode = true;
     absoluteIJK = false;
@@ -61,13 +60,13 @@ void GcodeViewParse::testLength(const QVector3D &start, const QVector3D &end)
 
 QList<LineSegment*> GcodeViewParse::toObjRedux(QList<QString> gcode, double arcPrecision, bool arcDegreeMode)
 {
-    GcodeParser gp;
+    GcodeParser parser;
 
     foreach (QString s, gcode) {
-        gp.addCommand(s);
+        parser.addCommand(s);
     }
 
-    return getLinesFromParser(&gp, arcPrecision, arcDegreeMode);
+    return getLinesFromParser(&parser, arcPrecision, arcDegreeMode);
 }
 
 QList<LineSegment*> GcodeViewParse::getLineSegmentList()
@@ -96,9 +95,9 @@ QSize GcodeViewParse::getResolution() const
     return QSize(((m_max.x() - m_min.x()) / m_minLength) + 1, ((m_max.y() - m_min.y()) / m_minLength) + 1);
 }
 
-QList<LineSegment*> GcodeViewParse::getLinesFromParser(GcodeParser *gp, double arcPrecision, bool arcDegreeMode)
+QList<LineSegment*> GcodeViewParse::getLinesFromParser(GcodeParser *parser, double arcPrecision, bool arcDegreeMode)
 {
-    QList<PointSegment*> psl = gp->getPointSegmentList();
+    QList<PointSegment*> psl = parser->getPointSegmentList();
     // For a line segment list ALL arcs must be converted to lines.
     double minArcLength = 0.1;
     double length;
