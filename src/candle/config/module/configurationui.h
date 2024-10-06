@@ -19,6 +19,8 @@ class ConfigurationUI : public ConfigurationModule
     Q_PROPERTY(QStringList recentHeightmaps MEMBER m_recentHeightmaps NOTIFY changed)
     Q_PROPERTY(bool autoScrollGCode MEMBER m_autoScrollGCode NOTIFY changed)
     Q_PROPERTY(QString currentWorkingDirectory MEMBER m_currentWorkingDirectory NOTIFY changed)
+    Q_PROPERTY(bool lockWindows MEMBER m_lockWindows NOTIFY changed)
+    Q_PROPERTY(bool lockPanels MEMBER m_lockPanels NOTIFY changed)
 
     public:
         explicit ConfigurationUI(QObject *parent);
@@ -38,6 +40,10 @@ class ConfigurationUI : public ConfigurationModule
         bool hasAnyRecentHeightmaps() const;
         void clearRecentFiles();
         void clearRecentHeightmaps();
+        bool lockWindows() const { return m_lockWindows; }
+        void setLockWindows(bool lockWindows) { m_lockWindows = lockWindows; emit changed(); }
+        bool lockPanels() const { return m_lockPanels; }
+        void setLockPanels(bool lockPanels) { m_lockPanels = lockPanels; emit changed(); }
 
     private:
         static const int MAX_RECENT_FILES = 10;
@@ -47,6 +53,8 @@ class ConfigurationUI : public ConfigurationModule
         QStringList m_recentHeightmaps;
         bool m_autoScrollGCode;
         QString m_currentWorkingDirectory;
+        bool m_lockWindows;
+        bool m_lockPanels;
 };
 
 #endif // CONFIGURATIONUI_H

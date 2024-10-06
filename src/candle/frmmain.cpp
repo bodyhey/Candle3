@@ -624,6 +624,9 @@ void frmMain::on_actViewLockWindows_toggled(bool checked)
     foreach (QDockWidget *d, dl) {
         d->setFeatures(checked ? QDockWidget::NoDockWidgetFeatures : QDockWidget::AllDockWidgetFeatures);
     }
+
+    ConfigurationUI &uiConfiguration = m_configuration.uiModule();
+    uiConfiguration.setLockWindows(checked);
 }
 
 void frmMain::on_cmdFileOpen_clicked()
@@ -2111,8 +2114,6 @@ void frmMain::loadSettings()
     // m_settings->restoreGeometry(set.value("formSettingsGeometry").toByteArray());
     m_settings->ui->splitMain->restoreState(set.value("settingsSplitMain").toByteArray());
 
-    emit settingsLoaded();
-
     // Shortcuts
     qRegisterMetaTypeStreamOperators<ShortcutsMap>("ShortcutsMap");
     
@@ -2127,12 +2128,15 @@ void frmMain::loadSettings()
     }
 
     // Menu
-    ui->actViewLockWindows->setChecked(set.value("lockWindows").toBool());
-    ui->actViewLockPanels->setChecked(set.value("lockPanels").toBool());
-
+    ConfigurationUI &uiConfiguration = m_configuration.uiModule();
+    ui->actViewLockWindows->setChecked(uiConfiguration.lockWindows());
+    ui->actViewLockPanels->setChecked(uiConfiguration.lockPanels());
+    // @TODO move to configuration form
     m_settings->restoreGeometry(set.value("formSettingsGeometry", m_settings->saveGeometry()).toByteArray());
 
     m_settingsLoading = false;
+
+    emit settingsLoaded();
 }
 
 void frmMain::saveSettings()
@@ -2143,7 +2147,7 @@ void frmMain::saveSettings()
     emit settingsAboutToSave();
 
     ConfigurationUI &uiConfiguration = m_configuration.uiModule();
-    ConfigurationJogging &joggingConfiguration = m_configuration.joggingModule();
+    // ConfigurationJogging &joggingConfiguration = m_configuration.joggingModule();
 
     m_configuration.machineModule().setSpindleSpeed(ui->slbSpindle->value());
     uiConfiguration.setAutoScrollGCode(ui->chkAutoScrollGCode->isChecked());
@@ -2196,8 +2200,10 @@ void frmMain::saveSettings()
     set.setValue("collapsedPanels", collapsedPanels);
 
     // Menu
-    set.setValue("lockWindows", ui->actViewLockWindows->isChecked());
-    set.setValue("lockPanels", ui->actViewLockPanels->isChecked());
+    // set.setValue("lockWindows", ui->actViewLockWindows->isChecked());
+    // set.setValue("lockPanels", ui->actViewLockPanels->isChecked());
+    uiConfiguration.setLockPanels(ui->actViewLockPanels->isChecked());
+    uiConfiguration.setLockWindows(ui->actViewLockWindows->isChecked());
 
     m_configuration.save();
 

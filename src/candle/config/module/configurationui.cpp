@@ -10,7 +10,9 @@ const QMap<QString,QVariant> DEFAULTS = {
     {"recentFiles", QStringList{"a.txt", "b.txt", "c.txt"}},
     {"recentHeightmaps", QStringList{"map1.txt", "map2.txt", "map3.txt"}},
     {"autoScrollGCode", true},
-    {"lastFileOpenDir", ""}
+    {"lastFileOpenDir", ""},
+    {"lockWindows", false},
+    {"lockPanels", false}
 };
 
 ConfigurationUI::ConfigurationUI(QObject *parent) : ConfigurationModule(parent, DEFAULTS)
