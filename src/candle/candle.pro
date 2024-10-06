@@ -88,6 +88,9 @@ SOURCES += main.cpp\
     drawers/shaderdrawable.cpp \
     drawers/tooldrawer.cpp \
     drawers/machineboundsdrawer.cpp \
+    gcode/gcode.cpp \
+    gcode/gcodeexporter.cpp \
+    gcode/gcodeloader.cpp \
     heightmap.cpp \
     machine/machineconfiguration.cpp \
     module/pendant/pendant.cpp \
@@ -97,7 +100,6 @@ SOURCES += main.cpp\
     parser/gcodeviewparse.cpp \
     parser/linesegment.cpp \
     parser/pointsegment.cpp \
-    streamer.cpp \
     tables/gcodetablemodel.cpp \
     tables/heightmaptablemodel.cpp \
     widgets/combobox.cpp \
@@ -160,6 +162,9 @@ HEADERS  += frmmain.h \
     drawers/shaderdrawable.h \
     drawers/tooldrawer.h \
     drawers/machineboundsdrawer.h \
+    gcode/gcode.h \
+    gcode/gcodeexporter.h \
+    gcode/gcodeloader.h \
     globals.h \
     heightmap.h \
     machine/machineconfiguration.h \
@@ -170,7 +175,6 @@ HEADERS  += frmmain.h \
     parser/gcodeviewparse.h \
     parser/linesegment.h \
     parser/pointsegment.h \
-    streamer.h \
     tables/gcodetablemodel.h \
     tables/heightmaptablemodel.h \
     utils/interpolation.h \
