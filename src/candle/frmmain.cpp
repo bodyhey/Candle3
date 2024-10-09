@@ -2024,7 +2024,7 @@ void frmMain::loadSettings()
 
     emit settingsAboutToLoad();
 
-    this->restoreGeometry(set.value("formGeometry", QByteArray()).toByteArray());
+//    this->restoreGeometry(set.value("formGeometry", QByteArray()).toByteArray());
 
     // ui->cboCommand->setMinimumHeight(ui->cboCommand->height());
     // ui->cmdClearConsole->setFixedHeight(ui->cboCommand->height());
@@ -2111,7 +2111,7 @@ void frmMain::loadSettings()
     // setupCoordsTextboxes();
 
     // Settings form geometry
-    // m_settings->restoreGeometry(set.value("formSettingsGeometry").toByteArray());
+    m_settings->restoreGeometry(set.value("formSettingsGeometry").toByteArray());
     m_settings->ui->splitMain->restoreState(set.value("settingsSplitMain").toByteArray());
 
     // Shortcuts
@@ -2131,8 +2131,9 @@ void frmMain::loadSettings()
     ConfigurationUI &uiConfiguration = m_configuration.uiModule();
     ui->actViewLockWindows->setChecked(uiConfiguration.lockWindows());
     ui->actViewLockPanels->setChecked(uiConfiguration.lockPanels());
+    m_settings->setGeometry(uiConfiguration.settingsFormGeometry());
     // @TODO move to configuration form
-    m_settings->restoreGeometry(set.value("formSettingsGeometry", m_settings->saveGeometry()).toByteArray());
+    //m_settings->restoreGeometry(set.value("formSettingsGeometry", m_settings->saveGeometry()).toByteArray());
 
     m_settingsLoading = false;
 
@@ -2154,8 +2155,10 @@ void frmMain::saveSettings()
 
     set.setValue("header", ui->tblProgram->horizontalHeader()->saveState());
     set.setValue("settingsSplitMain", m_settings->ui->splitMain->saveState());
-    set.setValue("formGeometry", this->saveGeometry());
-    set.setValue("formSettingsGeometry", m_settings->saveGeometry());
+//    set.setValue("formGeometry", this->saveGeometry());
+//    set.setValue("formSettingsGeometry", m_settings->saveGeometry());
+    uiConfiguration.setMainFormGeometry(this->geometry());
+    uiConfiguration.setSettingsFormGeometry(m_settings->geometry());
 
     // joggingConfiguration.setJogStep(ui->cboJogStep->currentText().toDouble());
     // joggingConfiguration.setJogFeed(ui->cboJogFeed->currentText().toInt());

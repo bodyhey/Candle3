@@ -4,6 +4,7 @@
 
 #include "configurationmodule.h"
 #include <QColor>
+#include <QRect>
 #include <QVector3D>
 
 ConfigurationModule::ConfigurationModule(QObject *parent, QMap<QString, QVariant> defaults) : QObject(parent), m_defaults(defaults)
@@ -59,6 +60,27 @@ ConfigurationModule::ConfigurationModule(QObject *parent, QMap<QString, QVariant
                 map["y"].toFloat(),
                 map["z"].toFloat()
             ));
+        }
+    );
+    ConfigurationRegistry::registerStruct(
+        "QRect",
+        [](const char* data) -> QVariantMap {
+            QRect *rect = (QRect*)data;
+
+            return {
+                {"x", rect->x()},
+                {"y", rect->y()},
+                {"width", rect->width()},
+                {"height", rect->height()},
+            };
+        },
+        [](QVariantMap map) -> QVariant {
+            return QVariant::fromValue(QRect{
+                map["x"].toInt(),
+                map["y"].toInt(),
+                map["width"].toInt(),
+                map["height"].toInt()
+            });
         }
     );
     ConfigurationRegistry::registerValue(

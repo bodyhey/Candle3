@@ -6,6 +6,7 @@
 #define CONFIGURATIONUI_H
 
 #include <QObject>
+#include <QRect>
 #include "configurationmodule.h"
 
 class ConfigurationUI : public ConfigurationModule
@@ -21,6 +22,8 @@ class ConfigurationUI : public ConfigurationModule
     Q_PROPERTY(QString currentWorkingDirectory MEMBER m_currentWorkingDirectory NOTIFY changed)
     Q_PROPERTY(bool lockWindows MEMBER m_lockWindows NOTIFY changed)
     Q_PROPERTY(bool lockPanels MEMBER m_lockPanels NOTIFY changed)
+    Q_PROPERTY(QRect settingsFormGeometry MEMBER m_settingsFormGeometry NOTIFY changed)
+    Q_PROPERTY(QRect mainFormGeometry MEMBER m_mainFormGeometry NOTIFY changed)
 
     public:
         explicit ConfigurationUI(QObject *parent);
@@ -44,6 +47,10 @@ class ConfigurationUI : public ConfigurationModule
         void setLockWindows(bool lockWindows) { m_lockWindows = lockWindows; emit changed(); }
         bool lockPanels() const { return m_lockPanels; }
         void setLockPanels(bool lockPanels) { m_lockPanels = lockPanels; emit changed(); }
+        QRect settingsFormGeometry() const { return m_settingsFormGeometry; }
+        void setSettingsFormGeometry(const QRect &geometry) { m_settingsFormGeometry = geometry; emit changed(); }\
+        QRect mainFormGeometry() const { return m_mainFormGeometry; }
+        void setMainFormGeometry(const QRect &geometry) { m_mainFormGeometry = geometry; emit changed(); }
 
     private:
         static const int MAX_RECENT_FILES = 10;
@@ -55,6 +62,8 @@ class ConfigurationUI : public ConfigurationModule
         QString m_currentWorkingDirectory;
         bool m_lockWindows;
         bool m_lockPanels;
+        QRect m_mainFormGeometry;
+        QRect m_settingsFormGeometry;
 };
 
 #endif // CONFIGURATIONUI_H
