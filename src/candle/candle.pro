@@ -93,6 +93,10 @@ SOURCES += main.cpp\
     gcode/gcodeloader.cpp \
     heightmap.cpp \
     machine/machineconfiguration.cpp \
+    module/camera/camera.cpp \
+    module/camera/qvideoframeconversionhelper.cpp \
+    module/camera/videosurface.cpp \
+    module/camera/viewfinder.cpp \
     module/pendant/pendant.cpp \
     parser/arcproperties.cpp \
     parser/gcodeparser.cpp \
@@ -168,6 +172,10 @@ HEADERS  += frmmain.h \
     globals.h \
     heightmap.h \
     machine/machineconfiguration.h \
+    module/camera/camera.h \
+    module/camera/qvideoframeconversionhelper.h \
+    module/camera/videosurface.h \
+    module/camera/viewfinder.h \
     module/pendant/pendant.h \
     parser/arcproperties.h \
     parser/gcodeparser.h \
@@ -198,7 +206,8 @@ FORMS    += frmmain.ui \
     frmdebug.ui \
     frmgrblconfigurator.ui \
     frmsettings.ui \
-    frmabout.ui
+    frmabout.ui \
+    module/camera/camera.ui
 
 DEFINES += _USE_MATH_DEFINES
 
