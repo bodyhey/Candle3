@@ -56,8 +56,6 @@
 #include <QMediaRecorder>
 #include <QScopedPointer>
 
-#include <QMainWindow>
-
 #include "videosurface.h"
 #include "viewfinder.h"
 
@@ -65,12 +63,12 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class Camera; }
 QT_END_NAMESPACE
 
-class Camera : public QMainWindow
+class Camera : public QWidget
 {
     Q_OBJECT
 
 public:
-    Camera();
+    Camera(QWidget* parent = nullptr);
 
 private slots:
     void setCamera(const QCameraInfo &cameraInfo);
@@ -134,8 +132,8 @@ private:
     bool m_isCapturingImage = false;
     bool m_applicationExiting = false;
 
-    VideoSurface *surface_ptr_;
-    ViewFinder *view_finder_ptr;
+    VideoSurface *m_videoSurface;
+    ViewFinder *m_viewFinder;
 };
 
 #endif

@@ -28,6 +28,7 @@
 #include "ui_partmainoverride.h"
 #include "widgets/widgetmimedata.h"
 #include "connection/connectionmanager.h"
+#include "module/camera/camera.h"
 
 #define FILE_FILTER_TEXT "G-Code files (*.nc *.ncc *.ngc *.tap *.gc *.gcode *.txt)"
 
@@ -262,6 +263,14 @@ frmMain::frmMain(QWidget *parent) :
     m_timerToolAnimation.start(25, this);
 
     Pendant *pendant = new Pendant(this, *m_communicator);
+
+    QDockWidget *dock = new QDockWidget(tr("Camera"), this);
+
+    Camera *camera = new Camera();
+
+    dock->setWidget(camera);
+    dock->setParent(this);
+    dock->show();
 }
 
 frmMain::~frmMain()

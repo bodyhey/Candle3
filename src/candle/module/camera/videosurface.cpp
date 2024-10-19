@@ -122,8 +122,6 @@ bool VideoSurface::present(const QVideoFrame &frame_)
 {
     if(frame_.isValid())
     {
-        // QImage img;// = frame.image();
-
         QVideoFrame frame = frame_;
         QImage result;
 

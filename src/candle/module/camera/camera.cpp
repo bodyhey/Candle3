@@ -66,7 +66,7 @@
 
 Q_DECLARE_METATYPE(QCameraInfo)
 
-Camera::Camera() : ui(new Ui::Camera)
+Camera::Camera(QWidget* parent) : QWidget(parent), ui(new Ui::Camera)
 {
     ui->setupUi(this);
 
@@ -83,14 +83,14 @@ Camera::Camera() : ui(new Ui::Camera)
         ui->menuDevices->addAction(videoDeviceAction);
     }
 
-    surface_ptr_ = new VideoSurface();
-    view_finder_ptr = new ViewFinder(ui->viewfinderPage);
-    view_finder_ptr->setGeometry(0,0,430,350);
-    view_finder_ptr->show();
+    m_videoSurface = new VideoSurface();
+    m_viewFinder = new ViewFinder(ui->viewfinderPage);
+    m_viewFinder->setGeometry(0,0,430,350);
+    m_viewFinder->show();
 
     connect(videoDevicesGroup, &QActionGroup::triggered, this, &Camera::updateCameraDevice);
     connect(ui->captureWidget, &QTabWidget::currentChanged, this, &Camera::updateCaptureMode);
-    connect(surface_ptr_, &VideoSurface::image, this, &Camera::onUpdateImage);
+    connect(m_videoSurface, &VideoSurface::image, this, &Camera::onUpdateImage);
 
     setCamera(QCameraInfo::defaultCamera());
 }
@@ -115,7 +115,7 @@ void Camera::setCamera(const QCameraInfo &cameraInfo)
 
     connect(ui->exposureCompensation, &QAbstractSlider::valueChanged, this, &Camera::setExposureCompensation);
 
-    m_camera->setViewfinder(surface_ptr_);
+    m_camera->setViewfinder(m_videoSurface);
 
     updateCameraState(m_camera->state());
     updateLockStatus(m_camera->lockStatus(), QCamera::UserRequest);
@@ -159,8 +159,8 @@ void Camera::keyPressEvent(QKeyEvent * event)
         }
         event->accept();
         break;
-    default:
-        QMainWindow::keyPressEvent(event);
+    // default:
+    //     QMainWindow::keyPressEvent(event);
     }
 }
 
@@ -173,15 +173,15 @@ void Camera::keyReleaseEvent(QKeyEvent *event)
     case Qt::Key_CameraFocus:
         m_camera->unlock();
         break;
-    default:
-        QMainWindow::keyReleaseEvent(event);
+    // default:
+    //     QMainWindow::keyReleaseEvent(event);
     }
 }
 
 void Camera::updateRecordTime()
 {
     QString str = QString("Recorded %1 sec").arg(m_mediaRecorder->duration()/1000);
-    ui->statusbar->showMessage(str);
+//    ui->statusbar->showMessage(str);
 }
 
 void Camera::processCapturedImage(int requestId, const QImage& img)
@@ -289,19 +289,19 @@ void Camera::updateLockStatus(QCamera::LockStatus status, QCamera::LockChangeRea
     switch (status) {
     case QCamera::Searching:
         indicationColor = Qt::yellow;
-        ui->statusbar->showMessage(tr("Focusing..."));
+        //ui->statusbar->showMessage(tr("Focusing..."));
         ui->lockButton->setText(tr("Focusing..."));
         break;
     case QCamera::Locked:
         indicationColor = Qt::darkGreen;
         ui->lockButton->setText(tr("Unlock"));
-        ui->statusbar->showMessage(tr("Focused"), 2000);
+        //ui->statusbar->showMessage(tr("Focused"), 2000);
         break;
     case QCamera::Unlocked:
         indicationColor = reason == QCamera::LockFailed ? Qt::red : Qt::black;
         ui->lockButton->setText(tr("Focus"));
-        if (reason == QCamera::LockFailed)
-            ui->statusbar->showMessage(tr("Focus Failed"), 2000);
+        // if (reason == QCamera::LockFailed)
+        //     ui->statusbar->showMessage(tr("Focus Failed"), 2000);
     }
 
     QPalette palette = ui->lockButton->palette();
@@ -419,7 +419,7 @@ void Camera::readyForCapture(bool ready)
 void Camera::imageSaved(int id, const QString &fileName)
 {
     Q_UNUSED(id);
-    ui->statusbar->showMessage(tr("Captured \"%1\"").arg(QDir::toNativeSeparators(fileName)));
+//    ui->statusbar->showMessage(tr("Captured \"%1\"").arg(QDir::toNativeSeparators(fileName)));
 
     m_isCapturingImage = false;
     if (m_applicationExiting)
@@ -439,5 +439,5 @@ void Camera::closeEvent(QCloseEvent *event)
 
 void Camera::onUpdateImage(const QPixmap &pixmap)
 {
-    view_finder_ptr->setPixmap(pixmap);
+    m_viewFinder->setPixmap(pixmap);
 }
