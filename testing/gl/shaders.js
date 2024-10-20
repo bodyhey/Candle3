@@ -21,7 +21,7 @@ varying vec3 v_position;
 varying vec2 v_start;
 varying vec3 v_normal;
 varying vec2 v_texture;
-varying vec3 v_world_pos;
+varying float v_z;
 varying vec3 v_light_direction;
 
 // bool isNan(float val)
@@ -31,6 +31,8 @@ varying vec3 v_light_direction;
 
 void main()
 {
+    v_z = a_position.z;
+
 //    vec4 vertex_position = mv_matrix * vec4(a_position.xyz, 1.0);
     vec4 vertex_position = vec4(a_position.xyz, 1.0);
 //    v_normal = (mv_matrix * a_normal).xyz;
@@ -59,11 +61,12 @@ precision mediump float;
 //Dash grid (px) = factor * pi;
 // const float factor = 2.0;
 
-//varying vec4 v_color;
+varying vec4 v_color;
 varying vec3 v_position;
 varying vec3 v_normal;
 // varying vec2 v_texture;
 varying vec3 v_light_direction;
+varying float v_z;
 
 uniform sampler2D texture;
 uniform mat4 mvp_matrix;
@@ -136,14 +139,23 @@ void main()
     vec3 viewDir = normalize(v_position - eye);
 
     // Wektor normalny (iloczyn wektorowy wektora widzenia i kierunku linii)
-    vec3 normal = normalize(cross(viewDir, lineDir));
+    vec3 normal = normalize(cross(viewDir, v_normal));
 
     // Cieniowanie z użyciem normalnego wektora
     // Możesz tu dodać obliczenia oświetlenia np. Phonga
     // ...
 
-    // Wynik shadera
-    gl_FragColor = vec4(normal, 1.0);
-}
+    vec4 c1 = vec4(0.0, 0.0, 1.0, 1.0);
+    vec4 c2 = vec4(1.0, 0.0, 0.0, 1.0);
 
+    vec3 lightDir = vec3(0.0, 0.0, 1.0);
+    vec4 baseColor = vec4(1.0, 0.0, 0.0, 1.0);
+    vec4 green = vec4(0.0, 1.0, 1.0, 1.0);
+
+    //float brightness = max(dot(viewDir, v_normal) + 0.1, 0.0) * 1.0;
+    //float brightness = mix(c1, c2, v_z);
+
+    gl_FragColor = mix(baseColor, green, (v_z + 15.0 ) / 30.0);
+    //vec4(baseColor * brightness, 1.0);
+}
     `;
