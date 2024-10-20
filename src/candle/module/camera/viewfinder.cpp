@@ -3,36 +3,39 @@
 #include <QPaintEvent>
 #include <QImage>
 
-ViewFinder::ViewFinder(QWidget* parent)
-    :QLabel(parent)
+ViewFinder::ViewFinder(VideoSurface *videoSurface, QWidget* parent)
+    : QLabel(parent), m_videoSurface(videoSurface)
 {
-
+    connect(m_videoSurface, &VideoSurface::realSizeChanged, [this](const QSize &size) {
+        this->setMaximumSize(16777215, size.height());
+    });
 }
 
 ViewFinder::~ViewFinder()
 {
+}
 
+void ViewFinder::resizeEvent(QResizeEvent *event)
+{
+    m_videoSurface->setDisplaySize(event->size().width(), event->size().height());
+    QWidget::resizeEvent(event);
 }
 
 void ViewFinder::paintEvent(QPaintEvent* event)
 {
    QLabel::paintEvent(event);
 
-   QString rect_path = ":/images/face_detect_bg.png";
-   QImage img(rect_path);
-
+   const int wh = this->width() / 2;
+   const int hh = this->height() / 2;
 
 
    QPainter painter(this);
    QPen pen = painter.pen();
+
    pen.setColor(Qt::red);
-   pen.setWidth(5);
+   pen.setWidth(3);
    painter.setPen(pen);
-   painter.drawLine(this->width() / 2, 0, this->width() / 2, this->height());
-   painter.drawLine(0, this->height() / 2, this->width(), this->height() / 2);
-   // painter.drawImage(
-   //     (this->width() - img.width()) / 2,
-   //     (this->height() - img.height()) / 2,
-   //     img
-   //     );
+
+   painter.drawLine(wh, 0, wh, this->height());
+   painter.drawLine(0, hh, this->width(), hh);
 }

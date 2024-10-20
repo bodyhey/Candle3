@@ -125,8 +125,9 @@ bool VideoSurface::present(const QVideoFrame &frame_)
         QVideoFrame frame = frame_;
         QImage result;
 
-        if (!frame.map(QAbstractVideoBuffer::ReadOnly))
+        if (!frame.map(QAbstractVideoBuffer::ReadOnly)) {
             return false;
+        }
 
         // Formats supported by QImage don't need conversion
         QImage::Format imageFormat = QVideoFrame::imageFormatFromPixelFormat(frame.pixelFormat());
@@ -157,10 +158,23 @@ bool VideoSurface::present(const QVideoFrame &frame_)
 
         frame.unmap();
 
-        QPixmap pixmap = QPixmap::fromImage(result);
-        emit image(pixmap);
+        QImage scaled = result.scaledToWidth(
+            this->m_maxSize.width(),
+            Qt::SmoothTransformation
+        );
+        if (m_realSize != scaled.size()) {
+            m_realSize = scaled.size();
+            emit realSizeChanged(m_realSize);
+        }
+
+        emit image(QPixmap::fromImage(scaled));
 
         return true;
     }
     return false;
-};
+}
+
+void VideoSurface::setDisplaySize(int width, int height)
+{
+    m_maxSize = QSize(width, height);
+}

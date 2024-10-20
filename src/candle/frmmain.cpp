@@ -271,6 +271,8 @@ frmMain::frmMain(QWidget *parent) :
     dock->setWidget(camera);
     dock->setParent(this);
     dock->show();
+
+    updateLayouts();
 }
 
 frmMain::~frmMain()

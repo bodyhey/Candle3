@@ -104,16 +104,17 @@ private slots:
     void processCapturedImage(int requestId, const QImage &img);
     void updateLockStatus(QCamera::LockStatus, QCamera::LockChangeReason);
 
-    void displayViewfinder();
-    void displayCapturedImage();
+    // void displayViewfinder();
+    // void displayCapturedImage();
 
     void readyForCapture(bool ready);
     void imageSaved(int id, const QString &fileName);
 
 protected:
-    void keyPressEvent(QKeyEvent *event) override;
-    void keyReleaseEvent(QKeyEvent *event) override;
-    void closeEvent(QCloseEvent *event) override;
+    // void keyPressEvent(QKeyEvent *event) override;
+    // void keyReleaseEvent(QKeyEvent *event) override;
+    // void closeEvent(QCloseEvent *event) override;
+    //void resizeEvent(QResizeEvent *event) override;
 
 private slots:
     void onUpdateImage(const QPixmap &);
