@@ -90,3 +90,15 @@ void partMainControl::onCmdDoorClicked()
 void partMainControl::onCmdFloodClicked(bool checked)
 {
 }
+
+void partMainControl::onCmdProbeClicked()
+{
+}
+
+void partMainControl::onCmdZeroZClicked()
+{
+}
+
+void partMainControl::onCmdZeroXYClicked()
+{
+}

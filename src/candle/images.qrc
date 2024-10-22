@@ -43,5 +43,11 @@
         <file>images/gpilot_icon.png</file>
         <file>images/gpilot.ico</file>
         <file>images/toggle.png</file>
+        <file>images/search_for_z.png</file>
+        <file>images/search_z.svg</file>
+        <file>images/axis_zero.png</file>
+        <file>images/axis_zero.svg</file>
+        <file>images/zero_z.png</file>
+        <file>images/zero_z.svg</file>
     </qresource>
 </RCC>
