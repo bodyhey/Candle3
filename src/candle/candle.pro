@@ -1,13 +1,15 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2014-05-23T17:51:21
-#
-#-------------------------------------------------
+QT = core gui opengl serialport uitools network xml
+QT += multimedia multimediawidgets
 
-QT       = core gui opengl serialport uitools
-equals(QT_MAJOR_VERSION, 5): QT += widgets network
+equals(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 12) {
+    message("Cannot use Qt $${QT_VERSION}")
+    error("Use Qt 5.12 or newer")
+}
 
-DEFINES += DEBUG_UCNC_COMMUNICATION=1
+VERSION=1.0.0.0
+
+# DEFINES += DEBUG_UCNC_COMMUNICATION=1
+# DEFINES += DEBUG_RAW_TCP_COMMUNICATION=1
 
 win32: {
     QT += winextras
@@ -42,6 +44,7 @@ TEMPLATE = app
 RC_ICONS = images/gpilot.ico
 
 DEFINES += sNan=\"65536\"
+# DEFINES += QLocale\:\:AnyTerritory=\"0\"
 
 TRANSLATIONS += translations/candle_en.ts translations/candle_ru.ts translations/candle_es.ts translations/candle_fr.ts translations/candle_pt.ts
 
