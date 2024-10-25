@@ -459,7 +459,7 @@ QLabel[overrided=&quot;false&quot;] {
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>765</height>
+          <height>761</height>
          </rect>
         </property>
         <property name="acceptDrops">
@@ -1234,8 +1234,23 @@ QLabel[overrided=&quot;false&quot;] {
      </property>
      <item>
       <widget class="QScrollArea" name="scrollArea_2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="frameShape">
         <enum>QFrame::Shape::NoFrame</enum>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustIgnored</enum>
        </property>
        <property name="widgetResizable">
         <bool>true</bool>
@@ -1246,13 +1261,16 @@ QLabel[overrided=&quot;false&quot;] {
           <x>0</x>
           <y>0</y>
           <width>105</width>
-          <height>526</height>
+          <height>476</height>
          </rect>
         </property>
         <property name="acceptDrops">
          <bool>true</bool>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_13" stretch="0,0,0,0,0,1">
+         <property name="sizeConstraint">
+          <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+         </property>
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -1285,7 +1303,7 @@ QLabel[overrided=&quot;false&quot;] {
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>30</height>
+                <height>0</height>
                </size>
               </property>
              </widget>
@@ -1329,7 +1347,7 @@ QLabel[overrided=&quot;false&quot;] {
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>30</height>
+                <height>0</height>
                </size>
               </property>
              </widget>
@@ -1351,63 +1369,9 @@ QLabel[overrided=&quot;false&quot;] {
            <property name="overrided" stdset="0">
             <bool>false</bool>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <layout class="QVBoxLayout" name="verticalLayout_11">
             <item>
-             <widget class="QWidget" name="spindle" native="true">
-              <layout class="QHBoxLayout" name="horizontalLayout_5">
-               <property name="spacing">
-                <number>10</number>
-               </property>
-               <property name="leftMargin">
-                <number>0</number>
-               </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>0</number>
-               </property>
-               <property name="bottomMargin">
-                <number>0</number>
-               </property>
-               <item>
-                <widget class="SliderBox" name="slbSpindle" native="true">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="StyledToolButton" name="cmdSpindle">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="toolTip">
-                  <string>Spindle on/off</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="images.qrc">
-                   <normaloff>:/images/cutter.png</normaloff>:/images/cutter.png</iconset>
-                 </property>
-                 <property name="iconSize">
-                  <size>
-                   <width>32</width>
-                   <height>32</height>
-                  </size>
-                 </property>
-                 <property name="checkable">
-                  <bool>true</bool>
-                 </property>
-                 <property name="adjustSize" stdset="0">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
+             <widget class="partMainSpindle" name="spindle" native="true"/>
             </item>
            </layout>
           </widget>
@@ -1425,14 +1389,7 @@ QLabel[overrided=&quot;false&quot;] {
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_11">
             <item>
-             <widget class="partMainJog" name="jog" native="true">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>50</height>
-               </size>
-              </property>
-             </widget>
+             <widget class="partMainJog" name="jog" native="true"/>
             </item>
            </layout>
           </widget>
@@ -1814,7 +1771,7 @@ QLabel[overrided=&quot;false&quot;] {
           <x>0</x>
           <y>0</y>
           <width>105</width>
-          <height>169</height>
+          <height>215</height>
          </rect>
         </property>
         <property name="acceptDrops">
@@ -2218,15 +2175,6 @@ QLabel[overrided=&quot;false&quot;] {
    <header>styledtoolbutton.h</header>
   </customwidget>
   <customwidget>
-   <class>SliderBox</class>
-   <extends>QWidget</extends>
-   <header>sliderbox.h</header>
-   <container>1</container>
-   <slots>
-    <slot>click()</slot>
-   </slots>
-  </customwidget>
-  <customwidget>
    <class>GLWidget</class>
    <extends>QWidget</extends>
    <header location="global">widgets/glwidget.h</header>
@@ -2266,6 +2214,12 @@ QLabel[overrided=&quot;false&quot;] {
    <class>partMainOverride</class>
    <extends>QWidget</extends>
    <header location="global">form_partial/main/partmainoverride.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>partMainSpindle</class>
+   <extends>QWidget</extends>
+   <header location="global">form_partial/main/partmainspindle.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -2579,22 +2533,6 @@ QLabel[overrided=&quot;false&quot;] {
     <hint type="destinationlabel">
      <x>1391</x>
      <y>994</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actSpindleOnOff</sender>
-   <signal>triggered()</signal>
-   <receiver>cmdSpindle</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>276</x>
-     <y>707</y>
     </hint>
    </hints>
   </connection>

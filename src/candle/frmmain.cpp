@@ -110,12 +110,16 @@ frmMain::frmMain(QWidget *parent) :
         ui->state->setVisible(checked);
     });
     connect(ui->grpSpindle, &QGroupBox::toggled, this, [=](bool checked) {
+        updateLayouts();
+        ui->spindle->setVisible(checked);
+    });
+    connect(ui->grpSpindle, &QGroupBox::toggled, this, [=](bool checked) {
         ui->grpSpindle->setProperty("overrided", checked);
         style()->unpolish(ui->grpSpindle);
         ui->grpSpindle->ensurePolished();
 
         if (checked) {
-            if (!ui->grpSpindle->isChecked()) ui->grpSpindle->setTitle(tr("Spindle") + QString(tr(" (%1)")).arg(ui->slbSpindle->value()));
+            // if (!ui->grpSpindle->isChecked()) ui->grpSpindle->setTitle(tr("Spindle") + QString(tr(" (%1)")).arg(ui->slbSpindle->value()));
         } else {
             ui->grpSpindle->setTitle(tr("Spindle"));
         }
@@ -234,11 +238,11 @@ frmMain::frmMain(QWidget *parent) :
     }
 
     // Setting up spindle slider box
-    ui->slbSpindle->setTitle(tr("Speed:"));
-    ui->slbSpindle->setCheckable(false);
-    ui->slbSpindle->setChecked(true);
-    connect(ui->slbSpindle, &SliderBox::valueUserChanged, this, &frmMain::onSlbSpindleValueUserChanged);
-    connect(ui->slbSpindle, &SliderBox::valueChanged, this, &frmMain::onSlbSpindleValueChanged);
+    // ui->slbSpindle->setTitle(tr("Speed:"));
+    // ui->slbSpindle->setCheckable(false);
+    // ui->slbSpindle->setChecked(true);
+    // connect(ui->slbSpindle, &SliderBox::valueUserChanged, this, &frmMain::onSlbSpindleValueUserChanged);
+    // connect(ui->slbSpindle, &SliderBox::valueChanged, this, &frmMain::onSlbSpindleValueChanged);
 
     // Enable form actions
     QList<QAction*> noActions;
@@ -365,8 +369,8 @@ void frmMain::resizeEvent(QResizeEvent *re)
 void frmMain::timerEvent(QTimerEvent *te)
 {
     if (te->timerId() == m_timerToolAnimation.timerId()) {
-        m_toolDrawer.rotate((m_communicator->m_spindleCW ? -40 : 40) * (double)(ui->slbSpindle->currentValue())
-                            / (ui->slbSpindle->maximum()));
+        // m_toolDrawer.rotate((m_communicator->m_spindleCW ? -40 : 40) * (double)(ui->slbSpindle->currentValue())
+        //                     / (ui->slbSpindle->maximum()));
         m_cursorDrawer.rotate();
     } else {
         QMainWindow::timerEvent(te);
@@ -621,12 +625,12 @@ void frmMain::on_actAbout_triggered()
 
 void frmMain::on_actSpindleSpeedPlus_triggered()
 {
-    ui->slbSpindle->setSliderPosition(ui->slbSpindle->sliderPosition() + 1);
+    // ui->slbSpindle->setSliderPosition(ui->slbSpindle->sliderPosition() + 1);
 }
 
 void frmMain::on_actSpindleSpeedMinus_triggered()
 {
-    ui->slbSpindle->setSliderPosition(ui->slbSpindle->sliderPosition() - 1);
+    // ui->slbSpindle->setSliderPosition(ui->slbSpindle->sliderPosition() - 1);
 }
 
 void frmMain::on_actViewLockWindows_toggled(bool checked)
@@ -873,7 +877,7 @@ void frmMain::on_cmdSpindle_clicked(bool checked)
     if (ui->control->hold()) {
         m_connection->sendByteArray(QByteArray(1, char(0x9e)));
     } else {
-        m_communicator->sendCommand(CommandSource::GeneralUI, checked ? QString("M3 S%1").arg(ui->slbSpindle->value()) : "M5", TABLE_INDEX_UI);
+        // m_communicator->sendCommand(CommandSource::GeneralUI, checked ? QString("M3 S%1").arg(ui->slbSpindle->value()) : "M5", TABLE_INDEX_UI);
     }
 }
 
@@ -926,15 +930,15 @@ void frmMain::on_grpOverriding_toggled(bool checked)
 
 void frmMain::on_grpSpindle_toggled(bool checked)
 {
-    if (checked) {
-        ui->grpSpindle->setTitle(tr("Spindle"));
-    } else if (ui->cmdSpindle->isChecked()) {
-//        ui->grpSpindle->setTitle(tr("Spindle") + QString(tr(" (%1)")).arg(ui->txtSpindleSpeed->text()));
-        ui->grpSpindle->setTitle(tr("Spindle") + QString(tr(" (%1)")).arg(ui->slbSpindle->value()));
-    }
+//     if (checked) {
+//         ui->grpSpindle->setTitle(tr("Spindle"));
+//     } else if (ui->cmdSpindle->isChecked()) {
+// //        ui->grpSpindle->setTitle(tr("Spindle") + QString(tr(" (%1)")).arg(ui->txtSpindleSpeed->text()));
+//         ui->grpSpindle->setTitle(tr("Spindle") + QString(tr(" (%1)")).arg(ui->slbSpindle->value()));
+//     }
     updateLayouts();
     
-    ui->spindle->setVisible(checked);
+    // ui->spindle->setVisible(checked);
 }
 
 void frmMain::on_grpJog_toggled(bool checked)
@@ -1486,7 +1490,7 @@ void frmMain::onDeviceStateChanged(DeviceState state)
     ui->control->updateControlsState(m_communicator->senderState(), state);
 
     // ui->spindle->...
-    ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_communicator->senderState() != SenderTransferring) &&                                                        (m_communicator->senderState() != SenderStopping)));
+    // ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_communicator->senderState() != SenderTransferring) &&                                                        (m_communicator->senderState() != SenderStopping)));
 }
 
 void frmMain::onDeviceStateReceived(DeviceState state)
@@ -1495,8 +1499,8 @@ void frmMain::onDeviceStateReceived(DeviceState state)
     ui->control->updateControlsState(state, m_communicator->deviceState());
 
     // ui->spindle->...
-    ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_communicator->senderState() != SenderTransferring) &&
-                                                        (m_communicator->senderState() != SenderStopping)));
+    // ui->cmdSpindle->setEnabled(state == DeviceHold0 || ((m_communicator->senderState() != SenderTransferring) &&
+    //                                                     (m_communicator->senderState() != SenderStopping)));
 
     // Update "elapsed time" timer
     if ((m_communicator->senderState() == SenderTransferring) || (m_communicator->senderState() == SenderStopping)) {
@@ -1520,11 +1524,11 @@ void frmMain::onSpindleStateReceived(bool state)
     switch (state) {
         case true:
             m_timerToolAnimation.start(25, this);
-            ui->cmdSpindle->setChecked(true);
+            // ui->cmdSpindle->setChecked(true);
             break;
         default:
             //m_timerToolAnimation.stop();
-            ui->cmdSpindle->setChecked(false);
+            // ui->cmdSpindle->setChecked(false);
             break;
     }
 }
@@ -1551,7 +1555,7 @@ void frmMain::onFeedSpindleSpeedReceived(int feedRate, int spindleSpeed)
 
 void frmMain::onSpindleSpeedReceived(int spindleSpeed)
 {
-    ui->slbSpindle->setCurrentValue(spindleSpeed);
+    // ui->slbSpindle->setCurrentValue(spindleSpeed);
 }
 
 void frmMain::onOverridesReceived(int feedOverride, int spindleOverride, int rapidOverride)
@@ -1882,8 +1886,8 @@ void frmMain::onSlbSpindleValueUserChanged()
 
 void frmMain::onSlbSpindleValueChanged()
 {
-    if (!ui->grpSpindle->isChecked() && ui->cmdSpindle->isChecked())
-        ui->grpSpindle->setTitle(tr("Spindle") + QString(tr(" (%1)")).arg(ui->slbSpindle->value()));
+    // if (!ui->grpSpindle->isChecked() && ui->cmdSpindle->isChecked())
+    //     ui->grpSpindle->setTitle(tr("Spindle") + QString(tr(" (%1)")).arg(ui->slbSpindle->value()));
 }
 
 // void frmMain::onCboCommandReturnPressed()
@@ -2016,10 +2020,10 @@ void frmMain::applyOverridesConfiguration(ConfigurationMachine &machineConfigura
 
 void frmMain::applySpindleConfiguration(ConfigurationMachine &machineConfiguration)
 {
-    ui->slbSpindle->setRatio(machineConfiguration.spindleSpeedRatio());
-    ui->slbSpindle->setMinimum(machineConfiguration.spindleSpeedRange().min);
-    ui->slbSpindle->setMaximum(machineConfiguration.spindleSpeedRange().max);
-    ui->slbSpindle->setValue(machineConfiguration.spindleSpeed());
+    // ui->slbSpindle->setRatio(machineConfiguration.spindleSpeedRatio());
+    // ui->slbSpindle->setMinimum(machineConfiguration.spindleSpeedRange().min);
+    // ui->slbSpindle->setMaximum(machineConfiguration.spindleSpeedRange().max);
+    // ui->slbSpindle->setValue(machineConfiguration.spindleSpeed());
 }
 
 void frmMain::applyRecentFilesConfiguration(ConfigurationUI &uiConfiguration)
@@ -2162,7 +2166,7 @@ void frmMain::saveSettings()
     ConfigurationUI &uiConfiguration = m_configuration.uiModule();
     // ConfigurationJogging &joggingConfiguration = m_configuration.joggingModule();
 
-    m_configuration.machineModule().setSpindleSpeed(ui->slbSpindle->value());
+    // m_configuration.machineModule().setSpindleSpeed(ui->slbSpindle->value());
     uiConfiguration.setAutoScrollGCode(ui->chkAutoScrollGCode->isChecked());
 
     set.setValue("header", ui->tblProgram->horizontalHeader()->saveState());
@@ -2907,7 +2911,7 @@ void frmMain::updateControlsState()
     ui->control->updateControlsState(portOpened, process);
 
     //ui->spindle->...
-    ui->cmdSpindle->setEnabled(!process);
+    // ui->cmdSpindle->setEnabled(!process);
 
     ui->actFileNew->setEnabled(senderState == SenderStopped);
     ui->actFileOpen->setEnabled(senderState == SenderStopped);
@@ -3585,7 +3589,7 @@ QString frmMain::getLineInitCommands(int row)
             plungeSegment = list.at(--segmentIndex);
 
 
-        commands.append(QString("M3 S%1\n").arg(qMax<double>(lastSegment->getSpindleSpeed(), ui->slbSpindle->value())));
+        // commands.append(QString("M3 S%1\n").arg(qMax<double>(lastSegment->getSpindleSpeed(), ui->slbSpindle->value())));
 
         commands.append(QString("G21 G90 G0 X%1 Y%2\n")
                         .arg(firstSegment->getStart().x())
