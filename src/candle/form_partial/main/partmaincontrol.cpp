@@ -39,6 +39,9 @@ void partMainControl::updateControlsState(SenderState senderState, DeviceState d
     ui->cmdCheck->setEnabled(deviceState != DeviceRun && (senderState == SenderStopped));
     ui->cmdCheck->setChecked(deviceState == DeviceCheck);
     ui->cmdHold->setChecked(deviceState == DeviceHold0 || deviceState == DeviceHold1 || deviceState == DeviceQueue);
+    ui->cmdProbe->setEnabled(deviceState == DeviceIdle && senderState == SenderStopped);
+    ui->cmdZeroZ->setEnabled(deviceState == DeviceIdle && senderState == SenderStopped);
+    ui->cmdZeroXY->setEnabled(deviceState == DeviceIdle && senderState == SenderStopped);
 }
 
 bool partMainControl::hold()
@@ -93,12 +96,18 @@ void partMainControl::onCmdFloodClicked(bool checked)
 
 void partMainControl::onCmdProbeClicked()
 {
+    emit this->probe();
+    emit this->command(GRBLCommand::Probe);
 }
 
 void partMainControl::onCmdZeroZClicked()
 {
+    emit this->zeroZ();
+    emit this->command(GRBLCommand::ZeroZ);
 }
 
 void partMainControl::onCmdZeroXYClicked()
 {
+    emit this->zeroXY();
+    emit this->command(GRBLCommand::ZeroXY);
 }

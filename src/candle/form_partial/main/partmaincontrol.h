@@ -25,6 +25,7 @@ public:
     void updateControlsState(SenderState senderState, DeviceState deviceState);
     bool hold();
     void setFlood(bool);
+    void initialize();
 
 signals:
     void home();
@@ -32,6 +33,9 @@ signals:
     void unlock();
     void sleep();
     void door();
+    void probe();
+    void zeroZ();
+    void zeroXY();
     void command(GRBLCommand command);
 
 private:
