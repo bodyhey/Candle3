@@ -264,13 +264,14 @@ frmMain::frmMain(QWidget *parent) :
 
     Pendant *pendant = new Pendant(this, *m_communicator);
 
-    QDockWidget *dock = new QDockWidget(tr("Camera"), this);
+    QDockWidget *dock = new QDockWidget(tr("Camera"));
+    dock->setObjectName("Camera");
 
     Camera *camera = new Camera();
 
     dock->setWidget(camera);
-    dock->setParent(this);
-    dock->show();
+
+    addDockWidget(Qt::TopDockWidgetArea, dock, Qt::Vertical);
 
     updateLayouts();
 }
