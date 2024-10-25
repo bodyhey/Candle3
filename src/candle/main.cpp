@@ -118,8 +118,8 @@ int main(int argc, char *argv[])
 
     app.setStyleSheet(app.styleSheet() + "QWidget {font-size: 8pt}");
 
-    frmMain w;
-    w.show();
+    frmMain form;
+    form.show();
 
     return app.exec();
 }

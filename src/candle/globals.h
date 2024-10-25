@@ -51,6 +51,9 @@ enum GRBLCommand {
     Home,
     Unlock,
     JogStop,
+    Probe,
+    ZeroZ,
+    ZeroXY,
 };
 
 enum class JoggindDir {
