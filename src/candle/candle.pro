@@ -14,6 +14,14 @@ win32: {
     DEFINES += WINDOWS
     QMAKE_CXXFLAGS_DEBUG += -g3 -pg
     QMAKE_LFLAGS_DEBUG += -pg -lgmon
+
+    build_nr.commands = python $$PWD/../../scripts/build_inc.py $$PWD
+    build_nr.depends = FORCE
+
+    QMAKE_EXTRA_TARGETS += build_nr
+    PRE_TARGETDEPS += build_nr
+
+    HEADERS  += build.h
 }
 
 unix:!macx {
