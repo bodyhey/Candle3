@@ -2,8 +2,8 @@
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
 // Copyright 2024 BTS
 
-#ifndef STREAMER_H
-#define STREAMER_H
+#ifndef GCODE_H
+#define GCODE_H
 
 #include <QObject>
 #include "tables/gcodetablemodel.h"
@@ -15,12 +15,24 @@ enum StreamerStartResult
     UnacceptableConnectionState = 2,
 };
 
-class Streamer : public QObject
+struct GCodeLine
+{
+        QString command;
+        QString comment;
+        QString response;
+        int lineNumber;
+        int state;
+        QStringList args;
+
+        enum States { InQueue, Sent, Processed, Skipped };
+};
+
+class GCode : public QObject , public QList<GCodeLine>
 {
     Q_OBJECT
 
     public:
-        explicit Streamer(QObject *parent = nullptr);
+        explicit GCode(QObject *parent = nullptr);
         void reset(int commandIndex = 0);
         void resetProcessed(int commandIndex = 0);
         int commandIndex() { return m_commandIndex; }
@@ -41,6 +53,7 @@ class Streamer : public QObject
             reset();
         }
         void commandSent();
+
     private:
         int m_commandIndex;
         int m_processedCommandIndex;
@@ -54,4 +67,4 @@ class Streamer : public QObject
         void error();
 };
 
-#endif // STREAMER_H
+#endif // GCODE_H

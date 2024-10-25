@@ -2,34 +2,18 @@
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
 // Copyright 2024 BTS
 
-#include "gcode.h"
-#include "parser/gcodepreprocessorutils.h"
-#include "parser/linesegment.h"
+#include "gcodeloader.h"
 #include "parser/gcodeparser.h"
-#include <QFile>
 #include <QDebug>
 
-GCode::GCode() : QObject(), QList<GCodeLine>()
-{
-    m_cancelling = false;
-}
+GCodeLoader::GCodeLoader() {}
 
-bool GCode::isModified()
-{
-
-}
-
-void GCode::saveToFile(const QString &fileName)
-{
-
-}
-
-void GCode::loadFromFile(const QString &fileName)
+void GCodeLoader::loadFromFile(const QString &fileName)
 {
     QFile file(fileName);
 
     if (!file.open(QIODevice::ReadOnly)) {
-//        QMessageBox::critical(this, this->windowTitle(), tr("Can't open file:\n") + fileName);
+        //        QMessageBox::critical(this, this->windowTitle(), tr("Can't open file:\n") + fileName);
         return;
     }
 
@@ -44,26 +28,32 @@ void GCode::loadFromFile(const QString &fileName)
 
     loadFromFileObject(file, file.size());
 
+    file.close();
+
     // Read lines
     // QList<std::string> data;
     // while (!textStream.atEnd()) {
     //     data.append(textStream.readLine().toStdString());
     // }
 
-    qDebug() << "Lines: " << count();
+    //qDebug() << "Lines: " << count();
 
     //loadFromString(data);
 }
 
-void GCode::loadFromFileObject(QFile &stream, int size)
+void GCodeLoader::loadFromFileObject(QFile &file, int size)
 {
+    GCode gCode;
+
+    m_cancelling = false;
+
     // assert(m_communicator->isMachineConfigurationReady());
     // if (!m_communicator->isMachineConfigurationReady()) {
     //     return;
     // }
 
     // Reset tables
-    clear();
+    gCode.clear();
     // clearTable();
     // m_probeModel.clear();
     // m_programHeightmapModel.clear();
@@ -118,9 +108,9 @@ void GCode::loadFromFileObject(QFile &stream, int size)
     GCodeLine item;
     int remaining = size;
 
-    while (!stream.atEnd())
+    while (!file.atEnd())
     {
-        command = stream.readLine().toStdString();
+        command = file.readLine().toStdString();
 
         trimmed = GcodePreprocessorUtils::trimCommand(command);
 
@@ -136,10 +126,10 @@ void GCode::loadFromFileObject(QFile &stream, int size)
             item.lineNumber = parser.getCommandNumber();
             item.args = args;
 
-            append(item);
+            gCode.append(item);
         }
 
-        remaining = size - stream.pos();
+        remaining = size - file.pos();
 
         int percentage = 100 - (remaining * 100 / size);
         static int lastPercentage = 0;
@@ -194,18 +184,14 @@ void GCode::loadFromFileObject(QFile &stream, int size)
     if (m_cancelling) {
         emit loadingCancelled();
     } else {
-        emit loadingFinished();
+        emit loadingFinished(gCode);
     }
 
     qDebug() << "Loaded: " << size;
 }
 
-void GCode::cancelLoading()
+
+void GCodeLoader::cancelLoading()
 {
 
-}
-
-void GCode::clear()
-{
-    QList<GCodeLine>::clear();
 }

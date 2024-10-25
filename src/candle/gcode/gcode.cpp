@@ -2,55 +2,55 @@
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
 // Copyright 2024 BTS
 
-#include "streamer.h"
+#include "gcode.h"
 
-Streamer::Streamer(QObject *parent) : QObject(parent) {
+GCode::GCode(QObject *parent) : QObject(parent) {
     reset();
 }
 
-void Streamer::reset(int commandIndex)
+void GCode::reset(int commandIndex)
 {
     m_commandIndex = commandIndex;
     m_processedCommandIndex = commandIndex;
 }
 
-void Streamer::resetProcessed(int commandIndex)
+void GCode::resetProcessed(int commandIndex)
 {
     m_processedCommandIndex = commandIndex;
 }
 
-QString Streamer::command()
+QString GCode::command()
 {
     return m_currentModel->data(m_currentModel->index(m_commandIndex, 1)).toString();
     //m_form->currentModel().data(m_form->currentModel().index(m_streamer->commandIndex(), 1)).toString();
 }
 
-void Streamer::advanceCommandIndex()
+void GCode::advanceCommandIndex()
 {
     m_commandIndex++;
 }
 
-bool Streamer::isLastCommand()
+bool GCode::isLastCommand()
 {
     return m_commandIndex == m_commandsCount - 1;
 }
 
-bool Streamer::noMoreCommands()
+bool GCode::noMoreCommands()
 {
     return m_commandIndex > m_commandsCount - 1;
 }
 
-bool Streamer::hasMoreCommands()
+bool GCode::hasMoreCommands()
 {
     return m_commandIndex <= m_commandsCount - 1;
 }
 
-bool Streamer::isLastCommandProcessed()
+bool GCode::isLastCommandProcessed()
 {
     return m_processedCommandIndex == m_commandsCount - 1;
 }
 
-void Streamer::commandSent()
+void GCode::commandSent()
 {
     m_currentModel->setData(m_currentModel->index(m_commandIndex, 2), GCodeItem::Sent);
     //        m_form->currentModel().setData(m_form->currentModel().index(m_streamer->commandIndex(), 2), GCodeItem::Sent);
