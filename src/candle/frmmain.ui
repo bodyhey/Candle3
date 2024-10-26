@@ -437,7 +437,7 @@ QLabel[overrided=&quot;false&quot;] {
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents">
+   <widget class="QWidget" name="dockModificationContents">
     <layout class="QVBoxLayout" name="verticalLayout_10">
      <property name="leftMargin">
       <number>0</number>
@@ -446,7 +446,7 @@ QLabel[overrided=&quot;false&quot;] {
       <number>0</number>
      </property>
      <item>
-      <widget class="QScrollArea" name="scrollArea">
+      <widget class="QScrollArea" name="dockModificationScrollArea">
        <property name="frameShape">
         <enum>QFrame::Shape::NoFrame</enum>
        </property>
@@ -459,7 +459,7 @@ QLabel[overrided=&quot;false&quot;] {
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>761</height>
+          <height>765</height>
          </rect>
         </property>
         <property name="acceptDrops">
@@ -1224,7 +1224,7 @@ QLabel[overrided=&quot;false&quot;] {
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2">
+   <widget class="QWidget" name="dockDeviceContents">
     <layout class="QVBoxLayout" name="verticalLayout_12">
      <property name="leftMargin">
       <number>0</number>
@@ -1233,7 +1233,7 @@ QLabel[overrided=&quot;false&quot;] {
       <number>0</number>
      </property>
      <item>
-      <widget class="QScrollArea" name="scrollArea_2">
+      <widget class="QScrollArea" name="dockDeviceScrollArea">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -1261,13 +1261,13 @@ QLabel[overrided=&quot;false&quot;] {
           <x>0</x>
           <y>0</y>
           <width>105</width>
-          <height>476</height>
+          <height>484</height>
          </rect>
         </property>
         <property name="acceptDrops">
          <bool>true</bool>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_13" stretch="0,0,0,0,0,1">
+        <layout class="QVBoxLayout" name="verticalLayout_13" stretch="0,0,0,0,0">
          <property name="sizeConstraint">
           <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
          </property>
@@ -1394,24 +1394,6 @@ QLabel[overrided=&quot;false&quot;] {
            </layout>
           </widget>
          </item>
-         <item>
-          <widget class="QGroupBox" name="spacerDevice">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QGroupBox {
-	margin-top: 7;
-}</string>
-           </property>
-           <property name="title">
-            <string/>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
       </widget>
@@ -1426,7 +1408,7 @@ QLabel[overrided=&quot;false&quot;] {
    <attribute name="dockWidgetArea">
     <number>4</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_3">
+   <widget class="QWidget" name="dockVisualizerContents">
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <property name="leftMargin">
       <number>0</number>
@@ -1749,7 +1731,7 @@ QLabel[overrided=&quot;false&quot;] {
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_5">
+   <widget class="QWidget" name="dockUserContents">
     <layout class="QVBoxLayout" name="verticalLayout_27">
      <property name="leftMargin">
       <number>0</number>
@@ -1758,7 +1740,7 @@ QLabel[overrided=&quot;false&quot;] {
       <number>0</number>
      </property>
      <item>
-      <widget class="QScrollArea" name="scrollArea_3">
+      <widget class="QScrollArea" name="dockUserScrollArea">
        <property name="frameShape">
         <enum>QFrame::Shape::NoFrame</enum>
        </property>
@@ -1771,7 +1753,7 @@ QLabel[overrided=&quot;false&quot;] {
           <x>0</x>
           <y>0</y>
           <width>105</width>
-          <height>215</height>
+          <height>211</height>
          </rect>
         </property>
         <property name="acceptDrops">
