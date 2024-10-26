@@ -20,6 +20,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include "frmmain.h"
+#include "utils.h"
 #include "form_partial/main/partmainjog.h"
 #include "form_partial/main/partmaincontrol.h"
 #include "module/pendant/pendant.h"
@@ -76,6 +77,8 @@ frmMain::frmMain(QWidget *parent) :
     // m_communicator->m_senderState = SenderUnknown;
 
     ui->setupUi(this);
+
+    Utils::positionDialog(this, m_configuration.uiModule().mainFormGeometry());
 
     ui->jog->initialize(m_configuration.joggingModule());
 
@@ -407,6 +410,8 @@ void frmMain::closeEvent(QCloseEvent *ce)
     //     m_communicator->m_queue.clear();
     // }
 
+    m_configuration.uiModule().setMainFormGeometry(this->geometry());
+
     saveSettings();
 }
 
@@ -613,7 +618,7 @@ void frmMain::on_actServiceSettings_triggered()
 
 void frmMain::on_actServiceConfigureGRBL_triggered()
 {
-    m_grblConfigurator = new frmGrblConfigurator(this, m_communicator);
+    m_grblConfigurator = new frmGrblConfigurator(this, m_configuration.uiModule(), m_communicator);
     m_grblConfigurator->exec();
     m_grblConfigurator->deleteLater();
 }

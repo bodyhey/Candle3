@@ -196,6 +196,7 @@ HEADERS  += frmmain.h \
     parser/pointsegment.h \
     tables/gcodetablemodel.h \
     tables/heightmaptablemodel.h \
+    utils.h \
     utils/interpolation.h \
     utils/util.h \
     utils/validators.h \

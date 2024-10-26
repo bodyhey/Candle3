@@ -2,7 +2,9 @@
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
 
 #include "frmsettings.h"
+#include "qdesktopwidget.h"
 #include "ui_frmsettings.h"
+#include "utils.h"
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QDebug>
@@ -365,6 +367,8 @@ void frmSettings::widgetValidity(QString widgetName, bool valid)
 
 int frmSettings::exec()
 {
+    Utils::positionDialog(this, m_configuration.uiModule().settingsFormGeometry());
+
     // Store settings to undo
     m_storedValues.clear();
     m_storedChecks.clear();
@@ -394,7 +398,11 @@ int frmSettings::exec()
     invalidWidgets.clear();
     initializeWidgets();
 
-    return QDialog::exec();
+    int result = QDialog::exec();
+
+    m_configuration.uiModule().setSettingsFormGeometry(this->geometry());
+
+    return result;
 }
 
 void frmSettings::undo()

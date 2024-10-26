@@ -1,5 +1,6 @@
 #include "frmgrblconfigurator.h"
 #include "ui_frmgrblconfigurator.h"
+#include "utils.h"
 #include <QMessageBox>
 #include <CPropertyEditor.h>
 #include <CPropertyHeader.h>
@@ -255,9 +256,10 @@ std::vector<ConfigGroup> ConfigMap = {
     }
 };
 
-frmGrblConfigurator::frmGrblConfigurator(QWidget *parent, Communicator *communicator)
+frmGrblConfigurator::frmGrblConfigurator(QWidget *parent, ConfigurationUI &uiConfiguration, Communicator *communicator)
     : QDialog(parent)
     , ui(new Ui::frmGrblConfigurator)
+    , m_uiConfiguration(uiConfiguration)
     , m_communicator(communicator)
 {
     ui->setupUi(this);
@@ -305,6 +307,17 @@ frmGrblConfigurator::frmGrblConfigurator(QWidget *parent, Communicator *communic
 frmGrblConfigurator::~frmGrblConfigurator()
 {
     delete ui;
+}
+
+int frmGrblConfigurator::exec()
+{
+    Utils::positionDialog(this, m_uiConfiguration.grblConfigratorFormGeometry());
+
+    int result = QDialog::exec();
+
+    m_uiConfiguration.setGrblConfigratorFormGeometry(this->geometry());
+
+    return result;
 }
 
 void frmGrblConfigurator::onConfigurationReceived(MachineConfiguration configuration, QMap<int, double> rawConfiguration)

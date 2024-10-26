@@ -23,6 +23,7 @@ class ConfigurationUI : public ConfigurationModule
     Q_PROPERTY(bool lockWindows MEMBER m_lockWindows NOTIFY changed)
     Q_PROPERTY(bool lockPanels MEMBER m_lockPanels NOTIFY changed)
     Q_PROPERTY(QRect settingsFormGeometry MEMBER m_settingsFormGeometry NOTIFY changed)
+    Q_PROPERTY(QRect grblConfigratorFormGeometry MEMBER m_grblConfigratorFormGeometry NOTIFY changed)
     Q_PROPERTY(QRect mainFormGeometry MEMBER m_mainFormGeometry NOTIFY changed)
 
     public:
@@ -48,7 +49,9 @@ class ConfigurationUI : public ConfigurationModule
         bool lockPanels() const { return m_lockPanels; }
         void setLockPanels(bool lockPanels) { m_lockPanels = lockPanels; emit changed(); }
         QRect settingsFormGeometry() const { return m_settingsFormGeometry; }
-        void setSettingsFormGeometry(const QRect &geometry) { m_settingsFormGeometry = geometry; emit changed(); }\
+        void setSettingsFormGeometry(const QRect &geometry) { m_settingsFormGeometry = geometry; emit changed(); }
+        QRect grblConfigratorFormGeometry() const { return m_grblConfigratorFormGeometry; }
+        void setGrblConfigratorFormGeometry(const QRect &geometry) { m_grblConfigratorFormGeometry = geometry; emit changed(); }
         QRect mainFormGeometry() const { return m_mainFormGeometry; }
         void setMainFormGeometry(const QRect &geometry) { m_mainFormGeometry = geometry; emit changed(); }
 
@@ -64,6 +67,7 @@ class ConfigurationUI : public ConfigurationModule
         bool m_lockPanels;
         QRect m_mainFormGeometry;
         QRect m_settingsFormGeometry;
+        QRect m_grblConfigratorFormGeometry;
 };
 
 #endif // CONFIGURATIONUI_H

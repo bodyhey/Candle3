@@ -38,11 +38,13 @@ class frmGrblConfigurator : public QDialog
     Q_OBJECT
 
     public:
-        explicit frmGrblConfigurator(QWidget *parent, Communicator *communicator);
+        explicit frmGrblConfigurator(QWidget *parent, ConfigurationUI &uiConfiguration, Communicator *communicator);
         ~frmGrblConfigurator();
+        int exec() override;
 
     private:        
         Ui::frmGrblConfigurator *ui;
+        ConfigurationUI &m_uiConfiguration;
         Communicator *m_communicator;
         QMap<int, double> m_currentSettings;
         bool m_isSaving = false;

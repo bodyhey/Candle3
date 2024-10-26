@@ -10,6 +10,12 @@
     <height>600</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>600</width>
+    <height>400</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Settings</string>
   </property>
@@ -49,7 +55,7 @@ QSplitter::handle:horizontal {
    <item>
     <widget class="QSplitter" name="splitMain">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="handleWidth">
       <number>30</number>
@@ -72,10 +78,10 @@ QSplitter::handle:horizontal {
        </sizepolicy>
       </property>
       <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOn</enum>
+       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
       </property>
       <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOff</enum>
+       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
       </property>
       <property name="widgetResizable">
        <bool>true</bool>
@@ -84,9 +90,9 @@ QSplitter::handle:horizontal {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-1225</y>
+         <y>0</y>
          <width>642</width>
-         <height>2491</height>
+         <height>2519</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -99,10 +105,10 @@ QSplitter::handle:horizontal {
            <item>
             <widget class="QFrame" name="frameConnection">
              <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
+              <enum>QFrame::Shape::NoFrame</enum>
              </property>
              <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
+              <enum>QFrame::Shadow::Raised</enum>
              </property>
              <layout class="QGridLayout" name="gridLayout_10">
               <property name="leftMargin">
@@ -163,10 +169,10 @@ QSplitter::handle:horizontal {
                    </font>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignCenter</set>
+                   <set>Qt::AlignmentFlag::AlignCenter</set>
                   </property>
                   <property name="buttonSymbols">
-                   <enum>QAbstractSpinBox::NoButtons</enum>
+                   <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                   </property>
                   <property name="minimum">
                    <number>10</number>
@@ -184,10 +190,10 @@ QSplitter::handle:horizontal {
            <item>
             <widget class="QFrame" name="frameConnectionRawSocket">
              <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
+              <enum>QFrame::Shape::NoFrame</enum>
              </property>
              <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
+              <enum>QFrame::Shadow::Raised</enum>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_6">
               <property name="leftMargin">
@@ -235,10 +241,10 @@ QSplitter::handle:horizontal {
            <item>
             <widget class="QFrame" name="frameConnectionSerial">
              <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
+              <enum>QFrame::Shape::NoFrame</enum>
              </property>
              <property name="frameShadow">
-              <enum>QFrame::Plain</enum>
+              <enum>QFrame::Shadow::Plain</enum>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_11">
               <property name="leftMargin">
@@ -343,10 +349,10 @@ QSplitter::handle:horizontal {
                 <item row="0" column="2">
                  <spacer name="horizontalSpacer_7">
                   <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
+                   <enum>Qt::Orientation::Horizontal</enum>
                   </property>
                   <property name="sizeType">
-                   <enum>QSizePolicy::Fixed</enum>
+                   <enum>QSizePolicy::Policy::Fixed</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
@@ -376,10 +382,10 @@ QSplitter::handle:horizontal {
               </size>
              </property>
              <property name="frameShape">
-              <enum>QFrame::Box</enum>
+              <enum>QFrame::Shape::Box</enum>
              </property>
              <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
+              <enum>QFrame::Shadow::Raised</enum>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_12">
               <property name="leftMargin">
@@ -491,10 +497,10 @@ QSplitter::handle:horizontal {
                 </font>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
                <property name="buttonSymbols">
-                <enum>QAbstractSpinBox::NoButtons</enum>
+                <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                </property>
                <property name="maximum">
                 <number>99999</number>
@@ -509,10 +515,10 @@ QSplitter::handle:horizontal {
                 </font>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
                <property name="buttonSymbols">
-                <enum>QAbstractSpinBox::NoButtons</enum>
+                <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                </property>
                <property name="maximum">
                 <number>99999</number>
@@ -534,10 +540,10 @@ QSplitter::handle:horizontal {
                 </font>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
                <property name="buttonSymbols">
-                <enum>QAbstractSpinBox::NoButtons</enum>
+                <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                </property>
                <property name="maximum">
                 <number>99999</number>
@@ -610,10 +616,10 @@ QSplitter::handle:horizontal {
                 </font>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
                <property name="buttonSymbols">
-                <enum>QAbstractSpinBox::NoButtons</enum>
+                <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                </property>
                <property name="maximum">
                 <number>99999</number>
@@ -623,10 +629,10 @@ QSplitter::handle:horizontal {
              <item row="0" column="2">
               <spacer name="horizontalSpacer_6">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
+                <enum>QSizePolicy::Policy::Fixed</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -698,7 +704,7 @@ QSplitter::handle:horizontal {
              <item>
               <spacer name="horizontalSpacer_3">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -731,7 +737,7 @@ QSplitter::handle:horizontal {
              <item>
               <spacer name="horizontalSpacer_14">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -758,10 +764,10 @@ QSplitter::handle:horizontal {
              <item row="0" column="2">
               <spacer name="horizontalSpacer_15">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
+                <enum>QSizePolicy::Policy::Fixed</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -777,10 +783,10 @@ QSplitter::handle:horizontal {
                 <bool>true</bool>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
                <property name="buttonSymbols">
-                <enum>QAbstractSpinBox::NoButtons</enum>
+                <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                </property>
                <property name="decimals">
                 <number>2</number>
@@ -806,10 +812,10 @@ QSplitter::handle:horizontal {
                 <bool>false</bool>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
                <property name="buttonSymbols">
-                <enum>QAbstractSpinBox::NoButtons</enum>
+                <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                </property>
                <property name="decimals">
                 <number>2</number>
@@ -975,7 +981,7 @@ QSplitter::handle:horizontal {
                <item>
                 <widget class="QComboBox" name="cboFpsLock">
                  <property name="inputMethodHints">
-                  <set>Qt::ImhDigitsOnly|Qt::ImhFormattedNumbersOnly</set>
+                  <set>Qt::InputMethodHint::ImhDigitsOnly|Qt::InputMethodHint::ImhFormattedNumbersOnly</set>
                  </property>
                  <property name="editable">
                   <bool>true</bool>
@@ -1058,10 +1064,10 @@ QSplitter::handle:horizontal {
                <item>
                 <widget class="QDoubleSpinBox" name="txtLineWidth">
                  <property name="alignment">
-                  <set>Qt::AlignCenter</set>
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
                  </property>
                  <property name="buttonSymbols">
-                  <enum>QAbstractSpinBox::NoButtons</enum>
+                  <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                  </property>
                  <property name="decimals">
                   <number>1</number>
@@ -1092,10 +1098,10 @@ QSplitter::handle:horizontal {
                 <bool>false</bool>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
                <property name="buttonSymbols">
-                <enum>QAbstractSpinBox::NoButtons</enum>
+                <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                </property>
                <property name="decimals">
                 <number>2</number>
@@ -1141,10 +1147,10 @@ QSplitter::handle:horizontal {
              <item row="0" column="2">
               <spacer name="horizontalSpacer_5">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
+                <enum>QSizePolicy::Policy::Fixed</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -1205,10 +1211,10 @@ QSplitter::handle:horizontal {
              <item>
               <widget class="QDoubleSpinBox" name="txtFieldOfView">
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
                <property name="buttonSymbols">
-                <enum>QAbstractSpinBox::NoButtons</enum>
+                <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                </property>
                <property name="decimals">
                 <number>2</number>
@@ -1231,10 +1237,10 @@ QSplitter::handle:horizontal {
              <item>
               <widget class="QDoubleSpinBox" name="txtNearPlane">
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
                <property name="buttonSymbols">
-                <enum>QAbstractSpinBox::NoButtons</enum>
+                <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                </property>
                <property name="decimals">
                 <number>2</number>
@@ -1257,10 +1263,10 @@ QSplitter::handle:horizontal {
              <item>
               <widget class="QDoubleSpinBox" name="txtFarPlane">
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
                <property name="buttonSymbols">
-                <enum>QAbstractSpinBox::NoButtons</enum>
+                <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
                </property>
                <property name="decimals">
                 <number>2</number>
@@ -1386,10 +1392,10 @@ QSplitter::handle:horizontal {
              <item row="4" column="0">
               <spacer name="verticalSpacer">
                <property name="orientation">
-                <enum>Qt::Vertical</enum>
+                <enum>Qt::Orientation::Vertical</enum>
                </property>
                <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
+                <enum>QSizePolicy::Policy::Fixed</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -1484,10 +1490,10 @@ QSplitter::handle:horizontal {
            <item row="0" column="2">
             <spacer name="horizontalSpacer_4">
              <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+              <enum>Qt::Orientation::Horizontal</enum>
              </property>
              <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
+              <enum>QSizePolicy::Policy::Fixed</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -1506,10 +1512,10 @@ QSplitter::handle:horizontal {
               </sizepolicy>
              </property>
              <property name="alignment">
-              <set>Qt::AlignCenter</set>
+              <set>Qt::AlignmentFlag::AlignCenter</set>
              </property>
              <property name="buttonSymbols">
-              <enum>QAbstractSpinBox::NoButtons</enum>
+              <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
              </property>
              <property name="decimals">
               <number>3</number>
@@ -1528,10 +1534,10 @@ QSplitter::handle:horizontal {
               </sizepolicy>
              </property>
              <property name="alignment">
-              <set>Qt::AlignCenter</set>
+              <set>Qt::AlignmentFlag::AlignCenter</set>
              </property>
              <property name="buttonSymbols">
-              <enum>QAbstractSpinBox::NoButtons</enum>
+              <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
              </property>
              <property name="decimals">
               <number>3</number>
@@ -1550,10 +1556,10 @@ QSplitter::handle:horizontal {
               </sizepolicy>
              </property>
              <property name="alignment">
-              <set>Qt::AlignCenter</set>
+              <set>Qt::AlignmentFlag::AlignCenter</set>
              </property>
              <property name="buttonSymbols">
-              <enum>QAbstractSpinBox::NoButtons</enum>
+              <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
              </property>
              <property name="decimals">
               <number>3</number>
@@ -1649,7 +1655,7 @@ QSplitter::handle:horizontal {
              <item row="0" column="3">
               <spacer name="horizontalSpacer_2">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -1755,7 +1761,7 @@ QSplitter::handle:horizontal {
                 <string>(restart needed)</string>
                </property>
                <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
               </widget>
              </item>
@@ -1784,7 +1790,7 @@ QSplitter::handle:horizontal {
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -1974,7 +1980,7 @@ QSplitter::handle:horizontal {
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="grpGrayscaleSegments"/>
   <buttongroup name="grpProgramDrawMode"/>
+  <buttongroup name="grpGrayscaleSegments"/>
  </buttongroups>
 </ui>
