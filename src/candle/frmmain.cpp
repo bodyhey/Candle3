@@ -2172,7 +2172,6 @@ void frmMain::loadSettings()
     ConfigurationUI &uiConfiguration = m_configuration.uiModule();
     ui->actViewLockWindows->setChecked(uiConfiguration.lockWindows());
     ui->actViewLockPanels->setChecked(uiConfiguration.lockPanels());
-    m_settings->setGeometry(uiConfiguration.settingsFormGeometry());
     // @TODO move to configuration form
     //m_settings->restoreGeometry(set.value("formSettingsGeometry", m_settings->saveGeometry()).toByteArray());
 
@@ -2366,7 +2365,6 @@ void frmMain::applyUIConfiguration(ConfigurationUI &uiConfiguration)
     qApp->setStyleSheet(
         QString(qApp->styleSheet()).replace(QRegExp("font-size:[^;^\\}]+"), QString("font-size: %1pt").arg(uiConfiguration.fontSize()))
     );
-    qDebug() << QString(qApp->styleSheet());
 }
 
 void frmMain::applyJoggingConfiguration(ConfigurationJogging &joggingConfiguration)
@@ -2923,34 +2921,6 @@ void frmMain::newHeightmap()
 
     updateControlsState();
 }
-
-// void frmMain::setupCoordsTextboxes()
-// {
-//     int prec = m_settings->units() == 0 ? 3 : 4;
-//     int bound = m_settings->units() == 0 ? 9999 : 999;
-
-//     m_partState->updateUnits();
-
-//     ui->txtMPosX->setDecimals(prec);
-//     ui->txtMPosX->setMinimum(-bound);
-//     ui->txtMPosX->setMaximum(bound);
-//     ui->txtMPosY->setDecimals(prec);
-//     ui->txtMPosY->setMinimum(-bound);
-//     ui->txtMPosY->setMaximum(bound);
-//     ui->txtMPosZ->setDecimals(prec);
-//     ui->txtMPosZ->setMinimum(-bound);
-//     ui->txtMPosZ->setMaximum(bound);
-
-//     ui->txtWPosX->setDecimals(prec);
-//     ui->txtWPosX->setMinimum(-bound);
-//     ui->txtWPosX->setMaximum(bound);
-//     ui->txtWPosY->setDecimals(prec);
-//     ui->txtWPosY->setMinimum(-bound);
-//     ui->txtWPosY->setMaximum(bound);
-//     ui->txtWPosZ->setDecimals(prec);
-//     ui->txtWPosZ->setMinimum(-bound);
-//     ui->txtWPosZ->setMaximum(bound);
-// }
 
 void frmMain::updateControlsState()
 {
