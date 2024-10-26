@@ -326,7 +326,7 @@ void frmGrblConfigurator::onConfigurationReceived(MachineConfiguration configura
 
     disconnect(
         m_communicator,
-        &Communicator::configurationReceived,
+        &Communicator::deviceConfigurationReceived,
         this,
         &frmGrblConfigurator::onConfigurationReceived
     );
@@ -421,7 +421,7 @@ void frmGrblConfigurator::update()
 
     connect(
         m_communicator,
-        &Communicator::configurationReceived,
+        &Communicator::deviceConfigurationReceived,
         this,
         &frmGrblConfigurator::onConfigurationReceived
     );

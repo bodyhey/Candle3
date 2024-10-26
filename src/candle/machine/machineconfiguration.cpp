@@ -10,6 +10,23 @@ MachineConfiguration::MachineConfiguration(QMap<int, double> settings, Configura
     if (settings.contains(20)) m_softLimitsEnabled = (bool)settings[20];
     if (settings.contains(21)) m_hardLimitsEnabled = (bool)settings[21];
     if (settings.contains(22)) m_homingEnabled = (bool)settings[22];
+    if (settings.contains(23)) {
+        uint8_t homingMask = settings[23];
+        // value depends on the machine type, for example, GRBL by default uses
+        // homing to the positive direction, but uCNC uses negative direction
+        // for GRBL
+        // HomingDirs homingDirs(
+        //     homingMask & 1 ? HomingDir::Negative : HomingDir::Positive,
+        //     homingMask & 2 ? HomingDir::Negative : HomingDir::Positive,
+        //     homingMask & 4 ? HomingDir::Negative : HomingDir::Positive
+        // );
+        HomingDirs homingDirs(
+            homingMask & 1 ? HomingDir::Positive : HomingDir::Negative,
+            homingMask & 2 ? HomingDir::Positive : HomingDir::Negative,
+            homingMask & 4 ? HomingDir::Positive : HomingDir::Negative
+        );
+        m_homingDirs = homingDirs;
+    }
     if (settings.contains(27)) m_homingPullOff = settings[27];
     if (settings.contains(32)) m_laserMode = (bool)settings[32];
 

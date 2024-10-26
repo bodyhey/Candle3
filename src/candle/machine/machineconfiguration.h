@@ -29,6 +29,7 @@ class MachineConfiguration
         QVector3D acceleration() { return m_acceleration; }
         QVector3D maxRate() { return m_maxRate; }
         QVector3D machineBounds() { return m_machineBounds; }
+        HomingDirs homingDirs() { return m_homingDirs; }
 
     private:
         bool m_homingEnabled = false;
@@ -44,6 +45,7 @@ class MachineConfiguration
         QVector3D m_acceleration = QVector3D(0,0,0);
         QVector3D m_maxRate = QVector3D(0,0,0);
         QVector3D m_machineBounds = QVector3D(0,0,0);
+        HomingDirs m_homingDirs;
         Units setUnits(int setting);
         double negativeValue(double value, bool negative);
 };

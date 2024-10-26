@@ -56,6 +56,35 @@ enum GRBLCommand {
     ZeroXY,
 };
 
+enum class HomingDir {
+    Negative = 0,
+    Positive
+};
+
+class HomingDirs {
+    public:
+        HomingDirs() {
+            m_x = HomingDir::Positive;
+            m_y = HomingDir::Negative;
+            m_z = HomingDir::Negative;
+        }
+
+        HomingDirs(HomingDir x, HomingDir y, HomingDir z) {
+            this->m_x = x;
+            this->m_y = y;
+            this->m_z = z;
+        }
+
+        HomingDir x() { return m_x; }
+        HomingDir y() { return m_y; }
+        HomingDir z() { return m_z; }
+
+    private:
+        HomingDir m_x;
+        HomingDir m_y;
+        HomingDir m_z;
+};
+
 enum class JoggindDir {
     None,
     XPlus,

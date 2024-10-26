@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PartMainVirtualSettings</class>
+ <widget class="QWidget" name="PartMainVirtualSettings">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>246</width>
+    <height>89</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>50</width>
+    <height>89</height>
+   </size>
+  </property>
+  <property name="baseSize">
+   <size>
+    <width>0</width>
+    <height>89</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>3</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="QLabel" name="labelX">
+     <property name="text">
+      <string>X</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="labelY">
+     <property name="text">
+      <string>Y</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLineEdit" name="editZ"/>
+   </item>
+   <item row="3" column="2">
+    <widget class="QPushButton" name="btnSet3">
+     <property name="text">
+      <string>100mm</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="editY"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLineEdit" name="editX"/>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLabel" name="labelZ">
+     <property name="text">
+      <string>Z</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QPushButton" name="btnSet2">
+     <property name="text">
+      <string>50mm</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QPushButton" name="btnSet1">
+     <property name="text">
+      <string>10mm</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="QLabel" name="labelProbe">
+     <property name="text">
+      <string>Probe</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QLineEdit" name="editProbe"/>
+   </item>
+   <item row="2" column="0" colspan="3">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Automatically set virtual limit:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="3">
+    <widget class="QPushButton" name="btnEStop">
+     <property name="text">
+      <string>E-STOP</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3">
+    <widget class="QLabel" name="labelActions">
+     <property name="text">
+      <string>Actions</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnSet1</sender>
+   <signal>clicked()</signal>
+   <receiver>PartMainVirtualSettings</receiver>
+   <slot>onSetClicked1()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>39</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>122</x>
+     <y>44</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnSet2</sender>
+   <signal>clicked()</signal>
+   <receiver>PartMainVirtualSettings</receiver>
+   <slot>onSetClicked2()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>121</x>
+     <y>88</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>122</x>
+     <y>44</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnSet3</sender>
+   <signal>clicked()</signal>
+   <receiver>PartMainVirtualSettings</receiver>
+   <slot>onSetClicked3()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>183</x>
+     <y>88</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>122</x>
+     <y>44</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnEStop</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>PartMainVirtualSettings</receiver>
+   <slot>onEStopToggled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>226</x>
+     <y>77</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>183</x>
+     <y>18</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>editX</sender>
+   <signal>editingFinished()</signal>
+   <receiver>PartMainVirtualSettings</receiver>
+   <slot>onEditingFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>21</x>
+     <y>29</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>15</x>
+     <y>44</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>editY</sender>
+   <signal>editingFinished()</signal>
+   <receiver>PartMainVirtualSettings</receiver>
+   <slot>onEditingFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>92</x>
+     <y>30</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>122</x>
+     <y>44</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>editZ</sender>
+   <signal>editingFinished()</signal>
+   <receiver>PartMainVirtualSettings</receiver>
+   <slot>onEditingFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>154</x>
+     <y>30</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>122</x>
+     <y>44</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>editProbe</sender>
+   <signal>editingFinished()</signal>
+   <receiver>PartMainVirtualSettings</receiver>
+   <slot>onEditingFinished()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>216</x>
+     <y>30</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>122</x>
+     <y>44</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onSetClicked1()</slot>
+  <slot>onSetClicked2()</slot>
+  <slot>onSetClicked3()</slot>
+  <slot>onEStopToggled(bool)</slot>
+  <slot>onEditingFinished()</slot>
+ </slots>
+</ui>

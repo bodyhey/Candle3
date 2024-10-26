@@ -23,6 +23,7 @@
 #include "connection/connectionmanager.h"
 #include "drawers/cursordrawer.h"
 #include "drawers/tablesurfacedrawer.h"
+#include "form_partial/main/partmainvirtualsettings.h"
 #include "gcode/gcode.h"
 #include "globals.h"
 
@@ -55,6 +56,7 @@
 #include "frmabout.h"
 
 #include "scripting/scriptvars.h"
+#include "widgets/dropwidget.h"
 
 #ifdef WINDOWS
     #include <QtWinExtras/QtWinExtras>
@@ -267,6 +269,9 @@ private:
     frmAbout m_frmAbout;
     frmGrblConfigurator *m_grblConfigurator;
 
+    // Partials/Panels
+    PartMainVirtualSettings *m_partMainVirtualSettings;
+
     // Filenames
     QString m_settingsFileName;
     QString m_programFileName;
@@ -375,6 +380,9 @@ private:
     void applyHeightmapDrawerConfiguration(ConfigurationVisualizer &visualizerConfiguration);
     void applyUIConfiguration(ConfigurationUI &uiConfiguration);
     void applyJoggingConfiguration(ConfigurationJogging &joggingConfiguration);
+    void appendPanel(DropWidget *dockPanel, const QString title, QWidget *panel);
+    void appendSpacer(DropWidget *dockPanel);
+    void addWindow(const QString title, QWidget *window, Qt::DockWidgetArea area, Qt::Orientation orientation);
 };
 
 typedef QMap<QString, QList<QKeySequence>> ShortcutsMap;

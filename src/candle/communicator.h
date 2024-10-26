@@ -137,7 +137,7 @@ class Communicator : public QObject
         void senderStateReceived(SenderState state);
         void senderStateChanged(SenderState state);
         void deviceStateChanged(DeviceState state);
-        void configurationReceived(MachineConfiguration configuration, QMap<int, double> rawConfiguration);
+        void deviceConfigurationReceived(MachineConfiguration configuration, QMap<int, double> rawConfiguration);
         void machinePosChanged(QVector3D pos);
         void workPosChanged(QVector3D pos);
         // emitted after status response received, if state changed, may be emitted together with deviceStateChanged!

@@ -23,6 +23,7 @@
 #include "utils.h"
 #include "form_partial/main/partmainjog.h"
 #include "form_partial/main/partmaincontrol.h"
+#include "form_partial/main/partmainvirtualsettings.h"
 #include "module/pendant/pendant.h"
 #include "ui_frmmain.h"
 #include "ui_frmsettings.h"
@@ -269,16 +270,31 @@ frmMain::frmMain(QWidget *parent) :
     m_timerConnection.start(1000);
     m_timerToolAnimation.start(25, this);
 
+    // Pendant
     Pendant *pendant = new Pendant(this, *m_communicator);
 
-    QDockWidget *dock = new QDockWidget(tr("Camera"));
-    dock->setObjectName("Camera");
+    // Virtual uCNC settings
+    m_partMainVirtualSettings = new PartMainVirtualSettings();
+    m_partMainVirtualSettings->setEnabled(false);
+    appendPanel(
+        ui->scrollContentsDevice,
+        "Virtual uCNC settings",
+        m_partMainVirtualSettings
+    );
 
-    Camera *camera = new Camera();
+    appendSpacer(
+        ui->scrollContentsDevice
+    );
 
-    dock->setWidget(camera);
+    updateLayouts();
 
-    addDockWidget(Qt::TopDockWidgetArea, dock, Qt::Vertical);
+    // Camera
+    addWindow(
+        "Camera",
+        new Camera(),
+        Qt::TopDockWidgetArea,
+        Qt::Vertical
+    );
 
     updateLayouts();
 }
@@ -320,6 +336,10 @@ void frmMain::initializeCommunicator()
     connect(m_communicator, SIGNAL(toolPositionReceived(QVector3D)), this, SLOT(onToolPositionReceived(QVector3D)));
     connect(m_communicator, SIGNAL(transferCompleted()), this, SLOT(onTransferCompleted()));
     connect(m_communicator, SIGNAL(aborted()), this, SLOT(onAborted()));
+    connect(m_communicator, &Communicator::deviceConfigurationReceived, this, [this](MachineConfiguration configuration, QMap<int, double> rawConfiguration) {
+        Q_UNUSED(rawConfiguration)
+        m_partMainVirtualSettings->deviceConfigurationReceived(configuration);
+    });
 }
 
 void frmMain::initializeVisualizer()
@@ -2354,6 +2374,41 @@ void frmMain::applyJoggingConfiguration(ConfigurationJogging &joggingConfigurati
     ui->jog->configurationUpdated();
 }
 
+void frmMain::appendPanel(DropWidget *dockPanel, const QString title, QWidget *panel)
+{
+    QGroupBox *grp = new QGroupBox(tr(title.toStdString().c_str()));
+    grp->setCheckable(true);
+    connect(grp, &QGroupBox::toggled, dockPanel, [panel](bool checked) {
+        panel->setVisible(checked);
+    });
+    QVBoxLayout *layout = new QVBoxLayout();
+    layout->addWidget(panel);
+    grp->setLayout(layout);
+    dockPanel->layout()->addWidget(grp);
+}
+
+void frmMain::appendSpacer(DropWidget *dockPanel)
+{
+    QGroupBox *grp = new QGroupBox();
+    QSizePolicy sp = grp->sizePolicy();
+    sp.setHorizontalPolicy(QSizePolicy::Preferred);
+    sp.setVerticalPolicy(QSizePolicy::Expanding);
+    sp.setHorizontalStretch(0);
+    sp.setVerticalStretch(0);
+    grp->setStyleSheet("QGroupBox {	margin-top: 7; }");
+    QVBoxLayout *layout = (QVBoxLayout*)dockPanel->layout();
+    layout->addWidget(grp);
+    layout->setStretchFactor(grp, 1);
+}
+
+void frmMain::addWindow(const QString title, QWidget *window, Qt::DockWidgetArea area, Qt::Orientation orientation)
+{
+    QDockWidget *dock = new QDockWidget(tr(title.toStdString().c_str()));
+    dock->setObjectName("Camera");
+    dock->setWidget(window);
+    addDockWidget(area, dock, orientation);
+}
+
 void frmMain::applySettings()
 {
     ConfigurationVisualizer &visualizerConfiguration = m_configuration.visualizerModule();
@@ -3264,7 +3319,7 @@ bool frmMain::eventFilter(QObject *obj, QEvent *event)
     }
 
     // Drag & drop panels
-    if (!ui->actViewLockPanels->isChecked() && obj->inherits("QGroupBox") 
+    if (!ui->actViewLockPanels->isChecked() && obj->inherits("QGroupBox") && obj->parent() != nullptr
         && (obj->parent()->objectName() == "scrollContentsDevice"
         || obj->parent()->objectName() == "scrollContentsModification"
         || obj->parent()->objectName() == "scrollContentsUser")
