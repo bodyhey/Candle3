@@ -118,6 +118,7 @@ SOURCES += main.cpp\
     parser/pointsegment.cpp \
     tables/gcodetablemodel.cpp \
     tables/heightmaptablemodel.cpp \
+    utils.cpp \
     widgets/combobox.cpp \
     widgets/comboboxkey.cpp \
     widgets/glwidget.cpp \

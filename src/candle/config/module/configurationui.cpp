@@ -14,8 +14,8 @@ const QMap<QString,QVariant> DEFAULTS = {
     {"lockWindows", false},
     {"lockPanels", false},
     // -1 is a special value to indicate that the window should be centered
-    // 0xFFFF is a special value to indicate that the window should be maximized
-    {"mainFormGeometry", QVariantMap({{"x", 0}, {"y", 0}, {"width", 0xFFFF}, {"height", 0xFFFF}})},
+    // -1 is a special value to indicate that the window should be maximized
+    {"mainFormGeometry", QVariantMap({{"x", 0}, {"y", 0}, {"width", -1}, {"height", -1}})},
     {"settingsFormGeometry", QVariantMap({{"x", -1}, {"y", -1}, {"width", 800}, {"height", 600}})},
     {"grblConfigratorFormGeometry", QVariantMap({{"x", -1}, {"y", -1}, {"width", 800}, {"height", 600}})},
     {"spindleSpeedRange", QVariantMap({{"min", 0}, {"max", 100}})},
