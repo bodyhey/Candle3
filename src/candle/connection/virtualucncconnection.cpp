@@ -3,27 +3,12 @@
 // Copyright 2024 BTS
 
 #include "virtualucncconnection.h"
-#include <QThread>
 #include <QDebug>
 
 extern "C" {
 Q_DECL_IMPORT
     void uCNC(QString serverName);
 }
-
-class WorkerThread : public QThread
-{
-public:
-    WorkerThread(QString serverName) : QThread(nullptr), m_serverName(serverName) {
-    }
-
-    void run() override {
-        qDebug() << "Starting virtual uCNC, server " << m_serverName;
-        uCNC(m_serverName.toStdString().c_str());
-    }
-private:
-    QString m_serverName;
-};
 
 VirtualUCNCConnection::VirtualUCNCConnection(QObject *parent) : Connection(parent)
 {
@@ -37,6 +22,19 @@ VirtualUCNCConnection::~VirtualUCNCConnection()
 {
 }
 
+void VirtualUCNCConnection::startLocalServer()
+{
+    m_server = new QLocalServer(this);
+    connect(m_server, &QLocalServer::newConnection, this, &VirtualUCNCConnection::onNewConnection);
+    m_server->listen("gpilotucnc");
+}
+
+void VirtualUCNCConnection::startWorkerThread()
+{
+    m_thread = new WorkerThread(m_server->serverName());
+    m_thread->start();
+}
+
 bool VirtualUCNCConnection::openConnection()
 {
     if (m_connecting) {
@@ -48,12 +46,8 @@ bool VirtualUCNCConnection::openConnection()
 
     m_connecting = true;
 
-    m_server = new QLocalServer(this);
-    connect(m_server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
-    m_server->listen("gpilotucnc");
-
-    WorkerThread* thread = new WorkerThread(m_server->serverName());
-    thread->start();
+    startLocalServer();
+    startWorkerThread();
 
     // still waiting for connection, return 'not connected'
     return false;
@@ -105,14 +99,25 @@ void VirtualUCNCConnection::sendLine(QString line)
 
 void VirtualUCNCConnection::closeConnection()
 {
+    m_thread->terminate();
+    m_thread->wait();
+    delete m_thread;
+    m_thread = nullptr;
+
     m_connected = false;
     if (m_socket != nullptr) {
-        m_socket->close();
-        m_socket->deleteLater();
+        if (m_socket->isOpen()) {
+            disconnect(m_socket, &QLocalSocket::disconnected, this, &VirtualUCNCConnection::onDisconnected);
+            m_socket->abort();
+        }
+        delete m_socket;
         m_socket = nullptr;
     }
-    m_server->close();
-    m_server->deleteLater();
+    if (m_server != nullptr && m_server->isListening()) {
+        m_server->close();
+        delete m_server;
+        m_server = nullptr;
+    }
 }
 
 void VirtualUCNCConnection::onNewConnection()
@@ -123,8 +128,8 @@ void VirtualUCNCConnection::onNewConnection()
     }
 
     m_socket = m_server->nextPendingConnection();
-    connect(m_socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
-    connect(m_socket, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
+    connect(m_socket, &QIODevice::readyRead, this, &VirtualUCNCConnection::onReadyRead);
+    connect(m_socket, &QLocalSocket::disconnected, this, &VirtualUCNCConnection::onDisconnected);
 
     m_connecting = false;
     m_connected = true;
@@ -165,4 +170,13 @@ void VirtualUCNCConnection::processIncomingData()
 
         emit this->lineReceived(line);
     }
+}
+
+WorkerThread::WorkerThread(QString serverName) : QThread(nullptr), m_serverName(serverName) {
+}
+
+void WorkerThread::run() {
+    qDebug() << "Starting virtual uCNC, server " << m_serverName;
+    uCNC(m_serverName.toStdString().c_str());
+    qDebug() << "uCNC stopped!";
 }

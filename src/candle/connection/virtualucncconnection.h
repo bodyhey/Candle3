@@ -9,6 +9,17 @@
 #include "connection.h"
 #include <QLocalSocket>
 #include <QLocalServer>
+#include <QThread>
+
+class WorkerThread : public QThread
+{
+    public:
+        WorkerThread(QString serverName);
+
+        void run() override;
+    private:
+        QString m_serverName;
+};
 
 class VirtualUCNCConnection : public Connection
 {
@@ -27,10 +38,15 @@ public:
 private:
     QLocalSocket* m_socket;
     QLocalServer* m_server;
+    WorkerThread* m_thread;
     QString m_incoming;
     bool m_connected;
     void flushOutgoingData();
     void processIncomingData();
+
+    void startLocalServer();
+
+    void startWorkerThread();
 
 private slots:
     void onNewConnection();
