@@ -368,7 +368,7 @@ QLabel[overrided=&quot;false&quot;] {
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="mnuFile">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>&amp;File</string>
     </property>
@@ -389,43 +389,43 @@ QLabel[overrided=&quot;false&quot;] {
     <addaction name="separator"/>
     <addaction name="actFileExit"/>
    </widget>
-   <widget class="QMenu" name="mnuService">
+   <widget class="QMenu" name="menuService">
     <property name="title">
      <string>&amp;Service</string>
     </property>
     <addaction name="actServiceSettings"/>
     <addaction name="actServiceConfigureGRBL"/>
    </widget>
-   <widget class="QMenu" name="mnuHelp">
+   <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>&amp;Help</string>
     </property>
     <addaction name="actAbout"/>
    </widget>
-   <widget class="QMenu" name="menu_View">
+   <widget class="QMenu" name="menuView">
     <property name="title">
      <string>&amp;View</string>
     </property>
-    <widget class="QMenu" name="mnuViewWindows">
+    <widget class="QMenu" name="menuViewWindows">
      <property name="title">
       <string>&amp;Windows</string>
      </property>
     </widget>
-    <widget class="QMenu" name="mnuViewPanels">
+    <widget class="QMenu" name="menuViewPanels">
      <property name="title">
       <string>&amp;Panels</string>
      </property>
     </widget>
-    <addaction name="mnuViewWindows"/>
-    <addaction name="mnuViewPanels"/>
+    <addaction name="menuViewWindows"/>
+    <addaction name="menuViewPanels"/>
     <addaction name="separator"/>
     <addaction name="actViewLockWindows"/>
     <addaction name="actViewLockPanels"/>
    </widget>
-   <addaction name="mnuFile"/>
-   <addaction name="menu_View"/>
-   <addaction name="mnuService"/>
-   <addaction name="mnuHelp"/>
+   <addaction name="menuFile"/>
+   <addaction name="menuView"/>
+   <addaction name="menuService"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QDockWidget" name="dockModification">
    <property name="allowedAreas">
@@ -2107,14 +2107,6 @@ QLabel[overrided=&quot;false&quot;] {
     <string>&amp;Lock windows</string>
    </property>
   </action>
-  <action name="actViewLockPanels">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>L&amp;ock panels</string>
-   </property>
-  </action>
   <action name="actControlHold">
    <property name="text">
     <string>Hold</string>
@@ -2147,6 +2139,14 @@ QLabel[overrided=&quot;false&quot;] {
   <action name="actServiceConfigureGRBL">
    <property name="text">
     <string>Configure GRBL</string>
+   </property>
+  </action>
+  <action name="actViewLockPanels">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>L&amp;ock panels</string>
    </property>
   </action>
  </widget>

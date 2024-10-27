@@ -422,7 +422,7 @@ void frmMain::closeEvent(QCloseEvent *ce)
 
     m_timerConnection.stop();
     m_connection->closeConnection();
-    
+
     m_communicator->clearCommandsAndQueue();
     // moved to communicator
     // if (m_communicator->m_queue.length() > 0) {
@@ -1439,7 +1439,7 @@ void frmMain::on_mnuViewWindows_aboutToShow()
     QList<QAction*> al;
 
     foreach (QDockWidget *d, findChildren<QDockWidget*>()) {
-        a = new QAction(d->windowTitle(), ui->mnuViewWindows);
+        a = new QAction(d->windowTitle(), ui->menuViewWindows);
         a->setCheckable(true);
         a->setChecked(d->isVisible());
         connect(a, &QAction::triggered, d, &QDockWidget::setVisible);
@@ -1448,15 +1448,15 @@ void frmMain::on_mnuViewWindows_aboutToShow()
 
     qSort(al.begin(), al.end(), frmMain::actionTextLessThan);
 
-    ui->mnuViewWindows->clear();
-    ui->mnuViewWindows->addActions(al);
+    ui->menuViewWindows->clear();
+    ui->menuViewWindows->addActions(al);
 }
 
 void frmMain::on_mnuViewPanels_aboutToShow()
 {
     QAction *a;
 
-    ui->mnuViewPanels->clear();
+    ui->menuViewPanels->clear();
 
     QStringList panels;
     if (ui->scrollContentsDevice->isVisible()) panels << ui->scrollContentsDevice->saveState();
@@ -1465,11 +1465,11 @@ void frmMain::on_mnuViewPanels_aboutToShow()
 
     foreach (QString s, panels) {
         if (s == "\n") {
-            ui->mnuViewPanels->addSeparator();
+            ui->menuViewPanels->addSeparator();
         } else {
             QGroupBox *b = findChild<QGroupBox*>(s);
             if (b) {
-                a = ui->mnuViewPanels->addAction(b->title());
+                a = ui->menuViewPanels->addAction(b->title());
                 a->setCheckable(true);
                 a->setChecked(b->isVisible());
                 connect(a, &QAction::triggered, b, &QWidget::setVisible);
@@ -3289,35 +3289,50 @@ bool frmMain::eventFilter(QObject *obj, QEvent *event)
     }
 
     // Drag & drop panels
-    if (!ui->actViewLockPanels->isChecked() && obj->inherits("QGroupBox") && obj->parent() != nullptr
-        && (obj->parent()->objectName() == "scrollContentsDevice"
-        || obj->parent()->objectName() == "scrollContentsModification"
-        || obj->parent()->objectName() == "scrollContentsUser")
+    static QObject *mouseDownObject = nullptr;
+    if (event->type() == QEvent::MouseButtonRelease && mouseDownObject != nullptr) {
+        mouseDownObject = nullptr;
+    }
+
+    if (!ui->actViewLockPanels->isChecked() && obj->parent() != nullptr && obj->inherits("QGroupBox")
+        && (obj->parent() == ui->scrollContentsDevice
+            || obj->parent() == ui->scrollContentsModification
+            || obj->parent() == ui->scrollContentsUser
+        )
         && obj->objectName().startsWith("grp")) {
 
-        if (event->type() == QEvent::MouseButtonPress) {
-            
-            QMouseEvent *e = static_cast<QMouseEvent*>(event);
-            m_mousePressPos = e->pos();
+        static QPoint mousePressPos;
 
-        } else if (event->type() == QEvent::MouseMove) {
+        switch (event->type()) {
+            case QEvent::MouseButtonPress:
+                mouseDownObject = obj;
+                break;
+            case QEvent::MouseButtonRelease:
+                mouseDownObject = nullptr;
+                break;
+            case QEvent::MouseMove: {
+                if (obj != mouseDownObject) break;
 
-            QMouseEvent *e = static_cast<QMouseEvent*>(event);
-            int d = (e->pos() - m_mousePressPos).manhattanLength();
+                QMouseEvent *e = static_cast<QMouseEvent*>(event);
+                int d = (e->pos() - mousePressPos).manhattanLength();
 
-            if (e->buttons() & Qt::LeftButton && d > QApplication::startDragDistance()) {
-                QDrag *drag = new QDrag(this);
-                WidgetMimeData *mimeData = new WidgetMimeData();
+                if (e->buttons() & Qt::LeftButton && d > QApplication::startDragDistance()) {
+                    QDrag *drag = new QDrag(this);
+                    WidgetMimeData *mimeData = new WidgetMimeData();
 
-                mimeData->setWidget(static_cast<QWidget*>(obj));
+                    mimeData->setWidget(static_cast<QWidget*>(obj));
 
-                QPixmap *pix = new QPixmap(static_cast<QWidget*>(obj)->size());
-                static_cast<QWidget*>(obj)->render(pix);
-                
-                drag->setMimeData(mimeData);
-                drag->setPixmap(*pix);
-                drag->exec();
+                    QPixmap *pix = new QPixmap(static_cast<QWidget*>(obj)->size());
+                    static_cast<QWidget*>(obj)->render(pix);
+
+                    drag->setMimeData(mimeData);
+                    drag->setPixmap(*pix);
+                    drag->exec();
+                }
+                break;
             }
+            default:
+                break;
         }
     }
 

@@ -302,9 +302,6 @@ private:
 
     Configuration m_configuration;
     ScriptVars m_scriptVars;
-
-    // Drag & drop
-    QPoint m_mousePressPos;
     
     // Settings
     void preloadSettings();
