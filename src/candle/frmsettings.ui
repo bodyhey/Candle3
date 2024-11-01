@@ -51,7 +51,7 @@ QSplitter::handle:horizontal {
   <property name="sizeGripEnabled">
    <bool>true</bool>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_10" stretch="0,0">
+  <layout class="QVBoxLayout" name="verticalLayout_10" stretch="0,0,0">
    <item>
     <widget class="QSplitter" name="splitMain">
      <property name="orientation">
@@ -90,9 +90,9 @@ QSplitter::handle:horizontal {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
+         <y>-2165</y>
          <width>642</width>
-         <height>2519</height>
+         <height>2547</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1652,18 +1652,12 @@ QSplitter::handle:horizontal {
           <layout class="QVBoxLayout" name="verticalLayout_9">
            <item>
             <layout class="QGridLayout" name="gridLayout_3">
-             <item row="0" column="3">
-              <spacer name="horizontalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+             <item row="0" column="0">
+              <widget class="QLabel" name="lblFontSize">
+               <property name="text">
+                <string>Font size:</string>
                </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
+              </widget>
              </item>
              <item row="0" column="2">
               <widget class="QLabel" name="label_30">
@@ -1719,17 +1713,16 @@ QSplitter::handle:horizontal {
                </item>
               </widget>
              </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="lblFontSize">
-               <property name="text">
-                <string>Font size:</string>
+             <item row="1" column="3">
+              <widget class="QLabel" name="label_31">
+               <property name="styleSheet">
+                <string notr="true">color: blue;</string>
                </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="lblLanguage">
                <property name="text">
-                <string>Language:</string>
+                <string>(restart needed)</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignCenter</set>
                </property>
               </widget>
              </item>
@@ -1752,20 +1745,34 @@ QSplitter::handle:horizontal {
                </property>
               </widget>
              </item>
-             <item row="1" column="3">
-              <widget class="QLabel" name="label_31">
-               <property name="styleSheet">
-                <string notr="true">color: blue;</string>
+             <item row="0" column="3">
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="lblLanguage">
                <property name="text">
-                <string>(restart needed)</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignCenter</set>
+                <string>Language:</string>
                </property>
               </widget>
              </item>
             </layout>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="chkStatePanelUseLCDStyle">
+             <property name="text">
+              <string>Use LCD style in the state panel</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -1774,6 +1781,19 @@ QSplitter::handle:horizontal {
       </widget>
      </widget>
     </widget>
+   </item>
+   <item>
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -1786,19 +1806,6 @@ QSplitter::handle:horizontal {
         <bool>false</bool>
        </property>
       </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
      </item>
      <item>
       <widget class="QPushButton" name="cmdOK">
@@ -1980,7 +1987,7 @@ QSplitter::handle:horizontal {
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="grpProgramDrawMode"/>
   <buttongroup name="grpGrayscaleSegments"/>
+  <buttongroup name="grpProgramDrawMode"/>
  </buttongroups>
 </ui>

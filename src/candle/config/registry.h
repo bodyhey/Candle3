@@ -8,8 +8,6 @@
 #include <QDebug>
 #include <QVector>
 
-using namespace std;
-
 class ConfigurationRegistry
 {
     public:

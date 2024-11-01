@@ -5,6 +5,7 @@
 #include "partmainconsole.h"
 #include "ui_partmainconsole.h"
 #include <QScrollBar>
+#include <QCompleter>
 
 partMainConsole::partMainConsole(QWidget *parent)
     : QWidget(parent)
@@ -25,7 +26,12 @@ void partMainConsole::initialize(ConfigurationConsole &configurationConsole)
 {
     m_configurationConsole = &configurationConsole;
 
-    ui->cboCommand->setAutoCompletion(m_configurationConsole->commandAutoCompletion());
+    // QCompleter *completer = new QCompleter(this);
+    // completer->set
+
+    // ui->cboCommand->completer()
+    //     setAutoCompletion(m_configurationConsole->commandAutoCompletion());
+
 
     // restore command history
     ui->cboCommand->addItems(m_configurationConsole->commandHistory());

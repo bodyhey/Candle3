@@ -7,6 +7,7 @@
 
 #include <QObject>
 #include <QRect>
+#include <QWidget>
 #include "configurationmodule.h"
 
 class ConfigurationUI : public ConfigurationModule
@@ -25,6 +26,7 @@ class ConfigurationUI : public ConfigurationModule
     Q_PROPERTY(QRect settingsFormGeometry MEMBER m_settingsFormGeometry NOTIFY changed)
     Q_PROPERTY(QRect grblConfigratorFormGeometry MEMBER m_grblConfigratorFormGeometry NOTIFY changed)
     Q_PROPERTY(QRect mainFormGeometry MEMBER m_mainFormGeometry NOTIFY changed)
+    Q_PROPERTY(QList<int> settingsFormSlicerSizes MEMBER m_settingsFormSlicerSizes NOTIFY changed)
 
     public:
         explicit ConfigurationUI(QObject *parent);
@@ -49,11 +51,13 @@ class ConfigurationUI : public ConfigurationModule
         bool lockPanels() const { return m_lockPanels; }
         void setLockPanels(bool lockPanels) { m_lockPanels = lockPanels; emit changed(); }
         QRect settingsFormGeometry() const { return m_settingsFormGeometry; }
-        void setSettingsFormGeometry(const QRect &geometry) { m_settingsFormGeometry = geometry; emit changed(); }
+        void setSettingsFormGeometry(const QWidget *widget) { m_settingsFormGeometry = widget->frameGeometry(); emit changed(); }
         QRect grblConfigratorFormGeometry() const { return m_grblConfigratorFormGeometry; }
-        void setGrblConfigratorFormGeometry(const QRect &geometry) { m_grblConfigratorFormGeometry = geometry; emit changed(); }
+        void setGrblConfigratorFormGeometry(const QWidget *widget) { m_grblConfigratorFormGeometry = widget->frameGeometry(); emit changed(); }
         QRect mainFormGeometry() const { return m_mainFormGeometry; }
-        void setMainFormGeometry(const QRect &geometry) { m_mainFormGeometry = geometry; emit changed(); }
+        void setMainFormGeometry(const QWidget *widget) { m_mainFormGeometry = widget->frameGeometry(); emit changed(); }
+        QList<int> settingsFormSlicerSizes() const { return m_settingsFormSlicerSizes; }
+        void setSettingsFormSlicerSizes(QList<int> sizes) { m_settingsFormSlicerSizes = sizes; emit changed(); }
 
     private:
         static const int MAX_RECENT_FILES = 10;
@@ -68,6 +72,7 @@ class ConfigurationUI : public ConfigurationModule
         QRect m_mainFormGeometry;
         QRect m_settingsFormGeometry;
         QRect m_grblConfigratorFormGeometry;
+        QList<int> m_settingsFormSlicerSizes;
 };
 
 #endif // CONFIGURATIONUI_H

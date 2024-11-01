@@ -10,7 +10,7 @@
 #include <iostream>
 
 #ifdef GLES
-#include <GLES/gl.h>
+//#include <GLES/gl.h>
 #endif
 
 #define ZOOMSTEP 1.1
@@ -405,10 +405,8 @@ void GLWidget::setSpendTime(const QTime &spendTime)
 
 void GLWidget::initializeGL()
 {
-#ifndef GLES
     // Initialize functions
     initializeOpenGLFunctions();
-#endif
 
     // Create shader program
     m_shaderProgram = new QOpenGLShaderProgram();
@@ -560,7 +558,7 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
     drawText(painter, pos, m_pinState, 10);
 
     // right side
-    pos = QPoint(this->width() - fm.width(str) - 10, this->height() - 60);
+    pos = QPoint(this->width() - fm.horizontalAdvance(str) - 10, this->height() - 60);
 
     drawText(painter, pos, m_spendTime.toString("hh:mm:ss") + " / " + m_estimatedTime.toString("hh:mm:ss"), 15);
     drawText(painter, pos, m_bufferState, 15);
@@ -697,9 +695,10 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void GLWidget::wheelEvent(QWheelEvent *we)
 {
-    if (m_zoomDistance > MIN_ZOOM && we->delta() < 0)
+    int delta = we->angleDelta().y();
+    if (m_zoomDistance > MIN_ZOOM && delta < 0)
         m_zoomDistance /= ZOOMSTEP;
-    else if (we->delta() > 0)
+    else if (delta > 0)
         m_zoomDistance *= ZOOMSTEP;
 
     if (!m_perspective) updateProjection();

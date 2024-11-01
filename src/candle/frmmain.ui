@@ -1261,7 +1261,7 @@ QLabel[overrided=&quot;false&quot;] {
           <x>0</x>
           <y>0</y>
           <width>105</width>
-          <height>484</height>
+          <height>461</height>
          </rect>
         </property>
         <property name="acceptDrops">
@@ -1753,7 +1753,7 @@ QLabel[overrided=&quot;false&quot;] {
           <x>0</x>
           <y>0</y>
           <width>105</width>
-          <height>211</height>
+          <height>234</height>
          </rect>
         </property>
         <property name="acceptDrops">

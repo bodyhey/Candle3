@@ -52,7 +52,7 @@
 #define CAMERA_H
 
 #include <QCamera>
-#include <QCameraImageCapture>
+//#include <QCameraImageCapture>
 #include <QMediaRecorder>
 #include <QScopedPointer>
 

@@ -5,7 +5,7 @@
 
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QDebug>
 #include <QVector3D>
 #include "gcodepreprocessorutils.h"
@@ -47,12 +47,13 @@ static inline std::string &trim(std::string &s) {
 */
 QString GcodePreprocessorUtils::overrideSpeed(QString command, double speed, double *original)
 {
-    static QRegExp re("[Ff]([0-9.]+)");
+    static QRegularExpression re("[Ff]([0-9.]+)");
 
-    if (re.indexIn(command) != -1) {
-        command.replace(re, QString("F%1").arg(re.cap(1).toDouble() / 100 * speed));
+    QRegularExpressionMatch match = re.match(command);
+    if (match.hasMatch()) {
+        command.replace(re, QString("F%1").arg(match.captured(1).toDouble() / 100 * speed));
 
-        if (original) *original = re.cap(1).toDouble();
+        if (original) *original = match.captured(1).toDouble();
     }
 
     return command;
@@ -73,8 +74,8 @@ std::string GcodePreprocessorUtils::trimCommand(std::string command)
 */
 QString GcodePreprocessorUtils::removeComment(QString command)
 {
-    static QRegExp rx1("\\(+[^\\(]*\\)+");
-    static QRegExp rx2(";.*");
+    static QRegularExpression rx1("\\(+[^\\(]*\\)+");
+    static QRegularExpression rx2(";.*");
 
     // Remove any comments within ( parentheses ) using regex "\([^\(]*\)"
     if (command.contains('(')) command.remove(rx1);
@@ -117,24 +118,28 @@ QString GcodePreprocessorUtils::parseComment(QString command)
     // "(?<=\()[^\(\)]*|(?<=\;)[^;]*"
     // "(?<=\\()[^\\(\\)]*|(?<=\\;)[^;]*"
 
-    static QRegExp re("(\\([^\\(\\)]*\\)|;[^;].*)");
+    static QRegularExpression re("(\\([^\\(\\)]*\\)|;[^;].*)");
 
-    if (re.indexIn(command) != -1) {
-        return re.cap(1);
+    QRegularExpressionMatch match = re.match(command);
+    if (match.hasMatch()) {
+        return match.captured(1);
     }
     return "";
 }
 
 QString GcodePreprocessorUtils::truncateDecimals(int length, QString command)
 {
-    static QRegExp re("(\\d*\\.\\d*)");
+    static QRegularExpression re("(\\d*\\.\\d*)");
     int pos = 0;
 
-    while ((pos = re.indexIn(command, pos)) != -1)
+    QRegularExpressionMatch match = re.match(command);
+    while (match.hasMatch())
     {
-        QString newNum = QString::number(re.cap(1).toDouble(), 'f', length);
-        command = command.left(pos) + newNum + command.mid(pos + re.matchedLength());
+        pos = match.capturedStart();
+        QString newNum = QString::number(match.captured(1).toDouble(), 'f', length);
+        command = command.left(pos) + newNum + command.mid(pos + match.capturedLength());
         pos += newNum.length() + 1;
+        match = re.match(command, pos);
     }
 
     return command;
@@ -142,7 +147,7 @@ QString GcodePreprocessorUtils::truncateDecimals(int length, QString command)
 
 QString GcodePreprocessorUtils::removeAllWhitespace(QString command)
 {
-    static QRegExp rx("\\s");
+    static QRegularExpression rx("\\s");
 
     return command.remove(rx);
 }
@@ -160,14 +165,17 @@ QList<float> GcodePreprocessorUtils::parseCodes(const QStringList &args, char co
 
 QList<int> GcodePreprocessorUtils::parseGCodes(QString command)
 {
-    static QRegExp re("[Gg]0*(\\d+)");
+    static QRegularExpression re("[Gg]0*(\\d+)");
 
     QList<int> codes;
     int pos = 0;
 
-    while ((pos = re.indexIn(command, pos)) != -1) {
-        codes.append(re.cap(1).toInt());
-        pos += re.matchedLength();
+    QRegularExpressionMatch match = re.match(command);
+    while (match.hasMatch()) {
+        pos = match.capturedStart();
+        codes.append(match.captured(1).toInt());
+        pos += match.capturedLength();
+        match = re.match(command, pos);
     }
 
     return codes;
@@ -175,14 +183,17 @@ QList<int> GcodePreprocessorUtils::parseGCodes(QString command)
 
 QList<int> GcodePreprocessorUtils::parseMCodes(QString command)
 {
-    static QRegExp re("[Mm]0*(\\d+)");
+    static QRegularExpression re("[Mm]0*(\\d+)");
 
     QList<int> codes;
     int pos = 0;
 
-    while ((pos = re.indexIn(command, pos)) != -1) {
-        codes.append(re.cap(1).toInt());
-        pos += re.matchedLength();
+    QRegularExpressionMatch match = re.match(command);
+    while (match.hasMatch()) {
+        pos = match.capturedStart();
+        codes.append(match.captured(1).toInt());
+        pos += match.capturedLength();
+        match = re.match(command, pos);
     }
 
     return codes;

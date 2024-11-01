@@ -3,11 +3,12 @@
 
 #include <QApplication>
 #include <QDebug>
-#include <QGLWidget>
+#include <QOpenGLWidget>
 #include <QLocale>
 #include <QTranslator>
 #include <QFile>
 #include <QStyleFactory>
+#include <QStyleHints>
 #include <QFontDatabase>
 #include <QMessageBox>
 
@@ -37,8 +38,8 @@ void messageHandler(QtMsgType type, const QMessageLogContext &, const QString & 
     QFile outFile("log");
     outFile.open(QIODevice::WriteOnly | QIODevice::Append);
     QTextStream ts(&outFile);
-    ts << txt << endl;
-    QTextStream(stdout) << txt << endl;
+    ts << txt << Qt::endl;
+    QTextStream(stdout) << txt << Qt::endl;
 }
 
 void initAppInfo()
@@ -67,13 +68,13 @@ int main(int argc, char *argv[])
 #ifdef GLES
     QFontDatabase::addApplicationFont(":/fonts/Ubuntu-R.ttf");
 #endif
-    QGLFormat glf = QGLFormat::defaultFormat();
-    glf.setSampleBuffers(true);
-    glf.setSamples(8);
-    QGLFormat::setDefaultFormat(glf);
+
+    // QGLFormat glf = QGLFormat::defaultFormat();
+    // glf.setSampleBuffers(true);
+    // glf.setSamples(8);
+    // QGLFormat::setDefaultFormat(glf);
 
     QSettings set(app.applicationDirPath() + "/settings.ini", QSettings::IniFormat);
-    set.setIniCodec("UTF-8");
     QString loc = set.value("language", "en").toString();
 
     QString translationsFolder = qApp->applicationDirPath() + "/translations/";
@@ -102,18 +103,19 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef GLES
-    a.setStyle(QStyleFactory::create("Fusion"));
-    QPalette palette;
-    palette.setColor(QPalette::Highlight, QColor(204, 204, 254));
-    palette.setColor(QPalette::HighlightedText, QColor(0, 0, 0));
-    a.setPalette(palette);
+    app.styleHints()->setColorScheme(Qt::ColorScheme::Light);
+    app.setStyle(QStyleFactory::create("Fusion"));
+    // QPalette palette;
+    // palette.setColor(QPalette::Highlight, QColor(204, 204, 254));
+    // palette.setColor(QPalette::HighlightedText, QColor(0, 0, 0));
+    // app.setPalette(palette);
 
-    a.setStyleSheet("QWidget {font-family: \"Ubuntu\";}\
-                    QMenuBar {background-color: #303030; padding-top: 2px; padding-bottom: 2px;}\
-                    QMenuBar::item {spacing: 3px; padding: 2px 8px; background: transparent; color: white;}\
-                    QMenuBar::item:pressed {border: 1px solid #505050; border-bottom: 1px; border-top-left-radius: 3px; border-top-right-radius: 3px; background: #404040; color: white;}\
-                    QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white;}\
-                    QDialog {border: 1px solid palette(mid);}");
+    // app.setStyleSheet("QWidget {font-family: \"Ubuntu\";}\
+    //                 QMenuBar {background-color: #303030; padding-top: 2px; padding-bottom: 2px;}\
+    //                 QMenuBar::item {spacing: 3px; padding: 2px 8px; background: transparent; color: white;}\
+    //                 QMenuBar::item:pressed {border: 1px solid #505050; border-bottom: 1px; border-top-left-radius: 3px; border-top-right-radius: 3px; background: #404040; color: white;}\
+    //                 QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white;}\
+    //                 QDialog {border: 1px solid palette(mid);}");
 #endif
 
     app.setStyleSheet(app.styleSheet() + "QWidget {font-size: 8pt}");

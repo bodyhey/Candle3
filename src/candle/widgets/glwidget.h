@@ -15,7 +15,7 @@
 #include "drawers/shaderdrawable.h"
 
 #ifdef GLES
-class GLWidget : public QOpenGLWidget
+class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 #else
 class GLWidget : public QGLWidget, protected QOpenGLFunctions
 #endif

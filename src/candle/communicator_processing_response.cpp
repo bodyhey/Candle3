@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include <QThread>
 #include <QCoreApplication>
+#include <QRegularExpression>
 
 void Communicator::onConnectionLineReceived(QString data)
 {
@@ -58,20 +59,24 @@ void Communicator::onConnectionConnected()
 
 void Communicator::processFeedSpindleSpeed(QString data)
 {
-    static QRegExp fs("FS:([^,]*),([^,^|^>]*)");
-    if (fs.indexIn(data) != -1) {
-        emit feedSpindleSpeedReceived(fs.cap(1).toInt(), fs.cap(2).toInt());
+    static QRegularExpression fs("FS:([^,]*),([^,^|^>]*)");
+
+    QRegularExpressionMatch match = fs.match(data);
+    if (match.hasMatch()) {
+        emit feedSpindleSpeedReceived(match.captured(1).toInt(), match.captured(2).toInt());
     }
 }
 
 void Communicator::processOverrides(QString data)
 {
-    static QRegExp ov("Ov:([^,]*),([^,]*),([^,^>^|]*)");
-    if (ov.indexIn(data) != -1)
+    static QRegularExpression ov("Ov:([^,]*),([^,]*),([^,^>^|]*)");
+
+    QRegularExpressionMatch match = ov.match(data);
+    if (match.hasMatch())
     {
-        int feedOverride = ov.cap(1).toInt();
-        int spindleOverride = ov.cap(3).toInt();
-        int rapidOverride = ov.cap(2).toInt();
+        int feedOverride = match.captured(1).toInt();
+        int spindleOverride = match.captured(3).toInt();
+        int rapidOverride = match.captured(2).toInt();
 
         emit overridesReceived(feedOverride, spindleOverride, rapidOverride);
 
@@ -79,15 +84,19 @@ void Communicator::processOverrides(QString data)
 
         // Update pins state
         QString pinState;
-        static QRegExp pn("Pn:([^|^>]*)");
-        if (pn.indexIn(data) != -1) {
-            pinState.append(QString(tr("PS: %1")).arg(pn.cap(1)));
+        static QRegularExpression pn("Pn:([^|^>]*)");
+
+        match = pn.match(data);
+        if (match.hasMatch()) {
+            pinState.append(QString(tr("PS: %1")).arg(match.captured(1)));
         }
 
         // Process spindle state
-        static QRegExp as("A:([^,^>^|]+)");
-        if (as.indexIn(data) != -1) {
-            QString q = as.cap(1);
+        static QRegularExpression as("A:([^,^>^|]+)");
+
+        match = as.match(data);
+        if (match.hasMatch()) {
+            QString q = match.captured(1);
             m_spindleCW = q.contains("S");
             if (q.contains("S") || q.contains("C")) {
                 emit spindleStateReceived(true);
@@ -103,7 +112,7 @@ void Communicator::processOverrides(QString data)
             emit floodStateReceived(q.contains("F"));
 
             if (!pinState.isEmpty()) pinState.append(" / ");
-            pinState.append(QString(tr("AS: %1")).arg(as.cap(1)));
+            pinState.append(QString(tr("AS: %1")).arg(match.captured(1)));
         } else {
             emit spindleStateReceived(false);
             // to spindleStateReceived handler
@@ -135,14 +144,15 @@ void Communicator::processNewToolPosition()
 void Communicator::processWorkOffset(QString data)
 {
     static QVector3D workOffset;
-    static QRegExp wpx("WCO:([^,]*),([^,]*),([^,^>^|]*)");
+    static QRegularExpression wpx("WCO:([^,]*),([^,]*),([^,^>^|]*)");
     bool changed = false;
 
-    if (wpx.indexIn(data) != -1) {
+    QRegularExpressionMatch match = wpx.match(data);
+    if (match.hasMatch()) {
         QVector3D newWorkOffset(
-            wpx.cap(1).toDouble(),
-            wpx.cap(2).toDouble(),
-            wpx.cap(3).toDouble()
+            match.captured(1).toDouble(),
+            match.captured(2).toDouble(),
+            match.captured(3).toDouble()
         );
         changed = newWorkOffset != workOffset;
         workOffset = newWorkOffset;
@@ -169,12 +179,14 @@ void Communicator::processStatus(QString data)
     m_statusReceived = true;
 
     // Update machine coordinates
-    static QRegExp mpx("MPos:([^,]*),([^,]*),([^,^>^|]*)");
-    if (mpx.indexIn(data) != -1) {
+    static QRegularExpression mpx("MPos:([^,]*),([^,]*),([^,^>^|]*)");
+
+    QRegularExpressionMatch match = mpx.match(data);
+    if (match.hasMatch()) {
         QVector3D newPos(
-            mpx.cap(1).toDouble(),
-            mpx.cap(2).toDouble(),
-            mpx.cap(3).toDouble()
+            match.captured(1).toDouble(),
+            match.captured(2).toDouble(),
+            match.captured(3).toDouble()
         );
         if (newPos != m_machinePos) {
             m_machinePos = newPos;
@@ -184,9 +196,11 @@ void Communicator::processStatus(QString data)
     }
 
     // Status
-    static QRegExp stx("<([^,^>^|]*)");
-    if (stx.indexIn(data) != -1) {
-        state = m_deviceStatesDictionary.key(stx.cap(1), DeviceUnknown);
+    static QRegularExpression stx("<([^,^>^|]*)");
+
+    match = stx.match(data);
+    if (match.hasMatch()) {
+        state = m_deviceStatesDictionary.key(match.captured(1), DeviceUnknown);
 
         // Update status
         if (state != m_deviceState) {
@@ -302,14 +316,17 @@ void Communicator::processCommandResponse(QString data)
 
     // Take command from buffer
     CommandAttributes commandAttributes = m_commands.takeFirst();
+    qDebug() << "taking command, new size " << m_commands.length() << ", command is " << commandAttributes.commandLine;
 
     QString command = GcodePreprocessorUtils::removeComment(commandAttributes.commandLine).toUpper();
 
     // Store current coordinate system
     if (command == "$G") {
-        static QRegExp g("G5[4-9]");
-        if (g.indexIn(response) != -1) {
-            m_storedVars.setCS(g.cap(0));
+        static QRegularExpression g("G5[4-9]");
+
+        QRegularExpressionMatch match = g.match(response);
+        if (match.hasMatch()) {
+            m_storedVars.setCS(match.captured(0));
             // @TODO how to update drawer? signal? timer?
             // m_form->machineBoundsDrawer().setOffset(
             //     QPointF(
@@ -321,9 +338,12 @@ void Communicator::processCommandResponse(QString data)
             //     )
             // ));
         }
-        static QRegExp t("T(\\d+)(?!\\d)");
-        if (t.indexIn(response) != -1) {
-            m_storedVars.setTool(g.cap(1).toInt());
+
+        static QRegularExpression t("T(\\d+)(?!\\d)");
+
+        match = t.match(response);
+        if (match.hasMatch()) {
+            m_storedVars.setTool(match.captured(1).toInt());
         }
 
         // TODO: Store firmware version, features, buffer size on $I command
@@ -353,9 +373,11 @@ void Communicator::processCommandResponse(QString data)
 
             // Spindle speed
             // @TODO what is the difference between this and processFeedSpindleSpeed??
-            QRegExp rx(".*S([\\d\\.]+)");
-            if (rx.indexIn(response) != -1) {
-                double spindleSpeed = rx.cap(1).toDouble();
+            static QRegularExpression rx(".*S([\\d\\.]+)");
+
+            match = rx.match(response);
+            if (match.hasMatch()) {
+                double spindleSpeed = match.captured(1).toDouble();
                 emit spindleSpeedReceived(spindleSpeed);
             }
 
@@ -368,23 +390,30 @@ void Communicator::processCommandResponse(QString data)
 
     // Settings response
     if (command == "$$") {
-        static QRegExp gs("\\$(\\d+)\\=([^;]+)\\; ");
+        static QRegularExpression gs("\\$(\\d+)\\=([^;]+)\\; ");
+
         QMap<int, double> rawMachineConfiguration;
         int p = 0;
-        while ((p = gs.indexIn(response, p)) != -1) {
-            rawMachineConfiguration[gs.cap(1).toInt()] = gs.cap(2).toDouble();
-            p += gs.matchedLength();
+        QRegularExpressionMatch match = gs.match(response);
+        while (match.hasMatch()) {
+            rawMachineConfiguration[match.captured(1).toInt()] = match.captured(2).toDouble();
+            p += match.capturedLength();
+            match = gs.match(response, p);
         }
 
-        m_machineConfiguration = new MachineConfiguration(
+        MachineConfiguration *machineConfiguration = m_machineConfiguration = new MachineConfiguration(
             rawMachineConfiguration,
             m_configuration->machineModule()
         );
 
-        emit configurationReceived(
-            *m_machineConfiguration,
+        emit deviceConfigurationReceived(
+            *machineConfiguration,
             rawMachineConfiguration
         );
+
+        if (commandAttributes.callback != nullptr) {
+            commandAttributes.callback(machineConfiguration);
+        }
 
         // Command sent after reset
         // if (ca.tableIndex == -2) {
@@ -411,7 +440,7 @@ void Communicator::processCommandResponse(QString data)
     }
 
     // Clear command buffer on "M2" & "M30" command (old firmwares)
-    static QRegExp M230("(M0*2|M30)(?!\\d)");
+    static QRegularExpression M230("(M0*2|M30)(?!\\d)");
     if (command.contains(M230) && response.contains("ok") && !response.contains("Pgm End")) {
         m_commands.clear();
         m_queue.clear();
@@ -421,12 +450,14 @@ void Communicator::processCommandResponse(QString data)
 
     // Update probe coords on user commands
     if (command.contains("G38.2") && commandAttributes.tableIndex < 0) {
-        static QRegExp PRB(".*PRB:([^,]*),([^,]*),([^,:]*)");
-        if (PRB.indexIn(response) != -1) {
+        static QRegularExpression PRB(".*PRB:([^,]*),([^,]*),([^,:]*)");
+
+        QRegularExpressionMatch match = PRB.match(response);
+        if (match.hasMatch()) {
             m_storedVars.setCoords("PRB", QVector3D(
-                PRB.cap(1).toDouble(),
-                PRB.cap(2).toDouble(),
-                PRB.cap(3).toDouble()
+                match.captured(1).toDouble(),
+                match.captured(2).toDouble(),
+                match.captured(3).toDouble()
             ));
         }
     }
@@ -437,7 +468,7 @@ void Communicator::processCommandResponse(QString data)
     //     // Get probe Z coordinate
     //     // "[PRB:0.000,0.000,0.000:0];ok"
     //     // "[PRB:0.000,0.000,0.000,0.000:0];ok"
-    //     QRegExp rx(".*PRB:([^,]*),([^,]*),([^,:]*)");
+    //     QRegularExpression rx(".*PRB:([^,]*),([^,]*),([^,:]*)");
     //     double z = qQNaN();
     //     if (rx.indexIn(response) != -1) {
     //         z = toMetric(rx.cap(3).toDouble());
@@ -466,7 +497,7 @@ void Communicator::processCommandResponse(QString data)
     // }
 
     // Change state query time on check mode on
-    if (command.contains(QRegExp("$[cC]"))) {
+    if (command.contains(QRegularExpression("$[cC]"))) {
         m_timerStateQuery.setInterval(response.contains("Enable") ? 1000 : m_configuration->connectionModule().queryStateInterval());
     }
 
@@ -555,8 +586,8 @@ void Communicator::processCommandResponse(QString data)
         }
 
         // Check transfer complete (last row always blank, last command row = rowcount - 2)
-//        if ((m_streamer->processedCommandIndex() == m_form->currentModel().rowCount() - 2) || uncomment.contains(QRegExp("(M0*2|M30)(?!\\d)"))) {
-        if (m_streamer->isLastCommandProcessed() || command.contains(QRegExp("(M0*2|M30)(?!\\d)"))) {
+//        if ((m_streamer->processedCommandIndex() == m_form->currentModel().rowCount() - 2) || uncomment.contains(QRegularExpression("(M0*2|M30)(?!\\d)"))) {
+        if (m_streamer->isLastCommandProcessed() || command.contains(QRegularExpression("(M0*2|M30)(?!\\d)"))) {
             if (m_deviceState == DeviceRun) {
                 setSenderStateAndEmitSignal(SenderStopping);
             } else {
@@ -573,7 +604,7 @@ void Communicator::processCommandResponse(QString data)
     }
 
     // Tool change mode
-    static QRegExp M6("(M0*6)(?!\\d)");
+    static QRegularExpression M6("(M0*6)(?!\\d)");
     if ((m_senderState == SenderPausing) && command.contains(M6)) {
         response.clear();
         
@@ -682,7 +713,7 @@ void Communicator::processWelcomeMessageDetected()
 void Communicator::processMessage(QString data)
 {
     qDebug() << "< MSG <" << data;
-    // static QRegExp msg("\\[MSG:([^\\]]+)\\]");
+    // static QRegularExpression msg("\\[MSG:([^\\]]+)\\]");
     // if (msg.indexIn(data) != -1) {
     //     QString message = msg.cap(1);
     //     if (message.contains("Enabled")) {

@@ -24,13 +24,9 @@ install_ucnc.files = src/vendor/uCNC/uCNC.dll
 
 INSTALLS += install_propertyeditor install_ucnc
 
-
-# install_ucnc.path = bin
-# install_ucnc.files = src/vendor/uCNC/build/*.dll
-
 INSTALLS += install_main
 # install_ucnc
 # install_translations install_license
 
-CONFIG += c++14
-QMAKE_CXXFLAGS += -std=c++14
+CONFIG += c++17
+QMAKE_CXXFLAGS += -std=c++17

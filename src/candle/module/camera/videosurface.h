@@ -1,6 +1,7 @@
 #ifndef VIDEOSURFACE_H
 #define VIDEOSURFACE_H
 
+/*
 #include <QAbstractVideoSurface>
 
 class VideoSurface : public QAbstractVideoSurface
@@ -26,5 +27,6 @@ signals:
     void realSizeChanged(const QSize &);
 
 };
+*/
 
 #endif // VIDEOSURFACE_H

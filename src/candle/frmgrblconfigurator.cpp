@@ -315,7 +315,7 @@ int frmGrblConfigurator::exec()
 
     int result = QDialog::exec();
 
-    m_uiConfiguration.setGrblConfigratorFormGeometry(this->geometry());
+    m_uiConfiguration.setGrblConfigratorFormGeometry(this);
 
     return result;
 }

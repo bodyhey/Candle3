@@ -13,7 +13,7 @@ class ConfigurationParser : public ConfigurationModule
     friend class frmSettings;
 
     Q_OBJECT
-    Q_PROPERTY(ParserArcApproximationMode arcApproximationMode MEMBER m_arcApproximationMode NOTIFY changed)
+//    Q_PROPERTY(ParserArcApproximationMode arcApproximationMode MEMBER m_arcApproximationMode NOTIFY changed)
     Q_PROPERTY(double arcApproximationLength MEMBER m_arcApproximationLength NOTIFY changed)
     Q_PROPERTY(double arcApproximationAngle MEMBER m_arcApproximationAngle NOTIFY changed)
 

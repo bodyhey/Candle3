@@ -13,37 +13,37 @@ class ConfigurationVisualizer : public ConfigurationModule
 {
     friend class frmSettings;
 
-    Q_OBJECT;
-    Q_PROPERTY(double lineWidth MEMBER m_lineWidth NOTIFY changed);
-    Q_PROPERTY(int fpsLock MEMBER m_fpsLock NOTIFY changed);
-    Q_PROPERTY(bool antialiasing MEMBER m_antialiasing NOTIFY changed);
-    Q_PROPERTY(bool msaa MEMBER m_msaa NOTIFY changed);
-    Q_PROPERTY(bool zBuffer MEMBER m_zBuffer NOTIFY changed);
-    Q_PROPERTY(bool vsync MEMBER m_vsync NOTIFY changed);
-    Q_PROPERTY(ProgramDrawMode programDrawMode MEMBER m_programDrawMode NOTIFY changed);
-    Q_PROPERTY(bool simplifyGeometry MEMBER m_simplifyGeometry NOTIFY changed);
-    Q_PROPERTY(double simplifyGeometryPrecision MEMBER m_simplifyGeometryPrecision NOTIFY changed);
-    Q_PROPERTY(bool grayscaleSegments MEMBER m_grayscaleSegments NOTIFY changed);
-    Q_PROPERTY(bool grayscaleSegmentsBySCode MEMBER m_grayscaleSegmentsBySCode NOTIFY changed);
-    Q_PROPERTY(bool grayscaleSegmentsByZCode MEMBER m_grayscaleSegmentsByZCode NOTIFY changed);
-    Q_PROPERTY(double fieldOfView MEMBER m_fieldOfView NOTIFY changed);
-    Q_PROPERTY(double nearPlane MEMBER m_nearPlane NOTIFY changed);
-    Q_PROPERTY(double farPlane MEMBER m_farPlane NOTIFY changed);
-    Q_PROPERTY(QColor backgroundColor MEMBER m_backgroundColor NOTIFY changed);
-    Q_PROPERTY(QColor toolColor MEMBER m_toolColor NOTIFY changed);
-    Q_PROPERTY(QColor textColor MEMBER m_textColor NOTIFY changed);
-    Q_PROPERTY(QColor normalToolpathColor MEMBER m_normalToolpathColor NOTIFY changed);
-    Q_PROPERTY(QColor drawnToolpathColor MEMBER m_drawnToolpathColor NOTIFY changed);
-    Q_PROPERTY(QColor hightlightToolpathColor MEMBER m_hightlightToolpathColor NOTIFY changed);
-    Q_PROPERTY(QColor zMovementColor MEMBER m_zMovementColor NOTIFY changed);
-    Q_PROPERTY(QColor startPointColor MEMBER m_startPointColor NOTIFY changed);
-    Q_PROPERTY(QColor endPointColor MEMBER m_endPointColor NOTIFY changed);
-    Q_PROPERTY(QColor tableSurfaceGridColor MEMBER m_tableSurfaceGridColor NOTIFY changed);
-    Q_PROPERTY(double toolDiameter MEMBER m_toolDiameter NOTIFY changed);
-    Q_PROPERTY(double toolLength MEMBER m_toolLength NOTIFY changed);
-    Q_PROPERTY(ToolType toolType MEMBER m_toolType NOTIFY changed);
-    Q_PROPERTY(double toolAngle MEMBER m_toolAngle NOTIFY changed);
-    Q_PROPERTY(bool show3dCursor MEMBER m_show3dCursor NOTIFY changed);
+    Q_OBJECT
+    Q_PROPERTY(double lineWidth MEMBER m_lineWidth NOTIFY changed)
+    Q_PROPERTY(int fpsLock MEMBER m_fpsLock NOTIFY changed)
+    Q_PROPERTY(bool antialiasing MEMBER m_antialiasing NOTIFY changed)
+    Q_PROPERTY(bool msaa MEMBER m_msaa NOTIFY changed)
+    Q_PROPERTY(bool zBuffer MEMBER m_zBuffer NOTIFY changed)
+    Q_PROPERTY(bool vsync MEMBER m_vsync NOTIFY changed)
+    Q_PROPERTY(ProgramDrawMode programDrawMode MEMBER m_programDrawMode NOTIFY changed)
+    Q_PROPERTY(bool simplifyGeometry MEMBER m_simplifyGeometry NOTIFY changed)
+    Q_PROPERTY(double simplifyGeometryPrecision MEMBER m_simplifyGeometryPrecision NOTIFY changed)
+    Q_PROPERTY(bool grayscaleSegments MEMBER m_grayscaleSegments NOTIFY changed)
+    Q_PROPERTY(bool grayscaleSegmentsBySCode MEMBER m_grayscaleSegmentsBySCode NOTIFY changed)
+    Q_PROPERTY(bool grayscaleSegmentsByZCode MEMBER m_grayscaleSegmentsByZCode NOTIFY changed)
+    Q_PROPERTY(double fieldOfView MEMBER m_fieldOfView NOTIFY changed)
+    Q_PROPERTY(double nearPlane MEMBER m_nearPlane NOTIFY changed)
+    Q_PROPERTY(double farPlane MEMBER m_farPlane NOTIFY changed)
+    Q_PROPERTY(QColor backgroundColor MEMBER m_backgroundColor NOTIFY changed)
+    Q_PROPERTY(QColor toolColor MEMBER m_toolColor NOTIFY changed)
+    Q_PROPERTY(QColor textColor MEMBER m_textColor NOTIFY changed)
+    Q_PROPERTY(QColor normalToolpathColor MEMBER m_normalToolpathColor NOTIFY changed)
+    Q_PROPERTY(QColor drawnToolpathColor MEMBER m_drawnToolpathColor NOTIFY changed)
+    Q_PROPERTY(QColor hightlightToolpathColor MEMBER m_hightlightToolpathColor NOTIFY changed)
+    Q_PROPERTY(QColor zMovementColor MEMBER m_zMovementColor NOTIFY changed)
+    Q_PROPERTY(QColor startPointColor MEMBER m_startPointColor NOTIFY changed)
+    Q_PROPERTY(QColor endPointColor MEMBER m_endPointColor NOTIFY changed)
+    Q_PROPERTY(QColor tableSurfaceGridColor MEMBER m_tableSurfaceGridColor NOTIFY changed)
+    Q_PROPERTY(double toolDiameter MEMBER m_toolDiameter NOTIFY changed)
+    Q_PROPERTY(double toolLength MEMBER m_toolLength NOTIFY changed)
+    Q_PROPERTY(ToolType toolType MEMBER m_toolType NOTIFY changed)
+    Q_PROPERTY(double toolAngle MEMBER m_toolAngle NOTIFY changed)
+    Q_PROPERTY(bool show3dCursor MEMBER m_show3dCursor NOTIFY changed)
 
     public:
         explicit ConfigurationVisualizer(QObject *parent);

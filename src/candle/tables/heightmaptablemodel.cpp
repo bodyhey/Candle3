@@ -98,7 +98,7 @@ QVariant HeightmapTableModel::headerData(int section, Qt::Orientation orientatio
 
 Qt::ItemFlags HeightmapTableModel::flags(const QModelIndex &index) const
 {
-    if (!index.isValid()) return NULL;
+    if (!index.isValid()) return Qt::NoItemFlags;
     return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
 }
 

@@ -30,7 +30,6 @@
 #include "ui_partmainoverride.h"
 #include "widgets/widgetmimedata.h"
 #include "connection/connectionmanager.h"
-#include "module/camera/camera.h"
 
 #define FILE_FILTER_TEXT "G-Code files (*.nc *.ncc *.ngc *.tap *.gc *.gcode *.txt)"
 
@@ -53,7 +52,7 @@ frmMain::frmMain(QWidget *parent) :
     m_settingsFileName = qApp->applicationDirPath() + "/settings.ini";
     preloadSettings();
 
-    m_settings = new frmSettings(this, m_configuration);
+    //m_settings = new frmSettings(this, m_configuration);
 
     initializeCommunicator();
 
@@ -144,10 +143,10 @@ frmMain::frmMain(QWidget *parent) :
     ui->fraDropUser->setVisible(false);
 
 #ifdef WINDOWS
-    if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7) {
-        m_taskBarButton = NULL;
-        m_taskBarProgress = NULL;
-    }
+    // if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7) {
+    //     m_taskBarButton = NULL;
+    //     m_taskBarProgress = NULL;
+    // }
 #endif
 
 //    ui->scrollArea->updateMinimumWidth();
@@ -191,7 +190,7 @@ frmMain::frmMain(QWidget *parent) :
 
     // connect(ui->cboCommand, SIGNAL(returnPressed()), this, SLOT(onCboCommandReturnPressed()));
 
-    foreach (StyledToolButton* button, this->findChildren<StyledToolButton*>(QRegExp("cmdUser\\d"))) {
+    foreach (StyledToolButton* button, this->findChildren<StyledToolButton*>(QRegularExpression("cmdUser\\d"))) {
         connect(button, SIGNAL(clicked(bool)), this, SLOT(onCmdUserClicked(bool)));
     }
 
@@ -236,7 +235,7 @@ frmMain::frmMain(QWidget *parent) :
     updateControlsState();
 
     // Prepare jog buttons
-    foreach (StyledToolButton* button, ui->grpJog->findChildren<StyledToolButton*>(QRegExp("cmdJogFeed\\d")))
+    foreach (StyledToolButton* button, ui->grpJog->findChildren<StyledToolButton*>(QRegularExpression("cmdJogFeed\\d")))
     {
         connect(button, SIGNAL(clicked(bool)), this, SLOT(onCmdJogFeedClicked()));
     }
@@ -289,12 +288,12 @@ frmMain::frmMain(QWidget *parent) :
     updateLayouts();
 
     // Camera
-    addWindow(
-        "Camera",
-        new Camera(),
-        Qt::TopDockWidgetArea,
-        Qt::Vertical
-    );
+    // addWindow(
+    //     "Camera",
+    //     new Camera(),
+    //     Qt::TopDockWidgetArea,
+    //     Qt::Horizontal
+    // );
 
     updateLayouts();
 }
@@ -366,13 +365,13 @@ void frmMain::showEvent(QShowEvent *se)
     placeVisualizerButtons();
 
 #ifdef WINDOWS
-    if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7) {
-        if (m_taskBarButton == NULL) {
-            m_taskBarButton = new QWinTaskbarButton(this);
-            m_taskBarButton->setWindow(this->windowHandle());
-            m_taskBarProgress = m_taskBarButton->progress();
-        }
-    }
+    // if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7) {
+    //     if (m_taskBarButton == NULL) {
+    //         m_taskBarButton = new QWinTaskbarButton(this);
+    //         m_taskBarButton->setWindow(this->windowHandle());
+    //         m_taskBarProgress = m_taskBarButton->progress();
+    //     }
+    // }
 #endif
 }
 
@@ -430,7 +429,7 @@ void frmMain::closeEvent(QCloseEvent *ce)
     //     m_communicator->m_queue.clear();
     // }
 
-    m_configuration.uiModule().setMainFormGeometry(this->geometry());
+    m_configuration.uiModule().setMainFormGeometry(this);
 
     saveSettings();
 }
@@ -576,37 +575,39 @@ void frmMain::on_actFileExit_triggered()
 
 void frmMain::on_actServiceSettings_triggered()
 {
-    QList<QAction*> acts = findChildren<QAction*>(QRegExp("act.*"));
-    QTableWidget *table = m_settings->ui->tblShortcuts;
+    QList<QAction*> acts = findChildren<QAction*>(QRegularExpression("act.*"));
 
-    table->clear();
-    table->setColumnCount(3);
-    table->setRowCount(acts.count());
-    table->setHorizontalHeaderLabels(QStringList() << tr("Command") << tr("Text") << tr("Shortcuts"));
+    // QTableWidget *table = m_settings->ui->tblShortcuts;
 
-    table->verticalHeader()->setDefaultAlignment(Qt::AlignCenter);
-    table->verticalHeader()->setFixedWidth(table->verticalHeader()->sizeHint().width() + 11);
+    // table->clear();
+    // table->setColumnCount(3);
+    // table->setRowCount(acts.count());
+    // table->setHorizontalHeaderLabels(QStringList() << tr("Command") << tr("Text") << tr("Shortcuts"));
 
-    qSort(acts.begin(), acts.end(), frmMain::actionLessThan);
-    for (int i = 0; i < acts.count(); i++) {
-        table->setItem(i, 0, new QTableWidgetItem(acts.at(i)->objectName()));
-        table->setItem(i, 1, new QTableWidgetItem(acts.at(i)->text().remove("&")));
-        table->setItem(i, 2, new QTableWidgetItem(acts.at(i)->shortcut().toString()));
+    // table->verticalHeader()->setDefaultAlignment(Qt::AlignCenter);
+    // table->verticalHeader()->setFixedWidth(table->verticalHeader()->sizeHint().width() + 11);
 
-        table->item(i, 0)->setFlags(Qt::ItemIsEnabled);
-        table->item(i, 1)->setFlags(Qt::ItemIsEnabled);
-        table->item(i, 2)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
-    }
+    // qSort(acts.begin(), acts.end(), frmMain::actionLessThan);
+    // for (int i = 0; i < acts.count(); i++) {
+    //     table->setItem(i, 0, new QTableWidgetItem(acts.at(i)->objectName()));
+    //     table->setItem(i, 1, new QTableWidgetItem(acts.at(i)->text().remove("&")));
+    //     table->setItem(i, 2, new QTableWidgetItem(acts.at(i)->shortcut().toString()));
 
-    table->resizeColumnsToContents();
-    table->setMinimumHeight(table->rowHeight(0) * 10
-        + table->horizontalHeader()->height() + table->frameWidth() * 2);
-    table->horizontalHeader()->setMinimumSectionSize(table->horizontalHeader()->sectionSize(2));
-    table->horizontalHeader()->setStretchLastSection(true);
+    //     table->item(i, 0)->setFlags(Qt::ItemIsEnabled);
+    //     table->item(i, 1)->setFlags(Qt::ItemIsEnabled);
+    //     table->item(i, 2)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    // }
+
+    // table->resizeColumnsToContents();
+    // table->setMinimumHeight(table->rowHeight(0) * 10
+    //     + table->horizontalHeader()->height() + table->frameWidth() * 2);
+    // table->horizontalHeader()->setMinimumSectionSize(table->horizontalHeader()->sectionSize(2));
+    // table->horizontalHeader()->setStretchLastSection(true);
 
     emit settingsAboutToShow();
 
-    if (m_settings->exec()) {
+    frmSettings *form = new frmSettings(this, m_configuration);
+    if (form->exec()) {
         // @TODO connection
         // if (m_settings->port() != "" && (m_settings->port() != m_serialPort.portName() ||
         //                                    m_settings->baud() != m_serialPort.baudRate())) {
@@ -623,7 +624,7 @@ void frmMain::on_actServiceSettings_triggered()
 
         // Update shortcuts
         for (int i = 0; i < acts.count(); i++) {
-            acts[i]->setShortcut(QKeySequence(table->item(i, 2)->data(Qt::DisplayRole).toString()));
+            //acts[i]->setShortcut(QKeySequence(table->item(i, 2)->data(Qt::DisplayRole).toString()));
         }
 
         emit settingsAccepted();
@@ -634,18 +635,21 @@ void frmMain::on_actServiceSettings_triggered()
 
         emit settingsRejected();
     }
+    form->deleteLater();
 }
 
 void frmMain::on_actServiceConfigureGRBL_triggered()
 {
-    m_grblConfigurator = new frmGrblConfigurator(this, m_configuration.uiModule(), m_communicator);
-    m_grblConfigurator->exec();
-    m_grblConfigurator->deleteLater();
+    frmGrblConfigurator *form = new frmGrblConfigurator(this, m_configuration.uiModule(), m_communicator);
+    form->exec();
+    form->deleteLater();
 }
 
 void frmMain::on_actAbout_triggered()
 {
-    m_frmAbout.exec();
+    frmAbout *form = new frmAbout(this);
+    form->exec();
+    form->deleteLater();
 }
 
 void frmMain::on_actSpindleSpeedPlus_triggered()
@@ -663,7 +667,10 @@ void frmMain::on_actViewLockWindows_toggled(bool checked)
     QList<QDockWidget*> dl = findChildren<QDockWidget*>();
 
     foreach (QDockWidget *d, dl) {
-        d->setFeatures(checked ? QDockWidget::NoDockWidgetFeatures : QDockWidget::AllDockWidgetFeatures);
+        d->setFeatures(checked
+           ? QDockWidget::NoDockWidgetFeatures
+           : QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable
+        );
     }
 
     ConfigurationUI &uiConfiguration = m_configuration.uiModule();
@@ -686,7 +693,7 @@ void frmMain::on_cmdFileOpen_clicked()
                                    tr(FILE_FILTER_TEXT";;All files (*.*)"));
 
         if (!fileName.isEmpty()) {
-            m_configuration.uiModule().currentWorkingDirectory(fileName.left(fileName.lastIndexOf(QRegExp("[/\\\\]+"))));
+            m_configuration.uiModule().currentWorkingDirectory(fileName.left(fileName.lastIndexOf(QRegularExpression("[/\\\\]+"))));
         }
 
         if (fileName != "") {
@@ -714,7 +721,7 @@ void frmMain::on_cmdFileSend_clicked()
 
     on_cmdFileReset_clicked();
 
-    m_startTime.start();
+    m_startTime = QDateTime::currentSecsSinceEpoch();
 
     m_communicator->setSenderStateAndEmitSignal(SenderTransferring);
 
@@ -725,13 +732,13 @@ void frmMain::on_cmdFileSend_clicked()
     m_communicator->storeParserState();
 
 #ifdef WINDOWS
-    if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7) {
-        if (m_taskBarProgress) {
-            m_taskBarProgress->setMaximum(m_currentModel->rowCount() - 2);
-            m_taskBarProgress->setValue(0);
-            m_taskBarProgress->show();
-        }
-    }
+    // if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7) {
+    //     if (m_taskBarProgress) {
+    //         m_taskBarProgress->setMaximum(m_currentModel->rowCount() - 2);
+    //         m_taskBarProgress->setValue(0);
+    //         m_taskBarProgress->show();
+    //     }
+    // }
 #endif
 
     updateControlsState();
@@ -1446,7 +1453,7 @@ void frmMain::on_mnuViewWindows_aboutToShow()
         al.append(a);
     }
 
-    qSort(al.begin(), al.end(), frmMain::actionTextLessThan);
+    std::sort(al.begin(), al.end(), frmMain::actionTextLessThan);
 
     ui->menuViewWindows->clear();
     ui->menuViewWindows->addActions(al);
@@ -1529,9 +1536,10 @@ void frmMain::onDeviceStateReceived(DeviceState state)
 
     // Update "elapsed time" timer
     if ((m_communicator->senderState() == SenderTransferring) || (m_communicator->senderState() == SenderStopping)) {
+        int elapsed = QDateTime::currentSecsSinceEpoch() - m_startTime;
         QTime time(0, 0, 0);
-        int elapsed = m_startTime.elapsed();
-        ui->glwVisualizer->setSpendTime(time.addMSecs(elapsed));
+        time.addSecs(elapsed);
+        ui->glwVisualizer->setSpendTime(time);
     }
 
     updateControlsState();
@@ -1877,7 +1885,7 @@ void frmMain::onActSendFromLineTriggered()
     ui->tblProgram->setUpdatesEnabled(true);
     ui->glwVisualizer->setSpendTime(QTime(0, 0, 0));
 
-    m_startTime.start();
+    m_startTime = QDateTime::currentSecsSinceEpoch();
 
     m_communicator->setSenderStateAndEmitSignal(SenderTransferring);
 
@@ -1888,13 +1896,13 @@ void frmMain::onActSendFromLineTriggered()
     m_communicator->storeParserState();
 
 #ifdef WINDOWS
-    if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7) {
-        if (m_taskBarProgress) {
-            m_taskBarProgress->setMaximum(m_currentModel->rowCount() - 2);
-            m_taskBarProgress->setValue(commandIndex);
-            m_taskBarProgress->show();
-        }
-    }
+    // if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7) {
+    //     if (m_taskBarProgress) {
+    //         m_taskBarProgress->setMaximum(m_currentModel->rowCount() - 2);
+    //         m_taskBarProgress->setValue(commandIndex);
+    //         m_taskBarProgress->show();
+    //     }
+    // }
 #endif
 
     updateControlsState();
@@ -2001,13 +2009,13 @@ void frmMain::preloadSettings()
     ConfigurationVisualizer &visualizerConfiguration = m_configuration.visualizerModule();
 
     qApp->setStyleSheet(
-        QString(qApp->styleSheet()).replace(QRegExp("font-size:[^;^\\}]+"), QString("font-size: %1pt").arg(uiConfiguration.fontSize()))
+        QString(qApp->styleSheet()).replace(QRegularExpression("font-size:[^;^\\}]+"), QString("font-size: %1pt").arg(uiConfiguration.fontSize()))
     );
 
     // Update v-sync in glformat
-    QGLFormat fmt = QGLFormat::defaultFormat();
-    fmt.setSwapInterval(visualizerConfiguration.vsync() ? 1 : 0);
-    QGLFormat::setDefaultFormat(fmt);
+    // QGLFormat fmt = QGLFormat::defaultFormat();
+    // fmt.setSwapInterval(visualizerConfiguration.vsync() ? 1 : 0);
+    // QGLFormat::setDefaultFormat(fmt);
 }
 
 void frmMain::applyHeightmapConfiguration(ConfigurationHeightmap &configurationHeightmap)
@@ -2059,7 +2067,6 @@ void frmMain::applyRecentFilesConfiguration(ConfigurationUI &uiConfiguration)
 void frmMain::loadSettings()
 {
     QSettings set(m_settingsFileName, QSettings::IniFormat);
-    set.setIniCodec("UTF-8");
 
     m_settingsLoading = true;
 
@@ -2098,22 +2105,22 @@ void frmMain::loadSettings()
     // Adjust docks width 
     int w = qMax(ui->dockDevice->widget()->sizeHint().width(), 
         ui->dockModification->widget()->sizeHint().width());
-    ui->dockDevice->setMinimumWidth(w);
-    ui->dockDevice->setMaximumWidth(w + ui->scrollArea->verticalScrollBar()->width());
-    ui->dockModification->setMinimumWidth(w);
-    ui->dockModification->setMaximumWidth(w + ui->scrollArea->verticalScrollBar()->width());
-    ui->dockUser->setMinimumWidth(w);
-    ui->dockUser->setMaximumWidth(w + ui->scrollArea->verticalScrollBar()->width());
+    // ui->dockDevice->setMinimumWidth(w);
+    // ui->dockDevice->setMaximumWidth(w + ui->dockDeviceScrollArea->verticalScrollBar()->width());
+    // ui->dockModification->setMinimumWidth(w);
+    // ui->dockModification->setMaximumWidth(w + ui->dockModificationScrollArea->verticalScrollBar()->width());
+    // ui->dockUser->setMinimumWidth(w);
+    // ui->dockUser->setMaximumWidth(w + ui->dockUserScrollArea->verticalScrollBar()->width());
 
     // Buttons
-    int b = (w - ui->grpControl->layout()->margin() * 2 - ui->grpControl->layout()->spacing() * 3) / 4 * 0.8;
-    int c = b * 0.8;
-    setStyleSheet(styleSheet() + QString("\nStyledToolButton[adjustSize='true'] {\n\
-	    min-width: %1px;\n\
-	    min-height: %1px;\n\
-	    qproperty-iconSize: %2px;\n\
-        }").arg(b).arg(c));
-    ensurePolished();
+    // int b = (w - ui->grpControl->layout()->margin() * 2 - ui->grpControl->layout()->spacing() * 3) / 4 * 0.8;
+    // int c = b * 0.8;
+    // setStyleSheet(styleSheet() + QString("\nStyledToolButton[adjustSize='true'] {\n\
+       //  min-width: %1px;\n\
+       //  min-height: %1px;\n\
+       //  qproperty-iconSize: %2px;\n\
+    //     }").arg(b).arg(c));
+    // ensurePolished();
 
     foreach (QDockWidget *w, findChildren<QDockWidget*>()) w->setStyleSheet("");
 
@@ -2152,12 +2159,10 @@ void frmMain::loadSettings()
     // setupCoordsTextboxes();
 
     // Settings form geometry
-    m_settings->restoreGeometry(set.value("formSettingsGeometry").toByteArray());
-    m_settings->ui->splitMain->restoreState(set.value("settingsSplitMain").toByteArray());
+    // m_settings->restoreGeometry(set.value("formSettingsGeometry").toByteArray());
+    // m_settings->ui->splitMain->restoreState(set.value("settingsSplitMain").toByteArray());
 
-    // Shortcuts
-    qRegisterMetaTypeStreamOperators<ShortcutsMap>("ShortcutsMap");
-    
+    // Shortcuts  
     ShortcutsMap m;
     QByteArray ba = set.value("shortcuts").toByteArray();
     QDataStream s(&ba, QIODevice::ReadOnly);
@@ -2183,7 +2188,6 @@ void frmMain::loadSettings()
 void frmMain::saveSettings()
 {
     QSettings set(m_settingsFileName, QSettings::IniFormat);
-    set.setIniCodec("UTF-8");
 
     emit settingsAboutToSave();
 
@@ -2194,11 +2198,11 @@ void frmMain::saveSettings()
     uiConfiguration.setAutoScrollGCode(ui->chkAutoScrollGCode->isChecked());
 
     set.setValue("header", ui->tblProgram->horizontalHeader()->saveState());
-    set.setValue("settingsSplitMain", m_settings->ui->splitMain->saveState());
+//    set.setValue("settingsSplitMain", m_settings->ui->splitMain->saveState());
 //    set.setValue("formGeometry", this->saveGeometry());
 //    set.setValue("formSettingsGeometry", m_settings->saveGeometry());
-    uiConfiguration.setMainFormGeometry(this->geometry());
-    uiConfiguration.setSettingsFormGeometry(m_settings->geometry());
+//    uiConfiguration.setMainFormGeometry(this->geometry());
+    //uiConfiguration.setSettingsFormGeometry(m_settings->geometry());
 
     // joggingConfiguration.setJogStep(ui->cboJogStep->currentText().toDouble());
     // joggingConfiguration.setJogFeed(ui->cboJogFeed->currentText().toInt());
@@ -2217,7 +2221,7 @@ void frmMain::saveSettings()
     ShortcutsMap m;
     QByteArray ba;
     QDataStream s(&ba, QIODevice::WriteOnly);
-    QList<QAction*> acts = findChildren<QAction*>(QRegExp("act.*"));
+    QList<QAction*> acts = findChildren<QAction*>(QRegularExpression("act.*"));
 
     foreach (QAction *a, acts) m[a->objectName()] = a->shortcuts();
     s << m;
@@ -2363,7 +2367,7 @@ void frmMain::applyUIConfiguration(ConfigurationUI &uiConfiguration)
 {
     ui->chkAutoScrollGCode->setChecked(uiConfiguration.autoScrollGCode());
     qApp->setStyleSheet(
-        QString(qApp->styleSheet()).replace(QRegExp("font-size:[^;^\\}]+"), QString("font-size: %1pt").arg(uiConfiguration.fontSize()))
+        QString(qApp->styleSheet()).replace(QRegularExpression("font-size:[^;^\\}]+"), QString("font-size: %1pt").arg(uiConfiguration.fontSize()))
     );
 }
 
@@ -2526,8 +2530,8 @@ void frmMain::updateParser()
 // @TODO scripting only??
 // void frmMain::storeOffsetsVars(QString response)
 // {
-//     static QRegExp gx("\\[(G5[4-9]|G28|G30|G92|PRB):([\\d\\.\\-]+),([\\d\\.\\-]+),([\\d\\.\\-]+)");
-//     static QRegExp tx("\\[(TLO):([\\d\\.\\-]+)");
+//     static QRegularExpression gx("\\[(G5[4-9]|G28|G30|G92|PRB):([\\d\\.\\-]+),([\\d\\.\\-]+),([\\d\\.\\-]+)");
+//     static QRegularExpression tx("\\[(TLO):([\\d\\.\\-]+)");
 
 //     int p = 0;
 //     while ((p = gx.indexIn(response, p)) != -1) {
@@ -2986,10 +2990,10 @@ void frmMain::updateControlsState()
     if (!process) ui->jog->restoreKeyboardControl();
 
 #ifdef WINDOWS
-    if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7 && m_taskBarProgress) {
-        m_taskBarProgress->setPaused(paused);
-        if (m_communicator->senderState() == SenderStopped) m_taskBarProgress->hide();
-    }
+    // if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7 && m_taskBarProgress) {
+    //     m_taskBarProgress->setPaused(paused);
+    //     if (m_communicator->senderState() == SenderStopped) m_taskBarProgress->hide();
+    // }
 #endif
 
     style()->unpolish(ui->cmdFileOpen);

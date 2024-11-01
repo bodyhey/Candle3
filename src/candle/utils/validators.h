@@ -20,7 +20,7 @@ class QCommaSeparatedValidator : public QValidator
             for(QString& str : elements) {
                 str = str.trimmed();
             }
-            static QRegExp rx("^.{1,}$");
+            static QRegularExpression rx("^.{1,}$");
             elements = elements.filter(rx);
 
             for (const QString& str : elements) {
@@ -43,9 +43,9 @@ class QCommaSeparatedIntValidator : public QCommaSeparatedValidator
 
         bool validateElement(const QString &element) const override
         {
-            static QRegExp rx("^[\\d]*$");
+            static QRegularExpression rx("^[\\d]*$");
 
-            return rx.exactMatch(element);
+            return element.indexOf(rx);
         }
 };
 
@@ -56,9 +56,9 @@ class QCommaSeparatedDoubleValidator : public QCommaSeparatedValidator
 
         bool validateElement(const QString &element) const override
         {
-            static QRegExp rx("^[\\d]*(\\.[\\d]{1,2})?$");
+            static QRegularExpression rx("^[\\d]*(\\.[\\d]{1,2})?$");
 
-            return rx.exactMatch(element);
+            return element.indexOf(rx);
         }
 };
 

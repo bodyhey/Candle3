@@ -5,6 +5,7 @@
 #include <QCheckBox>
 #include <QMessageBox>
 #include <QTextCursor>
+#include <QRegularExpression>
 #include <parser/gcodeviewparse.h>
 
 Communicator::Communicator(
@@ -65,8 +66,15 @@ void Communicator::resetStateVariables()
 /**
  * @param tableIndex -1 - ui commands, -2 - utility commands, -3 - utility commands
  */
-SendCommandResult Communicator::sendCommand(CommandSource source, QString commandLine, int tableIndex, bool wait)
-{
+SendCommandResult Communicator::sendCommand(
+    CommandSource source,
+    QString commandLine,
+    int tableIndex,
+    bool wait,
+    CommandCallback callback
+) {
+    QRegularExpressionMatch match;
+
     // tableIndex:
     // 0...n - commands from g-code program
     // -1 - ui commands
@@ -94,7 +102,7 @@ SendCommandResult Communicator::sendCommand(CommandSource source, QString comman
 
     // Place to queue if command buffer is full
     if ((bufferLength() + commandLine.length() + 1) > BUFFERLENGTH) {
-        m_queue.append(CommandQueue(source, commandLine, tableIndex));
+        m_queue.append(CommandQueue(source, commandLine, tableIndex, callback));
 
         return SendQueue;
     }
@@ -105,7 +113,8 @@ SendCommandResult Communicator::sendCommand(CommandSource source, QString comman
         source,
         m_commandIndex++,
         tableIndex,
-        commandLine
+        commandLine,
+        callback
     );
 
     m_commands.append(commandAttributes);
@@ -113,9 +122,10 @@ SendCommandResult Communicator::sendCommand(CommandSource source, QString comman
     QString command = GcodePreprocessorUtils::removeComment(commandLine);
 
     // Processing spindle speed only from g-code program
-    static QRegExp s("[Ss]0*(\\d+)");
-    if (s.indexIn(command) != -1 && commandAttributes.tableIndex > -2) {
-        int speed = s.cap(1).toInt();
+    static QRegularExpression s("[Ss]0*(\\d+)");
+    match = s.match(command);
+    if (match.hasMatch() && commandAttributes.tableIndex > -2) {
+        int speed = match.captured(1).toInt();
         // @TODO we are about to send new spindle speed, should we update UI now or wait for response?? or
         // maybe in onFeedSpindleSpeedReceived ??
         // if (ui->slbSpindle->value() != speed) {
@@ -124,8 +134,8 @@ SendCommandResult Communicator::sendCommand(CommandSource source, QString comman
     }
 
     // Set M2 & M30 commands sent flag
-    static QRegExp M230("(M0*2|M30|M0*6|M25)(?!\\d)");
-    static QRegExp M6("(M0*6)(?!\\d)");
+    static QRegularExpression M230("(M0*2|M30|M0*6|M25)(?!\\d)");
+    static QRegularExpression M6("(M0*6)(?!\\d)");
     if ((m_senderState == SenderTransferring) && command.contains(M230)) {
         if (
             !command.contains(M6) ||
@@ -137,7 +147,7 @@ SendCommandResult Communicator::sendCommand(CommandSource source, QString comman
     }
 
     // Queue offsets request on G92, G10 commands
-    static QRegExp G92("(G92|G10)(?!\\d)");
+    static QRegularExpression G92("(G92|G10)(?!\\d)");
     if (command.contains(G92)) sendCommand(source, "$#", TABLE_INDEX_UTIL2, true);
 
     m_connection->sendLine(commandLine);
@@ -187,6 +197,7 @@ bool Communicator::streamCommands(GCode *streamer)
 
 void Communicator::clearCommandsAndQueue()
 {
+    qDebug() << "clearing commands and queue";
     m_commands.clear();
     clearQueue();
 }
@@ -199,6 +210,8 @@ void Communicator::clearQueue()
 void Communicator::reset()
 {
     assert(m_connection != nullptr);
+
+    qDebug() << "resetting communicator";
 
     m_connection->sendByteArray(QByteArray(1, GRBL_LIVE_SOFT_RESET));
 
@@ -329,7 +342,14 @@ void Communicator::sendStreamerCommandsUntilBufferIsFull()
     if (m_queue.length() > 0) return;
 
     QString command = m_streamer->command();
-    static QRegExp M230("(M0*2|M30|M0*6)(?!\\d)");
+    static QRegularExpression M230("(M0*2|M30|M0*6)(?!\\d)");
+
+    qDebug() <<
+        "bufferLength: " << bufferLength() <<
+        "command.length: " << command.length() <<
+        "commandIndex: " << m_streamer->commandIndex() <<
+        "hasMoreCommands: " << m_streamer->hasMoreCommands() <<
+        "m_commands.isEmpty: " << (!m_commands.isEmpty() && GcodePreprocessorUtils::removeComment(m_commands.last().commandLine).contains(M230));
 
     while ((bufferLength() + command.length() + 1) <= BUFFERLENGTH
            && m_streamer->hasMoreCommands() /* commandIndex() < m_form->currentModel().rowCount() - 1 */
@@ -375,35 +395,38 @@ void Communicator::processConnectionTimer()
 /* used by scripting engine only?? emit signal and do not use m_storedVars directly */
 void Communicator::processOffsetsVars(QString response)
 {
-    static QRegExp gx("\\[(G5[4-9]|G28|G30|G92|PRB):([\\d\\.\\-]+),([\\d\\.\\-]+),([\\d\\.\\-]+)");
-    static QRegExp tx("\\[(TLO):([\\d\\.\\-]+)");
+    static QRegularExpression gx("\\[(G5[4-9]|G28|G30|G92|PRB):([\\d\\.\\-]+),([\\d\\.\\-]+),([\\d\\.\\-]+)");
+    static QRegularExpression tx("\\[(TLO):([\\d\\.\\-]+)");
 
     int p = 0;
-    while ((p = gx.indexIn(response, p)) != -1) {
+    QRegularExpressionMatch match = gx.match(response);
+    while (match.hasMatch()) {
+        p = match.capturedStart();
         m_storedVars.setCoords(
-            gx.cap(1),
+            match.captured(1),
             QVector3D(
-                gx.cap(2).toDouble(),
-                gx.cap(3).toDouble(),
-                gx.cap(4).toDouble()
+                match.captured(2).toDouble(),
+                match.captured(3).toDouble(),
+                match.captured(4).toDouble()
             )
         );
 
-        p += gx.matchedLength();
+        p += match.capturedLength();
+        match = gx.match(response, p);
     }
 
-    if (tx.indexIn(response) != -1) {
+    match = tx.match(response);
+    if (match.hasMatch()) {
         m_storedVars.setCoords(
-            tx.cap(1),
+            match.captured(1),
             QVector3D(
                 0,
                 0,
-                tx.cap(2).toDouble()
+                match.captured(2).toDouble()
             )
         );
     }
 }
-
 
 void Communicator::onTimerStateQuery()
 {
@@ -431,8 +454,9 @@ bool Communicator::dataIsReset(QString data)
     // GrblHAL 1.1f ['$' or '' for help]
     // Grbl 1.8 [uCNC v1.8.8 '$' for help]
     // Gcarvin ?? https://github.com/inventables/gCarvin
+    static QRegularExpression re("^(GRBL|GCARVIN)\\s\\d\\.\\d.", QRegularExpression::CaseInsensitiveOption);
 
-    return QRegExp("^(GRBL|GCARVIN)\\s\\d\\.\\d.").indexIn(data.toUpper()) != -1;
+    return data.contains(re);
 }
 
 bool Communicator::compareCoordinates(double x, double y, double z)
@@ -454,7 +478,7 @@ void Communicator::storeParserState()
 {
     // Remove GC:, Gx Mx, Fx, Sx ??
     // @TODO do it better
-    m_storedParserState = m_lastParserState.remove(QRegExp("GC:|\\[|\\]|G[01234]\\s|M[0345]+\\s|\\sF[\\d\\.]+|\\sS[\\d\\.]+"));
+    m_storedParserState = m_lastParserState.remove(QRegularExpression("GC:|\\[|\\]|G[01234]\\s|M[0345]+\\s|\\sF[\\d\\.]+|\\sS[\\d\\.]+"));
 }
 
 void Communicator::restoreParserState()
@@ -505,4 +529,5 @@ void Communicator::onConnectionError(QString message)
 {
     qDebug() << "Connection error: " << message;
 }
+
 

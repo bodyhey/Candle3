@@ -42,7 +42,7 @@ Usefull links:
 
 Build requirements:
 -------------------
-Qt 5.12.12 with MinGW/GCC 64bit compiler
+Qt 6.8 with MinGW/GCC 64bit compiler
 
 Start with:
 

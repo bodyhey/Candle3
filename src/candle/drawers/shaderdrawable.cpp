@@ -3,7 +3,7 @@
 #include "shaderdrawable.h"
 
 #ifdef GLES
-#include <GLES/gl.h>
+//#include <GLES/gl.h>
 #endif
 
 ShaderDrawable::ShaderDrawable()

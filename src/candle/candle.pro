@@ -1,10 +1,15 @@
-QT = core gui opengl serialport uitools network xml
-QT += multimedia multimediawidgets
-
-equals(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 12) {
+lessThan(QT_MAJOR_VERSION, 6) {
     message("Cannot use Qt $${QT_VERSION}")
-    error("Use Qt 5.12 or newer")
+    error("Use Qt 6.8 or newer")
 }
+equals(QT_MAJOR_VERSION, 6):lessThan(QT_MINOR_VERSION, 8) {
+    message("Cannot use Qt $${QT_VERSION}")
+    error("Use Qt 6.8 or newer")
+}
+
+QT = core gui opengl serialport uitools network xml
+QT += core5compat
+QT += multimedia multimediawidgets
 
 VERSION=1.0.0.0
 
@@ -12,7 +17,7 @@ VERSION=1.0.0.0
 # DEFINES += DEBUG_RAW_TCP_COMMUNICATION=1
 
 win32: {
-    QT += winextras
+    # QT += winextras
     DEFINES += WINDOWS
     QMAKE_CXXFLAGS_DEBUG += -g3 -pg
     QMAKE_LFLAGS_DEBUG += -pg -lgmon
@@ -31,6 +36,7 @@ unix:!macx {
     QMAKE_LFLAGS += "-Wl,-rpath,\'\$$ORIGIN/libs\'"
 }
 
+DEFINES += GLES
 contains(QT_CONFIG, opengles.) {
     warning("GL ES detected. VAO will be disabled.")
     DEFINES += GLES
@@ -44,12 +50,11 @@ TEMPLATE = app
 RC_ICONS = images/gpilot.ico
 
 DEFINES += sNan=\"65536\"
-# DEFINES += QLocale\:\:AnyTerritory=\"0\"
 
 TRANSLATIONS += translations/candle_en.ts translations/candle_ru.ts translations/candle_es.ts translations/candle_fr.ts translations/candle_pt.ts
 
-CONFIG += c++14
-QMAKE_CXXFLAGS += -std=c++14
+CONFIG += c++17
+QMAKE_CXXFLAGS += -std=c++17
 
 # don't create both debug and release folders
 CONFIG -= debug_and_release
@@ -105,10 +110,10 @@ SOURCES += main.cpp\
     gcode/gcodeloader.cpp \
     heightmap.cpp \
     machine/machineconfiguration.cpp \
-    module/camera/camera.cpp \
-    module/camera/qvideoframeconversionhelper.cpp \
-    module/camera/videosurface.cpp \
-    module/camera/viewfinder.cpp \
+    # module/camera/camera.cpp \
+    # module/camera/qvideoframeconversionhelper.cpp \
+    # module/camera/videosurface.cpp \
+    # module/camera/viewfinder.cpp \
     module/pendant/pendant.cpp \
     parser/arcproperties.cpp \
     parser/gcodeparser.cpp \
@@ -186,10 +191,10 @@ HEADERS  += frmmain.h \
     globals.h \
     heightmap.h \
     machine/machineconfiguration.h \
-    module/camera/camera.h \
-    module/camera/qvideoframeconversionhelper.h \
-    module/camera/videosurface.h \
-    module/camera/viewfinder.h \
+    # module/camera/camera.h \
+    # module/camera/qvideoframeconversionhelper.h \
+    # module/camera/videosurface.h \
+    # module/camera/viewfinder.h \
     module/pendant/pendant.h \
     parser/arcproperties.h \
     parser/gcodeparser.h \

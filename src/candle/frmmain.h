@@ -59,7 +59,7 @@
 #include "widgets/dropwidget.h"
 
 #ifdef WINDOWS
-    #include <QtWinExtras/QtWinExtras>
+    // #include <QtWinExtras/QtWinExtras>
     #include "shobjidl.h"
 #endif
 
@@ -228,8 +228,8 @@ private:
     QMenu *m_tableMenu;
     QMessageBox* m_senderErrorBox;
 #ifdef WINDOWS
-    QWinTaskbarButton *m_taskBarButton;
-    QWinTaskbarProgress *m_taskBarProgress;
+    // QWinTaskbarButton *m_taskBarButton;
+    // QWinTaskbarProgress *m_taskBarProgress;
 #endif
 
     // Parsers
@@ -264,11 +264,6 @@ private:
     Communicator *m_communicator;
     GCode *m_streamer;
 
-    // Forms
-    frmSettings *m_settings;
-    frmAbout m_frmAbout;
-    frmGrblConfigurator *m_grblConfigurator;
-
     // Partials/Panels
     PartMainVirtualSettings *m_partMainVirtualSettings;
 
@@ -280,7 +275,7 @@ private:
     // Timers
     QTimer m_timerConnection;
     QBasicTimer m_timerToolAnimation;
-    QTime m_startTime;
+    qint64 m_startTime;
 
     // Flags
     bool m_programLoading;

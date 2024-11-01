@@ -2,7 +2,6 @@
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
 
 #include "frmsettings.h"
-#include "qdesktopwidget.h"
 #include "ui_frmsettings.h"
 #include "utils.h"
 #include <QtSerialPort/QSerialPort>
@@ -111,10 +110,12 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
     QDir d(qApp->applicationDirPath() + "/translations");
     QStringList fl = QStringList() << "candle_*.qm";
     QStringList tl = d.entryList(fl, QDir::Files);
-    QRegExp fx("_([^\\.]+)");
+
+    static QRegularExpression fx("_([^\\.]+)");
     foreach (const QString &t, tl) {
-        if (fx.indexIn(t) != -1) {
-            QLocale l(fx.cap(1));
+        QRegularExpressionMatch match = fx.match(t);
+        if (match.hasMatch()) {
+            QLocale l(match.captured(1));
             ui->cboLanguage->addItem(l.nativeLanguageName(), l.name().left(2));
         }
     }
@@ -400,7 +401,8 @@ int frmSettings::exec()
 
     int result = QDialog::exec();
 
-    m_configuration.uiModule().setSettingsFormGeometry(this->geometry());
+    m_configuration.uiModule().setSettingsFormGeometry(this);
+    m_configuration.uiModule().setSettingsFormSlicerSizes(ui->splitMain->sizes());
 
     return result;
 }

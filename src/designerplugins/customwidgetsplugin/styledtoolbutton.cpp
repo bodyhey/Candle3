@@ -43,7 +43,7 @@ void StyledToolButton::paintEvent(QPaintEvent *e)
     QPainter painter(this);
 
     painter.setRenderHint(QPainter::Antialiasing);
-    painter.setRenderHint(QPainter::HighQualityAntialiasing);
+    //painter.setRenderHint(QPainter::HighQualityAntialiasing);
 
     // Highlight
     QPen highlightPen;
