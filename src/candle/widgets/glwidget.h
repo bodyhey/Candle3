@@ -149,13 +149,15 @@ private:
     QColor m_colorText;
 
     QPointF getClickPositionOnXYPlane(QVector2D mouseClickPosition, QMatrix4x4 projectionMatrix, QMatrix4x4 viewMatrix);
-    void drawText(QPainter &painter, QPoint &pos, QString text, int lineHeight);
+    void drawText(QPainter &painter, QPoint &pos, QString text, int lineHeight, Qt::AlignmentFlag align = Qt::AlignLeft);
+    void drawTexts(QPainter &painter, QPoint &pos, QStringList texts, int lineHeight);
 
 protected:
     void initializeGL();
     void resizeGL(int width, int height);
     void updateProjection();
     void updateView();
+
 #ifdef GLES
     void paintGL();
 #else

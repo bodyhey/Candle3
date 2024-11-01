@@ -68,12 +68,6 @@ int main(int argc, char *argv[])
 #ifdef GLES
     QFontDatabase::addApplicationFont(":/fonts/Ubuntu-R.ttf");
 #endif
-
-    // QGLFormat glf = QGLFormat::defaultFormat();
-    // glf.setSampleBuffers(true);
-    // glf.setSamples(8);
-    // QGLFormat::setDefaultFormat(glf);
-
     QSettings set(app.applicationDirPath() + "/settings.ini", QSettings::IniFormat);
     QString loc = set.value("language", "en").toString();
 
@@ -105,17 +99,18 @@ int main(int argc, char *argv[])
 #ifdef GLES
     app.styleHints()->setColorScheme(Qt::ColorScheme::Light);
     app.setStyle(QStyleFactory::create("Fusion"));
-    // QPalette palette;
-    // palette.setColor(QPalette::Highlight, QColor(204, 204, 254));
-    // palette.setColor(QPalette::HighlightedText, QColor(0, 0, 0));
-    // app.setPalette(palette);
 
-    // app.setStyleSheet("QWidget {font-family: \"Ubuntu\";}\
-    //                 QMenuBar {background-color: #303030; padding-top: 2px; padding-bottom: 2px;}\
-    //                 QMenuBar::item {spacing: 3px; padding: 2px 8px; background: transparent; color: white;}\
-    //                 QMenuBar::item:pressed {border: 1px solid #505050; border-bottom: 1px; border-top-left-radius: 3px; border-top-right-radius: 3px; background: #404040; color: white;}\
-    //                 QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white;}\
-    //                 QDialog {border: 1px solid palette(mid);}");
+    QPalette palette;
+    palette.setColor(QPalette::Highlight, QColor(204, 204, 254));
+    palette.setColor(QPalette::HighlightedText, QColor(0, 0, 0));
+    app.setPalette(palette);
+
+    app.setStyleSheet("QWidget {font-family: \"Ubuntu\";}\
+                    QMenuBar {background-color: #303030; padding-top: 2px; padding-bottom: 2px;}\
+                    QMenuBar::item {spacing: 3px; padding: 2px 8px; background: transparent; color: white;}\
+                    QMenuBar::item:pressed {border: 1px solid #505050; border-bottom: 1px; border-top-left-radius: 3px; border-top-right-radius: 3px; background: #404040; color: white;}\
+                    QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white;}\
+                    QDialog {border: 1px solid palette(mid);}");
 #endif
 
     app.setStyleSheet(app.styleSheet() + "QWidget {font-size: 8pt}");

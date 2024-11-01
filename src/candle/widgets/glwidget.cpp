@@ -26,7 +26,7 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent), m_shaderProgram(0)
 GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent), m_shaderProgram(0)
 #endif
 
-{
+{   
     m_frames = 0;
     m_fps = 0;
 
@@ -68,6 +68,11 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent), m_shaderProgram(0)
     QTimer::singleShot(1000, this, SLOT(onFramesTimer()));
 
     setMouseTracking(true);
+
+    // enable antialiasing
+    QSurfaceFormat sf = format();
+    sf.setSamples(4);
+    setFormat(sf);
 }
 
 GLWidget::~GLWidget()
@@ -460,11 +465,25 @@ void GLWidget::updateView()
     m_viewMatrix.translate(-m_lookAt);
 }
 
-void GLWidget::drawText(QPainter &painter, QPoint &pos, QString text, int lineHeight)
+void GLWidget::drawText(QPainter &painter, QPoint &pos, QString text, int lineHeight, Qt::AlignmentFlag align)
 {
+    int x = pos.x();
+    if (align == Qt::AlignRight) {
+        pos.setX(x - painter.fontMetrics().horizontalAdvance(text));
+    }
     painter.drawText(pos, text);
+    // revert X, advance Y
+    pos.setX(x);
     pos.setY(pos.y() + lineHeight);
 }
+
+void GLWidget::drawTexts(QPainter &painter, QPoint &pos, QStringList texts, int lineHeight)
+{
+    foreach (QString text, texts) {
+        drawText(painter, pos, text, lineHeight);
+    }
+}
+
 
 #ifdef GLES
 void GLWidget::paintGL() {
@@ -530,7 +549,6 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
 
     painter.endNativePainting();
 
-    QString str;
     QPoint pos;
 
     QPen pen(m_colorText);
@@ -558,12 +576,12 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
     drawText(painter, pos, m_pinState, 10);
 
     // right side
-    pos = QPoint(this->width() - fm.horizontalAdvance(str) - 10, this->height() - 60);
+    pos = QPoint(this->width() - 10, this->height() - 60);
 
-    drawText(painter, pos, m_spendTime.toString("hh:mm:ss") + " / " + m_estimatedTime.toString("hh:mm:ss"), 15);
-    drawText(painter, pos, m_bufferState, 15);
-    drawText(painter, pos, QString(tr("Vertices: %1")).arg(vertices), 15);
-    drawText(painter, pos, QString("FPS: %1").arg(m_fps), 15);
+    drawText(painter, pos, m_spendTime.toString("hh:mm:ss") + " / " + m_estimatedTime.toString("hh:mm:ss"), 15, Qt::AlignRight);
+    drawText(painter, pos, m_bufferState, 15, Qt::AlignRight);
+    drawText(painter, pos, QString(tr("Vertices: %1")).arg(vertices), 15, Qt::AlignRight);
+    drawText(painter, pos, QString("FPS: %1").arg(m_fps), 15, Qt::AlignRight);
 
     m_frames++;
 
