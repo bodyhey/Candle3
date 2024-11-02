@@ -8,8 +8,8 @@ equals(QT_MAJOR_VERSION, 6):lessThan(QT_MINOR_VERSION, 8) {
 }
 
 QT = core gui opengl serialport uitools network xml
-QT += core5compat
 QT += multimedia multimediawidgets
+QT += core5compat
 
 VERSION=1.0.0.0
 
@@ -110,7 +110,7 @@ SOURCES += main.cpp\
     gcode/gcodeloader.cpp \
     heightmap.cpp \
     machine/machineconfiguration.cpp \
-    # module/camera/camera.cpp \
+    module/camera/camera.cpp \
     # module/camera/qvideoframeconversionhelper.cpp \
     # module/camera/videosurface.cpp \
     # module/camera/viewfinder.cpp \
@@ -191,7 +191,7 @@ HEADERS  += frmmain.h \
     globals.h \
     heightmap.h \
     machine/machineconfiguration.h \
-    # module/camera/camera.h \
+    module/camera/camera.h \
     # module/camera/qvideoframeconversionhelper.h \
     # module/camera/videosurface.h \
     # module/camera/viewfinder.h \

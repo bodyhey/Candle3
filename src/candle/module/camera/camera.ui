@@ -52,38 +52,6 @@
  <resources/>
  <connections>
   <connection>
-   <sender>actionExit</sender>
-   <signal>triggered()</signal>
-   <receiver>Camera</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>154</x>
-     <y>130</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionSettings</sender>
-   <signal>triggered()</signal>
-   <receiver>Camera</receiver>
-   <slot>configureCaptureSettings()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>333</x>
-     <y>210</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>actionStartCamera</sender>
    <signal>triggered()</signal>
    <receiver>Camera</receiver>

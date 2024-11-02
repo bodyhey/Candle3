@@ -25,6 +25,7 @@
 #include "form_partial/main/partmaincontrol.h"
 #include "form_partial/main/partmainvirtualsettings.h"
 #include "module/pendant/pendant.h"
+#include "module/camera/camera.h"
 #include "ui_frmmain.h"
 #include "ui_frmsettings.h"
 #include "ui_partmainoverride.h"
@@ -288,12 +289,12 @@ frmMain::frmMain(QWidget *parent) :
     updateLayouts();
 
     // Camera
-    // addWindow(
-    //     "Camera",
-    //     new Camera(),
-    //     Qt::TopDockWidgetArea,
-    //     Qt::Horizontal
-    // );
+    addWindow(
+        "Camera",
+        new Camera(),
+        Qt::TopDockWidgetArea,
+        Qt::Horizontal
+    );
 
     updateLayouts();
 }

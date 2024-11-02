@@ -51,19 +51,22 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include <QMediaDevices>
+#include <QWidget>
 #include <QCamera>
-//#include <QCameraImageCapture>
+#include <QMediaCaptureSession>
 #include <QMediaRecorder>
 #include <QScopedPointer>
+#include <QVideoWidget>
 
-#include "videosurface.h"
-#include "viewfinder.h"
+// #include "videosurface.h"
+// #include "viewfinder.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Camera; }
 QT_END_NAMESPACE
 
-class Camera : public QWidget
+class Camera : public QVideoWidget
 {
     Q_OBJECT
 
@@ -71,44 +74,32 @@ public:
     Camera(QWidget* parent = nullptr);
 
 private slots:
-    void setCamera(const QCameraInfo &cameraInfo);
+    void setCamera(const QCameraDevice &cameraDevice);
 
     void startCamera();
     void stopCamera();
 
-    void record();
-    void pause();
-    void stop();
-    void setMuted(bool);
-
     void toggleLock();
-    void takeImage();
-    void displayCaptureError(int, QCameraImageCapture::Error, const QString &errorString);
+    // void displayCaptureError(int, QCameraImageCapture::Error, const QString &errorString);
 
-    // void configureCaptureSettings();
     // void configureVideoSettings();
     // void configureImageSettings();
 
-    void displayRecorderError();
     void displayCameraError();
 
     void updateCameraDevice(QAction *action);
 
-    void updateCameraState(QCamera::State);
+    // void updateCameraState(QCamera::State);
+    void updateCameraActive(bool active);
     void updateCaptureMode();
-    void updateRecorderState(QMediaRecorder::State state);
+    // void updateRecorderState(QMediaRecorder::State state);
     void setExposureCompensation(int index);
 
-    void updateRecordTime();
-
     void processCapturedImage(int requestId, const QImage &img);
-    void updateLockStatus(QCamera::LockStatus, QCamera::LockChangeReason);
+    // void updateLockStatus(QCamera::LockStatus, QCamera::LockChangeReason);
 
     // void displayViewfinder();
     // void displayCapturedImage();
-
-    void readyForCapture(bool ready);
-    void imageSaved(int id, const QString &fileName);
 
 protected:
     // void keyPressEvent(QKeyEvent *event) override;
@@ -122,19 +113,25 @@ private slots:
 private:
     Ui::Camera *ui;
 
+    QActionGroup *videoDevicesGroup = nullptr;
+    QMediaDevices m_devices;
     QScopedPointer<QCamera> m_camera;
-    QScopedPointer<QCameraImageCapture> m_imageCapture;
-    QScopedPointer<QMediaRecorder> m_mediaRecorder;
+    QMediaCaptureSession m_captureSession;
+    // QScopedPointer<QCameraImageCapture> m_imageCapture;
+    // QScopedPointer<QMediaRecorder> m_mediaRecorder;
 
-    QImageEncoderSettings m_imageSettings;
-    QAudioEncoderSettings m_audioSettings;
-    QVideoEncoderSettings m_videoSettings;
+    // QImageEncoderSettings m_imageSettings;
+    // QAudioEncoderSettings m_audioSettings;
+    // QVideoEncoderSettings m_videoSettings;
     QString m_videoContainerFormat;
-    bool m_isCapturingImage = false;
+    // bool m_isCapturingImage = false;
     bool m_applicationExiting = false;
 
-    VideoSurface *m_videoSurface;
-    ViewFinder *m_viewFinder;
+    // VideoSurface *m_videoSurface;
+    // ViewFinder *m_viewFinder;
+
+    void init();
+    void updateCameras();
 };
 
 #endif
