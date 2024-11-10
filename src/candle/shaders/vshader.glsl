@@ -44,7 +44,6 @@ void main()
     // Calculate vertex position in screen space
     gl_Position = mvp_matrix * a_position;
 
-    a_color.a = a_alpha;
-
     v_color = a_color;
+    v_color.a = a_alpha;
 }
