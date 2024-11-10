@@ -2,12 +2,11 @@
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
 
 #include "glwidget.h"
-#include "drawers/tooldrawer.h"
 #include <QDebug>
 #include <QtWidgets>
 #include <QPainter>
 #include <QEasingCurve>
-#include <iostream>
+#include <QOpenGLDebugLogger>
 
 #ifdef GLES
 //#include <GLES/gl.h>
@@ -71,7 +70,7 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent), m_shaderProgram(0)
 
     // enable antialiasing
     QSurfaceFormat sf = format();
-    sf.setSamples(4);
+    sf.setSamples(8);
     setFormat(sf);
 }
 
@@ -425,6 +424,15 @@ void GLWidget::initializeGL()
         m_shaderProgram->link();
         qDebug() << "shader program created";
     }
+
+    qDebug() << "Initialize debug logger";
+    QString glVersion = QString::fromUtf8((const char *)glGetString(GL_VERSION));
+    QString glslVersion = QString::fromUtf8((const char *)glGetString(GL_SHADING_LANGUAGE_VERSION));
+    QString glVendor = QString::fromUtf8((const char *)glGetString(GL_VENDOR));
+    QString glRenderer = QString::fromUtf8((const char *)glGetString(GL_RENDERER));
+    qDebug() << "OpenGL version: " << glVersion << "GLSL version: " << glslVersion << "Vendor: " << glVendor << "Renderer: " << glRenderer;
+    QOpenGLDebugLogger *logger = new QOpenGLDebugLogger(this);
+    logger->initialize();
 }
 
 void GLWidget::resizeGL(int width, int height)
