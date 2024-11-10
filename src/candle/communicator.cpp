@@ -183,13 +183,13 @@ void Communicator::sendCommands(CommandSource source, QString commands, int tabl
     }
 }
 
-bool Communicator::streamCommands(GCode *streamer)
+bool Communicator::streamCommands(GCode &streamer)
 {
     // if (cannot be streamed) {
     //     return false;
     // }
 
-    m_streamer = streamer;
+    m_streamer = &streamer;
     //startStreaming();
 
     return true;
@@ -442,21 +442,6 @@ void Communicator::onTimerStateQuery()
 
     // @todo find some other way to update buffer state
     //ui->glwVisualizer->setBufferState(QString(tr("Buffer: %1 / %2 / %3")).arg(bufferLength()).arg(m_commands.length()).arg(m_queue.length()));
-}
-
-// detects first line of communication?
-bool Communicator::dataIsReset(QString data)
-{
-    // "GRBL" in either case, optionally followed by a number of non-whitespace characters,
-    // followed by a version number in the format x.y.
-    // This matches e.g.
-    // Grbl 1.1h ['$' for help]
-    // GrblHAL 1.1f ['$' or '' for help]
-    // Grbl 1.8 [uCNC v1.8.8 '$' for help]
-    // Gcarvin ?? https://github.com/inventables/gCarvin
-    static QRegularExpression re("^(GRBL|GCARVIN)\\s\\d\\.\\d.", QRegularExpression::CaseInsensitiveOption);
-
-    return data.contains(re);
 }
 
 bool Communicator::compareCoordinates(double x, double y, double z)

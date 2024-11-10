@@ -105,7 +105,7 @@ void GCodeLoader::loadFromFileObject(QFile &file, int size)
     std::string stripped;
     std::string trimmed;
     QList<QString> args;
-    GCodeLine item;
+    GCodeItem item;
     int remaining = size;
 
     while (!file.atEnd())
@@ -122,7 +122,7 @@ void GCodeLoader::loadFromFileObject(QFile &file, int size)
             parser.addCommand(args);
 
             item.command = QString::fromStdString(trimmed);
-            item.state = GCodeLine::InQueue;
+            item.state = GCodeItem::InQueue;
             item.lineNumber = parser.getCommandNumber();
             item.args = args;
 

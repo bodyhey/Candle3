@@ -1,28 +1,19 @@
 // This file is a part of "Candle" application.
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
+// Copyright 2024 BTS
 
 #ifndef GCODETABLEMODEL_H
 #define GCODETABLEMODEL_H
 
+#include "gcode/gcode.h"
 #include <QAbstractTableModel>
 #include <QString>
-
-struct GCodeItem
-{
-    enum States { InQueue, Sent, Processed, Skipped };
-
-    QString command;
-    char state;
-    QString response;
-    int line;
-    QStringList args;
-};
 
 class GCodeTableModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    explicit GCodeTableModel(QObject *parent = 0);
+    explicit GCodeTableModel(GCode &data, QObject *parent = 0);
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
@@ -37,14 +28,8 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
 
-    QList<GCodeItem> &data();
-
-signals:
-
-public slots:
-
 private:
-    QList<GCodeItem> m_data;
+    GCode &m_data;
     QStringList m_headers;
 };
 

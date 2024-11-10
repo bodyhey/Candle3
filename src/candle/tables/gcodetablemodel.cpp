@@ -1,10 +1,12 @@
 // This file is a part of "Candle" application.
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
+// Copyright 2024 BTS
 
 #include "gcodetablemodel.h"
 
-GCodeTableModel::GCodeTableModel(QObject *parent) :
-    QAbstractTableModel(parent)
+GCodeTableModel::GCodeTableModel(GCode &data, QObject *parent) :
+    QAbstractTableModel(parent),
+    m_data(data)
 {
     m_headers << tr("#") << tr("Command") << tr("State") << tr("Response") << tr("Line") << tr("Args");
 }
@@ -16,22 +18,23 @@ QVariant GCodeTableModel::data(const QModelIndex &index, int role) const
     if (index.row() >= m_data.size()) return QVariant();
 
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
+        GCodeItem item = m_data.at(index.row());
         switch (index.column())
         {
-        case 0: return index.row() == this->rowCount() - 1 ? QString() : QString::number(index.row() + 1);
-        case 1: return m_data.at(index.row()).command;
-        case 2:
-            if (index.row() == this->rowCount() - 1) return QString();
-            switch (m_data.at(index.row()).state) {
-            case GCodeItem::InQueue: return tr("In queue");
-            case GCodeItem::Sent: return tr("Sent");
-            case GCodeItem::Processed: return tr("Processed");
-            case GCodeItem::Skipped: return tr("Skipped");
-            }
-            return tr("Unknown");
-        case 3: return m_data.at(index.row()).response;
-        case 4: return m_data.at(index.row()).line;
-        case 5: return QVariant(m_data.at(index.row()).args);
+            case 0: return index.row() == this->rowCount() - 1 ? QString() : QString::number(index.row() + 1);
+            case 1: return item.command;
+            case 2:
+                if (index.row() == this->rowCount() - 1) return QString();
+                switch (m_data.at(index.row()).state) {
+                    case GCodeItem::InQueue: return tr("In queue");
+                    case GCodeItem::Sent: return tr("Sent");
+                    case GCodeItem::Processed: return tr("Processed");
+                    case GCodeItem::Skipped: return tr("Skipped");
+                }
+                return tr("Unknown");
+            case 3: return item.response;
+            case 4: return item.lineNumber;
+            case 5: return QVariant(m_data.at(index.row()).args);
         }
     }
 
@@ -50,12 +53,12 @@ bool GCodeTableModel::setData(const QModelIndex &index, const QVariant &value, i
     if (index.isValid() && role == Qt::EditRole) {
         switch (index.column())
         {
-        case 0: return false;
-        case 1: m_data[index.row()].command = value.toString(); break;
-        case 2: m_data[index.row()].state = value.toInt(); break;
-        case 3: m_data[index.row()].response = value.toString(); break;
-        case 4: m_data[index.row()].line = value.toInt(); break;
-        case 5: m_data[index.row()].args = value.toStringList(); break;
+            case 0: return false;
+            case 1: m_data[index.row()].command = value.toString(); break;
+            // case 2: m_data[index.row()].state = value.toInt(); break;
+            case 3: m_data[index.row()].response = value.toString(); break;
+            case 4: m_data[index.row()].lineNumber = value.toInt(); break;
+            case 5: m_data[index.row()].args = value.toStringList(); break;
         }
         emit dataChanged(index, index);
         return true;
@@ -127,9 +130,4 @@ Qt::ItemFlags GCodeTableModel::flags(const QModelIndex &index) const
     if (!index.isValid()) return Qt::NoItemFlags;
     if (index.column() == 1) return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
     else return QAbstractTableModel::flags(index);
-}
-
-QList<GCodeItem> &GCodeTableModel::data()
-{
-    return m_data;
 }

@@ -21,8 +21,7 @@ void GCode::resetProcessed(int commandIndex)
 
 QString GCode::command()
 {
-    return m_currentModel->data(m_currentModel->index(m_commandIndex, 1)).toString();
-    //m_form->currentModel().data(m_form->currentModel().index(m_streamer->commandIndex(), 1)).toString();
+    return this[m_commandIndex].command();
 }
 
 void GCode::advanceCommandIndex()
@@ -32,26 +31,32 @@ void GCode::advanceCommandIndex()
 
 bool GCode::isLastCommand()
 {
-    return m_commandIndex == m_commandsCount - 1;
+    return m_commandIndex == count() - 1;
 }
 
 bool GCode::noMoreCommands()
 {
-    return m_commandIndex > m_commandsCount - 1;
+    return m_commandIndex > count() - 1;
 }
 
 bool GCode::hasMoreCommands()
 {
-    return m_commandIndex <= m_commandsCount - 1;
+    return m_commandIndex <= count() - 1;
+}
+
+int GCode::lastCommandIndex()
+{
+    return count() - 1;
 }
 
 bool GCode::isLastCommandProcessed()
 {
-    return m_processedCommandIndex == m_commandsCount - 1;
+    return m_processedCommandIndex == count() - 1;
 }
 
 void GCode::commandSent()
 {
-    m_currentModel->setData(m_currentModel->index(m_commandIndex, 2), GCodeItem::Sent);
+    data()[m_commandIndex].state = GCodeItem::Sent;
+    // m_currentModel->setData(m_currentModel->index(m_commandIndex, 2), GCodeItem::Sent);
     //        m_form->currentModel().setData(m_form->currentModel().index(m_streamer->commandIndex(), 2), GCodeItem::Sent);
 }

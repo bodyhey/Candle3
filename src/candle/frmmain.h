@@ -1,5 +1,6 @@
 // This file is a part of "Candle" application.
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
+// Copyright 2024 BTS
 
 #ifndef FRMMAIN_H
 #define FRMMAIN_H
@@ -262,7 +263,8 @@ private:
     ConnectionManager m_connectionManager;
     Connection *m_connection;
     Communicator *m_communicator;
-    GCode *m_streamer;
+    GCode m_program;
+    GCode *m_currentProgram = &m_program;
 
     // Partials/Panels
     PartMainVirtualSettings *m_partMainVirtualSettings;
@@ -304,9 +306,6 @@ private:
     void saveSettings();
     void applySettings();
 
-    // Plugins
-    void loadPlugins();
-
     // Communication
     void openPortIfNeeded();
     QString evaluateCommand(QString command);
@@ -318,7 +317,7 @@ private:
     void loadFile(QString fileName);
     void loadLines(QList<std::string> data);
     bool saveChanges(bool heightmapMode);
-    bool saveProgramToFile(QString fileName, GCodeTableModel *model);
+    bool saveProgramToFile(QString fileName, GCode &data);
     void loadHeightmap(QString fileName);
     bool saveHeightmap(QString fileName);
     void clearTable();
@@ -341,7 +340,7 @@ private:
     void updateHeightmapGrid(double arg1);
     void resizeTableHeightmapSections();
     bool eventFilter(QObject *obj, QEvent *event) override;
-    void updateCurrentModel(GCodeTableModel *m_currentModel);
+    // void updateCurrentModel(GCodeTableModel *m_currentModel);
     void updateToolPositionAndToolpathShadowing(QVector3D toolPosition);
     void updateToolpathShadowingOnCheckMode();
     QString lastWorkingDirectory();

@@ -6,7 +6,6 @@
 #define GCODE_H
 
 #include <QObject>
-#include "tables/gcodetablemodel.h"
 
 enum StreamerStartResult
 {
@@ -15,19 +14,19 @@ enum StreamerStartResult
     UnacceptableConnectionState = 2,
 };
 
-struct GCodeLine
+struct GCodeItem
 {
+        enum States { InQueue = 0, Sent, Processed, Skipped };
+
         QString command;
         QString comment;
         QString response;
         int lineNumber;
-        int state;
+        States state = InQueue;
         QStringList args;
-
-        enum States { InQueue, Sent, Processed, Skipped };
 };
 
-class GCode : public QObject , public QList<GCodeLine>
+class GCode : public QObject , public QList<GCodeItem>
 {
     Q_OBJECT
 
@@ -45,20 +44,13 @@ class GCode : public QObject , public QList<GCodeLine>
         bool isLastCommand();
         bool noMoreCommands();
         bool hasMoreCommands();
+        int lastCommandIndex();
         bool isLastCommandProcessed();
-        // @TODO remove this method??
-        void setModel(GCodeTableModel *model) {
-            m_currentModel = model;
-            m_commandsCount = model->rowCount() - 1;
-            reset();
-        }
         void commandSent();
 
     private:
         int m_commandIndex;
         int m_processedCommandIndex;
-        int m_commandsCount;
-        GCodeTableModel *m_currentModel;
 
     signals:
         void progressChanged(int progress);
