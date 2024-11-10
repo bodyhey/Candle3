@@ -7,9 +7,8 @@ equals(QT_MAJOR_VERSION, 6):lessThan(QT_MINOR_VERSION, 8) {
     error("Use Qt 6.8 or newer")
 }
 
-QT = core gui opengl serialport uitools network xml
+QT = core gui opengl serialport uitools network
 QT += multimedia multimediawidgets
-QT += core5compat
 
 VERSION=1.0.0.0
 
@@ -17,7 +16,6 @@ VERSION=1.0.0.0
 # DEFINES += DEBUG_RAW_TCP_COMMUNICATION=1
 
 win32: {
-    # QT += winextras
     DEFINES += WINDOWS
     QMAKE_CXXFLAGS_DEBUG += -g3 -pg
     QMAKE_LFLAGS_DEBUG += -pg -lgmon
