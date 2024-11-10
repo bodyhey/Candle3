@@ -358,7 +358,7 @@ private:
     static bool actionLessThan(const QAction *a1, const QAction *a2);
     static bool actionTextLessThan(const QAction *a1, const QAction *a2);
 
-    void initializeConnection(ConnectionMode mode);
+    void initializeConnection(ConfigurationConnection::ConnectionMode mode);
     void initializeVisualizer();
 
     void applySpindleConfiguration(ConfigurationMachine &machineConfiguration);

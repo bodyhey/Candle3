@@ -68,7 +68,7 @@ class ConfigurationVisualizer : public ConfigurationModule
         bool msaa() const { return m_msaa; }
         bool zBuffer() const { return m_zBuffer; }
         bool vsync() const { return m_vsync; }
-        ProgramDrawMode programDrawMode() const { return m_programDrawMode; }
+        ConfigurationVisualizer::ProgramDrawMode programDrawMode() const { return m_programDrawMode; }
         bool simplifyGeometry() const { return m_simplifyGeometry; }
         double simplifyGeometryPrecision() const { return m_simplifyGeometryPrecision; }
         bool grayscaleSegments() const { return m_grayscaleSegments; }
@@ -129,10 +129,5 @@ class ConfigurationVisualizer : public ConfigurationModule
         ToolType m_toolType;
         double m_toolAngle;
 };
-
-Q_DECLARE_METATYPE(ConfigurationVisualizer::ProgramDrawMode);
-Q_DECLARE_METATYPE(ConfigurationVisualizer::ToolType);
-Q_ENUMS(ConfigurationVisualizer::ProgramDrawMode);
-Q_ENUMS(ConfigurationVisualizer::ToolType);
 
 #endif // CONFIGURATION_VISUALIZER_H

@@ -23,6 +23,4 @@ const QMap<QString,QVariant> DEFAULTS = {
 
 ConfigurationMachine::ConfigurationMachine(QObject *parent) : ConfigurationModule(parent, DEFAULTS)
 {
-    ConfigurationRegistry::registerEnum("ConfigurationMachine::ReferencePositionDir");
-    ConfigurationRegistry::registerEnum("ConnectionMode");
 }

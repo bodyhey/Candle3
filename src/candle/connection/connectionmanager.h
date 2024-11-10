@@ -18,7 +18,7 @@ class ConnectionManager : public QObject
 
     public:
         ConnectionManager(QObject *parent, const ConfigurationConnection &configurationConnection);
-        Connection* createConnection(ConnectionMode mode);
+        Connection* createConnection(ConfigurationConnection::ConnectionMode mode);
 
     private:
         SerialConnection* initializeSerialConnection();

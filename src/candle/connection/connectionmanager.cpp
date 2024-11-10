@@ -11,14 +11,14 @@ ConnectionManager::ConnectionManager(QObject *parent, const ConfigurationConnect
 {
 }
 
-Connection *ConnectionManager::createConnection(ConnectionMode mode)
+Connection *ConnectionManager::createConnection(ConfigurationConnection::ConnectionMode mode)
 {
     switch (mode) {
-        case ConnectionMode::SERIAL:
+        case ConfigurationConnection::ConnectionMode::SERIAL:
             return initializeSerialConnection();
-        case ConnectionMode::VIRTUAL:
+        case ConfigurationConnection::ConnectionMode::VIRTUAL:
             return initializeVirtualConnection();
-        case ConnectionMode::RAW_TCP:
+        case ConfigurationConnection::ConnectionMode::RAW_TCP:
             return initializeRawTcpConnection();
     }
 }

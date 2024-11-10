@@ -6,7 +6,7 @@
 #define CONNECTION_H
 
 #include <QObject>
-#include "../globals.h"
+#include "config/module/configurationconnection.h"
 
 class Connection : public QObject
 {
@@ -25,7 +25,7 @@ class Connection : public QObject
         virtual bool isConnecting() { return m_connecting; }
         virtual void sendLine(QString) = 0;
         virtual void closeConnection() = 0;
-        virtual ConnectionMode getSupportedMode() = 0;
+        virtual ConfigurationConnection::ConnectionMode getSupportedMode() = 0;
 
     protected:
         bool m_connecting = false;

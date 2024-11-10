@@ -24,7 +24,7 @@ class SerialConnection : public Connection
         bool isConnected() override;
         void sendLine(QString) override;
         void closeConnection() override;
-        ConnectionMode getSupportedMode() override { return ConnectionMode::SERIAL; };
+        ConfigurationConnection::ConnectionMode getSupportedMode() override { return ConfigurationConnection::ConnectionMode::SERIAL; };
 
     private:
         QSerialPort m_serialPort;

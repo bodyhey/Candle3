@@ -2258,7 +2258,7 @@ void frmMain::saveSettings()
     emit settingsSaved();
 }
 
-void frmMain::initializeConnection(ConnectionMode mode)
+void frmMain::initializeConnection(ConfigurationConnection::ConnectionMode mode)
 {
     m_connection = m_connectionManager.createConnection(mode);
 

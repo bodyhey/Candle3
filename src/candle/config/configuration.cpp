@@ -44,7 +44,7 @@ void Configuration::save()
     qDebug() << "Save configurations";
 
     m_persister.open();
-    for (ConfigurationModule* module : qAsConst(m_modules)) {
+    for (ConfigurationModule* module : std::as_const(m_modules)) {
         saveModule(module);
     }
     m_persister.close();
@@ -79,14 +79,24 @@ void Configuration::saveModule(ConfigurationModule *module)
 
     for (int i = 0; i < metaObj->propertyCount(); ++i) {
         QMetaProperty prop = metaObj->property(i);
-
         if (QString(prop.name()) == "objectName") continue;
 
-        QVariant value = prop.read(module);
+        QString typeName = prop.typeName();
 
-        if (!persistByType(module->getSectionName(), prop.name(), value, prop.typeName())) {
-            auto registryItem = ConfigurationRegistry::getInfo(prop.typeName());
-            char *pos = (char*) value.data();
+        QVariant value = prop.read(module);
+        if (prop.isEnumType()) {
+            // Convert enum value to its string representation
+            QStringList typeNameElements = typeName.split("::");
+            int indexOfEnum = metaObj->indexOfEnumerator(typeNameElements.last().toStdString().c_str());
+            if (indexOfEnum > -1) {
+                QMetaEnum metaEnum = metaObj->enumerator(indexOfEnum);
+                value = QString(metaEnum.valueToKey(value.toInt()));
+                typeName = "QString";
+            }
+        }
+
+        if (!persistByType(module->getSectionName(), prop.name(), value, typeName)) {
+            auto registryItem = ConfigurationRegistry::getInfo(typeName);
             switch (registryItem.type) {
                 case ConfigurationRegistry::Type::Unknown:
                     break;
@@ -123,7 +133,9 @@ void Configuration::setModuleDefaults(ConfigurationModule *module)
         if (QString(prop.name()) == "objectName" || QString(prop.name()) == "DEFAULTS") continue;
 
         QString type(prop.typeName());
-        if (type == "QString") {
+        if (prop.isEnumType()) {
+            prop.write(module, defaults[prop.name()].toInt());
+        } else if (type == "QString") {
             prop.write(module, defaults[prop.name()].toString());
         } else if (type == "int") {
             prop.write(module, defaults[prop.name()].toInt());
@@ -146,7 +158,7 @@ void Configuration::load()
     qDebug() << "Load configurations";
 
     m_provider.open();
-    for (ConfigurationModule* module : qAsConst(m_modules)) {
+    for (ConfigurationModule* module : std::as_const(m_modules)) {
         loadModule(module);
     }
     m_provider.close();
@@ -154,7 +166,7 @@ void Configuration::load()
 
 void Configuration::setDefaults()
 {
-    for (ConfigurationModule* module : qAsConst(m_modules)) {
+    for (ConfigurationModule* module : std::as_const(m_modules)) {
         setModuleDefaults(module);
     }
 
@@ -186,11 +198,43 @@ void Configuration::loadModule(ConfigurationModule *module)
             prop.write(module, m_provider.getDouble(module->getSectionName(), name, defaults[prop.name()].toDouble()));
         } else if (type == "QStringList") {
             prop.write(module, m_provider.getStringList(module->getSectionName(), name, defaults[prop.name()].toStringList()));
+        } else if (prop.isEnumType()) {
+            QString value = m_provider.getString(module->getSectionName(), name, defaults[prop.name()].toString());
+            QStringList typeNameElements = QString(prop.typeName()).split("::");
+            int indexOfEnum = metaObj->indexOfEnumerator(typeNameElements.last().toStdString().c_str());
+            if (indexOfEnum == -1) {
+                qDebug() << "Enum not found" << prop.typeName() << prop.name() << "; trying to find in registry..";
+                auto registryItem = ConfigurationRegistry::getInfo(prop.typeName());
+                if (registryItem.type == ConfigurationRegistry::Type::Enum) {
+                    prop.write(module, m_provider.getInt(module->getSectionName(), QString(prop.name()), defaults[prop.name()].toInt()));
+                } else {
+                    qDebug() << "Enum not found in registry" << prop.typeName() << prop.name();
+                }
+
+                continue;
+            }
+            QMetaEnum metaEnum = metaObj->enumerator(indexOfEnum);
+
+            bool ok;
+            int enumValue = value.toInt(&ok);
+            if (ok) {
+                prop.write(module, enumValue);
+                continue;
+            }
+
+            enumValue = metaEnum.keyToValue(value.toStdString().c_str(), &ok);
+            if (!ok) {
+                qDebug() << "Enum value not found" << value << prop.name();
+                continue;
+            }
+
+            prop.write(module, enumValue);
         } else {
             auto registryItem = ConfigurationRegistry::getInfo(prop.typeName());
 
             switch (registryItem.type) {
                 case ConfigurationRegistry::Type::Unknown:
+                    qDebug() << "Unknown type" << prop.typeName();
                     break;
                 case ConfigurationRegistry::Type::Value: {
                     QVariant denormalized = registryItem.denormalizeValue(

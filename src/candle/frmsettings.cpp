@@ -276,7 +276,7 @@ void frmSettings::applySettings()
     console.m_showSystemCommands = ui->chkConsoleShowSystemCommands->isChecked();
 
     ConfigurationConnection &connection = m_configuration.connectionModule();
-    connection.m_connectionMode = static_cast<ConnectionMode>(ui->cboConnectionMode->currentIndex());
+    connection.m_connectionMode = static_cast<ConfigurationConnection::ConnectionMode>(ui->cboConnectionMode->currentIndex());
     connection.m_queryStateInterval = ui->txtQueryStateInterval->value();
     connection.m_serialPort = ui->cboSerialPort->currentText();
     connection.m_serialBaud = ui->cboSerialBaud->currentText().toInt();

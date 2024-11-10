@@ -10,6 +10,6 @@ const QMap<QString,QVariant> DEFAULTS = {
     {"approximatationAngle", 5.0}
 };
 
-ConfigurationParser::ConfigurationParser(QObject *parent) : ConfigurationModule(parent, DEFAULTS) {
-    ConfigurationRegistry::registerEnum("ParserArcApproximationMode");
+ConfigurationParser::ConfigurationParser(QObject *parent) : ConfigurationModule(parent, DEFAULTS)
+{
 }

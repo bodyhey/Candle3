@@ -6,7 +6,7 @@
 
 const QMap<QString,QVariant> DEFAULTS = {
     {"queryStateInterval", 100},
-    {"connectionMode", ConnectionMode::VIRTUAL},
+    {"connectionMode", ConfigurationConnection::ConnectionMode::VIRTUAL},
     {"serialPort", ""},
     {"serialBaud", 115200},
     {"rawTcpHost", "localhost"},
@@ -15,5 +15,4 @@ const QMap<QString,QVariant> DEFAULTS = {
 
 ConfigurationConnection::ConfigurationConnection(QObject *parent) : ConfigurationModule(parent, DEFAULTS)
 {
-    ConfigurationRegistry::registerEnum("ConnectionMode");
 }

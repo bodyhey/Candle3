@@ -27,6 +27,13 @@ class ConfigurationConnection : public ConfigurationModule
         ConfigurationConnection& operator=(const ConfigurationConnection&) { return *this; }
         QString getSectionName() override { return "connection"; }
 
+        enum ConnectionMode {
+            SERIAL = 0,
+            RAW_TCP = 1,
+            VIRTUAL = 2
+        };
+        Q_ENUM(ConnectionMode);
+
         ConnectionMode connectionMode() const { return m_connectionMode; }
         int queryStateInterval() const { return m_queryStateInterval; }
         QString serialPort() const { return m_serialPort; }
@@ -34,7 +41,7 @@ class ConfigurationConnection : public ConfigurationModule
         QString rawTcpHost() const { return m_rawTcpHost; }
         int rawTcpPort() const { return m_rawTcpPort; }
 
-    private:       
+    private:
         // General
         ConnectionMode m_connectionMode;
         int m_queryStateInterval;
@@ -47,7 +54,5 @@ class ConfigurationConnection : public ConfigurationModule
         QString m_rawTcpHost;
         int m_rawTcpPort;
 };
-
-Q_DECLARE_METATYPE(ConnectionMode);
 
 #endif // CONFIGURATION_CONNECTION_H

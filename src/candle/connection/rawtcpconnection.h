@@ -24,7 +24,7 @@ class RawTcpConnection : public Connection
         bool isConnected() override;
         void sendLine(QString) override;
         void closeConnection() override;
-        ConnectionMode getSupportedMode() override { return ConnectionMode::RAW_TCP; };
+        ConfigurationConnection::ConnectionMode getSupportedMode() override { return ConfigurationConnection::ConnectionMode::RAW_TCP; };
 
     private:
         QString m_host;

@@ -39,6 +39,4 @@ const QMap<QString, QVariant> DEFAULTS = {
 
 ConfigurationVisualizer::ConfigurationVisualizer(QObject *parent) : ConfigurationModule(parent, DEFAULTS)
 {
-    ConfigurationRegistry::registerEnum("ProgramDrawMode");
-    ConfigurationRegistry::registerEnum("ToolType");
 }

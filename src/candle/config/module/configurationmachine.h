@@ -17,9 +17,9 @@ class ConfigurationMachine : public ConfigurationModule
     Q_PROPERTY(ConfigurationModule::MinMax spindleSpeedRange MEMBER m_spindleSpeedRange NOTIFY changed)
     Q_PROPERTY(int spindleSpeed READ spindleSpeed NOTIFY changed)
     Q_PROPERTY(ConfigurationModule::MinMax laserPowerRange MEMBER m_laserPowerRange NOTIFY changed)
-    Q_PROPERTY(ConfigurationMachine::ReferencePositionDir referencePositionDirX MEMBER m_referencePositionDirX NOTIFY changed)
-    Q_PROPERTY(ConfigurationMachine::ReferencePositionDir referencePositionDirY MEMBER m_referencePositionDirY NOTIFY changed)
-    Q_PROPERTY(ConfigurationMachine::ReferencePositionDir referencePositionDirZ MEMBER m_referencePositionDirZ NOTIFY changed)
+    Q_PROPERTY(ReferencePositionDir referencePositionDirX MEMBER m_referencePositionDirX NOTIFY changed)
+    Q_PROPERTY(ReferencePositionDir referencePositionDirY MEMBER m_referencePositionDirY NOTIFY changed)
+    Q_PROPERTY(ReferencePositionDir referencePositionDirZ MEMBER m_referencePositionDirZ NOTIFY changed)
     Q_PROPERTY(bool overrideMaxTravel MEMBER m_overrideMaxTravel NOTIFY changed)
     Q_PROPERTY(QVector3D maxTravel MEMBER m_maxTravel NOTIFY changed)
     Q_PROPERTY(bool overrideFeed MEMBER m_overrideFeed NOTIFY changed)
@@ -37,6 +37,7 @@ class ConfigurationMachine : public ConfigurationModule
             Negative,
             Positive
         };
+        Q_ENUM(ReferencePositionDir);
 
         ConfigurationModule::MinMax spindleSpeedRange() const { return m_spindleSpeedRange; }
         double spindleSpeedRatio() const { return (m_spindleSpeedRange.max - m_spindleSpeedRange.min) / 100; }
@@ -71,7 +72,5 @@ class ConfigurationMachine : public ConfigurationModule
         bool m_overrideSpindleSpeed;
         int m_overrideSpindleSpeedValue;
 };
-
-Q_DECLARE_METATYPE(ConfigurationMachine::ReferencePositionDir);
 
 #endif // CONFIGURATIONMACHINE_H
