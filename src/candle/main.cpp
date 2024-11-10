@@ -1,5 +1,6 @@
 // This file is a part of "Candle" application.
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
+// Copyright 2024 BTS
 
 #include <QApplication>
 #include <QDebug>
@@ -10,7 +11,7 @@
 #include <QStyleFactory>
 #include <QStyleHints>
 #include <QFontDatabase>
-#include <QMessageBox>
+#include <QCommandLineParser>
 
 #include "frmmain.h"
 
@@ -35,7 +36,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &, const QString & 
             abort();
     }
 
-    QFile outFile("log");
+    QFile outFile("GPilot.log");
     outFile.open(QIODevice::WriteOnly | QIODevice::Append);
     QTextStream ts(&outFile);
     ts << txt << Qt::endl;
@@ -50,9 +51,6 @@ void initAppInfo()
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(messageHandler);
-    initAppInfo();
-
 #ifdef UNIX
     bool styleOverrided = false;
     for (int i = 0; i < argc; i++) if (QString(argv[i]).toUpper() == "-STYLE") {
@@ -64,6 +62,20 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setApplicationDisplayName("G-Pilot");
     app.setOrganizationName("G-Pilot");
+
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Test helper");
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    QCommandLineOption logToFileOption(QStringList{"l", "log-to-file"}, "Log debug info to `GPilot.log`.");
+    parser.addOption(logToFileOption);
+
+    parser.process(app);
+
+    if (parser.isSet(logToFileOption)) {
+        qInstallMessageHandler(messageHandler);
+    }
 
 #ifdef GLES
     QFontDatabase::addApplicationFont(":/fonts/Ubuntu-R.ttf");
