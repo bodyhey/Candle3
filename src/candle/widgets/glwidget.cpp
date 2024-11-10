@@ -607,15 +607,15 @@ QPointF GLWidget::getClickPositionOnXYPlane(QVector2D mouseClickPosition, QMatri
     QVector3D nearPlanePosition(mouseClickPosition, -1.0f);
 
     // Unproject the 3D position on the near plane to the world space
-    QVector3D nearPlaneWorldPosition = invertedProjection * nearPlanePosition;
-    nearPlaneWorldPosition = invertedView * nearPlaneWorldPosition;
+    QVector3D nearPlaneWorldPosition = invertedProjection.map(nearPlanePosition);
+    nearPlaneWorldPosition = invertedView.map(nearPlaneWorldPosition);
 
     // Convert 2D mouse position to 3D position with Z = 1 (far plane)
     QVector3D farPlanePosition(mouseClickPosition, 1.0f);
 
     // Unproject the 3D position on the far plane to the world space
-    QVector3D farPlaneWorldPosition = invertedProjection * farPlanePosition;
-    farPlaneWorldPosition = invertedView * farPlaneWorldPosition;
+    QVector3D farPlaneWorldPosition = invertedProjection.map(farPlanePosition);
+    farPlaneWorldPosition = invertedView.map(farPlaneWorldPosition);
 
     // Calculate the direction from the near plane to the far plane
     QVector3D direction = farPlaneWorldPosition - nearPlaneWorldPosition;
