@@ -56,6 +56,7 @@
 // #include <QCameraInfo>
 #include <QMediaMetaData>
 #include <QMediaDevices>
+#include <QVideoSink>
 #include <QMessageBox>
 #include <QPalette>
 

@@ -112,6 +112,7 @@ SOURCES += main.cpp\
     # module/camera/qvideoframeconversionhelper.cpp \
     # module/camera/videosurface.cpp \
     # module/camera/viewfinder.cpp \
+    module/camera/cameraframeprocessor.cpp \
     module/pendant/pendant.cpp \
     parser/arcproperties.cpp \
     parser/gcodeparser.cpp \
@@ -193,6 +194,7 @@ HEADERS  += frmmain.h \
     # module/camera/qvideoframeconversionhelper.h \
     # module/camera/videosurface.h \
     # module/camera/viewfinder.h \
+    module/camera/cameraframeprocessor.h \
     module/pendant/pendant.h \
     parser/arcproperties.h \
     parser/gcodeparser.h \
