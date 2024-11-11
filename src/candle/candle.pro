@@ -233,7 +233,7 @@ RESOURCES += \
 INCLUDEPATH += ../designerplugins/customwidgetsplugin
 INCLUDEPATH += ../vendor/PropertyEditor
 
-include(../vendor/CRC/CRC.pri)
+include(../vendor/CRC.pri)
 include(../vendor/PropertyEditor/PropertyEditor.pri)
 
 LIBS += -L../designerplugins/customwidgetsplugin -lcustomwidgets

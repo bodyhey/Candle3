@@ -1,6 +1,8 @@
 TEMPLATE = subdirs
 
 SUBDIRS =   uCNC \
-            CRC \
             PropertyEditor
 
+HEADERS += Arduino.h
+
+DISTFILES += CRC.pri
