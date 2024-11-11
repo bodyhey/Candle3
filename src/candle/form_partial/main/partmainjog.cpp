@@ -148,7 +148,7 @@ void partMainJog::onCmdStopClicked()
 void partMainJog::onCmdFeedRateChanged(int index)
 {
     // should not happen in real life, only during initialization (clear old items)
-    if (index <= 0 || index >= m_configurationJogging->feedChoices().count()) {
+    if (index < 0 || index >= m_configurationJogging->feedChoices().count()) {
         return;
     }
 
@@ -164,7 +164,7 @@ void partMainJog::onCmdFeedRateChanged(int index)
 void partMainJog::onCmdStepSizeChanged(int index)
 {
     // should not happen in real life, only during initialization (clear old items)
-    if (index <= 0 || index > m_configurationJogging->stepChoices().count()) {
+    if (index < 0 || index >= m_configurationJogging->stepChoices().count()) {
         return;
     }
 

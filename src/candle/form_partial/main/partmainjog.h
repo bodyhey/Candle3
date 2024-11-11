@@ -22,6 +22,7 @@ public:
 
     int feedRate() const { return m_feedRate; };
     double stepSize() const { return m_stepSize; };
+    bool isContinuous() const { return m_stepSize == CONTINUOUS; };
     JoggingVector jogVector() const { return m_jogVector; };
     void storeAndResetKeyboardControl();
     bool keyboardControl();

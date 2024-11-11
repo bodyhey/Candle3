@@ -134,7 +134,8 @@ frmMain::frmMain(QWidget *parent) :
         jogStep(jog);
     });
     connect(ui->jog, &partMainJog::stop, this, [=]() {
-        qDebug() << "Stop jog";
+        m_communicator->clearQueue();
+        m_communicator->sendRealtimeCommand(GRBL_LIVE_JOG_CANCEL);
     });
 
     // Drag&drop placeholders
@@ -338,6 +339,9 @@ void frmMain::initializeCommunicator()
     connect(m_communicator, &Communicator::deviceConfigurationReceived, this, [this](MachineConfiguration configuration, QMap<int, double> rawConfiguration) {
         Q_UNUSED(rawConfiguration)
         m_partMainVirtualSettings->deviceConfigurationReceived(configuration);
+    });
+    connect(m_communicator, &Communicator::statusReceived, this, [this]() {
+        jogContinuous();
     });
 }
 
@@ -3531,18 +3535,19 @@ void frmMain::jogStep(QVector3D vector)
 void frmMain::jogContinuous()
 {
     static bool block = false;
-    static QVector3D v;
+    static QVector3D lastVector(0, 0, 0);
 
-    if ((ui->jog->stepSize() == ui->jog->CONTINUOUS) && !block) {
+    if ((ui->jog->isContinuous()) && !block) {
         bool unitsInches = m_communicator->machineConfiguration().unitsInches();
 
-        if (ui->jog->jogVector() != v) {
+        if (ui->jog->jogVector() != lastVector) {
             // Store jog vector before block
-            QVector3D j = ui->jog->jogVector();
+            QVector3D vector = ui->jog->jogVector();
 
-            if (v.length()) {
+            // Stop jogging
+            if (lastVector.length()) {
                 block = true;
-                m_connection->sendByteArray(QByteArray(1, char(0x85)));
+                m_communicator->sendRealtimeCommand(GRBL_LIVE_JOG_CANCEL);
                 while (m_communicator->deviceState() == DeviceJog) qApp->processEvents();
                 block = false;
             }
@@ -3561,18 +3566,18 @@ void frmMain::jogContinuous()
             // Minimum distance to bounds
             double d = 0;
             if (m_communicator->machineConfiguration().softLimitsEnabled()) {
-                t = QVector3D(j.x() * b.x() < 0 ? 0 - m.x() : b.x() - m.x(), 
-                              j.y() * b.y() < 0 ? 0 - m.y() : b.y() - m.y(),
-                              j.z() * b.z() < 0 ? 0 - m.z() : b.z() - m.z());
-                for (int i = 0; i < 3; i++) if ((j[i] && (qAbs(t[i]) < d)) || (j[i] && !d)) d = qAbs(t[i]);
+                t = QVector3D(vector.x() * b.x() < 0 ? 0 - m.x() : b.x() - m.x(),
+                              vector.y() * b.y() < 0 ? 0 - m.y() : b.y() - m.y(),
+                              vector.z() * b.z() < 0 ? 0 - m.z() : b.z() - m.z());
+                for (int i = 0; i < 3; i++) if ((vector[i] && (qAbs(t[i]) < d)) || (vector[i] && !d)) d = qAbs(t[i]);
                 // Coords not aligned, add some bounds offset
                 d -= unitsInches ? m_communicator->toMetric(0.0005) : 0.005;
             } else {
-                for (int i = 0; i < 3; i++) if (j[i] && (qAbs(b[i]) > d)) d = qAbs(b[i]);
+                for (int i = 0; i < 3; i++) if (vector[i] && (qAbs(b[i]) > d)) d = qAbs(b[i]);
             }
 
             // Jog vector
-            QVector3D vec = j * m_communicator->toInches(d);
+            QVector3D vec = vector * m_communicator->toInches(d);
 
             if (vec.length()) {
                 m_communicator->sendCommand(CommandSource::System, QString("$J=%5G91X%1Y%2Z%3F%4")
@@ -3583,7 +3588,7 @@ void frmMain::jogContinuous()
                             .arg(unitsInches ? "G20" : "G21")
                             , -2);
             }
-            v = j;
+            lastVector = vector;
         }
     }
 }
