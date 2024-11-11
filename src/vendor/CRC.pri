@@ -17,5 +17,6 @@ HEADERS += $$PWD/CRC/src/CRC.h \
            $$PWD/CRC/src/CRC32.h \
            $$PWD/CRC/src/CRC64.h \
            $$PWD/CRC/src/CRC8.h \
+           $$PWD/CRC/src/CrcDefines.h \
            $$PWD/CRC/src/CrcFastReverse.h
 

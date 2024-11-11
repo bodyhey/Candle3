@@ -1,14 +1,18 @@
 TEMPLATE = subdirs
  
-SUBDIRS = joystickplugin customwidgetsplugin
+SUBDIRS = customwidgetsplugin
 
 install_customwidgetsplugin.path = ../../bin
 install_customwidgetsplugin.files = customwidgetsplugin/customwidgets.dll
 
-install_joystickplugin.path = ../../bin/plugins/joystick/plugins
-install_joystickplugin.files = joystickplugin/joystickplugin.dll
+win32: {
+    SUBDIRS += joystickplugin
 
-INSTALLS += install_customwidgetsplugin
+    install_joystickplugin.path = ../../bin/plugins/joystick/plugins
+    install_joystickplugin.files = joystickplugin/joystickplugin.dll
 
-CONFIG += c++14
-QMAKE_CXXFLAGS += -std=c++14
+    INSTALLS += install_customwidgetsplugin
+}
+
+CONFIG += c++17
+QMAKE_CXXFLAGS += -std=c++17

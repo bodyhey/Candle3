@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
     if (!styleOverrided) foreach (QString str, QStyleFactory::keys()) {
         qDebug() << "style" << str;
         if (str.contains("GTK+")) {
-            a.setStyle(QStyleFactory::create(str));
+            app.setStyle(QStyleFactory::create(str));
             break;
         }
     }

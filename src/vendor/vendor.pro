@@ -1,7 +1,8 @@
 TEMPLATE = subdirs
 
-SUBDIRS =   uCNC \
-            PropertyEditor
+SUBDIRS = PropertyEditor
+
+SUBDIRS += uCNC
 
 HEADERS += Arduino.h
 

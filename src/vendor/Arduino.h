@@ -6,6 +6,7 @@
 #define ARDUINO_H
 
 #include <stdint.h>
+#include <cstddef>
 
 #define yield()
 

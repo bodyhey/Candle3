@@ -4,6 +4,7 @@
 
 #include "virtualucncconnection.h"
 #include <QDebug>
+#include <QUuid>
 
 extern "C" {
 Q_DECL_IMPORT
@@ -25,8 +26,8 @@ VirtualUCNCConnection::~VirtualUCNCConnection()
 void VirtualUCNCConnection::startLocalServer()
 {
     m_server = new QLocalServer(this);
-    connect(m_server, &QLocalServer::newConnection, this, &VirtualUCNCConnection::onNewConnection);
-    m_server->listen("gpilotucnc");
+    connect(m_server, &QLocalServer::newConnection, this, &VirtualUCNCConnection::onNewConnection);    
+    m_server->listen("gpilotucnc_" + QUuid::createUuid().toString());
 }
 
 void VirtualUCNCConnection::startWorkerThread()

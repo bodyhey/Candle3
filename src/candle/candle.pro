@@ -250,24 +250,9 @@ LIBS += -L../designerplugins/customwidgetsplugin -lcustomwidgets
 #     system($$command)|error("Failed to run: $$command")
 # }
 
-LIBS += -L../vendor/uCNC -luCNC
-
 INCLUDEPATH += $$PWD/../vendor/uCNC/build
 INCLUDEPATH += $$PWD/../vendor/uCNC/makefiles/virtual
 DEPENDPATH += ../vendor/uCNC
 
-# win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../vendor/uCNC/release/libuCNC.a
-# else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../vendor/uCNC/release/uCNC.lib
+LIBS += -L../vendor/uCNC -luCNC
 
-# win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../vendor/uCNC/release/ -luCNC
-# else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../vendor/uCNC/debug/ -luCNC
-
-# INCLUDEPATH += $$PWD/../vendor/uCNC/build
-# DEPENDPATH += $$PWD/../vendor/uCNC/build
-
-# win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../vendor/uCNC/release/libuCNC.a
-# else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../vendor/uCNC/debug/libuCNC.a
-# else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../vendor/uCNC/release/uCNC.lib
-# else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../vendor/uCNC/debug/uCNC.lib
-
-win32: LIBS += -luCNC
