@@ -235,12 +235,6 @@ frmMain::frmMain(QWidget *parent) :
 
     updateControlsState();
 
-    // Prepare jog buttons
-    foreach (StyledToolButton* button, ui->grpJog->findChildren<StyledToolButton*>(QRegularExpression("cmdJogFeed\\d")))
-    {
-        connect(button, SIGNAL(clicked(bool)), this, SLOT(onCmdJogFeedClicked()));
-    }
-
     // Setting up spindle slider box
     // ui->slbSpindle->setTitle(tr("Speed:"));
     // ui->slbSpindle->setCheckable(false);
