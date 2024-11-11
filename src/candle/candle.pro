@@ -14,6 +14,8 @@ VERSION=1.0.0.0
 
 # DEFINES += DEBUG_UCNC_COMMUNICATION=1
 # DEFINES += DEBUG_RAW_TCP_COMMUNICATION=1
+# QT_DEBUG_PLUGINS=1
+# DEFINES += QT_DEBUG_PLUGINS=1
 
 win32: {
     DEFINES += WINDOWS
@@ -129,16 +131,8 @@ SOURCES += main.cpp\
     drawers/selectiondrawer.cpp \
     scripting/scriptvars.cpp \
     widgets/dropwidget.cpp \
-    ../vendor/CRC/src/CrcFastReverse.cpp \
-    ../vendor/CRC/src/CRC.cpp \
-    ../vendor/CRC/src/CRC8.cpp \
-    ../vendor/CRC/src/CRC12.cpp \
-    ../vendor/CRC/src/CRC16.cpp \
-    ../vendor/CRC/src/CRC32.cpp \
-    ../vendor/CRC/src/CRC64.cpp
 
 HEADERS  += frmmain.h \
-    Arduino.h \
     communicator.h \
     config/configuration.h \
     config/module/configurationconnection.h \
@@ -238,10 +232,11 @@ RESOURCES += \
 
 INCLUDEPATH += ../designerplugins/customwidgetsplugin
 INCLUDEPATH += ../vendor/PropertyEditor
-INCLUDEPATH += ../vendor/CRC/src
+
+include(../vendor/CRC/CRC.pri)
+include(../vendor/PropertyEditor/PropertyEditor.pri)
 
 LIBS += -L../designerplugins/customwidgetsplugin -lcustomwidgets
-LIBS += -L../vendor/PropertyEditor -lPropertyEditor
 
 # qtPrepareTool(LRELEASE, lrelease)
 # for(tsfile, TRANSLATIONS) {
