@@ -379,7 +379,7 @@
   <customwidget>
    <class>StyledToolButton</class>
    <extends>QToolButton</extends>
-   <header>styledtoolbutton.h</header>
+   <header location="global">styledtoolbutton.h</header>
   </customwidget>
  </customwidgets>
  <resources>

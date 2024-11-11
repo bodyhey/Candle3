@@ -64,13 +64,6 @@
    <item row="1" column="2">
     <widget class="QLineEdit" name="editZ"/>
    </item>
-   <item row="3" column="2">
-    <widget class="QPushButton" name="btnSet3">
-     <property name="text">
-      <string>100mm</string>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="1">
     <widget class="QLineEdit" name="editY"/>
    </item>
@@ -81,20 +74,6 @@
     <widget class="QLabel" name="labelZ">
      <property name="text">
       <string>Z</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QPushButton" name="btnSet2">
-     <property name="text">
-      <string>50mm</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QPushButton" name="btnSet1">
-     <property name="text">
-      <string>10mm</string>
      </property>
     </widget>
    </item>
@@ -115,8 +94,21 @@
      </property>
     </widget>
    </item>
+   <item row="2" column="3">
+    <widget class="QLabel" name="labelActions">
+     <property name="text">
+      <string>Actions</string>
+     </property>
+    </widget>
+   </item>
    <item row="3" column="3">
-    <widget class="QPushButton" name="btnEStop">
+    <widget class="StyledToolButton" name="btnEStop">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>E-STOP</string>
      </property>
@@ -125,81 +117,56 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="3">
-    <widget class="QLabel" name="labelActions">
+   <item row="3" column="0">
+    <widget class="StyledToolButton" name="btnSet1">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
-      <string>Actions</string>
+      <string>10mm</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="StyledToolButton" name="btnSet2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>50mm</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="StyledToolButton" name="btnSet3">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>100mm</string>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>StyledToolButton</class>
+   <extends>QToolButton</extends>
+   <header location="global">styledtoolbutton.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
-  <connection>
-   <sender>btnSet1</sender>
-   <signal>clicked()</signal>
-   <receiver>PartMainVirtualSettings</receiver>
-   <slot>onSetClicked1()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>39</x>
-     <y>76</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>122</x>
-     <y>44</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btnSet2</sender>
-   <signal>clicked()</signal>
-   <receiver>PartMainVirtualSettings</receiver>
-   <slot>onSetClicked2()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>121</x>
-     <y>88</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>122</x>
-     <y>44</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btnSet3</sender>
-   <signal>clicked()</signal>
-   <receiver>PartMainVirtualSettings</receiver>
-   <slot>onSetClicked3()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>183</x>
-     <y>88</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>122</x>
-     <y>44</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btnEStop</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>PartMainVirtualSettings</receiver>
-   <slot>onEStopToggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>226</x>
-     <y>77</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>183</x>
-     <y>18</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>editX</sender>
    <signal>editingFinished()</signal>
