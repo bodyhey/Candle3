@@ -317,24 +317,24 @@ void frmMain::initializeCommunicator()
     // @TODO temporary!
     m_communicator->streamCommands(m_program);
 
-    connect(m_communicator, SIGNAL(machinePosChanged(QVector3D)), this, SLOT(onMachinePosChanged(QVector3D)));
-    connect(m_communicator, SIGNAL(workPosChanged(QVector3D)), this, SLOT(onWorkPosChanged(QVector3D)));
-    connect(m_communicator, SIGNAL(deviceStateReceived(DeviceState)), this, SLOT(onDeviceStateReceived(DeviceState)));
-    connect(m_communicator, SIGNAL(deviceStateChanged(DeviceState)), this, SLOT(onDeviceStateChanged(DeviceState)));
-    connect(m_communicator, SIGNAL(senderStateReceived(SenderState)), this, SLOT(onSenderStateReceived(SenderState)));
+    connect(m_communicator, &Communicator::machinePosChanged, this, &frmMain::onMachinePosChanged);
+    connect(m_communicator, &Communicator::workPosChanged, this, &frmMain::onWorkPosChanged);
+    connect(m_communicator, &Communicator::deviceStateReceived, this, &frmMain::onDeviceStateReceived);
+    connect(m_communicator, &Communicator::deviceStateChanged, this, &frmMain::onDeviceStateChanged);
+    connect(m_communicator, &Communicator::senderStateReceived, this, &frmMain::onSenderStateReceived);
     connect(m_communicator, SIGNAL(spindleStateReceived(bool)), this, SLOT(onSpindleStateReceived(bool)));
-    connect(m_communicator, SIGNAL(floodStateReceived(bool)), this, SLOT(onFloodStateReceived(bool)));
-    connect(m_communicator, SIGNAL(commandSent(CommandAttributes)), this, SLOT(onCommandSent(CommandAttributes)));
-    connect(m_communicator, SIGNAL(commandResponseReceived(CommandAttributes)), this, SLOT(onCommandResponseReceived(CommandAttributes)));
-    connect(m_communicator, SIGNAL(parserStateReceived(QString)), this, SLOT(onParserStateReceived(QString)));
-    connect(m_communicator, SIGNAL(pinStateReceived(QString)), this, SLOT(onPinStateReceived(QString)));
-    connect(m_communicator, SIGNAL(spindleSpeedReceived(int)), this, SLOT(onSpindleSpeedReceived(int)));
-    connect(m_communicator, SIGNAL(commandProcessed(int,QString)), this, SLOT(onCommandProcessed(int,QString)));
+    connect(m_communicator, &Communicator::floodStateReceived, this, &frmMain::onFloodStateReceived);
+    connect(m_communicator, &Communicator::commandSent, this, &frmMain::onCommandSent);
+    connect(m_communicator, &Communicator::commandResponseReceived, this, &frmMain::onCommandResponseReceived);
+    connect(m_communicator, &Communicator::parserStateReceived, this, &frmMain::onParserStateReceived);
+    connect(m_communicator, &Communicator::pinStateReceived, this, &frmMain::onPinStateReceived);
+    connect(m_communicator, &Communicator::spindleSpeedReceived, this, &frmMain::onSpindleSpeedReceived);
+    connect(m_communicator, &Communicator::commandProcessed, this, &frmMain::onCommandProcessed);
     connect(m_communicator, SIGNAL(feedSpindleSpeedReceived(int,int)), this, SLOT(onFeedSpindleSpeedReceived(int,int)));
-    connect(m_communicator, SIGNAL(overridesReceived(int,int,int)), this, SLOT(onOverridesReceived(int,int,int)));
-    connect(m_communicator, SIGNAL(toolPositionReceived(QVector3D)), this, SLOT(onToolPositionReceived(QVector3D)));
-    connect(m_communicator, SIGNAL(transferCompleted()), this, SLOT(onTransferCompleted()));
-    connect(m_communicator, SIGNAL(aborted()), this, SLOT(onAborted()));
+    connect(m_communicator, &Communicator::overridesReceived, this, &frmMain::onOverridesReceived);
+    connect(m_communicator, &Communicator::toolPositionReceived, this, &frmMain::onToolPositionReceived);
+    connect(m_communicator, &Communicator::transferCompleted, this, &frmMain::onTransferCompleted);
+    connect(m_communicator, &Communicator::aborted, this, &frmMain::onAborted);
     connect(m_communicator, &Communicator::deviceConfigurationReceived, this, [this](MachineConfiguration configuration, QMap<int, double> rawConfiguration) {
         Q_UNUSED(rawConfiguration)
         m_partMainVirtualSettings->deviceConfigurationReceived(configuration);

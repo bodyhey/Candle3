@@ -96,8 +96,8 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
     }
 
     ui->listCategories->item(0)->setSelected(true);
-    connect(ui->scrollSettings->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(onScrollBarValueChanged(int)));
-    connect(this, SIGNAL(settingsSetToDefault()), parent, SIGNAL(settingsSetToDefault()));
+    connect(ui->scrollSettings->verticalScrollBar(), &QAbstractSlider::valueChanged, this, &frmSettings::onScrollBarValueChanged);
+    // connect(this, SIGNAL(settingsSetToDefault()), parent, SIGNAL(settingsSetToDefault()));
 
     // Shortcuts table
     ui->tblShortcuts->setItemDelegateForColumn(2, new ShortcutDelegate);
@@ -123,7 +123,7 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
     // Connection mode
     ui->frameConnectionRawSocket->hide();
     ui->frameConnectionSimulator->hide();
-    connect(ui->cboConnectionMode, SIGNAL(currentIndexChanged(int)), this, SLOT(onConnectionModeChanged(int)));
+    connect(ui->cboConnectionMode, &QComboBox::currentIndexChanged, this, &frmSettings::onConnectionModeChanged);
 
     m_animatingScrollBox = false;
     m_scrollingManuallyScrollBox = false;

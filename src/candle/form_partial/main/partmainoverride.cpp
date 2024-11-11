@@ -21,7 +21,7 @@ partMainOverride::partMainOverride(QWidget *parent)
     ui->slbFeed->setCurrentValue(100);
     ui->slbFeed->setTitle(tr("Feed rate:"));
     ui->slbFeed->setSuffix("%");
-    connect(ui->slbFeed, SIGNAL(toggled(bool)), this, SLOT(onOverridingToggled(bool)));
+    // connect(ui->slbFeed, SIGNAL(toggled(bool)), this, SLOT(onOverridingToggled(bool)));
     connect(ui->slbFeed, &SliderBox::toggled, this, &partMainOverride::onOverrideChanged);
     connect(ui->slbFeed, &SliderBox::valueChanged, this, &partMainOverride::onOverrideChanged);
 

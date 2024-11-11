@@ -42,15 +42,15 @@ Communicator::Communicator(
 
     resetStateVariables();
 
-    // this->connect(m_connection, SIGNAL(error(QString)), this, SLOT(onConnectionError(QString)));
+    // this->connect(m_connection, &Connection::error, this, &Communicator::onConnectionError(QString));
     if (m_connection) {
-        connect(m_connection, SIGNAL(lineReceived(QString)), this, SLOT(onConnectionLineReceived(QString)));
+        connect(m_connection, &Connection::lineReceived, this, &Communicator::onConnectionLineReceived);
     }
 
     setSenderStateAndEmitSignal(SenderStopped);
 
     // Update state timer
-    connect(&m_timerStateQuery, SIGNAL(timeout()), this, SLOT(onTimerStateQuery()));
+    connect(&m_timerStateQuery, &QTimer::timeout, this, &Communicator::onTimerStateQuery);
     m_timerStateQuery.start();
 }
 
