@@ -155,13 +155,15 @@ void Configuration::setModuleDefaults(ConfigurationModule *module)
 
 void Configuration::load()
 {
-    qDebug() << "Load configurations";
+    qInfo() << "Load configurations";
 
     m_provider.open();
     for (ConfigurationModule* module : std::as_const(m_modules)) {
         loadModule(module);
     }
     m_provider.close();
+
+    qDebug() << "Configurations loaded";
 }
 
 void Configuration::setDefaults()

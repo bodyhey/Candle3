@@ -123,7 +123,7 @@ void VirtualUCNCConnection::closeConnection()
 void VirtualUCNCConnection::onNewConnection()
 {
     if (m_socket != nullptr) {
-        qDebug() << "Virtual uCNC connection already exists!";
+        qWarning() << "Virtual uCNC connection already exists!";
         return;
     }
 
@@ -176,7 +176,7 @@ WorkerThread::WorkerThread(QString serverName) : QThread(nullptr), m_serverName(
 }
 
 void WorkerThread::run() {
-    qDebug() << "Starting virtual uCNC, server " << m_serverName;
+    qInfo() << "Starting virtual uCNC, server " << m_serverName;
     uCNC(m_serverName.toStdString().c_str());
-    qDebug() << "uCNC stopped!";
+    qInfo() << "uCNC stopped!";
 }
