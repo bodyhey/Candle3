@@ -1202,7 +1202,7 @@ QSplitter::handle:horizontal {
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_1">
              <item>
-              <widget class="QLabel" name="label_1">
+              <widget class="QLabel" name="lblVisualizerFov">
                <property name="text">
                 <string>FOV:</string>
                </property>
@@ -1228,7 +1228,7 @@ QSplitter::handle:horizontal {
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_8">
+              <widget class="QLabel" name="lblVisualizerNearPlane">
                <property name="text">
                 <string>Near plane:</string>
                </property>
@@ -1254,7 +1254,7 @@ QSplitter::handle:horizontal {
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_9">
+              <widget class="QLabel" name="lblVisualizerFarPlane">
                <property name="text">
                 <string>Far plane:</string>
                </property>
@@ -1808,9 +1808,22 @@ QSplitter::handle:horizontal {
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="cmdOK">
+      <spacer name="bottomButtonsSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cmdCancel">
        <property name="text">
-        <string>OK</string>
+        <string>Cancel</string>
        </property>
        <property name="autoDefault">
         <bool>false</bool>
@@ -1818,9 +1831,9 @@ QSplitter::handle:horizontal {
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="cmdCancel">
+      <widget class="QPushButton" name="cmdOK">
        <property name="text">
-        <string>Cancel</string>
+        <string>OK</string>
        </property>
        <property name="autoDefault">
         <bool>false</bool>
@@ -1850,7 +1863,6 @@ QSplitter::handle:horizontal {
   <tabstop>chkConsoleShowUICommands</tabstop>
   <tabstop>chkConsoleAutocompletion</tabstop>
   <tabstop>cmdDefaults</tabstop>
-  <tabstop>cmdOK</tabstop>
   <tabstop>cmdCancel</tabstop>
  </tabstops>
  <resources>

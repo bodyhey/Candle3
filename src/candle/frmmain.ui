@@ -1861,29 +1861,6 @@ QLabel[overrided=&quot;false&quot;] {
     <string>&amp;About</string>
    </property>
   </action>
-  <action name="actControlHome">
-   <property name="text">
-    <string>Home</string>
-   </property>
-  </action>
-  <action name="actControlCheck">
-   <property name="text">
-    <string>Check</string>
-   </property>
-   <property name="toolTip">
-    <string>Check</string>
-   </property>
-  </action>
-  <action name="actControlReset">
-   <property name="text">
-    <string>Reset</string>
-   </property>
-  </action>
-  <action name="actControlUnlock">
-   <property name="text">
-    <string>Unlock</string>
-   </property>
-  </action>
   <action name="actSpindleSpeedPlus">
    <property name="text">
     <string>Spindle speed +</string>
@@ -1897,66 +1874,6 @@ QLabel[overrided=&quot;false&quot;] {
   <action name="actSpindleOnOff">
    <property name="text">
     <string>Spindle on/off</string>
-   </property>
-  </action>
-  <action name="actJogYPlus">
-   <property name="text">
-    <string>Y+</string>
-   </property>
-  </action>
-  <action name="actJogYMinus">
-   <property name="text">
-    <string>Y-</string>
-   </property>
-  </action>
-  <action name="actJogXPlus">
-   <property name="text">
-    <string>X+</string>
-   </property>
-  </action>
-  <action name="actJogXMinus">
-   <property name="text">
-    <string>X-</string>
-   </property>
-  </action>
-  <action name="actJogZPlus">
-   <property name="text">
-    <string>Z+</string>
-   </property>
-  </action>
-  <action name="actJogZMinus">
-   <property name="text">
-    <string>Z-</string>
-   </property>
-  </action>
-  <action name="actJogStop">
-   <property name="text">
-    <string>Stop</string>
-   </property>
-  </action>
-  <action name="actJogStepNext">
-   <property name="text">
-    <string>Jog step next</string>
-   </property>
-  </action>
-  <action name="actJogStepPrevious">
-   <property name="text">
-    <string>Jog step previous</string>
-   </property>
-  </action>
-  <action name="actJogFeedNext">
-   <property name="text">
-    <string>Jog feed next</string>
-   </property>
-  </action>
-  <action name="actJogFeedPrevious">
-   <property name="text">
-    <string>Jog feed previous</string>
-   </property>
-  </action>
-  <action name="actJogKeyboardControl">
-   <property name="text">
-    <string>Keyboard control</string>
    </property>
   </action>
   <action name="actVisualizerFit">
@@ -2105,35 +2022,6 @@ QLabel[overrided=&quot;false&quot;] {
    </property>
    <property name="text">
     <string>&amp;Lock windows</string>
-   </property>
-  </action>
-  <action name="actControlHold">
-   <property name="text">
-    <string>Hold</string>
-   </property>
-   <property name="toolTip">
-    <string>Hold</string>
-   </property>
-  </action>
-  <action name="actControlSleep">
-   <property name="text">
-    <string>Sleep</string>
-   </property>
-   <property name="toolTip">
-    <string>Sleep</string>
-   </property>
-  </action>
-  <action name="actControlDoor">
-   <property name="text">
-    <string>Door</string>
-   </property>
-   <property name="toolTip">
-    <string>Door</string>
-   </property>
-  </action>
-  <action name="actControlFlood">
-   <property name="text">
-    <string>Flood</string>
    </property>
   </action>
   <action name="actServiceConfigureGRBL">
@@ -2359,22 +2247,6 @@ QLabel[overrided=&quot;false&quot;] {
     </hint>
     <hint type="destinationlabel">
      <x>983</x>
-     <y>951</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actProgramSend</sender>
-   <signal>triggered()</signal>
-   <receiver>cmdFileSend</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1029</x>
      <y>951</y>
     </hint>
    </hints>
