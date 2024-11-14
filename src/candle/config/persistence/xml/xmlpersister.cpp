@@ -14,6 +14,8 @@ bool XmlPersister::open()
     }
 
     m_settings = new QSettings(qApp->applicationDirPath() + "/" + CONFIGURATION_FILE, QSettings::CustomFormat1);
+
+    return true;
 }
 
 void XmlPersister::close()

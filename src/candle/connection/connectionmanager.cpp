@@ -21,6 +21,8 @@ Connection *ConnectionManager::createConnection(ConfigurationConnection::Connect
         case ConfigurationConnection::ConnectionMode::RAW_TCP:
             return initializeRawTcpConnection();
     }
+
+    return nullptr;
 }
 
 SerialConnection *ConnectionManager::initializeSerialConnection()
