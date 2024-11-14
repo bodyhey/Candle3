@@ -183,11 +183,15 @@ frmMain::frmMain(QWidget *parent) :
     // connect(ui->cboJogStep, &ComboBoxKey::currentTextChanged, this, &frmMain::updateJogTitle);
     // connect(ui->cboJogFeed, &ComboBoxKey::currentTextChanged, this, &frmMain::updateJogTitle);
 
-    // Prepare "Send"-button
-    ui->cmdFileSend->setMinimumWidth(qMax(ui->cmdFileSend->width(), ui->cmdFileOpen->width()));
-    QMenu *menuSend = new QMenu();
-    menuSend->addAction(tr("Send from current line"), this, SLOT(onActSendFromLineTriggered()));
-    ui->cmdFileSend->setMenu(menuSend);
+    QMenu *menu;
+
+    // Prepare Open and Send menus
+    menu = ui->cmdFileOpen->menu();
+    menu->addAction(tr("Open G-Code file"), this, SLOT(on_cmdFileOpen_clicked()));
+    menu->addAction(tr("Open Heightmap file"), this, SLOT(on_cmdHeightMapLoad_clicked()));
+
+    menu = ui->cmdFileSend->menu();
+    menu->addAction(tr("Send from current line"), this, SLOT(onActSendFromLineTriggered()));
 
     // connect(ui->cboCommand, SIGNAL(returnPressed()), this, SLOT(onCboCommandReturnPressed()));
 

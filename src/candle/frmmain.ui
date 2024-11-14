@@ -303,7 +303,7 @@ QLabel[overrided=&quot;false&quot;] {
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="cmdFileOpen">
+          <widget class="QPushButtonWithMenu" name="cmdFileOpen">
            <property name="text">
             <string>Open</string>
            </property>
@@ -317,7 +317,7 @@ QLabel[overrided=&quot;false&quot;] {
           </widget>
          </item>
          <item>
-          <widget class="QToolButton" name="cmdFileSend">
+          <widget class="QPushButtonWithMenu" name="cmdFileSend">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
              <horstretch>0</horstretch>
@@ -2203,6 +2203,11 @@ QLabel[overrided=&quot;false&quot;] {
    <extends>QWidget</extends>
    <header location="global">form_partial/main/partmainspindle.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QPushButtonWithMenu</class>
+   <extends>QPushButton</extends>
+   <header location="global">widgets/qpushbuttonwithmenu.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

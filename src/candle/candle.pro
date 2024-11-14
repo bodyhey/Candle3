@@ -139,6 +139,7 @@ SOURCES += main.cpp\
     drawers/selectiondrawer.cpp \
     scripting/scriptvars.cpp \
     widgets/dropwidget.cpp \
+    widgets/qpushbuttonwithmenu.cpp
 
 HEADERS  += frmmain.h \
     communicator.h \
@@ -223,7 +224,8 @@ HEADERS  += frmmain.h \
     widgets/glwidget.h \
     drawers/selectiondrawer.h \
     scripting/scriptvars.h \
-    widgets/dropwidget.h
+    widgets/dropwidget.h \
+    widgets/qpushbuttonwithmenu.h
 
 FORMS    += frmmain.ui \
     form_partial/main/partmainconsole.ui \
