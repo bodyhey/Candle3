@@ -1441,7 +1441,7 @@ void frmMain::on_tblProgram_customContextMenuRequested(const QPoint &pos)
     m_tableMenu->popup(ui->tblProgram->viewport()->mapToGlobal(pos));
 }
 
-void frmMain::on_mnuViewWindows_aboutToShow()
+void frmMain::on_menuViewWindows_aboutToShow()
 {
     QAction *a;
     QList<QAction*> al;
@@ -1460,7 +1460,7 @@ void frmMain::on_mnuViewWindows_aboutToShow()
     ui->menuViewWindows->addActions(al);
 }
 
-void frmMain::on_mnuViewPanels_aboutToShow()
+void frmMain::on_menuViewPanels_aboutToShow()
 {
     QAction *a;
 
@@ -2973,7 +2973,7 @@ void frmMain::updateControlsState()
     ui->cmdFilePause->setEnabled(portOpened && (process || paused) && (senderState != SenderPausing) && (senderState != SenderPausing2));
     ui->cmdFilePause->setChecked(paused);
     ui->cmdFileAbort->setEnabled(senderState != SenderStopped && senderState != SenderStopping);
-    ui->mnuRecent->setEnabled(
+    ui->menuRecent->setEnabled(
         (senderState == SenderStopped) &&
         ((m_configuration.uiModule().hasAnyRecentFiles() && !m_heightmapMode) || (m_configuration.uiModule().hasAnyRecentHeightmaps() && m_heightmapMode))
     );
@@ -3054,9 +3054,9 @@ void frmMain::updateLayouts()
 
 void frmMain::updateRecentFilesMenu()
 {
-    foreach (QAction * action, ui->mnuRecent->actions()) {
+    foreach (QAction * action, ui->menuRecent->actions()) {
         if (action->text() == "") break; else {
-            ui->mnuRecent->removeAction(action);
+            ui->menuRecent->removeAction(action);
             delete action;
         }
     }
@@ -3065,7 +3065,7 @@ void frmMain::updateRecentFilesMenu()
     foreach (QString file, files) {
         QAction *action = new QAction(file, this);
         connect(action, SIGNAL(triggered()), this, SLOT(onActRecentFileTriggered()));
-        ui->mnuRecent->insertAction(ui->mnuRecent->actions()[0], action);
+        ui->menuRecent->insertAction(ui->menuRecent->actions()[0], action);
     }
 
     updateControlsState();

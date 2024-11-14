@@ -372,7 +372,7 @@ QLabel[overrided=&quot;false&quot;] {
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <widget class="QMenu" name="mnuRecent">
+    <widget class="QMenu" name="menuRecent">
      <property name="title">
       <string>&amp;Recent files</string>
      </property>
@@ -381,7 +381,7 @@ QLabel[overrided=&quot;false&quot;] {
     </widget>
     <addaction name="actFileNew"/>
     <addaction name="actFileOpen"/>
-    <addaction name="mnuRecent"/>
+    <addaction name="menuRecent"/>
     <addaction name="separator"/>
     <addaction name="actFileSave"/>
     <addaction name="actFileSaveAs"/>

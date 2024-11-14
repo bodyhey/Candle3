@@ -163,8 +163,8 @@ private slots:
     void on_cmdHeightMapLoad_clicked();
     void on_cmdHeightMapBorderAuto_clicked();
     void on_tblProgram_customContextMenuRequested(const QPoint &pos);
-    void on_mnuViewWindows_aboutToShow();
-    void on_mnuViewPanels_aboutToShow();
+    void on_menuViewWindows_aboutToShow();
+    void on_menuViewPanels_aboutToShow();
     void on_dockVisualizer_visibilityChanged(bool visible);
 
     void onMachinePosChanged(QVector3D pos);
