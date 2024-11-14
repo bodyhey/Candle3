@@ -528,9 +528,9 @@ QList<QVector3D> GcodePreprocessorUtils::generatePointsAlongArcBDring(PointSegme
         m.rotate(-90, 0.0, 1.0, 0.0);
         break;
     }
-    start = m * start;
-    end = m * end;
-    center = m * center;
+    start = m.map(start);
+    end = m.map(end);
+    center = m.map(center);
 
     // Check center
     if (qIsNaN(center.length())) return QList<QVector3D>();
@@ -615,10 +615,10 @@ QList<QVector3D> GcodePreprocessorUtils::generatePointsAlongArcBDring(PointSegme
         lineEnd.setY(sin(angle) * radius + center.y());
         lineEnd.setZ(lineEnd.z() + zIncrement);
 
-        segments.append(m * lineEnd);
+        segments.append(m.map(lineEnd));
     }
 
-    segments.append(m * p2);
+    segments.append(m.map(p2));
 
     return segments;
 }
