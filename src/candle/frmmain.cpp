@@ -136,6 +136,9 @@ frmMain::frmMain(QWidget *parent) :
     connect(ui->jog, &partMainJog::stop, this, [=]() {
         m_communicator->clearQueue();
         m_communicator->sendRealtimeCommand(GRBL_LIVE_JOG_CANCEL);
+        while (m_communicator->deviceState() == DeviceJog) {
+            qApp->processEvents();
+        }
     });
 
     // Drag&drop placeholders
@@ -247,11 +250,11 @@ frmMain::frmMain(QWidget *parent) :
     // connect(ui->slbSpindle, &SliderBox::valueChanged, this, &frmMain::onSlbSpindleValueChanged);
 
     // Enable form actions
-    QList<QAction*> noActions;
-    noActions << ui->actJogXMinus << ui->actJogXPlus
-              << ui->actJogYMinus << ui->actJogYPlus
-              << ui->actJogZMinus << ui->actJogZPlus;  
-    foreach (QAction* a, findChildren<QAction*>()) if (!noActions.contains(a)) addAction(a);
+    // QList<QAction*> noActions;
+    // noActions << ui->actJogXMinus << ui->actJogXPlus
+    //           << ui->actJogYMinus << ui->actJogYPlus
+    //           << ui->actJogZMinus << ui->actJogZPlus;
+    // foreach (QAction* a, findChildren<QAction*>()) if (!noActions.contains(a)) addAction(a);
 
     // Handle file drop
     if (qApp->arguments().count() > 1 && Util::isGCodeFile(qApp->arguments().last())) {
@@ -3256,9 +3259,9 @@ bool frmMain::eventFilter(QObject *obj, QEvent *event)
             && ui->jog->keyboardControl() && !ev->isAutoRepeat())
         {
             static QList<QAction*> acts;
-            if (acts.isEmpty()) acts << ui->actJogXMinus << ui->actJogXPlus 
-                                     << ui->actJogYMinus << ui->actJogYPlus
-                                     << ui->actJogZMinus << ui->actJogZPlus;
+            // if (acts.isEmpty()) acts << ui->actJogXMinus << ui->actJogXPlus
+            //                          << ui->actJogYMinus << ui->actJogYPlus
+            //                          << ui->actJogZMinus << ui->actJogZPlus;
 
             // @TODO is this for keyboard jogging??
             // static QList<QAbstractButton*> buttons;
@@ -3511,7 +3514,7 @@ void frmMain::jogStep(QVector3D vector)
 {
     assert(m_communicator->isMachineConfigurationReady());
 
-    if (ui->jog->stepSize() == ui->jog->CONTINUOUS) {
+    if (ui->jog->isContinuous()) {
         return;
     }
 
@@ -3530,63 +3533,83 @@ void frmMain::jogStep(QVector3D vector)
     );
 }
 
+void frmMain::jogStart(QVector3D vector)
+{
+    bool unitsInches = m_communicator->machineConfiguration().unitsInches();
+
+    // Bounds
+    QVector3D b = m_communicator->machineConfiguration().machineBounds();
+    // Current machine coords
+    // @TODO use m_communicator storedVars
+    QVector3D m(
+        m_communicator->toMetric(m_communicator->m_storedVars.Mx()),
+        m_communicator->toMetric(m_communicator->m_storedVars.My()),
+        m_communicator->toMetric(m_communicator->m_storedVars.Mz())
+        );
+    // Distance to bounds
+    QVector3D t;
+    // Minimum distance to bounds
+    double d = 0;
+    if (m_communicator->machineConfiguration().softLimitsEnabled()) {
+        t = QVector3D(vector.x() * b.x() < 0 ? 0 - m.x() : b.x() - m.x(),
+                      vector.y() * b.y() < 0 ? 0 - m.y() : b.y() - m.y(),
+                      vector.z() * b.z() < 0 ? 0 - m.z() : b.z() - m.z());
+        for (int i = 0; i < 3; i++) if ((vector[i] && (qAbs(t[i]) < d)) || (vector[i] && !d)) d = qAbs(t[i]);
+        // Coords not aligned, add some bounds offset
+        d -= unitsInches ? m_communicator->toMetric(0.0005) : 0.005;
+    } else {
+        for (int i = 0; i < 3; i++) if (vector[i] && (qAbs(b[i]) > d)) d = qAbs(b[i]);
+    }
+
+    // Jog vector
+    QVector3D vec = vector * m_communicator->toInches(d);
+
+    if (vec.length()) {
+        m_communicator->sendCommand(CommandSource::System, QString("$J=%5G91X%1Y%2Z%3F%4")
+                                        .arg(vec.x(), 0, 'f', unitsInches ? 4 : 3)
+                                        .arg(vec.y(), 0, 'f', unitsInches ? 4 : 3)
+                                        .arg(vec.z(), 0, 'f', unitsInches ? 4 : 3)
+                                        .arg(m_configuration.joggingModule().jogFeed())
+                                        .arg(unitsInches ? "G20" : "G21")
+                                        , -2);
+    }
+}
+
 void frmMain::jogContinuous()
 {
     static bool block = false;
     static QVector3D lastVector(0, 0, 0);
 
     if ((ui->jog->isContinuous()) && !block) {
-        bool unitsInches = m_communicator->machineConfiguration().unitsInches();
-
         if (ui->jog->jogVector() != lastVector) {
             // Store jog vector before block
-            QVector3D vector = ui->jog->jogVector();
+            QVector3D vector = ui->jog->jogVector();            
 
             // Stop jogging
             if (lastVector.length()) {
+                lastVector = vector;
                 block = true;
+
                 m_communicator->sendRealtimeCommand(GRBL_LIVE_JOG_CANCEL);
-                while (m_communicator->deviceState() == DeviceJog) qApp->processEvents();
+
+                if (!vector.length()) {
+                    return;
+                }
+
+                QObject *obj = new QObject(this);
+                connect(m_communicator, &Communicator::deviceStateChanged, obj, [this, obj, vector] (int state) {
+                    qDebug() << "deviceStateChanged" << state;
+                    if (state != DeviceJog) {
+                        jogStart(vector);
+                        obj->deleteLater();
+                    }
+                });
+
                 block = false;
-            }
-            
-            // Bounds
-            QVector3D b = m_communicator->machineConfiguration().machineBounds();
-            // Current machine coords
-            // @TODO use m_communicator storedVars
-            QVector3D m(
-                m_communicator->toMetric(m_communicator->m_storedVars.Mx()),
-                m_communicator->toMetric(m_communicator->m_storedVars.My()),
-                m_communicator->toMetric(m_communicator->m_storedVars.Mz())
-            );
-            // Distance to bounds
-            QVector3D t;
-            // Minimum distance to bounds
-            double d = 0;
-            if (m_communicator->machineConfiguration().softLimitsEnabled()) {
-                t = QVector3D(vector.x() * b.x() < 0 ? 0 - m.x() : b.x() - m.x(),
-                              vector.y() * b.y() < 0 ? 0 - m.y() : b.y() - m.y(),
-                              vector.z() * b.z() < 0 ? 0 - m.z() : b.z() - m.z());
-                for (int i = 0; i < 3; i++) if ((vector[i] && (qAbs(t[i]) < d)) || (vector[i] && !d)) d = qAbs(t[i]);
-                // Coords not aligned, add some bounds offset
-                d -= unitsInches ? m_communicator->toMetric(0.0005) : 0.005;
             } else {
-                for (int i = 0; i < 3; i++) if (vector[i] && (qAbs(b[i]) > d)) d = qAbs(b[i]);
+                lastVector = vector;
+                jogStart(vector);
             }
-
-            // Jog vector
-            QVector3D vec = vector * m_communicator->toInches(d);
-
-            if (vec.length()) {
-                m_communicator->sendCommand(CommandSource::System, QString("$J=%5G91X%1Y%2Z%3F%4")
-                            .arg(vec.x(), 0, 'f', unitsInches ? 4 : 3)
-                            .arg(vec.y(), 0, 'f', unitsInches ? 4 : 3)
-                            .arg(vec.z(), 0, 'f', unitsInches ? 4 : 3)
-                            .arg(m_configuration.joggingModule().jogFeed())
-                            .arg(unitsInches ? "G20" : "G21")
-                            , -2);
-            }
-            lastVector = vector;
         }
     }
 }

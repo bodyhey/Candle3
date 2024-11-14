@@ -350,6 +350,7 @@ private:
     QTime updateProgramEstimatedTime(QList<LineSegment *> lines);
     QList<LineSegment *> subdivideSegment(LineSegment *segment);
     void jogStep(QVector3D vector);
+    void jogStart(QVector3D vector);
     void jogContinuous();
     // int buttonSize();
     QString getLineInitCommands(int row);
