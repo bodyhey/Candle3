@@ -122,6 +122,14 @@ SOURCES += main.cpp\
     parser/gcodeviewparse.cpp \
     parser/linesegment.cpp \
     parser/pointsegment.cpp \
+    state/state.cpp \
+    state/stateconnecting.cpp \
+    state/stateerror.cpp \
+    state/stateidle.cpp \
+    state/statejogging.cpp \
+    state/statejoggingwaitingforidle.cpp \
+    state/stateprobing.cpp \
+    state/staterunning.cpp \
     tables/gcodetablemodel.cpp \
     tables/heightmaptablemodel.cpp \
     utils.cpp \
@@ -196,6 +204,14 @@ HEADERS  += frmmain.h \
     parser/gcodeviewparse.h \
     parser/linesegment.h \
     parser/pointsegment.h \
+    state/state.h \
+    state/stateconnecting.h \
+    state/stateerror.h \
+    state/stateidle.h \
+    state/statejogging.h \
+    state/statejoggingwaitingforidle.h \
+    state/stateprobing.h \
+    state/staterunning.h \
     tables/gcodetablemodel.h \
     tables/heightmaptablemodel.h \
     utils.h \
