@@ -106,6 +106,8 @@ protected:
     // void keyReleaseEvent(QKeyEvent *event) override;
     // void closeEvent(QCloseEvent *event) override;
     //void resizeEvent(QResizeEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 
 private slots:
     void onUpdateImage(const QPixmap &);

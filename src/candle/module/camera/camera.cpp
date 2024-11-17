@@ -109,8 +109,6 @@ void Camera::setCamera(const QCameraDevice &cameraDevice)
     updateCameraActive(m_camera->isActive());
     updateCaptureMode();
 
-    m_camera->start();
-
 //     m_camera.reset(new QCamera(cameraInfo));
 
 //     connect(m_camera.data(), &QCamera::stateChanged, this, &Camera::updateCameraState);
@@ -205,6 +203,25 @@ void Camera::processCapturedImage(int requestId, const QImage& img)
 //    displayCapturedImage();
 //    QTimer::singleShot(4000, this, &Camera::displayViewfinder);
 }
+
+void Camera::hideEvent(QHideEvent *event)
+{
+    QWidget::hideEvent(event);
+
+    if (m_camera->isActive()) {
+        m_camera->stop();
+    }
+}
+
+void Camera::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+
+    if (!m_camera->isActive() && m_camera->isAvailable()) {
+        m_camera->start();
+    }
+}
+
 
 
 //     switch (m_camera->captureMode()) {
