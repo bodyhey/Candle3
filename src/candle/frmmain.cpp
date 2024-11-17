@@ -218,17 +218,17 @@ frmMain::frmMain(QWidget *parent) :
 
     initializeVisualizer();
 
-    connect(ui->glwVisualizer, SIGNAL(resized()), this, SLOT(placeVisualizerButtons()));
+    connect(ui->glwVisualizer, &GLWidget::resized, this, &frmMain::placeVisualizerButtons);
     connect(ui->glwVisualizer, &GLWidget::cursorPosChanged, this, &frmMain::onVisualizerCursorPosChanged);
-    connect(&m_programModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(onTableCellChanged(QModelIndex,QModelIndex)));
-    connect(&m_programHeightmapModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(onTableCellChanged(QModelIndex,QModelIndex)));
-    connect(&m_probeModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(onTableCellChanged(QModelIndex,QModelIndex)));
+    connect(&m_programModel, &QAbstractItemModel::dataChanged, this, &frmMain::onTableCellChanged);
+    connect(&m_programHeightmapModel, &QAbstractItemModel::dataChanged, this, &frmMain::onTableCellChanged);
+    connect(&m_probeModel, &QAbstractItemModel::dataChanged, this, &frmMain::onTableCellChanged);
     connect(&m_heightmapModel, SIGNAL(dataChangedByUserInput()), this, SLOT(updateHeightMapInterpolationDrawer()));
 
     ui->tblProgram->setModel(&m_programModel);
     ui->tblProgram->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
-    connect(ui->tblProgram->verticalScrollBar(), SIGNAL(actionTriggered(int)), this, SLOT(onScroolBarAction(int)));
-    connect(ui->tblProgram->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(onTableCurrentChanged(QModelIndex,QModelIndex)));    
+    connect(ui->tblProgram->verticalScrollBar(), &QAbstractSlider::actionTriggered, this, &frmMain::onScroolBarAction);
+    connect(ui->tblProgram->selectionModel(), &QItemSelectionModel::currentChanged, this, &frmMain::onTableCurrentChanged);
     clearTable();
 
     m_senderErrorBox = new QMessageBox(QMessageBox::Warning, qApp->applicationDisplayName(), QString(),
