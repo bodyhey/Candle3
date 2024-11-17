@@ -17,6 +17,7 @@ class QPushButtonWithMenu : public QPushButton
     protected:
         void mousePressEvent(QMouseEvent *e) override;
         void mouseReleaseEvent(QMouseEvent *e) override;
+        void paintEvent(QPaintEvent *) override;
 
     private:
         bool isOnArrow(const QPoint &pos) const;
