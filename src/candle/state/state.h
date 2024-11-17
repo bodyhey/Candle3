@@ -7,6 +7,7 @@
 
 #include <QObject>
 #include "../globals.h"
+#include "../connection/connection.h"
 
 class State : public QObject
 {
@@ -14,10 +15,7 @@ class State : public QObject
     public:
         explicit State(QObject *parent = nullptr);
         virtual QString name() = 0;
-        virtual bool isIdle() = 0;
-        virtual bool isJogging() = 0;
         virtual bool isJoggingAllowed() = 0;
-        virtual bool isHoming() = 0;
         virtual bool isHomingAllowed() = 0;
 
     signals:
@@ -25,7 +23,7 @@ class State : public QObject
 
     public slots:
         virtual void onDeviceStateReceived(DeviceState state) {};
-        virtual void onSenderStateReceived(SenderState state) {};
+        virtual void onConnectionStateChanged(ConnectionState state) {};
 };
 
 #endif // STATE_H

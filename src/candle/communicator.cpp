@@ -40,6 +40,8 @@ Communicator::Communicator(
     m_statusReceived = false;
     m_spindleCW = true;
 
+    m_state = new StateInitialization();
+
     resetStateVariables();
 
     // this->connect(m_connection, &Connection::error, this, &Communicator::onConnectionError(QString));

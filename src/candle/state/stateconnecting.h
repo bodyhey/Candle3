@@ -5,7 +5,9 @@
 #ifndef STATECONNECTING_H
 #define STATECONNECTING_H
 
-class StateConnecting
+#include "state.h"
+
+class StateConnecting : public State
 {
     public:
         StateConnecting();

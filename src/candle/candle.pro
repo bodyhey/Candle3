@@ -126,6 +126,7 @@ SOURCES += main.cpp\
     state/stateconnecting.cpp \
     state/stateerror.cpp \
     state/stateidle.cpp \
+    state/stateinitialization.cpp \
     state/statejogging.cpp \
     state/statejoggingwaitingforidle.cpp \
     state/stateprobing.cpp \
@@ -209,10 +210,12 @@ HEADERS  += frmmain.h \
     state/stateconnecting.h \
     state/stateerror.h \
     state/stateidle.h \
+    state/stateinitialization.h \
     state/statejogging.h \
     state/statejoggingwaitingforidle.h \
     state/stateprobing.h \
     state/staterunning.h \
+    state/states.h \
     tables/gcodetablemodel.h \
     tables/heightmaptablemodel.h \
     utils.h \

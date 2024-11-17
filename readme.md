@@ -127,6 +127,8 @@ stateDiagram-v2
     Paused --> Stopping : stop clicked
     Halted --> Running
     Halted --> Stopping
+    Idle --> Homing : home clicked
+    Homing --> Idle
     Resuming --> Running
     Stopping --> Stopped
     Stopped --> Idle

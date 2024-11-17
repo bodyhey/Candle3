@@ -7,6 +7,7 @@
 #include "connection/connection.h"
 #include "machine/machineconfiguration.h"
 #include "scripting/scriptvars.h"
+#include "state/states.h"
 #include <QTimer>
 
 class Communicator : public QObject
@@ -66,6 +67,7 @@ class Communicator : public QObject
         // States
         SenderState m_senderState;
         DeviceState m_deviceState;
+        State *m_state;
 
         ScriptVars m_storedVars;
 

@@ -5,7 +5,9 @@
 #ifndef STATEPROBING_H
 #define STATEPROBING_H
 
-class StateProbing
+#include "state.h"
+
+class StateProbing : public State
 {
     public:
         StateProbing();
