@@ -6,20 +6,22 @@
 #define QPUSHBUTTONWITHMENU_H
 
 #include <QPushButton>
+#include <QMouseEvent>
 
 class QPushButtonWithMenu : public QPushButton
 {
     public:
         QPushButtonWithMenu(QWidget *parent = nullptr);
+        QMenu *menu() const;
 
     protected:
-        // bool event(QEvent *e) override;
-        // void paintEvent(QPaintEvent *) override;
-        // void keyPressEvent(QKeyEvent *) override;
-        // void focusInEvent(QFocusEvent *) override;
-        // void focusOutEvent(QFocusEvent *) override;
-        // void mouseMoveEvent(QMouseEvent *) override;
-        bool hitButton(const QPoint &pos) const override;
+        void mousePressEvent(QMouseEvent *e) override;
+        void mouseReleaseEvent(QMouseEvent *e) override;
+
+    private:
+        bool isOnArrow(const QPoint &pos) const;
+        QMenu *m_menu;
+
 };
 
 #endif // QPUSHBUTTONWITHMENU_H

@@ -565,7 +565,7 @@ void frmMain::on_actFileSaveTransformedAs_triggered()
     }
 }
 
-void frmMain::on_actRecentClear_triggered()
+void frmMain::onActRecentClearTriggered()
 {
     if (!m_heightmapMode) m_configuration.uiModule().clearRecentFiles();
         else m_configuration.uiModule().clearRecentHeightmaps();
@@ -688,9 +688,6 @@ void frmMain::on_cmdFileOpen_clicked()
     }
 
     if (!m_heightmapMode) {
-        loadFile("d:\\Obiekty3d\\1001.nc");
-        return;
-
         if (!saveChanges(false)) return;
 
         QString fileName  = QFileDialog::getOpenFileName(this, tr("Open"), lastWorkingDirectory(),
@@ -3057,18 +3054,30 @@ void frmMain::updateLayouts()
 
 void frmMain::updateRecentFilesMenu()
 {
-    foreach (QAction * action, ui->menuRecent->actions()) {
-        if (action->text() == "") break; else {
-            ui->menuRecent->removeAction(action);
-            delete action;
-        }
-    }
+    ui->menuRecent->clear();
+    QMenu *fileOpenMenu = ui->cmdFileOpen->menu();
+    fileOpenMenu->clear();
 
     QStringList files = !m_heightmapMode ? m_configuration.uiModule().recentFiles() : m_configuration.uiModule().recentHeightmaps();
-    foreach (QString file, files) {
-        QAction *action = new QAction(file, this);
-        connect(action, SIGNAL(triggered()), this, SLOT(onActRecentFileTriggered()));
-        ui->menuRecent->insertAction(ui->menuRecent->actions()[0], action);
+    if (!files.empty())
+    {
+        QStringList::const_iterator it = files.constEnd();
+        while (it != files.constBegin()) {
+            --it;
+            QAction *action = new QAction(*it, this);
+            connect(action, &QAction::triggered, this, &frmMain::onActRecentFileTriggered);
+            ui->menuRecent->addAction(action);
+            fileOpenMenu->addAction(action);
+        }
+
+        ui->menuRecent->addSeparator();
+        fileOpenMenu->addSeparator();
+
+        QAction *clearAction = new QAction(tr("&Clear"), this);
+        connect(clearAction, &QAction::triggered, this, &frmMain::onActRecentClearTriggered);
+
+        ui->menuRecent->addAction(clearAction);
+        fileOpenMenu->addAction(clearAction);
     }
 
     updateControlsState();

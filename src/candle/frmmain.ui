@@ -376,8 +376,6 @@ QLabel[overrided=&quot;false&quot;] {
      <property name="title">
       <string>&amp;Recent files</string>
      </property>
-     <addaction name="separator"/>
-     <addaction name="actRecentClear"/>
     </widget>
     <addaction name="actFileNew"/>
     <addaction name="actFileOpen"/>

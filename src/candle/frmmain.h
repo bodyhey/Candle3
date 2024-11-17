@@ -114,7 +114,7 @@ private slots:
     void on_actFileSave_triggered();
     void on_actFileSaveAs_triggered();
     void on_actFileSaveTransformedAs_triggered();
-    void on_actRecentClear_triggered();
+    void onActRecentClearTriggered();
     void on_actFileExit_triggered();
     void on_actServiceSettings_triggered();
     void on_actServiceConfigureGRBL_triggered();
