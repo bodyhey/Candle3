@@ -21,7 +21,6 @@ class RawTcpConnection : public Connection
         void setHost(QString);
         void setPort(int);
         void sendByteArray(QByteArray) override;
-        bool isConnected() override;
         void sendLine(QString) override;
         void closeConnection() override;
         ConfigurationConnection::ConnectionMode getSupportedMode() override { return ConfigurationConnection::ConnectionMode::RAW_TCP; };

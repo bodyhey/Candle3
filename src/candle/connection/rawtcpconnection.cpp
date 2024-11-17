@@ -30,11 +30,6 @@ void RawTcpConnection::sendByteArray(QByteArray)
 
 }
 
-bool RawTcpConnection::isConnected()
-{
-    return m_connected;
-}
-
 void RawTcpConnection::sendLine(QString line)
 {
     //flushOutgoingData();

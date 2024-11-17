@@ -2454,7 +2454,7 @@ void frmMain::openPortIfNeeded()
 {
     assert(m_communicator != nullptr);
 
-    if (m_connection->isConnecting() || m_connection->isConnected()) {
+    if (m_connection->state() == ConnectionState::Connecting || m_connection->state() == ConnectionState::Connected) {
         return;
     }
 

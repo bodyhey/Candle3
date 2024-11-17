@@ -268,13 +268,13 @@ void Communicator::replaceConnection(Connection *newConnection)
     if (m_connection != nullptr || m_connection == newConnection) return;
 
     disconnect(m_connection, &Connection::lineReceived, this, &Communicator::onConnectionLineReceived);
-    disconnect(m_connection, &Connection::connected, this, &Communicator::onConnectionConnected);
+    disconnect(m_connection, &Connection::stateChanged, this, &Communicator::onConnectionStateChanged);
 
     m_connection->disconnect();
     m_connection = newConnection;
 
     connect(m_connection, &Connection::lineReceived, this, &Communicator::onConnectionLineReceived);
-    connect(m_connection, &Connection::connected, this, &Communicator::onConnectionConnected);
+    connect(m_connection, &Connection::stateChanged, this, &Communicator::onConnectionStateChanged);
 }
 
 void Communicator::stopUpdatingState()
@@ -513,6 +513,13 @@ void Communicator::completeTransfer()
 void Communicator::onConnectionError(QString message)
 {
     qDebug() << "Connection error: " << message;
+}
+
+void Communicator::onConnectionStateChanged(ConnectionState state)
+{
+    if (state == ConnectionState::Connected) {
+        reset();
+    }
 }
 
 

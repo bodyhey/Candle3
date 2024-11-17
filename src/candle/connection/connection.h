@@ -8,6 +8,15 @@
 #include <QObject>
 #include "config/module/configurationconnection.h"
 
+enum class ConnectionState
+{
+    Initialization,
+    Connecting,
+    Connected,
+    Disconnected,
+    InvalidConfiguration,
+};
+
 class Connection : public QObject
 {
     Q_OBJECT
@@ -21,19 +30,21 @@ class Connection : public QObject
         virtual void sendChar(QChar);
         virtual void sendChar(char);
         virtual void sendByteArray(QByteArray) = 0;
-        virtual bool isConnected() = 0;
-        virtual bool isConnecting() { return m_connecting; }
         virtual void sendLine(QString) = 0;
         virtual void closeConnection() = 0;
         virtual ConfigurationConnection::ConnectionMode getSupportedMode() = 0;
 
+        ConnectionState state() const { return m_state; }
+        bool isConnected() const { return m_state == ConnectionState::Connected; }
+
     protected:
-        bool m_connecting = false;
+        ConnectionState m_state = ConnectionState::Initialization;
+        void setState(ConnectionState state);
 
     signals:
         void lineReceived(const QString &line);
-        void connected();
         void error(const QString &text);
+        void stateChanged(ConnectionState state);
 };
 
 #endif

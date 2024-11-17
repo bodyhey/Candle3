@@ -14,7 +14,7 @@ SerialConnection::~SerialConnection()
 
 bool SerialConnection::openConnection()
 {
-    if (m_connecting) {
+    if (m_state == ConnectionState::Connecting) {
         return false;
     }
     if (m_serialPort.isOpen()) {
@@ -25,10 +25,9 @@ bool SerialConnection::openConnection()
         return false;
     }
 
-    m_connecting = true;
+    setState(ConnectionState::Connecting);
     QTimer::singleShot(100, this, [this]() {
-        m_connecting = false;
-        emit this->connected();
+        setState(m_serialPort.isOpen() ? ConnectionState::Connected : ConnectionState::Disconnected);
     });
 
     return true;
@@ -49,14 +48,9 @@ void SerialConnection::sendByteArray(QByteArray data)
     m_serialPort.write(data);
 }
 
-bool SerialConnection::isConnected()
-{
-    return !m_connecting && m_serialPort.isOpen();
-}
-
 void SerialConnection::sendLine(QString data)
 {
-    if (!isConnected()) {
+    if (m_state != ConnectionState::Connected) {
         return;
     }
 
@@ -98,5 +92,6 @@ void SerialConnection::onSerialPortError(QSerialPort::SerialPortError error)
             m_serialPort.close();
         }
         emit this->error(tr("Serial port error ") + QString::number(error) + ": " + m_serialPort.errorString());
+        setState(ConnectionState::Disconnected);
     }
 }

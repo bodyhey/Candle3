@@ -129,7 +129,7 @@ class Communicator : public QObject
         void onTimerStateQuery();
         void onConnectionLineReceived(QString);
         void onConnectionError(QString);
-        void onConnectionConnected();
+        void onConnectionStateChanged(ConnectionState state);
 
     signals:
         void responseReceived(QString command, int tableIndex, QString response);

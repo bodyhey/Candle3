@@ -13,8 +13,6 @@ Q_DECL_IMPORT
 
 VirtualUCNCConnection::VirtualUCNCConnection(QObject *parent) : Connection(parent)
 {
-    m_connected = false;
-    m_connecting = false;
     m_socket = nullptr;
     m_server = nullptr;
 }
@@ -38,14 +36,14 @@ void VirtualUCNCConnection::startWorkerThread()
 
 bool VirtualUCNCConnection::openConnection()
 {
-    if (m_connecting) {
+    if (m_state == ConnectionState::Connecting) {
         return false;
     }
-    if (m_connected) {
+    if (m_state == ConnectionState::Connected) {
         return true;
     }
 
-    m_connecting = true;
+    setState(ConnectionState::Connecting);
 
     startLocalServer();
     startWorkerThread();
@@ -79,11 +77,6 @@ void VirtualUCNCConnection::sendByteArray(QByteArray byteArray)
     m_socket->flush();
 }
 
-bool VirtualUCNCConnection::isConnected()
-{
-    return m_connected;
-}
-
 void VirtualUCNCConnection::sendLine(QString line)
 {
     flushOutgoingData();
@@ -105,7 +98,7 @@ void VirtualUCNCConnection::closeConnection()
     delete m_thread;
     m_thread = nullptr;
 
-    m_connected = false;
+    setState(ConnectionState::Disconnected);
     if (m_socket != nullptr) {
         if (m_socket->isOpen()) {
             disconnect(m_socket, &QLocalSocket::disconnected, this, &VirtualUCNCConnection::onDisconnected);
@@ -132,10 +125,7 @@ void VirtualUCNCConnection::onNewConnection()
     connect(m_socket, &QIODevice::readyRead, this, &VirtualUCNCConnection::onReadyRead);
     connect(m_socket, &QLocalSocket::disconnected, this, &VirtualUCNCConnection::onDisconnected);
 
-    m_connecting = false;
-    m_connected = true;
-
-    emit connected();
+    setState(ConnectionState::Connected);
 }
 
 void VirtualUCNCConnection::onDisconnected()

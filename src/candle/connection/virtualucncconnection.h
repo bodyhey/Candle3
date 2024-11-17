@@ -30,7 +30,6 @@ public:
     ~VirtualUCNCConnection();
     bool openConnection() override;
     void sendByteArray(QByteArray) override;
-    bool isConnected() override;
     void sendLine(QString) override;
     void closeConnection() override;
     ConfigurationConnection::ConnectionMode getSupportedMode() override { return ConfigurationConnection::ConnectionMode::VIRTUAL; }
@@ -40,12 +39,9 @@ private:
     QLocalServer* m_server;
     WorkerThread* m_thread;
     QString m_incoming;
-    bool m_connected;
     void flushOutgoingData();
     void processIncomingData();
-
     void startLocalServer();
-
     void startWorkerThread();
 
 private slots:
