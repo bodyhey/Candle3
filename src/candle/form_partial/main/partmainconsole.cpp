@@ -26,14 +26,14 @@ void partMainConsole::initialize(ConfigurationConsole &configurationConsole)
 {
     m_configurationConsole = &configurationConsole;
 
-    // QCompleter *completer = new QCompleter(this);
-    // completer->set
+    if (m_configurationConsole->commandAutoCompletion()) {
+        QCompleter completer = ui->cboCommand->completer();
+        completer.setCompletionMode(QCompleter::InlineCompletion);
+    } else {
+        ui->cboCommand->setCompleter(nullptr);
+    }
 
-    // ui->cboCommand->completer()
-    //     setAutoCompletion(m_configurationConsole->commandAutoCompletion());
-
-
-    // restore command history
+    //m_completerModel.setCommands(m_configurationConsole->commandHistory());
     ui->cboCommand->addItems(m_configurationConsole->commandHistory());
     ui->cboCommand->setCurrentIndex(-1);
 
@@ -55,8 +55,6 @@ void partMainConsole::applyDarkBackgroundMode()
 void partMainConsole::append(QString text)
 {
     ui->txtConsole->appendPlainText(text);
-
-    //return ui->txtConsole->document()->blockCount() - 1;
 }
 
 void partMainConsole::append(CommandAttributes commandAttributes)
@@ -156,6 +154,8 @@ void partMainConsole::send()
     ui->cboCommand->clearEditText();
 
     if (command.isEmpty()) return;
+
+    m_configurationConsole->setCommandHistory(ui->cboCommand->items());
 
     emit newCommand(command);
 }

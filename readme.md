@@ -71,7 +71,8 @@ The original Candle was built in a way that was not transparent and difficult to
 
 ![screenshot](/screenshots/arch1.png)
 
-State machine:
+Application states:
+-------------------
 
 The diagram below shows the possible states of the application. Transitions between states are triggered by events such as changing the state of the machine, clicking buttons, etc.
 
@@ -138,9 +139,6 @@ stateDiagram-v2
     [AnyState] --> Disconnected
     Disconnected --> [*] : Connecting
 ```
-
-%% You can add notes with two "%" signs in a row!
-
 
 Configurations:
 ---------------

@@ -31,7 +31,8 @@ class ConfigurationConsole : public ConfigurationModule
         bool commandAutoCompletion() const { return m_commandAutoCompletion; }
         bool darkBackgroundMode() const { return m_darkBackgroundMode; }
         QStringList commandHistory() const { return m_commandHistory; }
-
+        void addCommandToHistory(QString);
+        void setCommandHistory(QStringList);
     private:
         bool m_showProgramCommands;
         bool m_showUiCommands;

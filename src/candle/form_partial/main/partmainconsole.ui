@@ -29,10 +29,10 @@
    <item row="0" column="0">
     <widget class="QFrame" name="frame">
      <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
+      <enum>QFrame::Shape::NoFrame</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+      <enum>QFrame::Shadow::Raised</enum>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_14">
       <property name="leftMargin">
@@ -78,13 +78,16 @@ padding-right: 8;</string>
            <bool>true</bool>
           </property>
           <property name="maxVisibleItems">
-           <number>5</number>
-          </property>
-          <property name="maxCount">
            <number>10</number>
           </property>
+          <property name="maxCount">
+           <number>25</number>
+          </property>
           <property name="insertPolicy">
-           <enum>QComboBox::InsertAtTop</enum>
+           <enum>QComboBox::InsertPolicy::InsertAtTop</enum>
+          </property>
+          <property name="frame">
+           <bool>true</bool>
           </property>
          </widget>
         </item>

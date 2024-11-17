@@ -14,6 +14,17 @@ const QMap<QString, QVariant> DEFAULTS = {
 
 ConfigurationConsole::ConfigurationConsole(QObject *parent) : ConfigurationModule(parent, DEFAULTS)
 {
-    m_commandHistory << "G0 X10 Y10 Z10"
-                     << "G1 X20 Y20 Z20";
+}
+
+void ConfigurationConsole::addCommandToHistory(QString command)
+{
+    m_commandHistory << command;
+    if (m_commandHistory.size() > 25) {
+        m_commandHistory.removeFirst();
+    }
+}
+
+void ConfigurationConsole::setCommandHistory(QStringList commandHistory)
+{
+    m_commandHistory = commandHistory;
 }

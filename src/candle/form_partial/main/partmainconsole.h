@@ -7,6 +7,7 @@
 
 #include <QWidget>
 #include <QTextBlock>
+#include <QAbstractListModel>
 #include "../../config/module/configurationconsole.h"
 #include "globals.h"
 
@@ -57,7 +58,7 @@ class partMainConsole : public QWidget
 
     private slots:
         void onClearClicked();
-        void onSendClicked();
+        void onSendClicked();        
 };
 
 #endif // PARTMAINCONSOLE_H
