@@ -176,10 +176,14 @@ void Communicator::sendRealtimeCommand(int command)
 
 void Communicator::sendCommands(CommandSource source, QString commands, int tableIndex)
 {
-    QStringList list = commands.split("\n");
+    sendCommands(source, commands.split("\n"), tableIndex);
 
+}
+
+void Communicator::sendCommands(CommandSource source, QStringList commands, int tableIndex)
+{
     bool waitFlag = false;
-    foreach (QString cmd, list) {
+    foreach (QString cmd, commands) {
         SendCommandResult r = sendCommand(source, cmd.trimmed(), tableIndex, waitFlag);
         if (r == SendDone || r == SendQueue) waitFlag = true;
     }
@@ -372,6 +376,19 @@ bool Communicator::isMachineConfigurationReady() const
 bool Communicator::isSenderState(SenderState state) const
 {
     return m_senderState == state;
+}
+
+void Communicator::probe()
+{
+    sendCommands(
+        CommandSource::GeneralUI,
+        QStringList({
+            "G91 G21 G38.2 Z-50 F100",
+            "G92 Z14.09",
+            "G0Z5 M30"
+        }),
+        TABLE_INDEX_UI
+    );
 }
 
 void Communicator::processConnectionTimer()

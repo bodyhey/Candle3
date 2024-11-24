@@ -96,6 +96,9 @@ frmMain::frmMain(QWidget *parent) :
         m_communicator->m_updateSpindleSpeed = true;
         m_communicator->sendCommand(CommandSource::GeneralUI, "$H", TABLE_INDEX_UI);
     });
+    connect(ui->control, &partMainControl::probe, this, [=]() {
+        m_communicator->probe();
+    });
     connect(ui->control, &partMainControl::reset, this, [=]() {
         m_communicator->reset();
     });

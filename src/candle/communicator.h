@@ -26,6 +26,7 @@ class Communicator : public QObject
         void sendRealtimeCommand(QString command);
         void sendRealtimeCommand(int command);
         void sendCommands(CommandSource source, QString commands, int tableIndex = -1);
+        void sendCommands(CommandSource source, QStringList commands, int tableIndex = -1);
         bool streamCommands(GCode &streamer);
         void clearCommandsAndQueue();
         void clearQueue();
@@ -48,10 +49,10 @@ class Communicator : public QObject
         bool isSenderState(SenderState state, Args... args) const {
             return isSenderState(state) || isSenderState(args...);
         }
+        void probe();
 
         // @TODO to be removed!! another local timer? how it works??
         void processConnectionTimer();
-
     private:
         static const int BUFFERLENGTH = 127;
 
