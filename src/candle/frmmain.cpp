@@ -78,7 +78,7 @@ frmMain::frmMain(QWidget *parent) :
 
     ui->setupUi(this);
 
-    Utils::positionDialog(this, m_configuration.uiModule().mainFormGeometry());
+    Utils::positionDialog(this, m_configuration.uiModule().mainFormGeometry(), m_configuration.uiModule().mainFormMaximized());
 
     ui->jog->initialize(m_configuration.joggingModule());
 

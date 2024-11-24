@@ -311,7 +311,7 @@ frmGrblConfigurator::~frmGrblConfigurator()
 
 int frmGrblConfigurator::exec()
 {
-    Utils::positionDialog(this, m_uiConfiguration.grblConfigratorFormGeometry());
+    Utils::positionDialog(this, m_uiConfiguration.grblConfigratorFormGeometry(), m_uiConfiguration.grblConfigratorFormMaximized());
 
     int result = QDialog::exec();
 

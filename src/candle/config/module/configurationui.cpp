@@ -16,9 +16,12 @@ const QMap<QString,QVariant> DEFAULTS = {
     // -1 is a special value to indicate that the window should be centered
     // -1 is a special value to indicate that the window should be maximized
     {"mainFormGeometry", QVariantMap({{"x", 0}, {"y", 0}, {"width", -1}, {"height", -1}})},
+    {"mainFormMaximized", true},
     {"settingsFormGeometry", QVariantMap({{"x", -1}, {"y", -1}, {"width", 800}, {"height", 600}})},
+    {"settingsFormMaximized", false},
     {"settingsFormSlicerSizes", QVariantList{20, 200}},
     {"grblConfigratorFormGeometry", QVariantMap({{"x", -1}, {"y", -1}, {"width", 800}, {"height", 600}})},
+    {"grblConfigratorFormMaximized", false},
     {"spindleSpeedRange", QVariantMap({{"min", 0}, {"max", 100}})}
 };
 
@@ -58,4 +61,28 @@ void ConfigurationUI::clearRecentFiles()
 void ConfigurationUI::clearRecentHeightmaps()
 {
     m_recentHeightmaps.clear();
+}
+
+void ConfigurationUI::setSettingsFormGeometry(const QWidget *widget)
+{
+    m_settingsFormGeometry = widget->frameGeometry();
+    m_settingsFormMaximized = widget->isMaximized();
+
+    emit changed();
+}
+
+void ConfigurationUI::setGrblConfigratorFormGeometry(const QWidget *widget)
+{
+    m_grblConfigratorFormGeometry = widget->frameGeometry();
+    m_grblConfigratorFormMaximized = widget->isMaximized();
+
+    emit changed();
+}
+
+void ConfigurationUI::setMainFormGeometry(const QWidget *widget)
+{
+    m_mainFormGeometry = widget->frameGeometry();
+    m_mainFormMaximized = widget->isMaximized();
+
+    emit changed();
 }

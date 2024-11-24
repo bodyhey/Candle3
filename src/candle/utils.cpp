@@ -3,7 +3,8 @@
 #include <QApplication>
 #include <QDebug>
 
-void Utils::positionDialog(QWidget *widget, QRect geometry) {
+void Utils::positionDialog(QWidget *widget, QRect geometry, bool maximized)
+{
     QSize screenSize = QGuiApplication::primaryScreen()->availableSize();
     QSize size = geometry.size();
     if (geometry.x() == -1) {
@@ -22,10 +23,12 @@ void Utils::positionDialog(QWidget *widget, QRect geometry) {
     }
     QSize frameSize = widget->frameSize();
     size = frameSize - widget->size();
-    qDebug() << "Frame size" << size;
     widget->move(geometry.x(), geometry.y());
     widget->resize(
         geometry.width() - size.width(),
         geometry.height() - size.height()
     );
+    if (maximized) {
+        widget->showMaximized();
+    }
 }

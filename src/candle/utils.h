@@ -9,7 +9,7 @@
 
 class Utils {
     public:
-        static void positionDialog(QWidget *widget, QRect geometry);
+        static void positionDialog(QWidget *widget, QRect geometry, bool maximized);
 };
 
 #endif // UTILS_H

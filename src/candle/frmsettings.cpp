@@ -368,7 +368,7 @@ void frmSettings::widgetValidity(QString widgetName, bool valid)
 
 int frmSettings::exec()
 {
-    Utils::positionDialog(this, m_configuration.uiModule().settingsFormGeometry());
+    Utils::positionDialog(this, m_configuration.uiModule().settingsFormGeometry(), m_configuration.uiModule().settingsFormMaximized());
 
     // Store settings to undo
     m_storedValues.clear();

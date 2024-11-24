@@ -24,8 +24,11 @@ class ConfigurationUI : public ConfigurationModule
     Q_PROPERTY(bool lockWindows MEMBER m_lockWindows NOTIFY changed)
     Q_PROPERTY(bool lockPanels MEMBER m_lockPanels NOTIFY changed)
     Q_PROPERTY(QRect settingsFormGeometry MEMBER m_settingsFormGeometry NOTIFY changed)
+    Q_PROPERTY(bool settingsFormMaximized MEMBER m_settingsFormMaximized NOTIFY changed)
     Q_PROPERTY(QRect grblConfigratorFormGeometry MEMBER m_grblConfigratorFormGeometry NOTIFY changed)
+    Q_PROPERTY(bool grblConfigratorFormMaximized MEMBER m_grblConfigratorFormMaximized NOTIFY changed)
     Q_PROPERTY(QRect mainFormGeometry MEMBER m_mainFormGeometry NOTIFY changed)
+    Q_PROPERTY(bool mainFormMaximized MEMBER m_mainFormMaximized NOTIFY changed)
     Q_PROPERTY(QList<int> settingsFormSlicerSizes MEMBER m_settingsFormSlicerSizes NOTIFY changed)
 
     public:
@@ -51,11 +54,14 @@ class ConfigurationUI : public ConfigurationModule
         bool lockPanels() const { return m_lockPanels; }
         void setLockPanels(bool lockPanels) { m_lockPanels = lockPanels; emit changed(); }
         QRect settingsFormGeometry() const { return m_settingsFormGeometry; }
-        void setSettingsFormGeometry(const QWidget *widget) { m_settingsFormGeometry = widget->frameGeometry(); emit changed(); }
+        void setSettingsFormGeometry(const QWidget *widget);
+        bool settingsFormMaximized() const { return m_settingsFormMaximized; }
         QRect grblConfigratorFormGeometry() const { return m_grblConfigratorFormGeometry; }
-        void setGrblConfigratorFormGeometry(const QWidget *widget) { m_grblConfigratorFormGeometry = widget->frameGeometry(); emit changed(); }
+        void setGrblConfigratorFormGeometry(const QWidget *widget);
+        bool grblConfigratorFormMaximized() const { return m_grblConfigratorFormMaximized; }
         QRect mainFormGeometry() const { return m_mainFormGeometry; }
-        void setMainFormGeometry(const QWidget *widget) { m_mainFormGeometry = widget->frameGeometry(); emit changed(); }
+        void setMainFormGeometry(const QWidget *widget);
+        bool mainFormMaximized() const { return m_mainFormMaximized; }
         QList<int> settingsFormSlicerSizes() const { return m_settingsFormSlicerSizes; }
         void setSettingsFormSlicerSizes(QList<int> sizes) { m_settingsFormSlicerSizes = sizes; emit changed(); }
 
@@ -70,8 +76,11 @@ class ConfigurationUI : public ConfigurationModule
         bool m_lockWindows;
         bool m_lockPanels;
         QRect m_mainFormGeometry;
+        bool m_mainFormMaximized;
         QRect m_settingsFormGeometry;
+        bool m_settingsFormMaximized;
         QRect m_grblConfigratorFormGeometry;
+        bool m_grblConfigratorFormMaximized;
         QList<int> m_settingsFormSlicerSizes;
 };
 
