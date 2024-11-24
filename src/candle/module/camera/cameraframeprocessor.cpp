@@ -4,29 +4,40 @@
 
 #include "cameraframeprocessor.h"
 #include <QPainter>
+#include <QDebug>
 
 CameraFrameProcessor::CameraFrameProcessor(QObject *parent)
     : QObject{parent}
 {}
 
-QVideoSink *CameraFrameProcessor::videoSink() const
+void CameraFrameProcessor::setVideoSink(QVideoSink *inputSink, QVideoSink *outputSink)
 {
-    return m_videoSink;
-}
-
-void CameraFrameProcessor::setVideoSink(QVideoSink *sink)
-{
-    if (m_videoSink != sink)
+    if (m_inputSink != inputSink)
     {
-        m_videoSink = sink;
-        connect(m_videoSink, &QVideoSink::videoFrameChanged, this, &CameraFrameProcessor::processFrame);
+        m_inputSink = inputSink;
+        connect(m_inputSink, &QVideoSink::videoFrameChanged, this, &CameraFrameProcessor::processFrame);
     }
+
+    m_outputSink = outputSink;
 }
 
 void CameraFrameProcessor::processFrame(const QVideoFrame &frame)
 {
-//    QPaintEngine *paintEngine = QPaintEngine::paintEngine(frame);
-    // frame.
-    // QPainter painter(frame);
-    // frame.
+    QImage image = frame.toImage();
+
+    QPainter painter(&image);
+    if (!painter.isActive()) {
+        return;
+    }
+
+    QFont font = painter.font();
+    font.setPixelSize(100);
+    font.setBold(true);
+    painter.setFont(font);
+
+    painter.drawText(50, 50, "Example text");
+
+    QVideoFrame frameCopy(image);
+
+    m_outputSink->setVideoFrame(frameCopy);
 }

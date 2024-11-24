@@ -5,29 +5,27 @@
 #ifndef CAMERAFRAMEPROCESSOR_H
 #define CAMERAFRAMEPROCESSOR_H
 
-#include <QObject>
 #include <QVideoSink>
 #include <QVideoFrame>
 
 class CameraFrameProcessor : public QObject
 {
- Q_OBJECT
-    Q_PROPERTY(QVideoSink *videoSink READ videoSink WRITE setVideoSink NOTIFY videoSinkChanged)
+    Q_OBJECT
 
     public:
         CameraFrameProcessor(QObject *parent);
 
-        QVideoSink *videoSink() const;
-        void setVideoSink(QVideoSink *sink);
+        void setVideoSink(QVideoSink *inputSink, QVideoSink *outputSink);
 
     signals:
         void videoSinkChanged();
 
-    private slots:
+    public slots:
         void processFrame(const QVideoFrame &frame);
 
     private:
-        QVideoSink *m_videoSink;
+        QVideoSink *m_inputSink;
+        QVideoSink *m_outputSink;
 };
 
 #endif // CAMERAFRAMEPROCESSOR_H

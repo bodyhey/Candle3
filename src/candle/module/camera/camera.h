@@ -1,4 +1,4 @@
-/****************************************************************************
+/*************************************************************************** *
 **
 ** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
@@ -58,9 +58,9 @@
 #include <QMediaRecorder>
 #include <QScopedPointer>
 #include <QVideoWidget>
-
-// #include "videosurface.h"
-// #include "viewfinder.h"
+#include <QVideoSink>
+#include <QMenu>
+#include "cameraframeprocessor.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Camera; }
@@ -111,6 +111,7 @@ protected:
 
 private slots:
     void onUpdateImage(const QPixmap &);
+//    void processFrame(const QVideoFrame &frame);
 
 private:
     Ui::Camera *ui;
@@ -119,6 +120,7 @@ private:
     QMediaDevices m_devices;
     QScopedPointer<QCamera> m_camera;
     QMediaCaptureSession m_captureSession;
+    // QVideoSink m_videoSink;
     // QScopedPointer<QCameraImageCapture> m_imageCapture;
     // QScopedPointer<QMediaRecorder> m_mediaRecorder;
 
@@ -128,6 +130,8 @@ private:
     QString m_videoContainerFormat;
     // bool m_isCapturingImage = false;
     bool m_applicationExiting = false;
+    QMenu m_menu;
+    CameraFrameProcessor m_frameProcessor;
 
     // VideoSurface *m_videoSurface;
     // ViewFinder *m_viewFinder;

@@ -64,12 +64,14 @@
 
 // Q_DECLARE_METATYPE(QCameraInfo)
 
-Camera::Camera(QWidget* parent) : QVideoWidget(parent), ui(new Ui::Camera)
+Camera::Camera(QWidget* parent) : QVideoWidget(parent), ui(new Ui::Camera), m_frameProcessor(this)
 {
     ui->setupUi(this);
 
     QActionGroup *videoDevicesGroup = new QActionGroup(this);
     videoDevicesGroup->setExclusive(true);
+
+
     // const QList<QCameraInfo> availableCameras = QCameraInfo::availableCameras();
     // for (const QCameraInfo &cameraInfo : availableCameras) {
     //     QAction *videoDeviceAction = new QAction(cameraInfo.description(), videoDevicesGroup);
@@ -89,26 +91,50 @@ Camera::Camera(QWidget* parent) : QVideoWidget(parent), ui(new Ui::Camera)
     // layout->addWidget(m_viewFinder);
     // setLayout(layout);
 
+    // connect(&m_videoSink, &QVideoSink::videoFrameChanged, this, &Camera::processFrame);
     connect(videoDevicesGroup, &QActionGroup::triggered, this, &Camera::updateCameraDevice);
-    // connect(ui->captureWidget, &QTabWidget::currentChanged, this, &Camera::updateCaptureMode);
-    // connect(m_videoSurface, &VideoSurface::image, this, &Camera::onUpdateImage);
+
+    // popup menu to select camera
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, &QWidget::customContextMenuRequested, [=](const QPoint &pos){
+        m_menu.exec(this->mapToGlobal(pos));
+    });
 
     init();
 }
 
 void Camera::setCamera(const QCameraDevice &cameraDevice)
 {
+    if (!m_camera.isNull()) {
+        m_camera->stop();
+    }
+
+    qDebug() << cameraDevice.description();
+
+
     m_camera.reset(new QCamera(cameraDevice));
     m_captureSession.setCamera(m_camera.data());
 
-    connect(m_camera.data(), &QCamera::activeChanged, this, &Camera::updateCameraActive);
-    connect(m_camera.data(), &QCamera::errorOccurred, this, &Camera::displayCameraError);
+    // connect(m_camera.data(), &QCamera::activeChanged, this, &Camera::updateCameraActive);
+    // connect(m_camera.data(), &QCamera::errorOccurred, this, &Camera::displayCameraError);
+
+    QVideoSink *videoSink = new QVideoSink();
 
     m_captureSession.setVideoOutput(this);
+    m_captureSession.setVideoSink(videoSink);
+
+    m_frameProcessor.setVideoSink(
+        m_captureSession.videoSink(),
+        this->videoSink()
+    );
 
     updateCameraActive(m_camera->isActive());
-    updateCaptureMode();
 
+    if (isVisible()) {
+        m_camera->start();
+    }
+
+//    m_captureSession.setVideoSink(&m_videoSink);
 //     m_camera.reset(new QCamera(cameraInfo));
 
 //     connect(m_camera.data(), &QCamera::stateChanged, this, &Camera::updateCameraState);
@@ -208,18 +234,14 @@ void Camera::hideEvent(QHideEvent *event)
 {
     QWidget::hideEvent(event);
 
-    if (m_camera->isActive()) {
-        m_camera->stop();
-    }
+    stopCamera();
 }
 
 void Camera::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
 
-    if (!m_camera->isActive() && m_camera->isAvailable()) {
-        m_camera->start();
-    }
+    startCamera();
 }
 
 
@@ -322,11 +344,17 @@ void Camera::toggleLock()
 
 void Camera::startCamera()
 {
+    if (m_camera->isActive() || !m_camera->isAvailable())
+        return;
+
     m_camera->start();
 }
 
 void Camera::stopCamera()
 {
+    if (!m_camera->isActive())
+        return
+
     m_camera->stop();
 }
 
@@ -391,7 +419,7 @@ void Camera::displayCameraError()
 
 void Camera::updateCameraDevice(QAction *action)
 {
-    // setCamera(qvariant_cast<QCameraInfo>(action->data()));
+    setCamera(qvariant_cast<QCameraDevice>(action->data()));
 }
 
 void Camera::updateCameraActive(bool active)
@@ -455,7 +483,8 @@ void Camera::init()
 
 void Camera::updateCameras()
 {
-    //ui->menuDevices->clear();
+    m_menu.clear();
+
     const QList<QCameraDevice> availableCameras = QMediaDevices::videoInputs();
     for (const QCameraDevice &cameraDevice : availableCameras) {
         QAction *videoDeviceAction = new QAction(cameraDevice.description(), videoDevicesGroup);
@@ -464,6 +493,6 @@ void Camera::updateCameras()
         if (cameraDevice == QMediaDevices::defaultVideoInput())
             videoDeviceAction->setChecked(true);
 
-        //ui->menuDevices->addAction(videoDeviceAction);
+        m_menu.addAction(videoDeviceAction);
     }
 }
