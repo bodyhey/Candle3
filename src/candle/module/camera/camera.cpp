@@ -35,11 +35,10 @@ void Camera::setCamera(const QCameraDevice &cameraDevice)
 
     qDebug() << cameraDevice.description();
 
-
     m_camera.reset(new QCamera(cameraDevice));
     m_captureSession.setCamera(m_camera.data());
 
-    // connect(m_camera.data(), &QCamera::activeChanged, this, &Camera::updateCameraActive);
+        // connect(m_camera.data(), &QCamera::activeChanged, this, &Camera::updateCameraActive);
     // connect(m_camera.data(), &QCamera::errorOccurred, this, &Camera::displayCameraError);
 
     QVideoSink *videoSink = new QVideoSink();
@@ -57,6 +56,8 @@ void Camera::setCamera(const QCameraDevice &cameraDevice)
     if (isVisible()) {
         m_camera->start();
     }
+
+    findBestResolution(this->width(), this->height());
 }
 
 void Camera::hideEvent(QHideEvent *event)
@@ -105,12 +106,12 @@ void Camera::updateCameraActive(bool active)
     qDebug() << active;
 }
 
-// void Camera::resizeEvent(QResizeEvent *event)
-// {
-//     event->size()
-//     //videoSurface->setDisplaySize(event->size().width(), event->size().height());
-//     QWidget::resizeEvent(event);
-// }
+void Camera::resizeEvent(QResizeEvent *event)
+{
+    findBestResolution(event->size().width(), event->size().height());
+
+    QVideoWidget::resizeEvent(event);
+}
 
 void Camera::init()
 {
@@ -152,5 +153,36 @@ void Camera::updateCameras()
             videoDeviceAction->setChecked(true);
 
         m_menu.addAction(videoDeviceAction);
+    }
+}
+
+void Camera::findBestResolution(int w, int h)
+{
+    QCameraFormat bestFormat;
+    float bestScale = 1000.0;
+
+    for (const QCameraFormat &format : m_camera->cameraDevice().videoFormats()) {
+        if (format.pixelFormat() != QVideoFrameFormat::Format_NV12 && format.pixelFormat() != QVideoFrameFormat::Format_NV21) {
+            continue;
+        }
+
+        QSize resolution = format.resolution();
+        float scaleX = resolution.width() / (float)w;
+        float scaleY = resolution.height() / (float)h;
+        float maxScale = std::max(scaleX, scaleY);
+
+        if (maxScale >= 1 && maxScale < bestScale) {
+            bestScale = maxScale;
+            bestFormat = format;
+        }
+    }
+
+    if (!bestFormat.isNull() && m_camera->cameraFormat() != bestFormat) {
+        qDebug() << "Setting camera format to" << bestFormat.resolution() << bestScale;
+        m_camera->setCameraFormat(bestFormat);
+    }
+
+    if (bestFormat.isNull()) {
+        qDebug() << "Matching camera format not found!";
     }
 }

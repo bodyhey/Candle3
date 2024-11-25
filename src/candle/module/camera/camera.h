@@ -36,7 +36,7 @@ private slots:
     void updateCameraActive(bool active);
 
 protected:
-    //void resizeEvent(QResizeEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
     void hideEvent(QHideEvent *event) override;
     void showEvent(QShowEvent *event) override;
 
@@ -55,6 +55,7 @@ private:
 
     void init();
     void updateCameras();
+    void findBestResolution(int, int);
 };
 
 #endif
