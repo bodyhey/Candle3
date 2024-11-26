@@ -10,13 +10,11 @@
 class StateInitialization : public State
 {
     public:
-        explicit StateInitialization(QObject *parent = nullptr);
+        explicit StateInitialization(State *previous, QObject *parent = nullptr);
         QString name() override { return "Initialization"; }
         bool isJoggingAllowed() override { return false; }
         bool isHomingAllowed() override { return false; }
-
-    public slots:
-        void onDeviceStateReceived(DeviceState state) override;
+        void onDeviceStateChanged(DeviceState state) override;
 };
 
 #endif // STATEINITIALIZATION_H

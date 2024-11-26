@@ -4,6 +4,6 @@
 
 #include "stateidle.h"
 
-StateIdle::StateIdle(QObject *parent)
-    : State{parent}
+StateIdle::StateIdle(State *previous, QObject *parent)
+    : State{previous, parent}
 {}

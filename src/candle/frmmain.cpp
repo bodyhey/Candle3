@@ -92,9 +92,11 @@ frmMain::frmMain(QWidget *parent) :
         m_communicator->sendCommand(CommandSource::GeneralUI, "$X", TABLE_INDEX_UI);
     });
     connect(ui->control, &partMainControl::home, this, [=]() {
-        m_communicator->m_homing = true;
-        m_communicator->m_updateSpindleSpeed = true;
-        m_communicator->sendCommand(CommandSource::GeneralUI, "$H", TABLE_INDEX_UI);
+        // m_communicator->m_homing = true;
+        // m_communicator->m_updateSpindleSpeed = true;
+        // m_communicator->sendCommand(CommandSource::GeneralUI, "$H", TABLE_INDEX_UI);
+
+        m_communicator->home();
     });
     connect(ui->control, &partMainControl::probe, this, [=]() {
         m_communicator->probe();

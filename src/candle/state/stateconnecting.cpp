@@ -4,4 +4,6 @@
 
 #include "stateconnecting.h"
 
-StateConnecting::StateConnecting() {}
+StateConnecting::StateConnecting(State *previous, QObject *parent): State{previous, parent}
+{
+}

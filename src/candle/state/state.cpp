@@ -4,6 +4,13 @@
 
 #include "state.h"
 
-State::State(QObject *parent)
-    : QObject{parent}
-{}
+State::State(State *previous, QObject *parent) : QObject{parent}, m_previous{previous}
+{
+}
+
+void State::onEntry(Communicator *communicator, State *previous) {
+    if (previous) {
+        m_previous = previous;
+    }
+    m_communicator = communicator;
+}

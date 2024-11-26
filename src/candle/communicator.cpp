@@ -40,7 +40,7 @@ Communicator::Communicator(
     m_statusReceived = false;
     m_spindleCW = true;
 
-    m_state = new StateInitialization();
+    m_state = new StateIdle(nullptr);
 
     resetStateVariables();
 
@@ -389,6 +389,22 @@ void Communicator::probe()
         }),
         TABLE_INDEX_UI
     );
+}
+
+void Communicator::home()
+{
+    execute(new StateHoming(m_state));
+}
+
+void Communicator::execute(State *state)
+{
+    if (m_state != nullptr) {
+        m_state->onExit();
+    }
+
+    State *prevState = m_state;
+    m_state = state;
+    m_state->onEntry(this, prevState);
 }
 
 void Communicator::processConnectionTimer()

@@ -4,11 +4,11 @@
 
 #include "stateinitialization.h"
 
-StateInitialization::StateInitialization(QObject *parent)
-    : State{parent}
+StateInitialization::StateInitialization(State *previous, QObject *parent)
+    : State{previous, parent}
 {}
 
-void StateInitialization::onDeviceStateReceived(DeviceState state)
+void StateInitialization::onDeviceStateChanged(DeviceState state)
 {
 
 }

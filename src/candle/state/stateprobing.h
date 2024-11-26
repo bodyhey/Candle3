@@ -10,7 +10,7 @@
 class StateProbing : public State
 {
     public:
-        StateProbing();
+        StateProbing(State *previous, QObject *parent = nullptr);
 };
 
 #endif // STATEPROBING_H

@@ -4,6 +4,6 @@
 
 #include "staterunning.h"
 
-StateRunning::StateRunning(QObject *parent)
-    : State{parent}
+StateRunning::StateRunning(State *previous, QObject *parent)
+    : State{previous, parent}
 {}

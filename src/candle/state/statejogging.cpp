@@ -4,6 +4,6 @@
 
 #include "statejogging.h"
 
-StateJogging::StateJogging(QObject *parent)
-    : State{parent}
+StateJogging::StateJogging(State *previous, QObject *parent)
+    : State{previous, parent}
 {}

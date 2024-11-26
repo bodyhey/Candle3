@@ -10,7 +10,7 @@
 class StateRunning : public State
 {
     public:
-        explicit StateRunning(QObject *parent = nullptr);
+        explicit StateRunning(State *previous, QObject *parent = nullptr);
 };
 
 #endif // STATERUNNING_H

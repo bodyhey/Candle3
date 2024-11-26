@@ -11,7 +11,7 @@
 #include "stateprobing.h"
 #include "staterunning.h"
 #include "statejogging.h"
-//#include "statehoming.h"
+#include "statehoming.h"
 #include "statejoggingwaitingforidle.h"
 #include "stateidle.h"
 #include "stateerror.h"

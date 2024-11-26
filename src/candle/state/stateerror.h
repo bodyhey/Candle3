@@ -10,7 +10,7 @@
 class StateError : public State
 {
     public:
-        explicit StateError(QObject *parent = nullptr);
+        explicit StateError(State *previous, QObject *parent = nullptr);
 };
 
 #endif // STATEERROR_H

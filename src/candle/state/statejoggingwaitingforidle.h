@@ -10,7 +10,7 @@
 class StateJoggingWaitingForIdle : public State
 {
     public:
-        explicit StateJoggingWaitingForIdle(QObject *parent = nullptr);
+        explicit StateJoggingWaitingForIdle(State *previous, QObject *parent = nullptr);
 };
 
 #endif // STATEJOGGINGWAITINGFORIDLE_H

@@ -125,6 +125,7 @@ SOURCES += main.cpp\
     state/state.cpp \
     state/stateconnecting.cpp \
     state/stateerror.cpp \
+    state/statehoming.cpp \
     state/stateidle.cpp \
     state/stateinitialization.cpp \
     state/statejogging.cpp \
@@ -209,6 +210,7 @@ HEADERS  += frmmain.h \
     state/state.h \
     state/stateconnecting.h \
     state/stateerror.h \
+    state/statehoming.h \
     state/stateidle.h \
     state/stateinitialization.h \
     state/statejogging.h \

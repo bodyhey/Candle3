@@ -10,7 +10,7 @@
 class StateJogging : public State
 {
     public:
-        explicit StateJogging(QObject *parent = nullptr);
+        explicit StateJogging(State *previous, QObject *parent = nullptr);
 };
 
 #endif // STATEJOGGING_H

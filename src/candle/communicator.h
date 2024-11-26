@@ -50,6 +50,8 @@ class Communicator : public QObject
             return isSenderState(state) || isSenderState(args...);
         }
         void probe();
+        void home();
+        void execute(State *state);
 
         // @TODO to be removed!! another local timer? how it works??
         void processConnectionTimer();

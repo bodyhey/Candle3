@@ -8,9 +8,12 @@
 #include "state.h"
 
 class StateIdle : public State
-{
+{    
     public:
-        explicit StateIdle(QObject *parent = nullptr);
+        explicit StateIdle(State *previous, QObject *parent = nullptr);
+        QString name() override { return "Idle"; }
+        bool isJoggingAllowed() override { return false; }
+        bool isHomingAllowed() override { return false; }
 };
 
 #endif // STATEIDLE_H

@@ -4,4 +4,7 @@
 
 #include "stateprobing.h"
 
-StateProbing::StateProbing() {}
+StateProbing::StateProbing(State *previous, QObject *parent): State{previous, parent}
+{
+
+}

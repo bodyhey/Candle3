@@ -10,7 +10,7 @@
 class StateConnecting : public State
 {
     public:
-        StateConnecting();
+        StateConnecting(State *previous, QObject *parent = nullptr);
 };
 
 #endif // STATECONNECTING_H

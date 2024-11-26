@@ -200,6 +200,7 @@ void Communicator::processStatus(QString data)
         // Update status
         if (state != m_deviceState) {
             emit deviceStateChanged(state);
+            m_state->onDeviceStateChanged(state);
         }
 
         emit deviceStateReceived(state);

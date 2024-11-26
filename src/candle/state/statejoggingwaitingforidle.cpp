@@ -4,6 +4,6 @@
 
 #include "statejoggingwaitingforidle.h"
 
-StateJoggingWaitingForIdle::StateJoggingWaitingForIdle(QObject *parent)
-    : State{parent}
+StateJoggingWaitingForIdle::StateJoggingWaitingForIdle(State *previous, QObject *parent)
+    : State{previous, parent}
 {}
