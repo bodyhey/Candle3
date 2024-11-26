@@ -36,12 +36,12 @@ void partMainControl::updateControlsState(bool portOpened, bool process)
 
 void partMainControl::updateControlsState(SenderState senderState, DeviceState deviceState)
 {
-    ui->cmdCheck->setEnabled(deviceState != DeviceRun && (senderState == SenderStopped));
-    ui->cmdCheck->setChecked(deviceState == DeviceCheck);
-    ui->cmdHold->setChecked(deviceState == DeviceHold0 || deviceState == DeviceHold1 || deviceState == DeviceQueue);
-    ui->cmdProbe->setEnabled(deviceState == DeviceIdle && senderState == SenderStopped);
-    ui->cmdZeroZ->setEnabled(deviceState == DeviceIdle && senderState == SenderStopped);
-    ui->cmdZeroXY->setEnabled(deviceState == DeviceIdle && senderState == SenderStopped);
+    ui->cmdCheck->setEnabled(deviceState != DeviceState::Run && (senderState == SenderState::Stopped));
+    ui->cmdCheck->setChecked(deviceState == DeviceState::Check);
+    ui->cmdHold->setChecked(deviceState == DeviceState::Hold0 || deviceState == DeviceState::Hold1 || deviceState == DeviceState::Queue);
+    ui->cmdProbe->setEnabled(deviceState == DeviceState::Idle && senderState == SenderState::Stopped);
+    ui->cmdZeroZ->setEnabled(deviceState == DeviceState::Idle && senderState == SenderState::Stopped);
+    ui->cmdZeroXY->setEnabled(deviceState == DeviceState::Idle && senderState == SenderState::Stopped);
 }
 
 bool partMainControl::hold()

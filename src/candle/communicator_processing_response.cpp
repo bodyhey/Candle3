@@ -124,7 +124,7 @@ void Communicator::processNewToolPosition()
 {
     QVector3D toolPosition;
 //    if (!(m_deviceState == DeviceCheck && m_streamer->processedCommandIndex() < m_form->currentModel().rowCount() - 1)) {
-    if (!(m_deviceState == DeviceCheck && !m_streamer->isLastCommandProcessed())) {
+    if (!(m_deviceState == DeviceState::Check && !m_streamer->isLastCommandProcessed())) {
         toolPosition = m_machinePos;
         //m_form->toolDrawer().setToolPosition(m_form->codeDrawer().getIgnoreZ() ? QVector3D(toolPosition.x(), toolPosition.y(), 0) : toolPosition);
 
@@ -169,7 +169,7 @@ void Communicator::processWorkOffset(QString data)
 
 void Communicator::processStatus(QString data)
 {
-    DeviceState state = DeviceUnknown;
+    DeviceState state = DeviceState::Unknown;
 
     m_statusReceived = true;
 
@@ -195,7 +195,7 @@ void Communicator::processStatus(QString data)
 
     match = stx.match(data);
     if (match.hasMatch()) {
-        state = m_deviceStatesDictionary.key(match.captured(1), DeviceUnknown);
+        state = m_deviceStatesDictionary.key(match.captured(1), DeviceState::Unknown);
 
         // Update status
         if (state != m_deviceState) {
@@ -221,8 +221,8 @@ void Communicator::processStatus(QString data)
         // }
 
         // Test for job complete
-        if ((m_senderState == SenderStopping) &&
-            ((state == DeviceIdle && m_deviceState == DeviceRun) || state == DeviceCheck))
+        if ((m_senderState == SenderState::Stopping) &&
+            ((state == DeviceState::Idle && m_deviceState == DeviceState::Run) || state == DeviceState::Check))
         {
             completeTransfer();
         }
@@ -234,17 +234,17 @@ void Communicator::processStatus(QString data)
 
         if (m_aborting) {
             switch (state) {
-                case DeviceIdle: // Idle
-                    if ((m_senderState == SenderStopped) && m_resetCompleted) {
+                case DeviceState::Idle: // Idle
+                    if ((m_senderState == SenderState::Stopped) && m_resetCompleted) {
                         m_aborting = false;
                         restoreParserState();
                         restoreOffsets();
                         return;
                     }
                     break;
-                case DeviceHold0: // Hold
-                case DeviceHold1:
-                case DeviceQueue:
+                case DeviceState::Hold0: // Hold
+                case DeviceState::Hold1:
+                case DeviceState::Queue:
                     if (!m_reseting && compareCoordinates(x, y, z)) {
                         x = sNan;
                         y = sNan;
@@ -257,17 +257,17 @@ void Communicator::processStatus(QString data)
                         z = pos.z();
                     }
                     break;
-                case DeviceUnknown:
-                case DeviceAlarm:
-                case DeviceRun:
-                case DeviceHome:
-                case DeviceCheck:
-                case DeviceDoor0:
-                case DeviceDoor1:
-                case DeviceDoor2:
-                case DeviceDoor3:
-                case DeviceJog:
-                case DeviceSleep:
+                case DeviceState::Unknown:
+                case DeviceState::Alarm:
+                case DeviceState::Run:
+                case DeviceState::Home:
+                case DeviceState::Check:
+                case DeviceState::Door0:
+                case DeviceState::Door1:
+                case DeviceState::Door2:
+                case DeviceState::Door3:
+                case DeviceState::Jog:
+                case DeviceState::Sleep:
                     break;
             }
         }
@@ -362,7 +362,7 @@ void Communicator::processCommandResponse(QString data)
             emit parserStateReceived(m_lastParserState);
 
             // Store parser status
-            if ((m_senderState == SenderTransferring) || (m_senderState == SenderStopping)) {
+            if ((m_senderState == SenderState::Transferring) || (m_senderState == SenderState::Stopping)) {
                 storeParserState();
             }
 
@@ -515,9 +515,9 @@ void Communicator::processCommandResponse(QString data)
         while (m_queue.length() > 0) {
             CommandQueue command = m_queue.takeFirst();
             SendCommandResult r = sendCommand(command.source, command.commandLine, command.tableIndex, false, command.callback);
-            if (r == SendDone) {
+            if (r == SendCommandResult::Done) {
                 break;
-            } else if (r == SendQueue) {
+            } else if (r == SendCommandResult::Queue) {
                 m_queue.prepend(m_queue.takeLast());
                 break;
             }
@@ -526,7 +526,7 @@ void Communicator::processCommandResponse(QString data)
     }
 
     // Add response to table, send next program commands
-    if (m_senderState != SenderStopped) {
+    if (m_senderState != SenderState::Stopped) {
         // Only if command from table
         if (commandAttributes.tableIndex > -1) {
             m_streamer->resetProcessed(commandAttributes.tableIndex);
@@ -583,13 +583,13 @@ void Communicator::processCommandResponse(QString data)
         // Check transfer complete (last row always blank, last command row = rowcount - 2)
 //        if ((m_streamer->processedCommandIndex() == m_form->currentModel().rowCount() - 2) || uncomment.contains(QRegularExpression("(M0*2|M30)(?!\\d)"))) {
         if (m_streamer->isLastCommandProcessed() || command.contains(QRegularExpression("(M0*2|M30)(?!\\d)"))) {
-            if (m_deviceState == DeviceRun) {
-                setSenderStateAndEmitSignal(SenderStopping);
+            if (m_deviceState == DeviceState::Run) {
+                setSenderStateAndEmitSignal(SenderState::Stopping);
             } else {
                 completeTransfer();
             }
         } else if (m_streamer->hasMoreCommands()  // /*(m_streamer->commandIndex() < m_form->currentModel().rowCount())
-                   && (m_senderState == SenderTransferring)
+                   && (m_senderState == SenderState::Transferring)
                    && !holding)
         {
             // Send next program commands
@@ -600,7 +600,7 @@ void Communicator::processCommandResponse(QString data)
 
     // Tool change mode
     static QRegularExpression M6("(M0*6)(?!\\d)");
-    if ((m_senderState == SenderPausing) && command.contains(M6)) {
+    if ((m_senderState == SenderState::Pausing) && command.contains(M6)) {
         response.clear();
         
         if (m_configuration->senderModule(). pauseSenderOnToolChange()) {
@@ -626,26 +626,26 @@ void Communicator::processCommandResponse(QString data)
             }
         }
 
-        setSenderStateAndEmitSignal(SenderChangingTool);
+        setSenderStateAndEmitSignal(SenderState::ChangingTool);
     }
 
     // Pausing on button?
-    if ((m_senderState == SenderPausing) && !command.contains(M6)) {
+    if ((m_senderState == SenderState::Pausing) && !command.contains(M6)) {
         if (m_configuration->senderModule().usePauseCommands()) {
             sendCommands(CommandSource::ProgramAdditionalCommands, m_configuration->senderModule().beforePauseCommands());
-            setSenderStateAndEmitSignal(SenderPausing2);
+            setSenderStateAndEmitSignal(SenderState::Pausing2);
         }
     }
-    if ((m_senderState == SenderChangingTool) && !m_configuration->senderModule().pauseSenderOnToolChange()
+    if ((m_senderState == SenderState::ChangingTool) && !m_configuration->senderModule().pauseSenderOnToolChange()
         && m_commands.isEmpty())
     {
-        setSenderStateAndEmitSignal(SenderTransferring);
+        setSenderStateAndEmitSignal(SenderState::Transferring);
     }
 
     // Switch to pause mode
-    if (isSenderState(SenderPausing, SenderPausing2)) {
+    if (isSenderState(SenderState::Pausing, SenderState::Pausing2)) {
         if (m_commands.isEmpty()) {
-            setSenderStateAndEmitSignal(SenderPaused);
+            setSenderStateAndEmitSignal(SenderState::Paused);
         }
     }
 
@@ -683,8 +683,8 @@ void Communicator::processUnhandledResponse(QString data)
 
 void Communicator::processWelcomeMessageDetected()
 {
-    setSenderStateAndEmitSignal(SenderStopped);
-    setDeviceStateAndEmitSignal(DeviceUnknown);
+    setSenderStateAndEmitSignal(SenderState::Stopped);
+    setDeviceStateAndEmitSignal(DeviceState::Unknown);
 
     m_streamer->reset();
     //m_form->fileCommandIndex() = 0;

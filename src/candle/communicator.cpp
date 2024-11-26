@@ -17,21 +17,21 @@ Communicator::Communicator(
     m_configuration(configuration),
     m_timerStateQuery(this),
     m_deviceStatesDictionary({
-        {DeviceUnknown, "Unknown"},
-        {DeviceIdle, "Idle"},
-        {DeviceAlarm, "Alarm"},
-        {DeviceRun, "Run"},
-        {DeviceHome, "Home"},
-        {DeviceHold0, "Hold:0"},
-        {DeviceHold1, "Hold:1"},
-        {DeviceQueue, "Queue"},
-        {DeviceCheck, "Check"},
-        {DeviceDoor0, "Door:0"},
-        {DeviceDoor1, "Door:1"},
-        {DeviceDoor2, "Door:2"},
-        {DeviceDoor3, "Door:3"},
-        {DeviceJog, "Jog"},
-        {DeviceSleep, "Sleep"}
+        {DeviceState::Unknown, "Unknown"},
+        {DeviceState::Idle, "Idle"},
+        {DeviceState::Alarm, "Alarm"},
+        {DeviceState::Run, "Run"},
+        {DeviceState::Home, "Home"},
+        {DeviceState::Hold0, "Hold:0"},
+        {DeviceState::Hold1, "Hold:1"},
+        {DeviceState::Queue, "Queue"},
+        {DeviceState::Check, "Check"},
+        {DeviceState::Door0, "Door:0"},
+        {DeviceState::Door1, "Door:1"},
+        {DeviceState::Door2, "Door:2"},
+        {DeviceState::Door3, "Door:3"},
+        {DeviceState::Jog, "Jog"},
+        {DeviceState::Sleep, "Sleep"}
     })
 {
     m_reseting = false;
@@ -49,7 +49,7 @@ Communicator::Communicator(
         connect(m_connection, &Connection::lineReceived, this, &Communicator::onConnectionLineReceived);
     }
 
-    setSenderStateAndEmitSignal(SenderStopped);
+    setSenderStateAndEmitSignal(SenderState::Stopped);
 
     // Update state timer
     connect(&m_timerStateQuery, &QTimer::timeout, this, &Communicator::onTimerStateQuery);
@@ -58,8 +58,8 @@ Communicator::Communicator(
 
 void Communicator::resetStateVariables()
 {
-    m_deviceState = DeviceUnknown;
-    m_senderState = SenderUnknown;
+    m_deviceState = DeviceState::Unknown;
+    m_senderState = SenderState::Unknown;
     m_machinePos = QVector3D(0, 0, 0);
     m_workPos = QVector3D(0, 0, 0);
     m_machineConfiguration = nullptr;
@@ -83,16 +83,16 @@ SendCommandResult Communicator::sendCommand(
     // -2 - utility commands
     // -3 - utility commands
 
-    if (!m_connection->isConnected() || !m_resetCompleted) return SendDone;
+    if (!m_connection->isConnected() || !m_resetCompleted) return SendCommandResult::Done;
 
     // Check command
-    if (commandLine.isEmpty()) return SendEmpty;
+    if (commandLine.isEmpty()) return SendCommandResult::Empty;
 
     // Place to queue on 'wait' flag
     if (wait) {
         m_queue.append(CommandQueue(source, commandLine, tableIndex));
 
-        return SendQueue;
+        return SendCommandResult::Queue;
     }
 
     // Evaluate scripts in command
@@ -100,13 +100,13 @@ SendCommandResult Communicator::sendCommand(
     //if (tableIndex < 0) command = evaluateCommand(command);
 
     // Check evaluated command
-    if (commandLine.isEmpty()) return SendEmpty;
+    if (commandLine.isEmpty()) return SendCommandResult::Empty;
 
     // Place to queue if command buffer is full
     if ((bufferLength() + commandLine.length() + 1) > BUFFERLENGTH) {
         m_queue.append(CommandQueue(source, commandLine, tableIndex, callback));
 
-        return SendQueue;
+        return SendCommandResult::Queue;
     }
 
     commandLine = commandLine.toUpper();
@@ -138,13 +138,13 @@ SendCommandResult Communicator::sendCommand(
     // Set M2 & M30 commands sent flag
     static QRegularExpression M230("(M0*2|M30|M0*6|M25)(?!\\d)");
     static QRegularExpression M6("(M0*6)(?!\\d)");
-    if ((m_senderState == SenderTransferring) && command.contains(M230)) {
+    if ((m_senderState == SenderState::Transferring) && command.contains(M230)) {
         if (
             !command.contains(M6) ||
             m_configuration->senderModule().useToolChangeCommands() ||
             m_configuration->senderModule().pauseSenderOnToolChange()
         ) {
-            setSenderStateAndEmitSignal(SenderPausing);
+            setSenderStateAndEmitSignal(SenderState::Pausing);
         }
     }
 
@@ -156,7 +156,7 @@ SendCommandResult Communicator::sendCommand(
 
     emit commandSent(commandAttributes);
 
-    return SendDone;
+    return SendCommandResult::Done;
 }
 
 void Communicator::sendRealtimeCommand(QString command)
@@ -185,7 +185,7 @@ void Communicator::sendCommands(CommandSource source, QStringList commands, int 
     bool waitFlag = false;
     foreach (QString cmd, commands) {
         SendCommandResult r = sendCommand(source, cmd.trimmed(), tableIndex, waitFlag);
-        if (r == SendDone || r == SendQueue) waitFlag = true;
+        if (r == SendCommandResult::Done || r == SendCommandResult::Queue) waitFlag = true;
     }
 }
 
@@ -223,8 +223,8 @@ void Communicator::reset()
 
     resetStateVariables();
 
-    setSenderStateAndEmitSignal(SenderStopped);
-    setDeviceStateAndEmitSignal(DeviceUnknown);
+    setSenderStateAndEmitSignal(SenderState::Stopped);
+    setDeviceStateAndEmitSignal(DeviceState::Unknown);
     // in main form
     //m_fileCommandIndex = 0;
 
@@ -259,7 +259,7 @@ void Communicator::reset()
 void Communicator::abort()
 {
     // @TODO is CommandSource::Program correct here??
-    if (isSenderState(SenderPaused, SenderChangingTool)) {
+    if (isSenderState(SenderState::Paused, SenderState::ChangingTool)) {
         sendCommand(CommandSource::GeneralUI, "M2", TABLE_INDEX_UI, false);
     } else {
         sendCommand(CommandSource::GeneralUI, "M2", TABLE_INDEX_UI, true);
@@ -503,7 +503,7 @@ void Communicator::completeTransfer()
     // }
 
     // Update state
-    setSenderStateAndEmitSignal(SenderStopped);
+    setSenderStateAndEmitSignal(SenderState::Stopped);
     m_streamer->resetProcessed();
     //m_lastDrawnLineIndex = 0;
     m_storedParserState.clear();

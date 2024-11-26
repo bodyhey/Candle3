@@ -41,7 +41,7 @@
 #define TABLE_INDEX_UTIL1 -2
 #define TABLE_INDEX_UTIL2 -3
 
-enum Units {
+enum class Units {
     Inches,
     Millimeters
 };
@@ -97,42 +97,42 @@ enum class JoggindDir {
 
 typedef QVector3D JoggingVector;
 
-enum SenderState {
-    SenderUnknown = -1,
-    SenderTransferring = 0,
-    SenderPausing = 1,
-    SenderPaused = 2,
-    SenderStopping = 3,
-    SenderStopped = 4,
-    SenderChangingTool = 5,
-    SenderPausing2 = 6
+enum class SenderState {
+    Unknown = -1,
+    Transferring = 0,
+    Pausing = 1,
+    Paused = 2,
+    Stopping = 3,
+    Stopped = 4,
+    ChangingTool = 5,
+    Pausing2 = 6
 };
 
-enum DeviceState {
-    DeviceUnknown = 0,
-    DeviceIdle = 1,
-    DeviceAlarm = 2,
-    DeviceRun = 3,
-    DeviceHome = 4,
-    DeviceHold0 = 5,
-    DeviceHold1 = 6,
-    DeviceQueue = 7,
-    DeviceCheck = 8,
-    DeviceDoor0 = 9,
-    DeviceDoor1 = 10,
-    DeviceDoor2 = 11,
-    DeviceDoor3 = 12,
-    DeviceJog = 13,
-    DeviceSleep = 14
+enum class DeviceState {
+    Unknown = 0,
+    Idle = 1,
+    Alarm = 2,
+    Run = 3,
+    Home = 4,
+    Hold0 = 5,
+    Hold1 = 6,
+    Queue = 7,
+    Check = 8,
+    Door0 = 9,
+    Door1 = 10,
+    Door2 = 11,
+    Door3 = 12,
+    Jog = 13,
+    Sleep = 14
 };
 
-enum SendCommandResult {
-    SendDone = 0,
-    SendEmpty = 1,
-    SendQueue = 2
+enum class SendCommandResult: int {
+    Done = 0,
+    Empty = 1,
+    Queue = 2
 };
 
-enum CommandSource : uint8_t {
+enum class CommandSource : uint8_t {
     Console,
     GeneralUI,
     Program,
