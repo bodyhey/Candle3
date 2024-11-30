@@ -9,6 +9,14 @@
 #include <QTimer>
 #include <CRC.h>
 
+#ifdef __GNUC__
+#define PACK( __Declaration__ ) __Declaration__ __attribute__((__packed__))
+#endif
+
+#ifdef _MSC_VER
+#define PACK( __Declaration__ ) __pragma( pack(push, 1) ) __Declaration__ __pragma( pack(pop))
+#endif
+
 enum class Axis {
     None = -1,
     X = 0,
@@ -28,19 +36,19 @@ enum class CommunicationMode: uint8_t {
     WIFI,
 };
 
-struct __attribute__ ((packed)) Header
+PACK(struct Header
 {
     uint16_t start; // 0xAA55
     uint8_t size;
     uint8_t type;
-};
+});
 
-struct __attribute__ ((packed)) Footer
+PACK(struct Footer
 {
     uint8_t crc;
-};
+});
 
-struct __attribute__ ((packed)) StateMessage
+PACK(struct StateMessage
 {
     Header header;
     float x;
@@ -50,16 +58,16 @@ struct __attribute__ ((packed)) StateMessage
     CommunicationMode mode;
     char selectedAxis;
     Footer footer;
-};
+});
 
-struct __attribute__ ((packed)) WifiConfigMessage
+PACK(struct WifiConfigMessage
 {
     Header header;
     char ssid[20];
     char password[20];
     char clientIp[16];
     Footer footer;
-};
+});
 
 class Queue {
     private:

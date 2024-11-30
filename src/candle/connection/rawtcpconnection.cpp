@@ -12,7 +12,7 @@ RawTcpConnection::~RawTcpConnection()
 
 bool RawTcpConnection::openConnection()
 {
-
+    return true;
 }
 
 void RawTcpConnection::setHost(QString host)

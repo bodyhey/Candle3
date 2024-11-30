@@ -9,6 +9,10 @@ def copyFile(sourceSubpath, filename):
     if os.path.isfile(destPath + filename):
         os.remove(destPath + filename)
 
+    if not os.path.isfile(sourcePath + sourceSubpath + filename):
+        print("File " + filename + " not found in " + sourcePath + sourceSubpath)
+        return
+
     shutil.copyfile(sourcePath + sourceSubpath + filename, destPath + filename)
 
 copyFile("src\\candle\\", "GPilot.exe")

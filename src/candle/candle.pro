@@ -53,8 +53,17 @@ DEFINES += sNan=\"65536\"
 
 TRANSLATIONS += translations/candle_en.ts translations/candle_ru.ts translations/candle_es.ts translations/candle_fr.ts translations/candle_pt.ts
 
-CONFIG += c++17
-QMAKE_CXXFLAGS += -std=c++17
+QMAKE_CXXFLAGS += /std:c++20
+QMAKE_MSC_VER = 1929
+CMAKE_CXX_STANDARD=20
+CONFIG += c++20
+GCC_COMPILE_FLAGS = -std=c++20
+win32-msvc*: {
+    # QMAKE_CXXFLAGS += -std=c++20
+} else {
+    # CONFIG += c++17
+    # QMAKE_CXXFLAGS += -std=c++17
+}
 
 # don't create both debug and release folders
 CONFIG -= debug_and_release
