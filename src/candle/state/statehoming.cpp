@@ -7,7 +7,6 @@
 
 StateHoming::StateHoming(State *previous, QObject *parent) : State{previous, parent}
 {
-
 }
 
 void StateHoming::onEntry(Communicator *communicator, State *previous)
@@ -20,6 +19,10 @@ void StateHoming::onEntry(Communicator *communicator, State *previous)
 void StateHoming::onDeviceStateChanged(DeviceState state)
 {
     if (state == DeviceState::Idle) {
-        emit transition(*m_previous);
+        emit transition(this, m_previous);
+    }
+
+    if (state == DeviceState::Alarm) {
+        emit error(this, "Homing failed");
     }
 }

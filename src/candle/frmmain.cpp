@@ -349,6 +349,7 @@ void frmMain::initializeCommunicator()
     connect(m_communicator, &Communicator::statusReceived, this, [this]() {
         jogContinuous();
     });
+    connect(m_communicator, &Communicator::stateChanged, this, &frmMain::onStateChanged);
 }
 
 void frmMain::initializeVisualizer()
@@ -534,7 +535,7 @@ void frmMain::on_actFileSave_triggered()
 void frmMain::on_actFileSaveAs_triggered()
 {
     if (!m_heightmapMode) {
-        QString fileName = (QFileDialog::getSaveFileName(this, tr("Save file as"), lastWorkingDirectory(), tr(FILE_FILTER_TEXT)));
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save file as"), "", tr(FILE_FILTER_TEXT));
 
         if (!fileName.isEmpty()) if (saveProgramToFile(fileName, m_program)) {
             m_programFileName = fileName;
@@ -695,7 +696,7 @@ void frmMain::on_cmdFileOpen_clicked()
     if (!m_heightmapMode) {
         if (!saveChanges(false)) return;
 
-        QString fileName  = QFileDialog::getOpenFileName(this, tr("Open"), lastWorkingDirectory(),
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open"), "",
                                    tr(FILE_FILTER_TEXT";;All files (*.*)"));
 
         if (!fileName.isEmpty()) {
@@ -1675,6 +1676,11 @@ void frmMain::onToolPositionReceived(QVector3D pos)
 void frmMain::onConsoleNewCommand(QString command)
 {
     m_communicator->sendCommand(CommandSource::Console, command, TABLE_INDEX_UI);
+}
+
+void frmMain::onStateChanged(State *state)
+{
+    ui->state->setStatusText(state->name(), "black", "white");
 }
 
 void frmMain::onTimerConnection()

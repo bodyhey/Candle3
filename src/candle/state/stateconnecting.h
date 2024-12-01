@@ -11,6 +11,7 @@ class StateConnecting : public State
 {
     public:
         StateConnecting(State *previous, QObject *parent = nullptr);
+        QString name() override { return "Connecting"; }
 };
 
 #endif // STATECONNECTING_H

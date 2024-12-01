@@ -23,12 +23,11 @@ class State : public QObject
         virtual void onEntry(Communicator *communicator, State *previous = nullptr);
         virtual void onExit() {};
         virtual void onDeviceStateChanged(DeviceState state) {};
+        virtual void onConnectionStateChanged(ConnectionState state) {};
 
     signals:
-        void transition(State &state);
-
-    public slots:
-        virtual void onConnectionStateChanged(ConnectionState state) {};
+        void transition(State *state, State *newState);
+        void error(State *state, QString message);
 
     protected:
         State *m_previous;

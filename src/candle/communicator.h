@@ -135,6 +135,8 @@ class Communicator : public QObject
         void onConnectionLineReceived(QString);
         void onConnectionError(QString);
         void onConnectionStateChanged(ConnectionState state);
+        void onStateRequestsTransition(State *state, State *newState);
+        void onStateError(State *state, QString message);
 
     signals:
         void responseReceived(QString command, int tableIndex, QString response);
@@ -163,6 +165,7 @@ class Communicator : public QObject
         // @TODO aborted what?? find better name
         void aborted();
         void transferCompleted();
+        void stateChanged(State *state);
 };
 
 #endif // COMMUNICATOR_H

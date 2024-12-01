@@ -1,7 +1,8 @@
 #include "connection.h"
 
 Connection::Connection(QObject *parent) : QObject(parent)
-{    
+{
+    setState(ConnectionState::Initialization);
 }
 
 void Connection::sendChar(QChar char_)
