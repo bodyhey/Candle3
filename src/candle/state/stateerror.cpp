@@ -4,6 +4,6 @@
 
 #include "stateerror.h"
 
-StateError::StateError(State *previous, QObject *parent)
-    : State{previous, parent}
-{}
+// StateError::StateError(State *previous, QObject *parent)
+//     : State{previous, parent}
+// {}

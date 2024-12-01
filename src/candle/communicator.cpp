@@ -402,8 +402,12 @@ void Communicator::execute(State *state)
         m_state->onExit();
     }
 
+    emit stateChanged(state);
+    connect(state, &State::transition, this, &Communicator::onStateRequestsTransition, Qt::ConnectionType::UniqueConnection);
+    connect(state, &State::error, this, &Communicator::onStateError, Qt::ConnectionType::UniqueConnection);
+
     State *prevState = m_state;
-    m_state = state;
+    m_state = state; 
     m_state->onEntry(this, prevState);
 }
 
@@ -557,4 +561,13 @@ void Communicator::onConnectionStateChanged(ConnectionState state)
     }
 }
 
+void Communicator::onStateRequestsTransition(State *state, State *newState)
+{
+    execute(newState);
+}
 
+void Communicator::onStateError(State *state, QString message)
+{
+    qDebug() << "State error: " << message;
+    execute(new StateError(state, message));
+}

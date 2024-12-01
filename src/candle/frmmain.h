@@ -190,6 +190,7 @@ private slots:
     void onTransferCompleted();
     void onConnectionError(QString error);
     void onConsoleNewCommand(QString command);
+    void onStateChanged(State *state);
 
     void onTimerConnection();
     void onTableInsertLine();

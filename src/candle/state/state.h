@@ -25,7 +25,8 @@ class State : public QObject
         virtual void onDeviceStateChanged(DeviceState state) {};
 
     signals:
-        void transition(State &state);
+        void transition(State *state, State *newState);
+        void error(State *state, QString message);
 
     public slots:
         virtual void onConnectionStateChanged(ConnectionState state) {};

@@ -7,10 +7,14 @@
 #include <QLibrary>
 #include <QUuid>
 #ifdef WINDOWS
-#include <windows.h>
+Q_OS_WIN
+    #include <windows.h>
     #ifndef _MSC_VER
         #define STATIC_UCNC
     #endif
+#endif
+#ifdef LINUX
+    #define STATIC_UCNC
 #endif
 
 #ifdef STATIC_UCNC

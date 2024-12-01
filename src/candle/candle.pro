@@ -32,7 +32,7 @@ win32: {
 }
 
 unix:!macx {
-    DEFINES += UNIX #GL_GLEXT_PROTOTYPES
+    DEFINES += UNIX LINUX #GL_GLEXT_PROTOTYPES
     QMAKE_LFLAGS += "-Wl,-rpath,\'\$$ORIGIN/libs\'"
 }
 
@@ -53,9 +53,9 @@ DEFINES += sNan=\"65536\"
 
 TRANSLATIONS += translations/candle_en.ts translations/candle_ru.ts translations/candle_es.ts translations/candle_fr.ts translations/candle_pt.ts
 
-QMAKE_CXXFLAGS += /std:c++20
-QMAKE_MSC_VER = 1929
-CMAKE_CXX_STANDARD=20
+# QMAKE_CXXFLAGS += /std:c++20
+# QMAKE_MSC_VER = 1929
+# CMAKE_CXX_STANDARD=20
 CONFIG += c++20
 GCC_COMPILE_FLAGS = -std=c++20
 win32-msvc*: {
