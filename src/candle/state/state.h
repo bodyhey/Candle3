@@ -13,7 +13,8 @@ class Communicator;
 
 class State : public QObject
 {
-        Q_OBJECT
+    Q_OBJECT
+
     public:
         explicit State(State *previous, QObject *parent = nullptr);
         virtual QString name() = 0;

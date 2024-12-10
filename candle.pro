@@ -4,8 +4,10 @@ SUBDIRS =   src/candle \
             src/designerplugins \
             src/vendor
 
+OTHER_FILES += scripts/*.py
+
 # Make plugins translations
-system(qmake src/candleplugins/candleplugins.pro)
+# system(qmake src/candleplugins/candleplugins.pro)
 
 install_main.path = bin
 install_main.files += $$OUT_PWD/src/candle/GPilot.exe
@@ -28,5 +30,7 @@ INSTALLS += install_main
 # install_ucnc
 # install_translations install_license
 
-CONFIG += c++17
-QMAKE_CXXFLAGS += -std=c++17
+# CONFIG += c++17
+# QMAKE_CXXFLAGS += -std=c++17
+
+

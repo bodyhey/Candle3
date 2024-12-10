@@ -26,7 +26,7 @@ void partMainState::setStatusText(QString status, QString bgColor, QString fgCol
 
 void partMainState::setState(DeviceState state)
 {
-    //setStatusText(m_statusCaptions[state], m_statusBackColors[state], m_statusForeColors[state]);
+    // setStatusText(m_statusCaptions[state], m_statusBackColors[state], m_statusForeColors[state]);
 }
 
 void partMainState::setWorkCoordinates(QVector3D pos)

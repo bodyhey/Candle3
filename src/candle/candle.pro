@@ -19,8 +19,8 @@ VERSION=1.0.0.0
 
 win32: {
     DEFINES += WINDOWS
-    QMAKE_CXXFLAGS_DEBUG += -g3 -pg
-    QMAKE_LFLAGS_DEBUG += -pg -lgmon
+    # QMAKE_CXXFLAGS_DEBUG += -g3 -pg
+    # QMAKE_LFLAGS_DEBUG += -pg -lgmon
 
     build_nr.commands = python $$PWD/../../scripts/build_inc.py $$PWD
     build_nr.depends = FORCE
@@ -56,6 +56,12 @@ TRANSLATIONS += translations/candle_en.ts translations/candle_ru.ts translations
 # QMAKE_CXXFLAGS += /std:c++20
 # QMAKE_MSC_VER = 1929
 # CMAKE_CXX_STANDARD=20
+
+win32-msvc*: {
+    QMAKE_CXXFLAGS += /std:c++20
+    CMAKE_CXX_STANDARD=20
+}
+QMAKE_MSC_VER = 1929
 CONFIG += c++20
 GCC_COMPILE_FLAGS = -std=c++20
 win32-msvc*: {
@@ -282,9 +288,11 @@ LIBS += -L../designerplugins/customwidgetsplugin -lcustomwidgets
 #     system($$command)|error("Failed to run: $$command")
 # }
 
-INCLUDEPATH += $$PWD/../vendor/uCNC/build
-INCLUDEPATH += $$PWD/../vendor/uCNC/makefiles/virtual
-DEPENDPATH += ../vendor/uCNC
+# INCLUDEPATH += $$PWD/../vendor/uCNC/build
+# INCLUDEPATH += $$PWD/../vendor/uCNC/makefiles/virtual
+# DEPENDPATH += ../vendor/uCNC
+
+#LIBS += C:/Projekty/Qt/Candle/src/vendor/build/uCNC-Debug
 
 LIBS += -L../vendor/uCNC -luCNC
 

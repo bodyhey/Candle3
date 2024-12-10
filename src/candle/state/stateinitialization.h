@@ -15,6 +15,8 @@ class StateInitialization : public State
         bool isJoggingAllowed() override { return false; }
         bool isHomingAllowed() override { return false; }
         void onDeviceStateChanged(DeviceState state) override;
+        void onConnectionStateChanged(ConnectionState state) override;
+        void onEntry(Communicator *communicator, State *previous = nullptr) override;
 };
 
 #endif // STATEINITIALIZATION_H

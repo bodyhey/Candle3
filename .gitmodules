@@ -11,6 +11,9 @@
 [submodule "src/vendor/CircularBuffer"]
 	path = src/vendor/CircularBuffer
 	url = https://github.com/rlogiacco/CircularBuffer
+[submodule "src/vendor/QtEventBus"]
+	path = src/vendor/QtEventBus
+	url = https://github.com/cmguo/QtEventBus
 [submodule "src/vendor/CRC"]
 	path = src/vendor/CRC
 	url = https://github.com/RobTillaart/CRC

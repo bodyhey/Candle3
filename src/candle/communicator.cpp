@@ -40,7 +40,8 @@ Communicator::Communicator(
     m_statusReceived = false;
     m_spindleCW = true;
 
-    m_state = new StateIdle(nullptr);
+    m_state = nullptr;
+    execute(new StateInitialization(nullptr));
 
     resetStateVariables();
 
@@ -559,6 +560,7 @@ void Communicator::onConnectionStateChanged(ConnectionState state)
     if (state == ConnectionState::Connected) {
         reset();
     }
+    m_state->onConnectionStateChanged(state);
 }
 
 void Communicator::onStateRequestsTransition(State *state, State *newState)

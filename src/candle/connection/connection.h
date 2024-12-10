@@ -38,7 +38,7 @@ class Connection : public QObject
         bool isConnected() const { return m_state == ConnectionState::Connected; }
 
     protected:
-        ConnectionState m_state = ConnectionState::Initialization;
+        ConnectionState m_state;
         void setState(ConnectionState state);
 
     signals:
