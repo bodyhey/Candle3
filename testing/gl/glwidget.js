@@ -4,9 +4,12 @@ class GLWidget {
     m_antialiasing = false;
     m_msaa = false;
     m_colorBackground = new QColor(1, 1, 1);
-    m_shaderProgram = new ShaderProgram();
+    m_shaderProgram1 = new ShaderProgram(vertexShaderSource1, fragmentShaderSource1);
+    m_shaderProgram2 = new ShaderProgram(vertexShaderSource2, fragmentShaderSource2);
     m_shaderDrawables = [
-        new ShaderDrawable()
+        new ShaderDrawable1(this.m_shaderProgram1),
+        //new ShaderDrawable2(this.m_shaderProgram2),
+        new ShaderDrawable3(this.m_shaderProgram2),
     ];
     m_projectionMatrix = glMatrix.mat4.create();// new QMatrix4x4();
     m_viewMatrix = glMatrix.mat4.create();// new QMatrix4x4();
@@ -20,7 +23,7 @@ class GLWidget {
     m_eye = glMatrix.vec3.create();
     m_eye2 = glMatrix.vec3.create();
     m_perspective = false;
-    m_fov = 30; m_near = 0.5; m_far = 15000.0;
+    m_fov = 30; m_near = 0.5; m_far = 17000.0;
     m_xMin = 0; m_xMax = 0;
     m_yMin = 0; m_yMax = 0;
     m_zMin = 0; m_zMax = 0;
@@ -34,6 +37,10 @@ class GLWidget {
 
         this.updateProjection();
         this.updateView();
+
+        setTimeout(() => {
+            this.setIsometricView();
+        }, 100);
     }
 
     rotate() {
@@ -173,7 +180,6 @@ class GLWidget {
         this.updateView();
     }
 
-
     fit() {
         this.fitDrawable(this.m_shaderDrawables[0]);
     }
@@ -305,6 +311,8 @@ class GLWidget {
         // Clear viewport
         gl.clearColor(this.m_colorBackground.redF(), this.m_colorBackground.greenF(), this.m_colorBackground.blueF(), 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        //gl.alphaTest(gl.GREATER, 0.0);
+        // gl.polygonMode(gl.FRONT_AND_BACK, gl.LINE);
 
         // Shader drawable points
         //gl.enable(gl.PROGRAM_POINT_SIZE);
@@ -319,16 +327,14 @@ class GLWidget {
                 gl.hint(gl.POINT_SMOOTH_HINT, gl.NICEST);
                 gl.enable(gl.POINT_SMOOTH);
 
-                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
                 gl.enable(gl.BLEND);
             }
         }
-//        if (this.m_zBuffer) gl.enable(gl.DEPTH_TEST);
-
-        if (this.m_shaderProgram) {
-            // Draw 3d
-            this.m_shaderProgram.bind();
-
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.enable(gl.BLEND);
+        //        if (this.m_zBuffer)
+        const bindEverything = program => {
+            program.bind();
             //console.log(this.m_projectionMatrix, this.m_viewMatrix);
 
             // zamiast `m_projectionMatrix * m_viewMatrix`
@@ -336,35 +342,50 @@ class GLWidget {
             glMatrix.mat4.multiply(mvpMatrix, this.m_projectionMatrix, this.m_viewMatrix);
 
             // Set modelview-projection matrix
-            this.m_shaderProgram.setUniformValueMatrix("mvp_matrix", mvpMatrix);
-            this.m_shaderProgram.setUniformValueMatrix("mv_matrix", this.m_viewMatrix);
-            this.m_shaderProgram.setUniformValueVec3("eye", this.m_eye);
-            this.m_shaderProgram.setUniformValueVec3("u_light_color", glMatrix.vec3.fromValues(0.9, 0.6, 0.9));
-            this.m_shaderProgram.setUniformValueVec3("u_object_color", glMatrix.vec3.fromValues(1.0, 1.0, 1.0));
+            program.setUniformValueMatrix("mvp_matrix", mvpMatrix);
+            program.setUniformValueMatrix("mv_matrix", this.m_viewMatrix);
+            program.setUniformValueVec3("eye", this.m_eye);
+            program.setUniformValueVec3("u_light_color", glMatrix.vec3.fromValues(0.9, 0.6, 0.9));
+            program.setUniformValueVec3("u_object_color", glMatrix.vec3.fromValues(1.0, 1.0, 1.0));
 
             const light_pos = glMatrix.vec3.fromValues(1110, 1111, 11);
             //console.log(light_pos);
             const light_matrix = glMatrix.mat4.create();
             glMatrix.mat4.identity(light_matrix);
             glMatrix.mat4.rotateZ(light_matrix, light_matrix, this.lightRot);
-            this.lightRot += 0.01;
             glMatrix.vec3.transformMat4(light_pos, light_pos, light_matrix);
-            this.m_shaderProgram.setUniformValueVec3("u_light_position", light_pos);
+            program.setUniformValueVec3("u_light_position", light_pos);
             //console.log(light_pos);
 
-            // Update geometries in current opengl context
-            for (const drawable of this.m_shaderDrawables)
-                if (drawable.needsUpdateGeometry()) drawable.updateGeometry(this.m_shaderProgram);
+            program.release();
 
-            // Draw geometries
-            for (const drawable of this.m_shaderDrawables) {
-                drawable.draw(this.m_shaderProgram, this.m_eye2);
-                //console.log(this.m_eye);
-                if (drawable.visible()) vertices += drawable.getVertexCount();
-            }
-
-            this.m_shaderProgram.release();
+            return [mvpMatrix]
         }
+        const [mvpMatrix] = bindEverything(this.m_shaderProgram1);
+        bindEverything(this.m_shaderProgram2);
+
+        // Update geometries in current opengl context
+        for (const drawable of this.m_shaderDrawables) {
+            if (drawable.needsUpdateGeometry()) drawable.updateGeometry();
+        }
+
+        // Draw geometries
+        // for (const drawable of this.m_shaderDrawables) {
+        //     drawable.draw(this.m_eye2);
+        //     if (drawable.visible()) vertices += drawable.getVertexCount();
+        // }
+        gl.depthMask(true);
+        gl.enable(gl.DEPTH_TEST);
+//        this.m_shaderDrawables[0].draw(this.m_eye2, mvpMatrix);
+        gl.depthMask(false);
+        // gl.blendFunc(gl.SRC_ALPHA, gl.SRC_ALPHA);
+        gl.blendFunc(gl.DST_COLOR, gl.ZERO);
+        gl.enable(gl.DEPTH_TEST);
+        this.m_shaderDrawables[1].draw(this.m_eye2, mvpMatrix);
+        gl.depthMask(true);
+        gl.enable(gl.DEPTH_TEST);
+
+        this.lightRot += 0.01;
 
         // Draw 2D
         gl.disable(gl.DEPTH_TEST);

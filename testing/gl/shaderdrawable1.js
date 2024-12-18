@@ -1,5 +1,5 @@
 
-class ShaderDrawable {
+class ShaderDrawable1 {
     m_needsUpdateGeometry = true;
     m_visible = true;
     m_lineWidth = 0.1;
@@ -11,6 +11,11 @@ class ShaderDrawable {
     m_lines = [];
     m_triangles = [];
     m_points = [];
+    m_program = null;
+
+    constructor(shaderProgram) {
+        this.m_program = shaderProgram;
+    }
 
     init()
     {
@@ -52,11 +57,12 @@ class ShaderDrawable {
         return true;
     }
 
-    updateGeometry(shaderProgram)
+    updateGeometry()
     {
+        this.m_program.bind();
+
         // Init in context
         if (this.m_vbo == null) this.init();
-
 
         // console.log(this.m_vao);
         //if (this.m_vao.isCreated()) {
@@ -87,9 +93,11 @@ class ShaderDrawable {
             this.m_vbo.release();
             if (this.m_vao.isCreated()) m_vao.release();
             this.m_needsUpdateGeometry = false;
+            this.m_program.release();
             return;
         }
 
+        this.m_program.release();
         return;
 
         //if (m_vao.isCreated())
@@ -158,9 +166,11 @@ class ShaderDrawable {
 
     once = true;
 
-    draw(shaderProgram, eye)
+    draw(eye)
     {
         if (!this.m_visible) return;
+
+        this.m_program.bind();
 
         // if (this.m_vao.isCreated()) {
         //     // Prepare vao
@@ -175,25 +185,25 @@ class ShaderDrawable {
             let offset = 0;
 
             // Tell OpenGL programmable pipeline how to locate vertex position data
-            const vertexLocation = shaderProgram.attributeLocation("a_position");
-            shaderProgram.enableAttributeArray(vertexLocation);
-            shaderProgram.setAttributeBuffer(vertexLocation, gl.FLOAT, offset, 3, VERTEX_SIZE);
+            const vertexLocation = this.m_program.attributeLocation("a_position");
+            this.m_program.enableAttributeArray(vertexLocation);
+            this.m_program.setAttributeBuffer(vertexLocation, gl.FLOAT, offset, 3, VERTEX_SIZE);
 
             // Offset for color
             offset += VECTOR3D_SIZE;
 
             // Tell OpenGL programmable pipeline how to locate vertex color data
-            const colorLocation = shaderProgram.attributeLocation("a_color");
-            shaderProgram.enableAttributeArray(colorLocation);
-            shaderProgram.setAttributeBuffer(colorLocation, gl.FLOAT, offset, 3, VERTEX_SIZE);
+            const colorLocation = this.m_program.attributeLocation("a_color");
+            this.m_program.enableAttributeArray(colorLocation);
+            this.m_program.setAttributeBuffer(colorLocation, gl.FLOAT, offset, 3, VERTEX_SIZE);
 
             // Offset for line start point
             offset += VECTOR3D_SIZE;
 
             // Tell OpenGL programmable pipeline how to locate vertex line start point
-            const startLocation = shaderProgram.attributeLocation("a_normal");
-            shaderProgram.enableAttributeArray(startLocation);
-            shaderProgram.setAttributeBuffer(startLocation, gl.FLOAT, offset, 3, VERTEX_SIZE);
+            const startLocation = this.m_program.attributeLocation("a_normal");
+            this.m_program.enableAttributeArray(startLocation);
+            this.m_program.setAttributeBuffer(startLocation, gl.FLOAT, offset, 3, VERTEX_SIZE);
 
             //shaderProgram.setAttributeValue("a_alpha", this.m_globalAlpha);
         // }
@@ -243,15 +253,15 @@ class ShaderDrawable {
             // ));
 
             const SIZE = 150.0;
-            const STEP = 20.0;
+            const STEP = 1;
             let normal;
             const MAP_HEIGHT = 25.0;
             const MAP_SCALE = 0.15;
 
             const grid = [];
-            for (let x = -SIZE; x < SIZE; x++) {
+            for (let x = -SIZE; x < SIZE; x+=STEP) {
                 const col = [];
-                for (let y = -SIZE; y < SIZE; y++)
+                for (let y = -SIZE; y < SIZE; y+=STEP)
                 {
                     col[y] = Math.sin(y * MAP_SCALE) * Math.cos(x * MAP_SCALE) * MAP_HEIGHT;
                 }
@@ -305,7 +315,8 @@ class ShaderDrawable {
                 return cubicInterpolate(colInterpolations[0], colInterpolations[1], colInterpolations[2], colInterpolations[3], yFrac);
             }
 
-            const MICROSTEP = 2;
+            const MICROSTEP = 2
+             ;
 //            for (let i = -SIZE; i <= SIZE; i += MICROSTEP) {
             for (let i = -SIZE; i <= SIZE; i += MICROSTEP) {
                 for (let j = -SIZE; j <= SIZE; j += 2)
@@ -432,8 +443,8 @@ class ShaderDrawable {
             gl.bufferData(gl.ARRAY_BUFFER,
                 new Float32Array(this.m_lines.toRawArray().concat(this.m_triangles.toRawArray())), gl.STATIC_DRAW);
 
-            gl.lineWidth(2);
-            gl.enable(gl.DEPTH_TEST);
+            // gl.lineWidth(2);
+            // gl.enable(gl.DEPTH_TEST);
             // shaderProgram.setUniformValue("blur", -3.0); gl.drawArrays(gl.LINES, 0, this.m_lines.length);
             // shaderProgram.setUniformValue("blur", -1.5); gl.drawArrays(gl.LINES, 0, this.m_lines.length);
             // shaderProgram.setUniformValue("blur", -2); gl.drawArrays(gl.LINES, 0, this.m_lines.length);
@@ -457,7 +468,6 @@ class ShaderDrawable {
 
         //if (m_vao.isCreated()) m_vao.release(); else m_vbo.release();
     }
-
 
     needsUpdateGeometry() {
         return this.m_needsUpdateGeometry;

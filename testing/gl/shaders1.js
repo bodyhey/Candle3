@@ -1,5 +1,5 @@
 
-    const vertexShaderSource = `
+const vertexShaderSource1 = `
 
 #ifdef GL_ES
 // Set default precision to medium
@@ -50,7 +50,7 @@ void main()
 
     `;
 
-    const fragmentShaderSource = `
+const fragmentShaderSource1 = `
 
 #ifdef GL_ES
 // Set default precision to medium

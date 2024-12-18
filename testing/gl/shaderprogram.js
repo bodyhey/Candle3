@@ -3,11 +3,11 @@ class ShaderProgram {
     m_fragmentShader;
     m_program;
 
-    constructor() {
+    constructor(vss, fss) {
         this.m_program = gl.createProgram();
 
         this.m_vertexShader = gl.createShader(gl.VERTEX_SHADER);
-        gl.shaderSource(this.m_vertexShader, vertexShaderSource);
+        gl.shaderSource(this.m_vertexShader, vss);
         gl.compileShader(this.m_vertexShader);
 
         if (!gl.getShaderParameter(this.m_vertexShader, gl.COMPILE_STATUS)) {
@@ -17,7 +17,7 @@ class ShaderProgram {
 
         // now compile the fragment shader
         this.m_fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-        gl.shaderSource(this.m_fragmentShader, fragmentShaderSource);
+        gl.shaderSource(this.m_fragmentShader, fss);
         gl.compileShader(this.m_fragmentShader);
 
         if (!gl.getShaderParameter(this.m_fragmentShader, gl.COMPILE_STATUS)) {
@@ -59,6 +59,7 @@ class ShaderProgram {
     }
 
     release() {
+        gl.useProgram(null);
     }
 
     attributeLocation(name) {
