@@ -81,8 +81,8 @@ uniform vec3 object_color;
 
 void main()
 {
-    vec4 green = vec4(v_color.xyz, 0.5);
-    //vec4 green = vec4(0.01, 0.01, 0.4, 0.3);
+    //vec4 green = vec4(v_color.xyz, 1);
+    vec4 green = vec4(0.6, 0.6, 0.1, 0.7);
 
     gl_FragColor = green;
 }

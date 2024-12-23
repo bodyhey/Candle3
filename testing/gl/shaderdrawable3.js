@@ -170,6 +170,8 @@ class ShaderDrawable3 {
     vertexToScreen(P, mvpMatrix) {
         const P2 = glMatrix.vec3.create();
         glMatrix.vec3.transformMat4(P2, P, mvpMatrix);
+
+        return glMatrix.vec3.fromValues(0, 0, P2[2]);
         return P2;
     }
 
@@ -238,7 +240,7 @@ class ShaderDrawable3 {
             this.m_lines = new Vertexes();
             this.m_triangles = new Vertexes();
 
-            const SIZE = 155;
+            const SIZE = 150;
 
             const c1 = glMatrix.vec3.fromValues(1, 0, 0);
             const c2 = glMatrix.vec3.fromValues(0, 1, 0);
@@ -247,73 +249,51 @@ class ShaderDrawable3 {
             const c5 = glMatrix.vec3.fromValues(1, 0, 1);
             const c6 = glMatrix.vec3.fromValues(0, 1, 1);
 
-            const cubeQuads = [
-                // Przednia ściana (z = SIZE)
-                [
-                    [[-SIZE, -SIZE, SIZE],  [SIZE, -SIZE, SIZE],  [SIZE, SIZE, SIZE],
-                    [-SIZE, -SIZE, SIZE],  [SIZE, SIZE, SIZE],  [-SIZE, SIZE, SIZE]],
-                    c1,
-                ],
-                // Tylna ściana (z = -SIZE)
-                [
-                    [[-SIZE, -SIZE, -SIZE],  [SIZE, SIZE, -SIZE],  [SIZE, -SIZE, -SIZE],
-                    [-SIZE, -SIZE, -SIZE],  [-SIZE, SIZE, -SIZE],  [SIZE, SIZE, -SIZE]],
-                    c2,
-                ],
-                // Lewa ściana (x = -SIZE)
-                [
-                    [[-SIZE, -SIZE, -SIZE],  [-SIZE, -SIZE, SIZE],  [-SIZE, SIZE, SIZE],
-                    [-SIZE, -SIZE, -SIZE],  [-SIZE, SIZE, SIZE],  [-SIZE, SIZE, -SIZE]],
-                    c3,
-                ],
-                // Prawa ściana (x = SIZE)
-                [
-                    [[SIZE, -SIZE, -SIZE],  [SIZE, SIZE, SIZE],  [SIZE, -SIZE, SIZE],
-                    [SIZE, -SIZE, -SIZE],  [SIZE, SIZE, -SIZE],  [SIZE, SIZE, SIZE]],
-                    c4,
-                ],
-                // Dolna ściana (y = -SIZE)
-                [
-                    [[-SIZE, -SIZE, -SIZE],  [SIZE, -SIZE, -SIZE],  [SIZE, -SIZE, SIZE],
-                    [-SIZE, -SIZE, -SIZE],  [SIZE, -SIZE, SIZE],  [-SIZE, -SIZE, SIZE]],
-                    c5,
-                ],
-                // Górna ściana (y = SIZE)
-                [
-                    [[-SIZE, SIZE, -SIZE],  [SIZE, SIZE, SIZE],  [SIZE, SIZE, -SIZE],
-                    [-SIZE, SIZE, -SIZE],  [-SIZE, SIZE, SIZE],  [SIZE, SIZE, SIZE]],
-                    c6,
-                ],
-            ];
+            const cubeQuads = [];
+            const Y = 35;
+            for (let i = -SIZE; i < SIZE; i+=10) {
+                for (let j = -SIZE; j < SIZE; j+=10) {
+                    cubeQuads.push(
+                        [
+                            [i, j, Y],  [i+10, j, Y],  [i+10, j+10, Y],
+                            [i, j, Y],  [i+10, j+10, Y],  [i, j+10, Y],
+                        ]
+                    );
+                }
+            }
+            //console.log(cubeQuads.length);
 
-            const cubeTrianglesSorted = [];
-            for (const quad of cubeQuads) {
-                const [points, color] = quad;
+            const cubeTrianglesSorted = new Array(cubeQuads.length * 2);
+            let index = 0;
+            for (const points of cubeQuads) {
                 const center = this.pointsCenter(mvpMatrix, [points[0], points[1], points[2], points[4]]);
                 const length = glMatrix.vec3.length(center);
-                cubeTrianglesSorted.push([center, length, color, [points[0], points[1], points[2]]]);
-                cubeTrianglesSorted.push([center, length, color, [points[3], points[4], points[5]]]);
+                cubeTrianglesSorted[index++] = [center, length, [points[0], points[1], points[2]]];
+                cubeTrianglesSorted[index++] = [center, length, [points[3], points[4], points[5]]];
             }
 
             cubeTrianglesSorted.sort((a, b) => b[1] - a[1]);
 
-            const colors = [
-                glMatrix.vec3.fromValues(1, 0, 0),
-                glMatrix.vec3.fromValues(0, 1, 0),
-                glMatrix.vec3.fromValues(0, 0, 1),
-                glMatrix.vec3.fromValues(1, 1, 0),
-                glMatrix.vec3.fromValues(1, 0, 1),
-                glMatrix.vec3.fromValues(0, 1, 1),
-            ];
+            const max = cubeTrianglesSorted[0][1];
+            const min = cubeTrianglesSorted[cubeTrianglesSorted.length - 1][1];
+
+            //console.log([min, max]);
+
+            const colors = [c1, c2, c3, c4, c5, c6];
 
             let ic = 0;
-            for (const [center,length,color, triangle] of cubeTrianglesSorted) {
+            for (const [center,length,triangle] of cubeTrianglesSorted) {
+                ic = (length - min) / (max - min);
                 //console.log(triangle);
                 for (const vertex of triangle) {
                     this.m_triangles.push(
                         new VertexData(
                             glMatrix.vec3.fromValues(...vertex),
-                            color,
+                            glMatrix.vec3.fromValues(
+                                ic,
+                                ic,
+                                ic
+                            ),
                             glMatrix.vec3.fromValues(0, 0, 1)
                         )
                     );
@@ -325,12 +305,28 @@ class ShaderDrawable3 {
                     //     )
                     // );
                 }
-                ic++;
+                // if (ic < 1) {
+                //     ic+=0.015;
+                // }
             }
+
+            this.m_lines.push(
+                new VertexData(
+                    glMatrix.vec3.fromValues(0, 0, 0),
+                    c1,
+                    glMatrix.vec3.fromValues(0, 0, 1)
+                )
+            );
+            this.m_lines.push(
+                new VertexData(
+                    glMatrix.vec3.fromValues(0, 0, 100),
+                    c1,
+                    glMatrix.vec3.fromValues(0, 0, 1)
+                )
+            );
 
             gl.bufferData(gl.ARRAY_BUFFER,
                 new Float32Array(this.m_lines.toRawArray().concat(this.m_triangles.toRawArray())), gl.STATIC_DRAW);
-
             gl.drawArrays(gl.TRIANGLES, this.m_lines.length, this.m_triangles.length);
             gl.drawArrays(gl.LINES, 0, this.m_lines.length);
         }

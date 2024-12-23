@@ -11,9 +11,9 @@ uniform mat4 mvp_matrix;
 uniform mat4 mv_matrix;
 uniform vec3 u_light_position;
 
-attribute vec4 a_position;
-attribute vec4 a_color;
-attribute vec4 a_normal;
+attribute vec3 a_position;
+attribute vec3 a_color;
+attribute vec3 a_normal;
 attribute float a_alpha;
 
 varying vec4 v_color;
@@ -34,9 +34,9 @@ void main()
     v_z = a_position.z;
 
 //    vec4 vertex_position = mv_matrix * vec4(a_position.xyz, 1.0);
-    vec4 vertex_position = vec4(a_position.xyz, 1.0);
+    vec4 vertex_position = vec4(a_position, 1.0);
 //    v_normal = (mv_matrix * a_normal).xyz;
-    v_normal = a_normal.xyz;
+    v_normal = a_normal;
 
     //vec3 light_position_ = (mv_matrix * vec4(u_light_position, 1.0)).xyz;
     vec3 light_position_ = vec4(u_light_position, 1.0).xyz;
@@ -45,7 +45,7 @@ void main()
     gl_Position = mvp_matrix * vertex_position;
     v_position = vertex_position.xyz;
 
-    v_color = a_color;
+    v_color = vec4(a_color, 1.0);
 }
 
     `;
@@ -148,14 +148,14 @@ void main()
     vec4 c1 = vec4(0.0, 0.0, 1.0, 1.0);
     vec4 c2 = vec4(1.0, 0.0, 0.0, 1.0);
 
-    vec3 lightDir = vec3(0.0, 0.0, 1.0);
+    vec3 lightDir = vec3(0.9, 0.2, 0.0);
     vec4 baseColor = vec4(1.0, 0.0, 0.0, 1.0);
-    vec4 green = vec4(0.0, 1.0, 1.0, 1.0);
+    vec4 green = vec4(0.8, 0.0, 0.2, 1.0);
 
     //float brightness = max(dot(viewDir, v_normal) + 0.1, 0.0) * 1.0;
     //float brightness = mix(c1, c2, v_z);
 
     gl_FragColor = mix(baseColor, green, (v_z + 15.0 ) / 30.0);
-    //vec4(baseColor * brightness, 1.0);
+    // gl_FragColor = v_color;
 }
     `;

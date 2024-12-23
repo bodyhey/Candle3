@@ -6,7 +6,7 @@ class ShaderDrawable1 {
     m_pointSize = 1.0;
     m_globalAlpha = 1.0;
     m_texture = null;
-    m_vao;
+    //m_vao;
     m_vbo = null;
     m_lines = [];
     m_triangles = [];
@@ -20,7 +20,7 @@ class ShaderDrawable1 {
     init()
     {
         // Create buffers
-        this.m_vao = gl.createVertexArray();
+        //this.m_vao = gl.createVertexArray();
         this.m_vbo = gl.createBuffer();
     }
 
@@ -45,14 +45,14 @@ class ShaderDrawable1 {
         const color1 = glMatrix.vec3.fromValues(1, 0, 0);
         const color2 = glMatrix.vec3.fromValues(0, 0, 1);
 
-        this.m_lines = new Vertexes();
+        // this.m_lines = new Vertexes();
 
-        for (let i = -SIZE; i < SIZE; i++) {
-            this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(i * 10, -SIZE * 10, 0), color1, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
-            this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(i * 10, SIZE * 10, 0), color2, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
-            this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(-SIZE * 10, i * 10, 0), color1, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
-            this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(SIZE * 10, i * 10, 0), color2, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
-        }
+        // for (let i = -SIZE; i < SIZE; i++) {
+        //     this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(i * 10, -SIZE * 10, 0), color1, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
+        //     this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(i * 10, SIZE * 10, 0), color2, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
+        //     this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(-SIZE * 10, i * 10, 0), color1, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
+        //     this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(SIZE * 10, i * 10, 0), color2, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
+        // }
 
         return true;
     }
@@ -88,7 +88,7 @@ class ShaderDrawable1 {
             // vertexData += this.m_points;
             //this.m_vbo.allocate(vertexData, vertexData.length * VertexData.sizeof());
             //console.log(this.m_lines);
-            gl.bufferData(gl.ARRAY_BUFFER, this.m_lines.toRawArray(), gl.STATIC_DRAW);
+            //gl.bufferData(gl.ARRAY_BUFFER, this.m_lines.toRawArray(), gl.STATIC_DRAW);
         } else {
             this.m_vbo.release();
             if (this.m_vao.isCreated()) m_vao.release();
@@ -165,6 +165,7 @@ class ShaderDrawable1 {
     }
 
     once = true;
+    m_lines = null;
 
     draw(eye)
     {
@@ -192,6 +193,9 @@ class ShaderDrawable1 {
             // Offset for color
             offset += VECTOR3D_SIZE;
 
+            // console.log('Vertex size: ' + VERTEX_SIZE);
+            // console.log('Vector3D size: ' + VECTOR3D_SIZE);
+
             // Tell OpenGL programmable pipeline how to locate vertex color data
             const colorLocation = this.m_program.attributeLocation("a_color");
             this.m_program.enableAttributeArray(colorLocation);
@@ -208,57 +212,25 @@ class ShaderDrawable1 {
             //shaderProgram.setAttributeValue("a_alpha", this.m_globalAlpha);
         // }
 
-        // setAttributeBuffer must used every time, because it is not stored in VAO??
-        //shaderProgram.setAttributeValue("a_alpha", this.m_globalAlpha);
-        //shaderProgram.setUniformValueVec3("eye", eye);
-
-        // if (this.m_triangles.length) {
-        //     if (this.m_texture) {
-        //         m_texture.bind();
-        //         //shaderProgram.setUniformValue("texture", 0);
-        //     }
-        //     glDrawArrays(gl.gl.TRIANGLES, 0, this.m_triangles.length);
-        // }
-
         //if (this.m_lines.length)
         {
             //console.log('draw lines', this.m_lines.length);
 
             const color1 = glMatrix.vec3.fromValues(0, 1, 0);
-            const color2 = glMatrix.vec3.fromValues(1, 0, 0);
+            const color2 = glMatrix.vec3.fromValues(0, 1, 0);
             const color3 = glMatrix.vec3.fromValues(0, 1, 0);
             const color4 = glMatrix.vec3.fromValues(0, 0, 0);
 
-            // const invMvpMatrix = glMatrix.mat4.create();
-            // glMatrix.mat4.invert(invMvpMatrix, mvpMatrix);
-
-            // const vec4 = glMatrix.vec4.fromValues(eye[0], eye[1], eye[2], 0);
-            // glMatrix.vec4.transformMat4(vec4, vec4, invMvpMatrix);
-            // const eye2 = glMatrix.vec3.fromValues(NaN, -100, -100);
-            //console.log(eye2);
-
-            this.m_lines = new Vertexes();
             this.m_triangles = new Vertexes();
-            // this.m_lines.push(new VertexData(
-            //     glMatrix.vec3.fromValues(-100.0, 100.0, 0.0), color1, glMatrix.vec3.fromValues(NaN, NaN, NaN)
-            // ));
-            // this.m_lines.push(new VertexData(
-            //     eye2, color2, glMatrix.vec3.fromValues(NaN, NaN, NaN)
-            // ));
-            // this.m_lines.push(new VertexData(
-            //     glMatrix.vec3.fromValues(100.0, -100.0, 0.0), color2, glMatrix.vec3.fromValues(NaN, NaN, NaN)
-            // ));
-            // this.m_lines.push(new VertexData(
-            //     eye2, color1, glMatrix.vec3.fromValues(NaN, NaN, NaN)
-            // ));
 
-            const SIZE = 150.0;
+            const SIZE = 200.0;
             const STEP = 1;
             let normal;
-            const MAP_HEIGHT = 25.0;
-            const MAP_SCALE = 0.15;
+            const MAP_HEIGHT = 50.0;
+            const MAP_SCALE = 0.025;
 
             const grid = [];
+            if (this.once)
             for (let x = -SIZE; x < SIZE; x+=STEP) {
                 const col = [];
                 for (let y = -SIZE; y < SIZE; y+=STEP)
@@ -315,156 +287,62 @@ class ShaderDrawable1 {
                 return cubicInterpolate(colInterpolations[0], colInterpolations[1], colInterpolations[2], colInterpolations[3], yFrac);
             }
 
-            const MICROSTEP = 2
-             ;
-//            for (let i = -SIZE; i <= SIZE; i += MICROSTEP) {
-            for (let i = -SIZE; i <= SIZE; i += MICROSTEP) {
-                for (let j = -SIZE; j <= SIZE; j += 2)
-                //const j = 1;
-                {
-                    const z1 = bicubicInterpolate(i, j);
-                    const z2 = bicubicInterpolate(i + MICROSTEP, j);
+            const MICROSTEP = 4;
 
-                    const p1 = glMatrix.vec3.fromValues(i, j, z1);
-                    const p2 = glMatrix.vec3.fromValues(i + (MICROSTEP), j, z2);
-
-                    const direction = glMatrix.vec3.create();
-                    glMatrix.vec3.sub(direction, p2, p1);
-
-                    let normal = glMatrix.vec3.create();
-                    if (direction.z == 0) {
-                        normal = glMatrix.vec3.fromValues(0.0, -1.0, 0.1);
-                    } else {
-                        // let up = glMatrix.vec3.fromValues(-1, 0, 0);
-                        // glMatrix.vec3.cross(normal, direction, up);
-                        normal = glMatrix.vec3.fromValues(-direction[2], 0.0, direction[0]);
-                        // glMatrix.vec3.normalize(normal, normal);
-                        //glMatrix.vec3.normalize(normal, normal);
-                    }
-                    glMatrix.vec3.normalize(normal, normal);
-                    if (this.once) {
-                        //console.log('d', direction, normal);
-                    }
-
-                    this.m_lines.push(new VertexData(p1, color1, normal));
-                    this.m_lines.push(new VertexData(p2, color1, normal));
-
-                    this.m_lines.push(new VertexData(p1, color1, normal));
-                    const p3 = glMatrix.vec3.fromValues(p1[0], p1[1], p1[2]);
-                    glMatrix.vec3.add(p3, p1, normal);
-                    this.m_lines.push(new VertexData(p3, color1, normal));
-                }
-                // for (let j = -SIZE; j < SIZE; j+=10) {
-                //     const z1 = Math.sin(j * MAP_SCALE) * Math.cos(i * MAP_SCALE) * MAP_HEIGHT;
-                //     this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(i * 10, j * 10, z1), color1, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
-                //     const j2 = j + 10;
-                //     const z2 = Math.sin(j2 * MAP_SCALE) * Math.cos(i * MAP_SCALE) * MAP_HEIGHT;
-                //     this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(i * 10, (j + 10) * 10, z2), color1, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
-
-                //     this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(j * 10, i * 10, z1), color2, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
-                //     this.m_lines.push(new VertexData(glMatrix.vec3.fromValues((j + 10) * 10, i * 10, z2), color2, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
-                // }
-
-               // const
-
-                // const pp1 = glMatrix.vec3.fromValues(-SIZE * 10, i * 10, 0);
-                // const pp2 = glMatrix.vec3.fromValues(SIZE * 10, i * 10, 0);
-                // const direction = glMatrix.vec3.create();
-                // glMatrix.vec3.sub(direction, pp2, pp1);
-                // if (direction.z == 0) {
-                    normal = glMatrix.vec3.fromValues(0.0, -1.0, 0.1);
-                    glMatrix.vec3.normalize(normal, normal);
-                // } else {
-                //     normal = glMatrix.vec3.fromValues(-direction.z, 0.0, direction.x);
-                //     glMatrix.vec3.normalize(normal, normal);
-                // }
-
-                // this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(-SIZE * 10, i * 10, z), color1, normal));
-                // this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(SIZE * 10, i * 10, z), color2, normal));
-
-                // const p1 = glMatrix.vec3.fromValues(i * 10, -SIZE * 10 + 5, -2*W);
-                // const p2 = glMatrix.vec3.fromValues(i * 10, SIZE * 10 + 5, -2*W);
-                // const p3 = glMatrix.vec3.fromValues(i * 10, SIZE * 10, 0);
-                // normal = this.calculateNormal(p1, p2, p3);
-                // this.m_triangles.push(new VertexData(p1, color1, normal));
-                // this.m_triangles.push(new VertexData(p2, color2, normal));
-                // this.m_triangles.push(new VertexData(p3, color3, normal));
-                // const p4 = glMatrix.vec3.fromValues(i * 10, -SIZE * 10, 0);
-                // const p5 = glMatrix.vec3.fromValues(i * 10, -SIZE * 10 + 5, -2*W);
-                // normal = this.calculateNormal(p3, p4, p5);
-                // this.m_triangles.push(new VertexData(p3, color3, normal));
-                // this.m_triangles.push(new VertexData(p4, color1, normal));
-                // this.m_triangles.push(new VertexData(p5, color3, normal));
-
-                // this.m_triangles.push(new VertexData(glMatrix.vec3.fromValues(i * 10 -W, -SIZE * 10, -2*W), color4, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
-                // this.m_triangles.push(new VertexData(glMatrix.vec3.fromValues(i * 10 -W, SIZE * 10, -2*W), color4, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
-                // this.m_triangles.push(new VertexData(glMatrix.vec3.fromValues(i * 10 +W, SIZE * 10, 0), color4, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
-                // this.m_triangles.push(new VertexData(glMatrix.vec3.fromValues(i * 10 +W, SIZE * 10, 0), color4, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
-                // this.m_triangles.push(new VertexData(glMatrix.vec3.fromValues(i * 10 +W, -SIZE * 10, 0), color4, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
-                // this.m_triangles.push(new VertexData(glMatrix.vec3.fromValues(i * 10 -W, -SIZE * 10, -2*W), color4, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
+            if (this.once) {
+                this.m_lines = new Vertexes();
+             //   console.log(this.m_lines);
             }
+
+            if (this.once) {
+                for (let i = -SIZE; i <= SIZE; i += MICROSTEP) {
+                    for (let j = -SIZE; j <= SIZE; j += MICROSTEP) {
+                        const z1 = bicubicInterpolate(i, j);
+                        const z2 = bicubicInterpolate(i + MICROSTEP, j);
+
+                        const p1 = glMatrix.vec3.fromValues(i, j, z1);
+                        const p2 = glMatrix.vec3.fromValues(i + (MICROSTEP), j, z2);
+
+                        const direction = glMatrix.vec3.create();
+                        glMatrix.vec3.sub(direction, p2, p1);
+
+                        let normal = glMatrix.vec3.create();
+                        if (direction.z == 0) {
+                            normal = glMatrix.vec3.fromValues(0.0, -1.0, 0.1);
+                        } else {
+                            normal = glMatrix.vec3.fromValues(-direction[2], 0.0, direction[0]);
+                        }
+                        glMatrix.vec3.normalize(normal, normal);
+
+                        this.m_lines.push(new VertexData(p1, color1, normal));
+                        this.m_lines.push(new VertexData(p2, color1, normal));
+
+                        this.m_lines.push(new VertexData(p1, color1, normal));
+                        const p3 = glMatrix.vec3.fromValues(p1[0], p1[1], p1[2]);
+                        glMatrix.vec3.add(p3, p1, normal);
+                        this.m_lines.push(new VertexData(p3, color1, normal));
+                    }
+                }
+                console.log('Lines: ' + this.m_lines.length);
+            }
+
+            if (this.once) {
+                //console.log(this.m_lines);
+            }
+
             this.once = false;
 
-            let a = 0;
-            for (const line of data) {
-                const p1 = glMatrix.vec3.fromValues(...line[0]);
-                const p2 = glMatrix.vec3.fromValues(...line[1]);
-
-                const direction = glMatrix.vec3.create();
-                glMatrix.vec3.sub(direction, p2, p1);
-
-                const pmid = glMatrix.vec3.create();
-                glMatrix.vec3.add(pmid, p1, p2);
-                glMatrix.vec3.scale(pmid, pmid, 0.5);
-
-                const v = glMatrix.vec3.create();
-                glMatrix.vec3.sub(v, pmid, eye);
-
-                normal = glMatrix.vec3.multiply(normal, v, direction);
-                glMatrix.vec3.normalize(normal, normal);
-
-                // if (direction.z == 0) {
-                //     normal = glMatrix.vec3.fromValues(0.0, -1.0, 0.1);
-                //     glMatrix.vec3.normalize(normal, normal);
-                // } else {
-                //     normal = glMatrix.vec3.fromValues(-direction.z, 0.0, direction.x);
-                //     glMatrix.vec3.normalize(normal, normal);
-                // }
-
-                // this.m_lines.push(new VertexData(p1, color1, normal));
-                // this.m_lines.push(new VertexData(p2, color1, normal));
-                //console.log(vertex);
-                if (a++ > 6000) break;
-            }
-
-            // this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(0,0,0), color1, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
-            // this.m_lines.push(new VertexData(eye, color2, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
-
+            const t0 = performance.now();
+            const ra = this.m_lines.toRawArray().concat(this.m_triangles.toRawArray())
+            //console.log('Draw time: ' + (performance.now() - t0));
             gl.bufferData(gl.ARRAY_BUFFER,
-                new Float32Array(this.m_lines.toRawArray().concat(this.m_triangles.toRawArray())), gl.STATIC_DRAW);
+                new Float32Array(ra), gl.STATIC_DRAW);
 
-            // gl.lineWidth(2);
-            // gl.enable(gl.DEPTH_TEST);
-            // shaderProgram.setUniformValue("blur", -3.0); gl.drawArrays(gl.LINES, 0, this.m_lines.length);
-            // shaderProgram.setUniformValue("blur", -1.5); gl.drawArrays(gl.LINES, 0, this.m_lines.length);
-            // shaderProgram.setUniformValue("blur", -2); gl.drawArrays(gl.LINES, 0, this.m_lines.length);
-            // shaderProgram.setUniformValue("blur", 2); gl.drawArrays(gl.LINES, 0, this.m_lines.length);
-            // gl.clear(gl.DEPTH_BUFFER_BIT);
-            //gl.disable(gl.DEPTH_TEST);
-            //shaderProgram.setUniformValue("blur", 0); gl.drawArrays(gl.LINES, 0, this.m_lines.length);
-
-            //shaderProgram.setUniformValue("blur", 0);
-            gl.drawArrays(gl.TRIANGLES, this.m_lines.length, this.m_triangles.length);
+//            gl.drawArrays(gl.TRIANGLES, this.m_lines.length, this.m_triangles.length);
             gl.drawArrays(gl.LINES, 0, this.m_lines.length);
-                        //console.log('draw lines', this.m_lines);
 
-            // this.m_lines.pop();
-            // this.m_lines.pop();
+            //console.log(new Float32Array(ra), this.m_lines.length, this.m_triangles.length);
         }
-
-        // if (this.m_points.length) {
-        //     gl.drawArrays(gl.gl.POINTS, this.m_triangles.length + this.m_lines.length, this.m_points.length);
-        // }
 
         //if (m_vao.isCreated()) m_vao.release(); else m_vbo.release();
     }

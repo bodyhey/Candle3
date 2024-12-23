@@ -173,11 +173,17 @@ class ShaderDrawable2 {
         return P2;
     }
 
-    triangleCenter(P1, P2, P3, mvpMatrix) {
+    pointsCenter(mvpMatrix, points) {
         let center = glMatrix.vec3.create();
-        glMatrix.vec3.add(center, this.vertexToScreen(P1, mvpMatrix), this.vertexToScreen(P2, mvpMatrix));
-        glMatrix.vec3.add(center, center, this.vertexToScreen(P3, mvpMatrix));
-        glMatrix.vec3.scale(center, center, 1.0 / 3.0);
+        const leng = points.length;
+        if (leng < 2) {
+            throw new Error('Not enough points');
+        }
+        glMatrix.vec3.add(center, this.vertexToScreen(points.shift(), mvpMatrix), this.vertexToScreen(points.shift(), mvpMatrix));
+        for (const P of points) {
+            glMatrix.vec3.add(center, center, this.vertexToScreen(P, mvpMatrix));
+        }
+        glMatrix.vec3.scale(center, center, 1.0 / leng);
         return center;
     }
 
@@ -241,44 +247,68 @@ class ShaderDrawable2 {
             const c5 = glMatrix.vec3.fromValues(1, 0, 1);
             const c6 = glMatrix.vec3.fromValues(0, 1, 1);
 
-            const cubeTriangles = [
+            const cubeQuads = [
                 // Przednia ściana (z = SIZE)
-                [[-SIZE, -SIZE, SIZE],  [SIZE, -SIZE, SIZE],  [SIZE, SIZE, SIZE], c1],
-                [[-SIZE, -SIZE, SIZE],  [SIZE, SIZE, SIZE],  [-SIZE, SIZE, SIZE], c1],
+                [
+                    [[-SIZE, -SIZE, SIZE],  [SIZE, -SIZE, SIZE],  [SIZE, SIZE, SIZE],
+                    [-SIZE, -SIZE, SIZE],  [SIZE, SIZE, SIZE],  [-SIZE, SIZE, SIZE]],
+                    c1,
+                ],
                 // Tylna ściana (z = -SIZE)
-                [[-SIZE, -SIZE, -SIZE],  [SIZE, SIZE, -SIZE],  [SIZE, -SIZE, -SIZE], c2],
-                [[-SIZE, -SIZE, -SIZE],  [-SIZE, SIZE, -SIZE],  [SIZE, SIZE, -SIZE], c2],
+                [
+                    [[-SIZE, -SIZE, -SIZE],  [SIZE, SIZE, -SIZE],  [SIZE, -SIZE, -SIZE],
+                    [-SIZE, -SIZE, -SIZE],  [-SIZE, SIZE, -SIZE],  [SIZE, SIZE, -SIZE]],
+                    c2,
+                ],
                 // Lewa ściana (x = -SIZE)
-                [[-SIZE, -SIZE, -SIZE],  [-SIZE, -SIZE, SIZE],  [-SIZE, SIZE, SIZE], c3],
-                [[-SIZE, -SIZE, -SIZE],  [-SIZE, SIZE, SIZE],  [-SIZE, SIZE, -SIZE], c3],
+                [
+                    [[-SIZE, -SIZE, -SIZE],  [-SIZE, -SIZE, SIZE],  [-SIZE, SIZE, SIZE],
+                    [-SIZE, -SIZE, -SIZE],  [-SIZE, SIZE, SIZE],  [-SIZE, SIZE, -SIZE]],
+                    c3,
+                ],
                 // Prawa ściana (x = SIZE)
-                [[SIZE, -SIZE, -SIZE],  [SIZE, SIZE, SIZE],  [SIZE, -SIZE, SIZE], c4],
-                [[SIZE, -SIZE, -SIZE],  [SIZE, SIZE, -SIZE],  [SIZE, SIZE, SIZE], c4],
+                [
+                    [[SIZE, -SIZE, -SIZE],  [SIZE, SIZE, SIZE],  [SIZE, -SIZE, SIZE],
+                    [SIZE, -SIZE, -SIZE],  [SIZE, SIZE, -SIZE],  [SIZE, SIZE, SIZE]],
+                    c4,
+                ],
                 // Dolna ściana (y = -SIZE)
-                [[-SIZE, -SIZE, -SIZE],  [SIZE, -SIZE, -SIZE],  [SIZE, -SIZE, SIZE], c5],
-                [[-SIZE, -SIZE, -SIZE],  [SIZE, -SIZE, SIZE],  [-SIZE, -SIZE, SIZE], c5],
+                [
+                    [[-SIZE, -SIZE, -SIZE],  [SIZE, -SIZE, -SIZE],  [SIZE, -SIZE, SIZE],
+                    [-SIZE, -SIZE, -SIZE],  [SIZE, -SIZE, SIZE],  [-SIZE, -SIZE, SIZE]],
+                    c5,
+                ],
                 // Górna ściana (y = SIZE)
-                [[-SIZE, SIZE, -SIZE],  [SIZE, SIZE, SIZE],  [SIZE, SIZE, -SIZE], c6],
-                [[-SIZE, SIZE, -SIZE],  [-SIZE, SIZE, SIZE],  [SIZE, SIZE, SIZE], c6],
+                [
+                    [[-SIZE, SIZE, -SIZE],  [SIZE, SIZE, SIZE],  [SIZE, SIZE, -SIZE],
+                    [-SIZE, SIZE, -SIZE],  [-SIZE, SIZE, SIZE],  [SIZE, SIZE, SIZE]],
+                    c6,
+                ],
             ];
 
             const cubeTrianglesSorted = [];
-            for (const triangle of cubeTriangles) {
-                const center = this.triangleCenter(...triangle, mvpMatrix);
+            for (const quad of cubeQuads) {
+                const [points, color] = quad;
+                const center = this.pointsCenter(mvpMatrix, [points[0], points[1], points[2], points[4]]);
                 const length = glMatrix.vec3.length(center);
-                cubeTrianglesSorted.push([center, length, triangle]);
+                cubeTrianglesSorted.push([center, length, color, [points[0], points[1], points[2]]]);
+                cubeTrianglesSorted.push([center, length, color, [points[3], points[4], points[5]]]);
             }
 
-            cubeTrianglesSorted.sort((a, b) => a[1] - b[1]);
+            cubeTrianglesSorted.sort((a, b) => b[1] - a[1]);
 
-            console.log('s', cubeTrianglesSorted);
-            // return;
-
+            const colors = [
+                glMatrix.vec3.fromValues(1, 0, 0),
+                glMatrix.vec3.fromValues(0, 1, 0),
+                glMatrix.vec3.fromValues(0, 0, 1),
+                glMatrix.vec3.fromValues(1, 1, 0),
+                glMatrix.vec3.fromValues(1, 0, 1),
+                glMatrix.vec3.fromValues(0, 1, 1),
+            ];
 
             let ic = 0;
-            for (const [center,length,triangle] of cubeTrianglesSorted) {
-                console.log(triangle);
-                const color = triangle.pop();
+            for (const [center,length,color, triangle] of cubeTrianglesSorted) {
+                //console.log(triangle);
                 for (const vertex of triangle) {
                     this.m_triangles.push(
                         new VertexData(
@@ -287,13 +317,13 @@ class ShaderDrawable2 {
                             glMatrix.vec3.fromValues(0, 0, 1)
                         )
                     );
-                    this.m_lines.push(
-                        new VertexData(
-                            glMatrix.vec3.fromValues(...vertex),
-                            color,
-                            glMatrix.vec3.fromValues(NaN, NaN, NaN)
-                        )
-                    );
+                    // this.m_lines.push(
+                    //     new VertexData(
+                    //         glMatrix.vec3.fromValues(...vertex),
+                    //         color,
+                    //         glMatrix.vec3.fromValues(NaN, NaN, NaN)
+                    //     )
+                    // );
                 }
                 ic++;
             }

@@ -21,13 +21,19 @@ class Vertexes extends Array {
     }
 
     toRawArray() {
-        const raw = [];
+        const raw = new Array(this.length * 9);
+        let index = 0;
         for (const vertex of this) {
-            raw.push(...vertex.m_position);
-            raw.push(...vertex.m_color);
-            raw.push(...vertex.m_start);
+            raw[index++] = vertex.m_position[0];
+            raw[index++] = vertex.m_position[1];
+            raw[index++] = vertex.m_position[2];
+            raw[index++] = vertex.m_color[0];
+            raw[index++] = vertex.m_color[1];
+            raw[index++] = vertex.m_color[2];
+            raw[index++] = vertex.m_start[0];
+            raw[index++] = vertex.m_start[1];
+            raw[index++] = vertex.m_start[2];
         }
         return raw;
-        return new Float32Array(raw)    ;
     }
 }
