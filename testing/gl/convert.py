@@ -1,4 +1,5 @@
 import os
+import math
 
 def read_file(filename):
     with open(filename, 'r') as f:
@@ -40,25 +41,84 @@ print(vertexes)
 print(normals)
 print(faces)
 
-def new_func(f, vertex):
+colors = [
+    [1.0, 0.0, 0.0],
+    [0.0, 1.0, 0.0],
+    [0.0, 0.0, 1.0],
+    [1.0, 1.0, 0.0],
+    [1.0, 0.0, 1.0],
+    [0.0, 1.0, 1.0],
+    [1.0, 1.0, 1.0],
+    [0.5, 0.5, 0.5],
+    [0.5, 0.0, 0.0],
+    [0.0, 0.5, 0.0],
+    [0.0, 0.0, 0.5],
+    [0.5, 0.5, 0.0],
+    [0.5, 0.0, 0.5],
+    [0.0, 0.5, 0.5],
+    [0.5, 0.5, 0.5],
+    [0.25, 0.25, 0.25],
+    [0.25, 0.0, 0.0],
+    [0.0, 0.25, 0.0],
+    [0.0, 0.0, 0.25],
+    [0.25, 0.25, 0.0],
+    [0.25, 0.0, 0.25],
+    [0.0, 0.25, 0.25],
+    [0.25, 0.25, 0.25],
+    [1.0, 0.5, 0.0],
+    [1.0, 0.0, 0.5],
+    [0.5, 1.0, 0.0],
+    [0.5, 0.0, 1.0],
+    [0.0, 1.0, 0.5],
+    [0.0, 0.5, 1.0],
+    [1.0, 0.5, 0.5],
+    [1.0, 0.0, 1.0],
+    [0.5, 1.0, 0.5],
+    [0.5, 0.0, 1.0],
+    [0.0, 1.0, 0.5],
+    [0.0, 0.5, 1.0],
+    [1.0, 0.5, 1.0],
+    [1.0, 1.0, 0.5],
+    [0.5, 1.0, 1.0],
+    [0.5, 1.0, 1.0],
+    [0.5, 0.5, 1.0],
+    [1.0, 0.5, 1.0],
+    [1.0, 1.0, 0.5],
+    [0.5, 1.0, 1.0],
+    [0.5, 1.0, 1.0],
+    [0.5, 0.5, 1.0],
+    [1.0, 0.5, 1.0],
+]
+
+def write_vertex(f, vertex, color):
     [vi, vni] = vertex
     v = vertexes[vi]
     vn = normals[vni]
             
-    print("%f, %f, %f, 1.0, 0.0, 0.0, %f, %f, %f," % (v[0], v[1], v[2], vn[0], vn[1], vn[2]))
-    f.write("%f, %f, %f, 1.0, 0.0, 0.0, %f, %f, %f,\n" % (v[0], v[1], v[2], vn[0], vn[1], vn[2]))
+    print("%f, %f, %f, %f, %f, %f, %f, %f, %f," % (v[0], v[1], v[2], color[0], color[1], color[2], vn[0], vn[1], vn[2]))
+    f.write("%f, %f, %f, %f, %f, %f, %f, %f, %f,\n" % (v[0], v[1], v[2], color[0], color[1], color[2], vn[0], vn[1], vn[2]))
+    
+def write_lines(iface, face, write_vertex, f):
+    write_vertex(f, face[0], colors[iface])
+    write_vertex(f, face[1], colors[iface])
+    write_vertex(f, face[1], colors[iface])
+    write_vertex(f, face[2], colors[iface])
+    write_vertex(f, face[2], colors[iface])
+    write_vertex(f, face[0], colors[iface])
+    
+def write_face(iface, face, write_vertex, f):
+    write_vertex(f, face[0], colors[iface])
+    write_vertex(f, face[1], colors[iface])
+    write_vertex(f, face[2], colors[iface])
 
 with open("cube_.js", 'w') as f:
     print("const cube = [")
     f.write("const cube = [\n")
     for iface, face in enumerate(faces):
+        
         f.write("// f %d\n" % iface)
-        new_func(f, face[0])
-        new_func(f, face[1])
-        new_func(f, face[1])
-        new_func(f, face[2])
-        new_func(f, face[2])
-        new_func(f, face[0])
+        # write_lines(face, write_vertex, f)
+        write_face(math.floor(iface / 2), face, write_vertex, f)
         
     print("];")
     f.write("];\n")

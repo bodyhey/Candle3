@@ -25,7 +25,7 @@ class ShaderProgram {
             return null;
         }
 
-        //console.log("ShaderProgram created");
+        console.log("ShaderProgram created");
 
         gl.attachShader(this.m_program, this.m_fragmentShader);
         gl.attachShader(this.m_program, this.m_vertexShader);
@@ -43,7 +43,7 @@ class ShaderProgram {
 
     setUniformValueMatrix(name, matrix) {
         const location = gl.getUniformLocation(this.m_program, name);
-        if (location == -1) {
+        if (location == -1 || location == null) {
             throw "Could not find " + name;
         }
         gl.uniformMatrix4fv(location, false, matrix.values().toArray());
@@ -52,7 +52,8 @@ class ShaderProgram {
 
     setUniformValueVec3(name, vec3) {
         const location = gl.getUniformLocation(this.m_program, name);
-        if (location == -1) {
+        console.log(name, location); 
+        if (location == -1 || location == null) {
             throw "Could not find " + name;
         }
         gl.uniform3fv(location, vec3);
@@ -64,7 +65,7 @@ class ShaderProgram {
 
     attributeLocation(name) {
         const loc = gl.getAttribLocation(this.m_program, name);
-        if (loc == -1) {
+        if (loc == -1 || loc == null) {
             throw "Could not find " + name;
         }
 
@@ -83,7 +84,7 @@ class ShaderProgram {
 
     setAttributeValue(name, value) {
         const location = gl.getAttribLocation(this.m_program, name);
-        if (location == -1) {
+        if (location == -1 || location == null) {
             throw "Could not find " + name;
         }
         gl.vertexAttrib1f(location, value);
@@ -91,7 +92,7 @@ class ShaderProgram {
 
     setUniformValue(name, value) {
         const location = gl.getUniformLocation(this.m_program, name);
-        if (location == -1) {
+        if (location == -1 || location == null) {
             throw "Could not find " + name;
         }
         gl.uniform1f(location, value);

@@ -1,9 +1,12 @@
 class Cube {
-    constructor() {
+    constructor(width, height) {
+        this.width = width;
+        this.height = height;
         this.m_eye = glMatrix.vec3.create();
         this.m_lookAt = glMatrix.vec3.create();
         this.m_viewMatrix = glMatrix.mat4.create();
         this.m_projectionMatrix = glMatrix.mat4.create();
+        this.m_rotation = glMatrix.vec3.fromValues(0, 0, 50);
         this.lightRot = 0.2;
         this.m_zoomDistance = Utils.DEFAULT_ZOOM;
         this.m_fov = 36.0;
@@ -14,12 +17,11 @@ class Cube {
         this.m_yRot = 0.0;
         this.m_fbo = gl.createFramebuffer();
         this.m_vbo = gl.createBuffer();
-        gl.createRenderbuffer();
-        this.renderTexture = this.createTexture(512, 512);
-        this.m_program = new ShaderProgram(vertexShaderSource1, fragmentShaderSource1);
+        this.renderTexture = this.createTexture();
+        this.m_program = new ShaderProgram(vertexShaderSource1Cube, fragmentShaderSource1Cube);
         this.draw();
     }
-    createTexture(width, height) {
+    createTexture() {
         var texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texImage2D(
@@ -28,11 +30,11 @@ class Cube {
         // Mipmap level.  Always 0.
         0, 
         // Internal format of each pixel.  Here we want an RGBA texture.
-        gl.RGBA, 
+        gl.RGBA8, 
         // Width of the texture.
-        width, 
+        this.width, 
         // Height of the texture.
-        height, 
+        this.height, 
         // Width of the border of the texture.  Always 0.
         0, 
         // The pixel format of the data that is going to be uploaded to the GPU.
@@ -40,7 +42,7 @@ class Cube {
         gl.RGBA, 
         // The type of each component of the pixel that is going to be uploaded.
         // Here we want a floating point texture.
-        gl.FLOAT, 
+        gl.UNSIGNED_BYTE, 
         // The data that is going to be uploaded.
         // We don't have any data, so we give null.
         // WebGL will just allocate the texture and leave it blank.
@@ -51,12 +53,6 @@ class Cube {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.bindTexture(gl.TEXTURE_2D, null);
         return texture;
-    }
-    width() {
-        return canvas.width;
-    }
-    height() {
-        return canvas.height;
     }
     updateProjection() {
         // Reset projection
@@ -91,7 +87,11 @@ class Cube {
         // zamiast `eye * m_zoomDistance`
         const eye2 = glMatrix.vec3.create();
         //        glMatrix.vec3.multiply(eye, eye, glMatrix.vec3.fromValues(this.m_zoomDistance, this.m_zoomDistance, this.m_zoomDistance));
-        glMatrix.mat4.lookAt(this.m_viewMatrix, [1, 0, 50], [0, 0, 0], [0, 1, 0]);
+        const distance = 50; // [0, 0, 50]
+        glMatrix.vec3.normalize(this.m_rotation, this.m_rotation);
+        glMatrix.vec3.scale(this.m_rotation, this.m_rotation, distance);
+        console.log(this.m_rotation);
+        glMatrix.mat4.lookAt(this.m_viewMatrix, this.m_rotation, [0, 0, 0], [0, 1, 0]);
         //this.m_viewMatrix.lookAt(eye * m_zoomDistance, QVector3D(0,0,0), up.normalized());
         //glMatrix.mat4.rotate(this.m_viewMatrix, this.m_viewMatrix, Utils.toRadians(-90), glMatrix.vec3.fromValues(1.0, 0.0, 0.0));
         // this.m_viewMatrix.rotate(-90, 1.0, 0.0, 0.0);
@@ -100,29 +100,26 @@ class Cube {
         //glMatrix.mat4.translate(this.m_viewMatrix, this.m_viewMatrix, lookAt);
         this.m_eye = eye;
     }
+    updateRotation(x, y, z) {
+        this.m_rotation = glMatrix.vec3.fromValues(x, y, z);
+        this.draw();
+    }
     drawCube() {
-        let offset = 0;
         this.m_program.bind();
         this.updateProjection();
         this.updateView();
         //
         const mvpMatrix = glMatrix.mat4.create();
         glMatrix.mat4.multiply(mvpMatrix, this.m_projectionMatrix, this.m_viewMatrix);
-        // Set modelview-projection matrix
         this.m_program.setUniformValueMatrix("mvp_matrix", mvpMatrix);
-        this.m_program.setUniformValueMatrix("mv_matrix", this.m_viewMatrix);
-        this.m_program.setUniformValueVec3("eye", this.m_eye);
-        this.m_program.setUniformValueVec3("u_light_color", glMatrix.vec3.fromValues(0.9, 0.6, 0.9));
-        this.m_program.setUniformValueVec3("u_object_color", glMatrix.vec3.fromValues(1.0, 1.0, 1.0));
-        const light_pos = glMatrix.vec3.fromValues(1110, 1111, 11);
-        //console.log(light_pos);
-        const light_matrix = glMatrix.mat4.create();
-        glMatrix.mat4.identity(light_matrix);
-        glMatrix.mat4.rotateZ(light_matrix, light_matrix, this.lightRot);
-        glMatrix.vec3.transformMat4(light_pos, light_pos, light_matrix);
-        this.m_program.setUniformValueVec3("u_light_position", light_pos);
+        //this.m_program.setUniformValueMatrix("mv_matrix", this.m_viewMatrix);
+        const cMatrix = glMatrix.mat4.create();
+        //        glMatrix.mat4.rotate(cMatrix, cMatrix, 1.0, this.m_rotation);
+        glMatrix.mat4.scale(cMatrix, cMatrix, glMatrix.vec3.fromValues(0.9, 0.9, 0.9));
+        this.m_program.setUniformValueMatrix("c_matrix", cMatrix);
         //
         gl.bindBuffer(gl.ARRAY_BUFFER, this.m_vbo);
+        let offset = 0;
         // Tell OpenGL programmable pipeline how to locate vertex position data
         const vertexLocation = this.m_program.attributeLocation("a_position");
         this.m_program.enableAttributeArray(vertexLocation);
@@ -136,19 +133,22 @@ class Cube {
         // Offset for line start point
         offset += Utils.VECTOR3D_SIZE;
         // Tell OpenGL programmable pipeline how to locate vertex line start point
-        const startLocation = this.m_program.attributeLocation("a_normal");
-        this.m_program.enableAttributeArray(startLocation);
-        this.m_program.setAttributeBuffer(startLocation, gl.FLOAT, offset, 3, Utils.VERTEX_SIZE);
+        // const startLocation = this.m_program.attributeLocation("a_normal");
+        // this.m_program.enableAttributeArray(startLocation);
+        // this.m_program.setAttributeBuffer(startLocation, gl.FLOAT, offset, 3, Utils.VERTEX_SIZE);        
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cube), gl.STATIC_DRAW);
+        gl.enable(gl.DEPTH_TEST);
+        gl.enable(gl.CULL_FACE);
         // gl.clearColor(0, 1, 1, 0.8);
         // gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-        gl.drawArrays(gl.LINES, 0, cube.length / 9);
+        gl.drawArrays(gl.TRIANGLES, 0, cube.length / 9);
+        gl.disable(gl.CULL_FACE);
         this.m_program.release();
         gl.flush();
     }
     draw() {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_fbo);
-        gl.viewport(0, 0, 512, 512);
+        gl.viewport(0, 0, this.width, this.height);
         // // Step 2: Attach the texture to the FBO.
         gl.framebufferTexture2D(
         // First argument is always gl.FRAMEBUFFER
@@ -170,7 +170,7 @@ class Cube {
         0);
         // Step 3: Do your rendering as usual.
         {
-            gl.clearColor(0, 0, 1, 0.8);
+            gl.clearColor(0, 0, 0, 0.5);
             gl.clear(gl.COLOR_BUFFER_BIT);
             this.drawCube();
             // Step 4: Flush the buffer just to be sure everything is rendered to the texture.

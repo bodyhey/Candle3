@@ -1,6 +1,6 @@
+
 declare var gl: WebGL2RenderingContext;
 declare var canvas: HTMLCanvasElement;
-declare var glMatrix: any;
 
 declare var vertexShaderSource1: string;
 declare var fragmentShaderSource1: string;
@@ -8,61 +8,6 @@ declare var vertexShaderSource2: string;
 declare var fragmentShaderSource2: string;
 declare var vertexShaderSource2d: string;
 declare var fragmentShaderSource2d: string;
-
-declare class ShaderProgram {
-    constructor(vertexShaderSource: string, fragmentShaderSource: string);
-    bind(): void;
-    release(): void;
-    setUniformValueMatrix(name: string, matrix: any): void;
-    setUniformValueVec3(name: string, vec: any): void;
-    attributeLocation(name: string): number;
-    enableAttributeArray(location: number): void;
-    setAttributeBuffer(location: number, type: number, offset: number, size: number, stride: number): void;    
-};
-declare interface Cube {
-    renderTexture: WebGLTexture | null;
-};
-declare class ShaderDrawable1 {
-    constructor(shaderProgram: ShaderProgram);
-    needsUpdateGeometry(): boolean;
-    updateGeometry(): void;
-    draw(eye2: any, mvpMatrix: any): void;
-    getVertexCount(): any;
-}
-declare class ShaderDrawable2 {
-    constructor(shaderProgram: ShaderProgram);
-    needsUpdateGeometry(): boolean;
-    updateGeometry(): void;
-    draw(eye2: any, mvpMatrix: any): void;
-    getVertexCount(): any;
-}
-declare class ShaderDrawable3 {
-    constructor(shaderProgram: ShaderProgram);
-    needsUpdateGeometry(): boolean;
-    updateGeometry(): void;
-    draw(eye2: any, mvpMatrix: any): void;
-    getVertexCount(): any;
-}
-declare class QColor {
-    constructor(r: number, g: number, b: number);
-    redF(): number;
-    greenF(): number;
-    blueF(): number;
-}
-declare class Utils {
-    static DEFAULT_ZOOM: number;
-    static MIN_ZOOM: number;
-    static ZOOMSTEP: number;
-    static ONE_DEG_IN_RAD: number;
-    static MAGIC_ZOOM_MULTIPLIER: number;
-    static M_PI: number;
-    static VERTEX_SIZE: number;
-    static VECTOR3D_SIZE: number;
-    static VECTOR2D_SIZE: number;
-    static GL_FLOAT_SIZE: number;
-    static qIsNaN(value: number): boolean;
-    static toRadians(degrees: number): number;
-}   
 
 class GLWidget {
     m_zBuffer = true;
@@ -85,7 +30,7 @@ class GLWidget {
     // m_yRotTarget;
     m_zoomDistance;
     m_lastPos = {x: 0, y: 0};
-    m_lookAt = glMatrix.vec3.create(0, 0, 0);
+    m_lookAt = glMatrix.vec3.fromValues(0, 0, 0);
     m_eye = glMatrix.vec3.create();
     m_eye2 = glMatrix.vec3.create();
     m_perspective = false;
@@ -110,7 +55,7 @@ class GLWidget {
 
         setTimeout(() => {
             this.setPerspectiveView();
-        }, 100);
+        }, 10);
     }
 
     rotate() {
@@ -164,26 +109,37 @@ class GLWidget {
         //onsole.log(this.m_xRot, this.m_yRot, angX, angY);
         //console.log('ang', angX, angY, Math.cos(angX));
 
-        const eye = glMatrix.vec3.fromValues(Math.cos(angX) * Math.sin(angY), Math.sin(angX), Math.cos(angX) * Math.cos(angY));
+        const eye = glMatrix.vec3.fromValues(
+            Math.cos(angX) * Math.sin(angY),
+            Math.sin(angX),
+            Math.cos(angX) * Math.cos(angY)
+        );
+        //console.log(eye.to this.m_xRot, this.m_yRot);
         const up = glMatrix.vec3.fromValues(
             Math.abs(this.m_xRot) == 90 ? -Math.sin(angY + (this.m_xRot < 0 ? Utils.M_PI : 0)) : 0,
             Math.cos(angX),
             Math.abs(this.m_xRot) == 90 ? -Math.cos(angY + (this.m_xRot < 0 ? Utils.M_PI : 0)) : 0
         );
 
-        // zamiast `eye * m_zoomDistance`
-        const eye2 = glMatrix.vec3.create();
         glMatrix.vec3.multiply(eye, eye, glMatrix.vec3.fromValues(this.m_zoomDistance, this.m_zoomDistance, this.m_zoomDistance));
 
         glMatrix.mat4.lookAt(this.m_viewMatrix, eye, glMatrix.vec3.create(), glMatrix.vec3.normalize(up, up));
-        //this.m_viewMatrix.lookAt(eye * m_zoomDistance, QVector3D(0,0,0), up.normalized());
-        glMatrix.mat4.rotate(this.m_viewMatrix, this.m_viewMatrix, Utils.toRadians(-90), glMatrix.vec3.fromValues(1.0, 0.0, 0.0));
-        // this.m_viewMatrix.rotate(-90, 1.0, 0.0, 0.0);
+        //glMatrix.mat4.rotate(this.m_viewMatrix, this.m_viewMatrix, Utils.toRadians(-90), glMatrix.vec3.fromValues(1.0, 0.0, 0.0));
+
         const lookAt = glMatrix.vec3.create();
         glMatrix.vec3.multiply(lookAt, this.m_lookAt, glMatrix.vec3.fromValues(-1, -1, -1));
         glMatrix.mat4.translate(this.m_viewMatrix, this.m_viewMatrix, lookAt);
 
         this.m_eye = eye;
+
+        this.cube.updateRotation(
+            eye[0], eye[1], eye[2],
+
+            // Math.cos(angX) * Math.sin(angY) * Math.PI, 
+            // Math.sin(angX)* Math.PI, 
+            // Math.cos(angX) * Math.cos(angY)* Math.PI
+        );
+        gl.viewport(0, 0, this.width(), this.height());
     }
 
     fitDrawable(drawable: any)
@@ -317,7 +273,7 @@ class GLWidget {
             glMatrix.mat4.invert(mvpi, mvp);
 
             const centerVector = glMatrix.vec4.create();
-            glMatrix.vec4.transformMat4(centerVector, glMatrix.vec4.fromValues(...this.m_lookAt, 1.0), mvp);
+            glMatrix.vec4.transformMat4(centerVector, glMatrix.vec4.fromValues(this.m_lookAt[0], this.m_lookAt[1], this.m_lookAt[2], 1.0), mvp);
 
             // Get last mouse XY in clip
             const lastMouseInWorld = glMatrix.vec4.fromValues(
@@ -351,7 +307,7 @@ class GLWidget {
             //console.log(difference);
 
             // Subtract difference from center point
-            glMatrix.vec3.subtract(this.m_lookAt, this.m_lookAt, glMatrix.vec3.fromValues(...difference));
+            glMatrix.vec3.subtract(this.m_lookAt, this.m_lookAt, glMatrix.vec3.fromValues(difference[0], difference[1], difference[2]));
 
             this.m_lastPos = {x: event.clientX, y: event.clientY};
 
@@ -421,10 +377,10 @@ class GLWidget {
 
             // Set modelview-projection matrix
             program.setUniformValueMatrix("mvp_matrix", mvpMatrix);
-            program.setUniformValueMatrix("mv_matrix", this.m_viewMatrix);
-            program.setUniformValueVec3("eye", this.m_eye);
-            program.setUniformValueVec3("u_light_color", glMatrix.vec3.fromValues(0.9, 0.6, 0.9));
-            program.setUniformValueVec3("u_object_color", glMatrix.vec3.fromValues(1.0, 1.0, 1.0));
+            //program.setUniformValueMatrix("mv_matrix", this.m_viewMatrix);
+            // program.setUniformValueVec3("eye", this.m_eye);
+            // program.setUniformValueVec3("u_light_color", glMatrix.vec3.fromValues(0.9, 0.6, 0.9));
+            // program.setUniformValueVec3("u_object_color", glMatrix.vec3.fromValues(1.0, 1.0, 1.0));
 
             const light_pos = glMatrix.vec3.fromValues(1110, 1111, 11);
             //console.log(light_pos);
@@ -432,7 +388,7 @@ class GLWidget {
             glMatrix.mat4.identity(light_matrix);
             glMatrix.mat4.rotateZ(light_matrix, light_matrix, this.lightRot);
             glMatrix.vec3.transformMat4(light_pos, light_pos, light_matrix);
-            program.setUniformValueVec3("u_light_position", light_pos);
+            // /program.setUniformValueVec3("u_light_position", light_pos);
             //console.log(light_pos);
 
             program.release();
@@ -494,7 +450,7 @@ class GLWidget {
         const trx = (pos: number) => (pos / this.width()) * 2.0 - 1.0;
         const try_ = (pos: number) => (pos / this.height()) * 2.0 - 1.0;
 
-        const SIZE = 512;
+        const SIZE = 100;
         const LEFT = trx(0);
         const RIGHT = trx(SIZE + 0);
         const TOP = try_(this.height() - 0);

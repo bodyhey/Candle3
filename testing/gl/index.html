@@ -22,6 +22,7 @@
         <script src="shaders1.js"></script>
         <script src="shaders2.js"></script>
         <script src="shaders2d.js"></script>
+        <script src="shaders1cube.js"></script>
         <script src="webgl-debug.js"></script>
         <script src="color.js"></script>
         <script src="vertex.js"></script>
@@ -39,17 +40,7 @@
                 alert("Failed to retrieve the <canvas> element");
             }
 
-            let gl = canvas.getContext("webgl", {antialias: false});
-            var ext = gl.getExtension("OES_vertex_array_object");
-            if (!ext) {
-                alert("this machine or browser does not support OES_vertex_array_object");
-            }
-            gl.createVertexArray = ext.createVertexArrayOES.bind(ext);
-            var ext = gl.getExtension("OES_texture_float");
-            if (!ext) {
-                alert("this machine or browser does not support OES_texture_float");
-            }   
-            console.log(gl.getExtension("OES_texture_float_linear"));
+            let gl = canvas.getContext("webgl2");
 
             gl = WebGLDebugUtils.makeDebugContext(gl,
                 function (err, funcName, args) {
@@ -57,7 +48,7 @@
                 }
             );
 
-            const glWidget = new GLWidget(new Cube());
+            const glWidget = new GLWidget(new Cube(100, 100));
             setInterval(() => {
                 glWidget.paintEvent();
                 glWidget.rotate();
