@@ -23,6 +23,18 @@ struct VertexData
     QVector3D start;
 };
 
+struct _2DTexturedVertexData
+{
+    _2DTexturedVertexData() {}
+    _2DTexturedVertexData(QVector2D pos, QVector2D tex) {
+        position = pos;
+        texCoord = tex;
+    }
+
+    QVector2D position;
+    QVector2D texCoord;
+};
+
 class ShaderDrawable : protected QOpenGLFunctions
 {
 public:

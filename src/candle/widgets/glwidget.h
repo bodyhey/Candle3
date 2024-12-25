@@ -10,12 +10,14 @@
 #include <QOpenGLWidget>
 #endif
 
+#include <QOpenGLFunctions_3_0>
 #include <QTimer>
 #include <QTime>
 #include "drawers/shaderdrawable.h"
+#include "drawers/cubedrawer.h"
 
 #ifdef GLES
-class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
+class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_0
 #else
 class GLWidget : public QGLWidget, protected QOpenGLFunctions
 #endif
@@ -144,6 +146,7 @@ private:
     QOpenGLShaderProgram *m_shaderProgram;
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_viewMatrix;
+    CubeDrawer m_cubeDrawer;
 
     QColor m_colorBackground;
     QColor m_colorText;

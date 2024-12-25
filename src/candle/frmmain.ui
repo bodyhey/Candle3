@@ -1411,13 +1411,20 @@ QLabel[overrided=&quot;false&quot;] {
      <property name="leftMargin">
       <number>0</number>
      </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
      <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
       <widget class="QFrame" name="fraProgram">
        <property name="styleSheet">
-        <string notr="true">border: 1px solid gray;</string>
+        <string notr="true">border: 1px solid gray;
+border-top: 0;</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::Shape::StyledPanel</enum>

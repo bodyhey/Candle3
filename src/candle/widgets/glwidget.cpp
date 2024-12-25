@@ -416,11 +416,8 @@ void GLWidget::initializeGL()
     m_shaderProgram = new QOpenGLShaderProgram();
 
     if (m_shaderProgram) {
-        // Compile vertex shader
-        m_shaderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vshader.glsl");
-        // Compile fragment shader
-        m_shaderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fshader.glsl");
-        // Link shader pipeline
+        m_shaderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/base_vertex.glsl");
+        m_shaderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/base_fragment.glsl");
         m_shaderProgram->link();
         qDebug() << "shader program created";
     }
@@ -467,6 +464,8 @@ void GLWidget::updateView()
 
     QVector3D eye(cos(angX) * sin(angY), sin(angX), cos(angX) * cos(angY));
     QVector3D up(fabs(m_xRot) == 90 ? -sin(angY + (m_xRot < 0 ? M_PI : 0)) : 0, cos(angX), fabs(m_xRot) == 90 ? -cos(angY + (m_xRot < 0 ? M_PI : 0)) : 0);
+
+    m_cubeDrawer.updateEyePosition(eye);
 
     m_viewMatrix.lookAt(eye * m_zoomDistance, QVector3D(0,0,0), up.normalized());
     m_viewMatrix.rotate(-90, 1.0, 0.0, 0.0);
@@ -548,6 +547,11 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
 
         m_shaderProgram->release();
     }
+
+    m_cubeDrawer.draw(QRect(0, height() - 100, 100, 100));
+
+    // viewport was changed by cube drawer
+    glViewport(0, 0, this->width(), this->height());
 
     // Draw 2D
     glDisable(GL_DEPTH_TEST);
