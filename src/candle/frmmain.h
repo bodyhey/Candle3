@@ -137,6 +137,7 @@ private slots:
     void on_cmdFront_clicked();
     void on_cmdLeft_clicked();
     void on_cmdIsometric_clicked();
+    void on_cmdRotationCube_clicked();
     void on_cmdToggleProjection_clicked();
     void on_cmdFit_clicked();
     void on_grpOverriding_toggled(bool checked);

@@ -1604,6 +1604,32 @@ border-top: 0;</string>
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QToolButton" name="cmdRotationCube">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Left view</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="images.qrc">
+            <normaloff>:/images/rotation_cube.png</normaloff>:/images/rotation_cube.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>

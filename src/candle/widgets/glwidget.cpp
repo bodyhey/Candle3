@@ -341,6 +341,11 @@ void GLWidget::toggleProjectionType() {
     updateView();
 }
 
+void GLWidget::toggleRotationCube()
+{
+    m_rotationCube = !m_rotationCube;
+}
+
 void GLWidget::setIsometricView()
 {
     m_perspective = false;
@@ -548,10 +553,12 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
         m_shaderProgram->release();
     }
 
-    m_cubeDrawer.draw(QRect(0, height() - 100, 100, 100));
+    if (m_rotationCube) {
+        m_cubeDrawer.draw(QRect(0, height() - 100, 100, 100));
 
-    // viewport was changed by cube drawer
-    glViewport(0, 0, this->width(), this->height());
+        // viewport was changed by cube drawer
+        glViewport(0, 0, this->width(), this->height());
+    }
 
     // Draw 2D
     glDisable(GL_DEPTH_TEST);

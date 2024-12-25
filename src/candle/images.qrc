@@ -49,5 +49,6 @@
         <file>images/axis_zero.svg</file>
         <file>images/zero_z.png</file>
         <file>images/zero_z.svg</file>
+        <file>images/rotation_cube.png</file>
     </qresource>
 </RCC>

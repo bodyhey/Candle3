@@ -49,6 +49,7 @@ public:
     void setFrontView();
     void setLeftView();
     void toggleProjectionType();
+    void toggleRotationCube();
 
     int fps();
     void setFps(int fps);
@@ -120,6 +121,7 @@ private:
     bool m_msaa;
     bool m_vsync;
     bool m_zBuffer;
+    bool m_rotationCube;
     int m_frames;
     int m_fps;
     int m_targetFps;

@@ -180,6 +180,7 @@ frmMain::frmMain(QWidget *parent) :
     ui->cmdTop->setParent(ui->glwVisualizer);
     ui->cmdFront->setParent(ui->glwVisualizer);
     ui->cmdLeft->setParent(ui->glwVisualizer);
+    ui->cmdRotationCube->setParent(ui->glwVisualizer);
 
     ui->cmdHeightMapBorderAuto->setMinimumHeight(ui->chkHeightMapBorderShow->sizeHint().height());
     ui->cmdHeightMapCreate->setMinimumHeight(ui->cmdFileOpen->sizeHint().height());
@@ -938,6 +939,11 @@ void frmMain::on_cmdLeft_clicked()
 void frmMain::on_cmdIsometric_clicked()
 {
     ui->glwVisualizer->setIsometricView();
+}
+
+void frmMain::on_cmdRotationCube_clicked()
+{
+    ui->glwVisualizer->toggleRotationCube();
 }
 
 void frmMain::on_cmdToggleProjection_clicked()
@@ -2017,6 +2023,7 @@ void frmMain::placeVisualizerButtons()
     ui->cmdFront->move(ui->cmdLeft->geometry().left() - ui->cmdFront->width() - 8, ui->cmdIsometric->geometry().bottom() + 8);
     ui->cmdFit->move(ui->glwVisualizer->width() - ui->cmdFit->width() - 8, ui->cmdLeft->geometry().bottom() + 8);
     ui->cmdToggleProjection->move(ui->cmdFit->geometry().left() - ui->cmdToggleProjection->width() - 8, ui->cmdLeft->geometry().bottom() + 8);
+    ui->cmdRotationCube->move(ui->glwVisualizer->width() - ui->cmdRotationCube->width() - 8, ui->cmdFit->geometry().bottom() + 8);
 }
 
 void frmMain::preloadSettings()
