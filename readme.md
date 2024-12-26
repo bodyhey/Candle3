@@ -29,9 +29,8 @@ Supported functions:
 
 System requirements for running "G-Pilot":
 -------------------
-* Windows/Linux x86(not tested att all!)
-* CPU with SSE2 instruction set support
-* Graphics card with OpenGL 2.0 support
+* Windows 10/Linux x86(not tested att all!)
+* Graphics card with OpenGL 3.0 support
 * 120 MB free storage space
 
 Usefull links:
