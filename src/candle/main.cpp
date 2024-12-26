@@ -86,20 +86,21 @@ int main(int argc, char *argv[])
     QString translationsFolder = qApp->applicationDirPath() + "/translations/";
     QString translationFileName = translationsFolder + "candle_" + loc + ".qm";
 
-    if(QFile::exists(translationFileName)) {
+    if (QFile::exists(translationFileName)) {
         QTranslator* translator = new QTranslator();
         if (translator->load(translationFileName)) app.installTranslator(translator); else delete translator;
     }
 
     QString baseTranslationFileName = translationsFolder + "qt_" + loc + ".qm";
 
-    if(QFile::exists(translationFileName)) {
+    if (QFile::exists(translationFileName)) {
         QTranslator* baseTranslator = new QTranslator();
         if (baseTranslator->load(baseTranslationFileName)) app.installTranslator(baseTranslator); else delete baseTranslator;
     }
 
 #ifdef UNIX
-    if (!styleOverrided) foreach (QString str, QStyleFactory::keys()) {
+    if (!styleOverrided)
+    foreach (QString str, QStyleFactory::keys()) {
         qDebug() << "style" << str;
         if (str.contains("GTK+")) {
             app.setStyle(QStyleFactory::create(str));
@@ -118,8 +119,8 @@ int main(int argc, char *argv[])
     app.setPalette(palette);
 
     app.setStyleSheet("QWidget {font-family: \"Ubuntu\";}\
-                    QMenuBar {background-color: #303030; padding-top: 2px; padding-bottom: 2px;}\
-                    QMenuBar::item {spacing: 3px; padding: 2px 8px; background: transparent; color: white;}\
+                    QMenuBar {padding-top: 2px; padding-bottom: 2px;}\
+                    QMenuBar::item {spacing: 3px; padding: 2px 8px; background: transparent;}\
                     QMenuBar::item:pressed {border: 1px solid #505050; border-bottom: 1px; border-top-left-radius: 3px; border-top-right-radius: 3px; background: #404040; color: white;}\
                     QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white;}\
                     QDialog {border: 1px solid palette(mid);}");
