@@ -57,6 +57,12 @@ void partMainConsole::append(QString text)
     ui->txtConsole->appendPlainText(text);
 }
 
+void partMainConsole::appendSystem(QString text)
+{
+    if (!m_configurationConsole->showSystemCommands()) return;
+    append(text);
+}
+
 void partMainConsole::append(CommandAttributes commandAttributes)
 {
     append(">> " + commandAttributes.commandLine);

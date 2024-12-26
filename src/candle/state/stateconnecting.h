@@ -12,6 +12,7 @@ class StateConnecting : public State
     public:
         StateConnecting(State *previous, QObject *parent = nullptr);
         QString name() override { return "Connecting"; }
+        void onConnectionStateChanged(ConnectionState state) override;
 };
 
 #endif // STATECONNECTING_H

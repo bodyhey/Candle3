@@ -23,14 +23,18 @@ class State : public QObject
         State* previous() const { return m_previous; }
         virtual void onEntry(Communicator *communicator, State *previous = nullptr);
         virtual void onExit() {};
-        virtual void onDeviceStateChanged(DeviceState state) {};
+        virtual void onDeviceStateChanged(DeviceState state) {
+            Q_UNUSED(state);
+        };
 
     signals:
         void transition(State *state, State *newState);
         void error(State *state, QString message);
 
     public slots:
-        virtual void onConnectionStateChanged(ConnectionState state) {};
+        virtual void onConnectionStateChanged(ConnectionState state) {
+            Q_UNUSED(state);
+        };
 
     protected:
         State *m_previous;

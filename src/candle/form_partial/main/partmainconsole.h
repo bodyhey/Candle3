@@ -24,6 +24,7 @@ class partMainConsole : public QWidget
         void initialize(ConfigurationConsole &configurationConsole);
         ~partMainConsole();
         void append(QString text);
+        void appendSystem(QString text);
         void append(CommandAttributes commandAttributes);
         void appendFiltered(CommandAttributes commandAttributes);
         void appendResponse(int consoleIndex, QString command, QString response);

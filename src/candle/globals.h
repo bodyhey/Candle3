@@ -186,6 +186,11 @@ struct CommandAttributes : CommandQueue {
         this->length = commandLine.length() + 1;
         this->commandIndex = commandIndex;
     }
+
+    CommandAttributes(CommandSource source, QString commandLine, CommandCallback callback = nullptr)
+        : CommandAttributes(source, -1, TABLE_INDEX_UI, commandLine, callback)
+    {
+    }
 };
 
 #endif // GLOBALS_H
