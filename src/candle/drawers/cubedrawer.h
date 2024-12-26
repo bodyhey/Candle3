@@ -19,7 +19,7 @@ public:
     void draw(QRect);
     void setProjection();
     void updateView();
-    void updateEyePosition(QVector3D eye);
+    void updateEyePosition(QVector3D eye, QVector3D up);
 private:
     QOpenGLVertexArrayObject m_vao;
     QOpenGLBuffer m_vbo;
@@ -28,9 +28,11 @@ private:
     int m_height;
     bool m_needsUpdateGeometry = true;
     QVector3D m_eye;
+    QVector3D m_up;
     QVector<VertexData> m_triangles;
 
     void init();
+    void initAttributes();
     void updateGeometry();
     void drawBackground();
     void drawCube();

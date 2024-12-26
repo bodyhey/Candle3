@@ -470,7 +470,7 @@ void GLWidget::updateView()
     QVector3D eye(cos(angX) * sin(angY), sin(angX), cos(angX) * cos(angY));
     QVector3D up(fabs(m_xRot) == 90 ? -sin(angY + (m_xRot < 0 ? M_PI : 0)) : 0, cos(angX), fabs(m_xRot) == 90 ? -cos(angY + (m_xRot < 0 ? M_PI : 0)) : 0);
 
-    m_cubeDrawer.updateEyePosition(eye);
+    m_cubeDrawer.updateEyePosition(eye, up);
 
     m_viewMatrix.lookAt(eye * m_zoomDistance, QVector3D(0,0,0), up.normalized());
     m_viewMatrix.rotate(-90, 1.0, 0.0, 0.0);

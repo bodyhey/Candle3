@@ -39,6 +39,7 @@ void CubeDrawer::draw(QRect dest) {
 
     glViewport(dest.x(), dest.y(), dest.width(), dest.height());
 
+    //
     // glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo->handle());
     // glBlitFramebuffer(
     //     0, 0, m_width, m_height,
@@ -65,18 +66,31 @@ void CubeDrawer::draw(QRect dest) {
     m_copyProgram->setAttributeBuffer(textureLocation, GL_FLOAT, offset, 2, 2 * 4 * 2);
 
     QVector<_2DTexturedVertexData> m_copyTriangles;
-    m_copyTriangles << _2DTexturedVertexData(QVector2D(-1.0, -1.0), QVector2D(0, 0))
-                    << _2DTexturedVertexData(QVector2D(1.0, -1.0), QVector2D(1, 0))
-                    << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0, 1))
-                    << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0, 1))
-                    << _2DTexturedVertexData(QVector2D(1.0, -1.0), QVector2D(1, 0))
-                    << _2DTexturedVertexData(QVector2D(1.0, 1.0), QVector2D(1, 1));
+    // m_copyTriangles << _2DTexturedVertexData(QVector2D(-1.0, -1.0), QVector2D(0, 0))
+    //                 << _2DTexturedVertexData(QVector2D(1.0, -1.0), QVector2D(1, 0))
+    //                 << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0, 1))
+    //                 << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0, 1))
+    //                 << _2DTexturedVertexData(QVector2D(1.0, -1.0), QVector2D(1, 0))
+    //                 << _2DTexturedVertexData(QVector2D(1.0, 1.0), QVector2D(1, 1));
+
+    // 3 triangles are used to draw chamfered corner
+    m_copyTriangles << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0.0, 1.0))
+                    << _2DTexturedVertexData(QVector2D(0.5, -1.0), QVector2D(0.75, 0.0))
+                    << _2DTexturedVertexData(QVector2D(-1.0, -1.0), QVector2D(0.0, 0.0))
+
+                    << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0.0, 1.0))
+                    << _2DTexturedVertexData(QVector2D(1.0, -0.5), QVector2D(1.0, 0.25))
+                    << _2DTexturedVertexData(QVector2D(0.5, -1.0), QVector2D(0.75, 0.0))
+
+                    << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0.0, 1.0))
+                    << _2DTexturedVertexData(QVector2D(1.0, 1.0), QVector2D(1.0, 1.0))
+                    << _2DTexturedVertexData(QVector2D(1.0, -0.5), QVector2D(1.0, 0.25));
 
     copyVbo.allocate(m_copyTriangles.constData(), m_copyTriangles.count() * sizeof(_2DTexturedVertexData));
 
     glBindTexture(GL_TEXTURE_2D, m_fbo->texture());
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLES, 0, m_copyTriangles.count());
 
     copyVbo.release();
     copyVbo.destroy();
@@ -95,15 +109,17 @@ void CubeDrawer::updateView()
     m_viewMatrix.setToIdentity();
 
     // use the eye position of main scene to rotate cube
-    m_eye.normalize();
-    m_eye *= DISTANCE;
+    QVector3D normalized = m_eye.normalized();
+    QVector3D eye = normalized * DISTANCE;
+    qDebug() << "eye: " << m_eye << normalized << eye;
 
-    m_viewMatrix.lookAt(m_eye, QVector3D(0, 0, 0), QVector3D(0, 1, 0));
+    m_viewMatrix.lookAt(eye, QVector3D(0, 0, 0), m_up);
 }
 
-void CubeDrawer::updateEyePosition(QVector3D eye)
+void CubeDrawer::updateEyePosition(QVector3D eye, QVector3D up)
 {
     m_eye = eye;
+    m_up = up;
     m_needsUpdateGeometry = true;
 }
 
@@ -126,33 +142,37 @@ void CubeDrawer::init()
     m_copyProgram->link();
 }
 
-void CubeDrawer::updateGeometry()
-{
-    if (!m_vbo.isCreated()) init();
+void CubeDrawer::initAttributes() {
+    quintptr offset = 0;
+
+    int vertexLocation = m_program->attributeLocation("a_position");
+    m_program->enableAttributeArray(vertexLocation);
+    m_program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3,
+                                  sizeof(VertexData));
+
+    offset = sizeof(QVector3D);
+
+    int colorLocation = m_program->attributeLocation("a_color");
+    m_program->enableAttributeArray(colorLocation);
+    m_program->setAttributeBuffer(colorLocation, GL_FLOAT, offset, 3,
+                                  sizeof(VertexData));
+
+    offset = sizeof(QVector3D);
+}
+void CubeDrawer::updateGeometry() {
+    if (!m_vbo.isCreated())
+        init();
 
     if (m_vao.isCreated()) {
-        // Prepare vao
         m_vao.bind();
     }
 
     m_vbo.bind();
-    m_vbo.allocate(m_triangles.constData(), m_triangles.count() * sizeof(VertexData));
+    m_vbo.allocate(m_triangles.constData(),
+                   m_triangles.count() * sizeof(VertexData));
 
     if (m_vao.isCreated()) {
-        quintptr offset = 0;
-
-        int vertexLocation = m_program->attributeLocation("a_position");
-        m_program->enableAttributeArray(vertexLocation);
-        m_program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-        offset = sizeof(QVector3D);
-
-        int colorLocation = m_program->attributeLocation("a_color");
-        m_program->enableAttributeArray(colorLocation);
-        m_program->setAttributeBuffer(colorLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-        offset = sizeof(QVector3D);
-
+        initAttributes();
         m_vao.release();
     }
 
@@ -173,27 +193,16 @@ void CubeDrawer::drawCube()
     cMatrix.scale(0.9);
     m_program->setUniformValue("c_matrix", cMatrix);
 
-    //
-
-    m_vbo.bind();
-
-    quintptr offset = 0;
-
-    int vertexLocation = m_program->attributeLocation("a_position");
-    m_program->enableAttributeArray(vertexLocation);
-    m_program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-    offset = sizeof(QVector3D);
-
-    int colorLocation = m_program->attributeLocation("a_color");
-    m_program->enableAttributeArray(colorLocation);
-    m_program->setAttributeBuffer(colorLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-    offset = sizeof(QVector3D);
+    if (m_vao.isCreated()) m_vao.bind(); else {
+        m_vbo.bind();
+        initAttributes();
+    }
 
     glEnable(GL_CULL_FACE);
     glDrawArrays(GL_TRIANGLES, 0, m_triangles.count());
     glDisable(GL_CULL_FACE);
+
+    if (m_vao.isCreated()) m_vao.release(); else m_vbo.release();
 
     m_program->release();
     glFlush();

@@ -121,7 +121,7 @@ private:
     bool m_msaa;
     bool m_vsync;
     bool m_zBuffer;
-    bool m_rotationCube;
+    bool m_rotationCube = true;
     int m_frames;
     int m_fps;
     int m_targetFps;
