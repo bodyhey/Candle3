@@ -36,13 +36,39 @@ void ShaderDrawable::update()
     m_needsUpdateGeometry = true;
 }
 
-void ShaderDrawable::updateGeometry(QOpenGLShaderProgram *shaderProgram)
+void ShaderDrawable::bindAttributes(QOpenGLShaderProgram *&shaderProgram)
 {
+    // Offset for position
+    quintptr offset = 0;
+
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+    int vertexLocation = shaderProgram->attributeLocation("a_position");
+    shaderProgram->enableAttributeArray(vertexLocation);
+    shaderProgram->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+
+    // Offset for color
+    offset = sizeof(QVector3D);
+
+    // Tell OpenGL programmable pipeline how to locate vertex color data
+    int color = shaderProgram->attributeLocation("a_color");
+    shaderProgram->enableAttributeArray(color);
+    shaderProgram->setAttributeBuffer(color, GL_FLOAT, offset, 3, sizeof(VertexData));
+
+    // Offset for line start point
+    offset += sizeof(QVector3D);
+
+    // Tell OpenGL programmable pipeline how to locate vertex line start point
+    int start = shaderProgram->attributeLocation("a_start");
+    shaderProgram->enableAttributeArray(start);
+    shaderProgram->setAttributeBuffer(start, GL_FLOAT, offset, 3, sizeof(VertexData));
+}
+
+void ShaderDrawable::updateGeometry(QOpenGLShaderProgram *shaderProgram) {
     // Init in context
-    if (!m_vbo.isCreated()) init();
+    if (!m_vbo.isCreated())
+        init();
 
     if (m_vao.isCreated()) {
-        // Prepare vao
         m_vao.bind();
     }
 
@@ -55,39 +81,18 @@ void ShaderDrawable::updateGeometry(QOpenGLShaderProgram *shaderProgram)
         QVector<VertexData> vertexData(m_triangles);
         vertexData += m_lines;
         vertexData += m_points;
-        m_vbo.allocate(vertexData.constData(), vertexData.count() * sizeof(VertexData));
+        m_vbo.allocate(vertexData.constData(),
+                       vertexData.count() * sizeof(VertexData));
     } else {
-        m_vbo.release();        
-        if (m_vao.isCreated()) m_vao.release();
+        m_vbo.release();
+        if (m_vao.isCreated())
+            m_vao.release();
         m_needsUpdateGeometry = false;
         return;
     }
 
     if (m_vao.isCreated()) {
-        // Offset for position
-        quintptr offset = 0;
-
-        // Tell OpenGL programmable pipeline how to locate vertex position data
-        int vertexLocation = shaderProgram->attributeLocation("a_position");
-        shaderProgram->enableAttributeArray(vertexLocation);
-        shaderProgram->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-        // Offset for color
-        offset = sizeof(QVector3D);
-
-        // Tell OpenGL programmable pipeline how to locate vertex color data
-        int color = shaderProgram->attributeLocation("a_color");
-        shaderProgram->enableAttributeArray(color);
-        shaderProgram->setAttributeBuffer(color, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-        // Offset for line start point
-        offset += sizeof(QVector3D);
-
-        // Tell OpenGL programmable pipeline how to locate vertex line start point
-        int start = shaderProgram->attributeLocation("a_start");
-        shaderProgram->enableAttributeArray(start);
-        shaderProgram->setAttributeBuffer(start, GL_FLOAT, offset, 3, sizeof(VertexData));
-
+        bindAttributes(shaderProgram);
         m_vao.release();
     }
 
@@ -120,47 +125,20 @@ void ShaderDrawable::draw(QOpenGLShaderProgram *shaderProgram)
     if (!m_visible) return;
 
     if (m_vao.isCreated()) {
-        // Prepare vao
         m_vao.bind();
     } else {
-        // Prepare vbo
-        m_vbo.bind();
-
-        // Offset for position
-        quintptr offset = 0;
-
-        // Tell OpenGL programmable pipeline how to locate vertex position data
-        int vertexLocation = shaderProgram->attributeLocation("a_position");
-        shaderProgram->enableAttributeArray(vertexLocation);
-        shaderProgram->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-        // Offset for color
-        offset = sizeof(QVector3D);
-
-        // Tell OpenGL programmable pipeline how to locate vertex color data
-        int color = shaderProgram->attributeLocation("a_color");
-        shaderProgram->enableAttributeArray(color);
-        shaderProgram->setAttributeBuffer(color, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-        // Offset for line start point
-        offset += sizeof(QVector3D);
-
-        // Tell OpenGL programmable pipeline how to locate vertex line start point
-        int start = shaderProgram->attributeLocation("a_start");
-        shaderProgram->enableAttributeArray(start);
-        shaderProgram->setAttributeBuffer(start, GL_FLOAT, offset, 3, sizeof(VertexData));
-
-        shaderProgram->setAttributeValue("a_alpha", m_globalAlpha);
+        m_vbo.bind();        
+        bindAttributes(shaderProgram);
     }
 
     // setAttributeBuffer must used every time, because it is not stored in VAO??
-    shaderProgram->setAttributeValue("a_alpha", m_globalAlpha);
+    //shaderProgram->setAttributeValue("a_alpha", m_globalAlpha);
 
     if (!m_triangles.isEmpty()) {
-        if (m_texture) {
-            m_texture->bind();
-            shaderProgram->setUniformValue("texture", 0);
-        }
+        // if (m_texture) {
+        //     m_texture->bind();
+        //     shaderProgram->setUniformValue("texture", 0);
+        // }
         glDrawArrays(GL_TRIANGLES, 0, m_triangles.count());
     }
 
@@ -225,5 +203,3 @@ void ShaderDrawable::setPointSize(double pointSize)
 {
     m_pointSize = pointSize;
 }
-
-

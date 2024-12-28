@@ -2,6 +2,7 @@
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
 
 #include "glwidget.h"
+#include "../drawers/gcodedrawer.h"
 #include <QDebug>
 #include <QtWidgets>
 #include <QPainter>
@@ -20,7 +21,7 @@
 #define MAGIC_ZOOM_MULTIPLIER 1.9
 
 #ifdef GLES
-GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent), m_shaderProgram(0)
+GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent), m_defaultShaderProgram(0), m_gcodeShaderProgram(0)
 #else
 GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent), m_shaderProgram(0)
 #endif
@@ -37,7 +38,8 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent), m_shaderProgram(0)
 
     m_zoomDistance = DEFAULT_ZOOM;
 
-    m_lookAt = QVector3D(0,0,0);
+    m_lookAt = QVector3D(0, 0, 0);
+    m_eye = QVector3D(0, 0, -50);
 
     m_perspective = false;
 
@@ -76,8 +78,11 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent), m_shaderProgram(0)
 
 GLWidget::~GLWidget()
 {
-    if (m_shaderProgram) {
-        delete m_shaderProgram;
+    if (m_defaultShaderProgram) {
+        delete m_defaultShaderProgram;
+    }
+    if (m_gcodeShaderProgram) {
+        delete m_gcodeShaderProgram;
     }
 }
 
@@ -316,9 +321,23 @@ void GLWidget::setTopView()
     beginViewAnimation();
 }
 
+void GLWidget::setBottomView()
+{
+    m_xRotTarget = 270;
+    m_yRotTarget = m_yRot > 180 ? 360 : 0;
+    beginViewAnimation();
+}
+
 void GLWidget::setFrontView()
 {
     m_xRotTarget = 0;
+    m_yRotTarget = m_yRot > 180 ? 360 : 0;
+    beginViewAnimation();
+}
+
+void GLWidget::setBackView()
+{
+    m_xRotTarget = 180;
     m_yRotTarget = m_yRot > 180 ? 360 : 0;
     beginViewAnimation();
 }
@@ -327,6 +346,13 @@ void GLWidget::setLeftView()
 {
     m_xRotTarget = 0;
     m_yRotTarget = m_yRot > 270 ? 450 : 90;
+    beginViewAnimation();
+}
+
+void GLWidget::setRightView()
+{
+    m_xRotTarget = 0;
+    m_yRotTarget = m_yRot > 90 ? 270 : -90;
     beginViewAnimation();
 }
 
@@ -412,21 +438,8 @@ void GLWidget::setSpendTime(const QTime &spendTime)
     m_spendTime = spendTime;
 }
 
-void GLWidget::initializeGL()
+void GLWidget::initializeDebugLogger()
 {
-    // Initialize functions
-    initializeOpenGLFunctions();
-
-    // Create shader program
-    m_shaderProgram = new QOpenGLShaderProgram();
-
-    if (m_shaderProgram) {
-        m_shaderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/base_vertex.glsl");
-        m_shaderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/base_fragment.glsl");
-        m_shaderProgram->link();
-        qDebug() << "shader program created";
-    }
-
     qDebug() << "Initialize debug logger";
     QString glVersion = QString::fromUtf8((const char *)glGetString(GL_VERSION));
     QString glslVersion = QString::fromUtf8((const char *)glGetString(GL_SHADING_LANGUAGE_VERSION));
@@ -435,6 +448,31 @@ void GLWidget::initializeGL()
     qDebug() << "OpenGL version: " << glVersion << "GLSL version: " << glslVersion << "Vendor: " << glVendor << "Renderer: " << glRenderer;
     QOpenGLDebugLogger *logger = new QOpenGLDebugLogger(this);
     logger->initialize();
+}
+
+void GLWidget::initializeGL()
+{
+    initializeOpenGLFunctions();
+
+    m_defaultShaderProgram = new QOpenGLShaderProgram();
+    if (m_defaultShaderProgram) {
+        m_defaultShaderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/base_vertex.glsl");
+        m_defaultShaderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/base_fragment.glsl");
+        if (m_defaultShaderProgram->link()) {
+            qDebug() << "shader program created";
+        }
+    }
+
+    m_gcodeShaderProgram = new QOpenGLShaderProgram();
+    if (m_gcodeShaderProgram) {
+        m_gcodeShaderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/gcode_vertex.glsl");
+        m_gcodeShaderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/gcode_fragment.glsl");
+        if (m_gcodeShaderProgram->link()) {
+            qDebug() << "gcode shader program created";
+        }
+    }
+
+    initializeDebugLogger();
 }
 
 void GLWidget::resizeGL(int width, int height)
@@ -453,10 +491,11 @@ void GLWidget::updateProjection()
     double orthoSize = m_zoomDistance * tan((m_fov * 0.0174533) / 2.0);
 
     // perspective / orthographic projection
-    if (m_perspective)
+    if (m_perspective) {
         m_projectionMatrix.perspective(m_fov, aspectRatio, m_near, m_far);
-    else
+    } else {
         m_projectionMatrix.ortho(-orthoSize * aspectRatio, orthoSize * aspectRatio, -orthoSize, orthoSize, -m_far/2.0, m_far/2.0);
+    }
 }
 
 void GLWidget::updateView()
@@ -467,14 +506,16 @@ void GLWidget::updateView()
     double angY = M_PI / 180 * m_yRot;
     double angX = M_PI / 180 * m_xRot;
 
-    QVector3D eye(cos(angX) * sin(angY), sin(angX), cos(angX) * cos(angY));
+    m_eye = QVector3D(cos(angX) * sin(angY), sin(angX), cos(angX) * cos(angY));
     QVector3D up(fabs(m_xRot) == 90 ? -sin(angY + (m_xRot < 0 ? M_PI : 0)) : 0, cos(angX), fabs(m_xRot) == 90 ? -cos(angY + (m_xRot < 0 ? M_PI : 0)) : 0);
 
-    m_cubeDrawer.updateEyePosition(eye, up);
+    m_cubeDrawer.updateEyePosition(m_eye, up);
 
-    m_viewMatrix.lookAt(eye * m_zoomDistance, QVector3D(0,0,0), up.normalized());
+    m_viewMatrix.lookAt(m_eye * m_zoomDistance, QVector3D(0,0,0), up.normalized());
     m_viewMatrix.rotate(-90, 1.0, 0.0, 0.0);
     m_viewMatrix.translate(-m_lookAt);
+
+    m_eye *= 1000;
 }
 
 void GLWidget::drawText(QPainter &painter, QPoint &pos, QString text, int lineHeight, Qt::AlignmentFlag align)
@@ -526,31 +567,78 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
             glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
             glEnable(GL_POINT_SMOOTH);
 
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glEnable(GL_BLEND);
         }
     }
-    if (m_zBuffer) glEnable(GL_DEPTH_TEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    //if (m_zBuffer)
+    glEnable(GL_DEPTH_TEST);
 
-    if (m_shaderProgram) {
-        // Draw 3d
-        m_shaderProgram->bind();
+    QOpenGLShaderProgram *currentProgram = nullptr;
 
-        // Set modelview-projection matrix
-        m_shaderProgram->setUniformValue("mvp_matrix", m_projectionMatrix * m_viewMatrix);
-        m_shaderProgram->setUniformValue("mv_matrix", m_viewMatrix);
+    if (m_gcodeShaderProgram) {
+        m_gcodeShaderProgram->bind();
+        m_gcodeShaderProgram->setUniformValue("u_mvp_matrix", m_projectionMatrix * m_viewMatrix);
+        m_gcodeShaderProgram->setUniformValue("u_light_position", m_eye);
+        m_gcodeShaderProgram->setUniformValue("u_eye", m_eye);
+        m_gcodeShaderProgram->setUniformValue("u_offset", QVector2D(2.0 / width(), 2.0 / height()));
+        currentProgram = m_gcodeShaderProgram;
+    }
 
-        // Update geometries in current opengl context
-        foreach (ShaderDrawable *drawable, m_shaderDrawables)
-            if (drawable->needsUpdateGeometry()) drawable->updateGeometry(m_shaderProgram);
+    if (m_defaultShaderProgram) {
+        if (currentProgram != m_defaultShaderProgram) {
+            currentProgram->release();
+        }
+        m_defaultShaderProgram->bind();
+        m_defaultShaderProgram->setUniformValue("mvp_matrix", m_projectionMatrix * m_viewMatrix);
+        m_defaultShaderProgram->setUniformValue("mv_matrix", m_viewMatrix);
+        m_defaultShaderProgram->release();
+        currentProgram = m_defaultShaderProgram;
+    }
 
-        // Draw geometries
-        foreach (ShaderDrawable *drawable, m_shaderDrawables) {
-            drawable->draw(m_shaderProgram);
-            if (drawable->visible()) vertices += drawable->getVertexCount();
+    foreach (ShaderDrawable *drawable, m_shaderDrawables) {
+        if (!drawable->visible()) {
+            continue;
+        }
+        QOpenGLShaderProgram *newProgram;
+        switch (drawable->programType()) {
+            case ShaderDrawable::ProgramType::GCode: {
+                GcodeDrawer *gcodeDrawable = static_cast<GcodeDrawer*>(drawable);
+                gcodeDrawable->setEyePos(m_eye);
+                //gcodeDrawable->update();
+                newProgram = m_gcodeShaderProgram;
+                break;
+            }
+            default:
+                newProgram = m_defaultShaderProgram;
+                break;
+        }
+        if (currentProgram != newProgram) {
+            if (currentProgram != nullptr) {
+                currentProgram->release();
+            }
+            currentProgram = newProgram;
+            currentProgram->bind();
         }
 
-        m_shaderProgram->release();
+        if (drawable->needsUpdateGeometry()) {
+            drawable->updateGeometry(currentProgram);
+        }
+        switch (drawable->programType()) {
+        case ShaderDrawable::ProgramType::GCode:
+            m_gcodeShaderProgram->setUniformValue("u_shadow", true);
+            drawable->draw(currentProgram);
+            m_gcodeShaderProgram->setUniformValue("u_shadow", false);
+            break;
+        case ShaderDrawable::ProgramType::Default:
+            break;
+        }
+        drawable->draw(currentProgram);
+        vertices += drawable->getVertexCount();
+    }
+
+    if (currentProgram != nullptr) {
+        currentProgram->release();
     }
 
     if (m_rotationCube) {
@@ -611,6 +699,33 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
+    QPoint pos = event->pos();
+    if (pos.x() < 100 && pos.y() < 100) {
+        CubeClickableFace face = m_cubeDrawer.faceAtPos(pos);
+        switch (face) {
+            case CubeClickableFace::Front:
+                setFrontView();
+                break;
+            case CubeClickableFace::Back:
+                setBackView();
+                break;
+            case CubeClickableFace::Top:
+                setTopView();
+                break;
+            case CubeClickableFace::Bottom:
+                setBottomView();
+                break;
+            case CubeClickableFace::Left:
+                setLeftView();
+                break;
+            case CubeClickableFace::Right:
+                setRightView();
+                break;
+            case CubeClickableFace::None:
+                break;
+        }
+    }
+
     m_lastPos = event->pos();
     m_xLastRot = m_xRot;
     m_yLastRot = m_yRot;
@@ -728,6 +843,15 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
         updateView();
     }
+
+    if (pos.x() < 200 && pos.y() < 200) {
+        m_cubeDrawer.mouseMoveEvent(event);
+    }
+}
+
+void GLWidget::leaveEvent(QEvent *event)
+{
+    m_cubeDrawer.leaveEvent(event);
 }
 
 void GLWidget::wheelEvent(QWheelEvent *we)

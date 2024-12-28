@@ -98,7 +98,6 @@ SOURCES += main.cpp\
     connection/rawtcpconnection.cpp \
     connection/serialconnection.cpp \
     connection/virtualucncconnection.cpp \
-    drawers/cube.cpp \
     drawers/cubedrawer.cpp \
     drawers/cursordrawer.cpp \
     drawers/tablesurfacedrawer.cpp \
@@ -185,6 +184,7 @@ HEADERS  += frmmain.h \
     connection/rawtcpconnection.h \
     connection/serialconnection.h \
     connection/virtualucncconnection.h \
+    drawers/cube.h \
     drawers/cubedrawer.h \
     drawers/cursordrawer.h \
     drawers/tablesurfacedrawer.h \
@@ -298,4 +298,14 @@ LIBS += -L../designerplugins/customwidgetsplugin -lcustomwidgets
 #LIBS += C:/Projekty/Qt/Candle/src/vendor/build/uCNC-Debug
 
 LIBS += -L../vendor/uCNC -luCNC
+
+DISTFILES += \
+    shaders/2dcopy_fragment.glsl \
+    shaders/2dcopy_vertex.glsl \
+    shaders/base_fragment.glsl \
+    shaders/base_vertex.glsl \
+    shaders/cube_fragment.glsl \
+    shaders/cube_vertex.glsl \
+    shaders/gcode_fragment.glsl \
+    shaders/gcode_vertex.glsl
 

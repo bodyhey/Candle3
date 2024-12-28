@@ -32,3 +32,26 @@ void Utils::positionDialog(QWidget *widget, QRect geometry, bool maximized)
         widget->showMaximized();
     }
 }
+
+bool Utils::pointInTriangle(QPoint p, QPoint p0, QPoint p1, QPoint p2)
+{
+    int dX = p.x()-p2.x();
+    int dY = p.y()-p2.y();
+    int dX21 = p2.x()-p1.x();
+    int dY12 = p1.y()-p2.y();
+    int d = dY12*(p0.x()-p2.x()) + dX21*(p0.y()-p2.y());
+    int s = dY12*dX + dX21*dY;
+    int t = (p2.y()-p0.y())*dX + (p0.x()-p2.x())*dY;
+
+    if (d<0) {
+        return s<=0 && t<=0 && s+t>=d;
+    }
+
+    return s>=0 && t>=0 && s+t<=d;
+}
+
+bool Utils::triangleDir(QPoint p0, QPoint p1, QPoint p2)
+{
+    return (p0.x() - p2.x()) * (p1.y() - p2.y()) - (p1.x() - p2.x()) * (p0.y() - p2.y()) < 0;
+}
+

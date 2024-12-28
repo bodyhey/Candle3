@@ -43,6 +43,22 @@ bool GcodeDrawer::updateData()
     }
 }
 
+QVector3D GcodeDrawer::initialNormal(QVector3D p1, QVector3D p2)
+{
+    QVector3D direction = p2 - p1;
+    QVector3D normal;
+
+    if (direction.z() == 0) {
+        normal = QVector3D(0.0, -1.0, 0.1);
+    } else {
+        normal = QVector3D(-direction.z(), 0.0, direction.x());
+    }
+
+    assert(normal.length());
+
+    return normal.normalized();
+}
+
 bool GcodeDrawer::prepareVectors()
 {
     qDebug() << "preparing vectors" << this;
@@ -115,18 +131,20 @@ bool GcodeDrawer::prepareVectors()
             list->at(i)->setVertexIndex(m_lines.count()); // Store vertex index
         }
 
-        // Set color
         vertex.color = getSegmentColorVector(list->at(i));
 
-        // Line start
-        vertex.position = list->at(j)->getStart();
-        if (m_ignoreZ) vertex.position.setZ(0);
-        m_lines.append(vertex);
+        // ignore shorter than 0.0001
+        if ((list->at(i)->getEnd() - list->at(j)->getStart()).length() > 0.0001) {
+            // Line start
+            vertex.position = list->at(j)->getStart();
+            if (m_ignoreZ) vertex.position.setZ(0);
+            m_lines.append(vertex);
 
-        // Line end
-        vertex.position = list->at(i)->getEnd();
-        if (m_ignoreZ) vertex.position.setZ(0);
-        m_lines.append(vertex);
+            // Line end
+            vertex.position = list->at(i)->getEnd();
+            if (m_ignoreZ) vertex.position.setZ(0);
+            m_lines.append(vertex);
+        }
 
         // Draw last toolpath point
         if (i == list->count() - 1) {
@@ -137,6 +155,73 @@ bool GcodeDrawer::prepareVectors()
             m_points.append(vertex);
         }
     }
+
+    if (m_lines.count())
+    {
+        // static float rot = 0;
+        // QMatrix4x4 m;
+        // m.setToIdentity();
+        // m.rotate(rot, 0, 0, 1);
+        // rot += 5;
+
+        //qDebug() << m.map(m_eye);
+
+        m_lines.append(VertexData(QVector3D(100,100,100), Util::colorToVector(Qt::black), QVector3D(0, 0, 1)));
+        m_lines.append(VertexData(QVector3D(0,0,0), Util::colorToVector(Qt::black), QVector3D(0, 0, 1)));
+
+        // Calculate normals
+        int il = 0;
+        int vc = m_lines.count() / 2;
+        QVector<QVector3D> tangents;
+
+        QVector<QVector3D> normals;
+        normals.append(initialNormal(m_lines[0].position, m_lines[2].position));
+        assert((m_lines[0].position - m_lines[2].position).length());
+
+        for (int i = 0; i < vc - 1; i++) {
+            QVector3D T_i = (m_lines[il + 2].position - m_lines[il].position).normalized();
+            tangents.append(T_i);
+            assert(T_i.length());
+
+            if (il > 0) {
+                QVector3D N_i = QVector3D::crossProduct(
+                    QVector3D::crossProduct(tangents[i - 1], normals.last()),
+                    tangents[i]
+                ).normalized();
+                if (QVector3D::dotProduct(N_i, normals.last()) < 0) {
+                    N_i = -N_i;
+                }
+
+                if (!N_i.length()) {
+                    qDebug() << N_i << m_lines[il + 2].position << m_lines[il].position << m_lines[il - 2].position << tangents[i] << tangents[i - 1] << normals.last()
+                             << QVector3D::crossProduct(tangents[i - 1], normals.last());
+                }
+                assert(N_i.length());
+
+                normals.append(N_i);
+            }
+
+            il+=2;
+        }
+        normals.append(normals.last());
+
+        il = 0;
+        // QVector<VertexData> normalVertices;
+        // QVector3D black = Util::colorToVector(Qt::black);
+        for (auto &v : m_lines) {
+            v.start = normals[il/2];
+            il++;
+            //m_lines.append(v);
+
+            // normalVertices.append(VertexData(v.position, black, QVector3D(0,0,1)));
+            // normalVertices.append(VertexData(v.position + v.start * 1, black, QVector3D(0,0,1)));
+        }
+
+        // m_lines += normalVertices;
+
+        qDebug() << m_lines.count() << normals.count();
+    }
+
     m_geometryUpdated = true;
     m_indexes.clear();
     return true;
@@ -189,7 +274,7 @@ bool GcodeDrawer::prepareRaster()
         image.fill(Qt::white);
 
         QList<LineSegment*> *list = m_viewParser->getLines();
-        qDebug() << "lines count" << list->count();
+        //qDebug() << "lines count" << list->count();
 
         double pixelSize = m_viewParser->getMinLength();
         QVector3D origin = m_viewParser->getMinimumExtremes();
@@ -360,6 +445,7 @@ void GcodeDrawer::setSimplify(bool simplify)
 {
     m_simplify = simplify;
 }
+
 double GcodeDrawer::simplifyPrecision() const
 {
     return m_simplifyPrecision;
@@ -374,6 +460,7 @@ bool GcodeDrawer::geometryUpdated()
 {
     return m_geometryUpdated;
 }
+
 QColor GcodeDrawer::colorNormal() const
 {
     return m_colorNormal;
@@ -412,6 +499,7 @@ void GcodeDrawer::setColorDrawn(const QColor &colorDrawn)
 {
     m_colorDrawn = colorDrawn;
 }
+
 QColor GcodeDrawer::colorStart() const
 {
     return m_colorStart;
@@ -421,6 +509,7 @@ void GcodeDrawer::setColorStart(const QColor &colorStart)
 {
     m_colorStart = colorStart;
 }
+
 QColor GcodeDrawer::colorEnd() const
 {
     return m_colorEnd;
@@ -495,12 +584,3 @@ void GcodeDrawer::setGrayscaleSegments(bool grayscaleSegments)
 {
     m_grayscaleSegments = grayscaleSegments;
 }
-
-
-
-
-
-
-
-
-

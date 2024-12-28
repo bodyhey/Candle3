@@ -10,16 +10,27 @@
 #include <QMatrix4x4>
 #include <QVector3D>
 #include <QOpenGLShaderProgram>
+#include <QPropertyAnimation>
+#include <QMouseEvent>
 #include "shaderdrawable.h"
+#include "cube.h"
 
-class CubeDrawer : protected QOpenGLFunctions_3_0
+class CubeDrawer : public QObject, protected QOpenGLFunctions_3_0
 {
+    Q_OBJECT
+
+    Q_PROPERTY(float faceAnimation WRITE setEye)
+
 public:
-    CubeDrawer();
+    explicit CubeDrawer();
     void draw(QRect);
     void setProjection();
     void updateView();
     void updateEyePosition(QVector3D eye, QVector3D up);
+    CubeClickableFace faceAtPos(QPoint pos);
+    void mouseMoveEvent(QMouseEvent *event);
+    void leaveEvent(QEvent *event);
+
 private:
     QOpenGLVertexArrayObject m_vao;
     QOpenGLBuffer m_vbo;
@@ -29,19 +40,23 @@ private:
     bool m_needsUpdateGeometry = true;
     QVector3D m_eye;
     QVector3D m_up;
+    QVector<QPoint> m_points2d;
     QVector<VertexData> m_triangles;
+    QVector<VertexData> m_lines;
+    QMatrix4x4 m_projectionMatrix;
+    QMatrix4x4 m_viewMatrix;
+    QOpenGLShaderProgram *m_program;
+    QOpenGLShaderProgram *m_copyProgram;;
+    QPropertyAnimation m_animation;
+
+    CubeClickableFace m_faceAtCursor = CubeClickableFace::None;
 
     void init();
     void initAttributes();
     void updateGeometry();
     void drawBackground();
     void drawCube();
-    void generateCube();
-
-    QMatrix4x4 m_projectionMatrix;
-    QMatrix4x4 m_viewMatrix;
-    QOpenGLShaderProgram *m_program;
-    QOpenGLShaderProgram *m_copyProgram;;
+    void setEye(float pos);
 };
 
 #endif // CUBEDRAWER_H

@@ -9,7 +9,7 @@ uniform mat4 c_matrix;
 
 attribute vec3 a_position;
 attribute vec3 a_color;
-attribute vec3 a_normal;
+//attribute vec3 a_normal;
 
 varying vec4 v_color;
 

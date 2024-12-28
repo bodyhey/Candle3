@@ -10,6 +10,8 @@
 class Utils {
     public:
         static void positionDialog(QWidget *widget, QRect geometry, bool maximized);
+        static bool pointInTriangle(QPoint p, QPoint p0, QPoint p1, QPoint p2);
+        static bool triangleDir(QPoint p0, QPoint p1, QPoint p2);
 };
 
 #endif // UTILS_H

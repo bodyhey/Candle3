@@ -38,13 +38,18 @@ struct _2DTexturedVertexData
 class ShaderDrawable : protected QOpenGLFunctions
 {
 public:
+    enum class ProgramType {
+        Default,
+        GCode,
+    };
+
     explicit ShaderDrawable();
     ~ShaderDrawable();
     void update();
     void draw(QOpenGLShaderProgram *shaderProgram);
 
     bool needsUpdateGeometry() const;
-    void updateGeometry(QOpenGLShaderProgram *shaderProgram = 0);
+    virtual void updateGeometry(QOpenGLShaderProgram *shaderProgram = 0);
 
     virtual QVector3D getSizes();
     virtual QVector3D getMinimumExtremes();
@@ -59,6 +64,8 @@ public:
 
     double pointSize() const;
     void setPointSize(double pointSize);
+
+    virtual ProgramType programType() { return ProgramType::Default; };
 
 signals:
 
@@ -77,8 +84,9 @@ protected:
 
     QOpenGLBuffer m_vbo; // Protected for direct vbo access
 
-    virtual bool updateData();
     void init();
+    virtual bool updateData();
+    virtual void bindAttributes(QOpenGLShaderProgram *&shaderProgram);
 
 private:
     QOpenGLVertexArrayObject m_vao;

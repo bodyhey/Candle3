@@ -46,8 +46,11 @@ public:
 
     void setIsometricView();
     void setTopView();
+    void setBottomView();
     void setFrontView();
+    void setBackView();
     void setLeftView();
+    void setRightView();
     void toggleProjectionType();
     void toggleRotationCube();
 
@@ -110,6 +113,7 @@ private slots:
 private:
     double m_xRot, m_yRot, m_xLastRot, m_yLastRot;
     QVector3D m_lookAt;
+    QVector3D m_eye;
     bool m_perspective;
     QPoint m_lastPos;
     double m_zoomDistance;
@@ -145,7 +149,8 @@ private:
     void stopViewAnimation();
 
     QList<ShaderDrawable*> m_shaderDrawables;
-    QOpenGLShaderProgram *m_shaderProgram;
+    QOpenGLShaderProgram *m_defaultShaderProgram;
+    QOpenGLShaderProgram *m_gcodeShaderProgram;
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_viewMatrix;
     CubeDrawer m_cubeDrawer;
@@ -157,23 +162,26 @@ private:
     void drawText(QPainter &painter, QPoint &pos, QString text, int lineHeight, Qt::AlignmentFlag align = Qt::AlignLeft);
     void drawTexts(QPainter &painter, QPoint &pos, QStringList texts, int lineHeight);
 
+    void initializeDebugLogger();
+    void initializeGL() override;
+
 protected:
-    void initializeGL();
-    void resizeGL(int width, int height);
+    void resizeGL(int width, int height) override;
     void updateProjection();
     void updateView();
 
 #ifdef GLES
-    void paintGL();
+    void paintGL() override;
 #else
     void paintEvent(QPaintEvent *pe);
 #endif
 
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void wheelEvent(QWheelEvent *we);
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void leaveEvent(QEvent *event) override;
+    void wheelEvent(QWheelEvent *we) override;
 
-    void timerEvent(QTimerEvent *);
+    void timerEvent(QTimerEvent *) override;
 };
 
 #endif // GLWIDGET_H

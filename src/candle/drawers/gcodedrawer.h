@@ -21,11 +21,11 @@ public:
 
     void update();
     void update(QList<int> indexes);
-    bool updateData();
+    bool updateData() override;
 
-    QVector3D getSizes();
-    QVector3D getMinimumExtremes();
-    QVector3D getMaximumExtremes();
+    QVector3D getSizes() override;
+    QVector3D getMinimumExtremes() override;
+    QVector3D getMaximumExtremes() override;
 
     void setViewParser(GcodeViewParse* viewParser);
     GcodeViewParse* viewParser();        
@@ -74,6 +74,10 @@ public:
     DrawMode drawMode() const;
     void setDrawMode(const DrawMode &drawMode);
 
+    ProgramType programType() override { return ProgramType::GCode; };
+
+    void setEyePos(QVector3D eye) { m_eye = eye; }
+
 private slots:
     void onTimerVertexUpdate();
 
@@ -88,7 +92,9 @@ private:
     bool m_grayscaleSegments;
     GrayscaleCode m_grayscaleCode;
     int m_grayscaleMin;
-    int m_grayscaleMax;   
+    int m_grayscaleMax;
+
+    QVector3D m_eye;
 
     QColor m_colorNormal;
     QColor m_colorDrawn;
@@ -108,6 +114,7 @@ private:
     bool prepareRaster();
     bool updateRaster();
 
+    QVector3D initialNormal(QVector3D p1, QVector3D p2);
     int getSegmentType(LineSegment *segment);
     QVector3D getSegmentColorVector(LineSegment *segment);
     QColor getSegmentColor(LineSegment *segment);
