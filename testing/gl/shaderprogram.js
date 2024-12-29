@@ -50,9 +50,18 @@ class ShaderProgram {
         gl.uniform
     }
 
+    setUniformValueMatrix3(name, matrix) {
+        const location = gl.getUniformLocation(this.m_program, name);
+        if (location == -1 || location == null) {
+            throw "Could not find " + name;
+        }
+        gl.uniformMatrix3fv(location, false, matrix.values().toArray());
+        gl.uniform
+    }
+        
     setUniformValueVec3(name, vec3) {
         const location = gl.getUniformLocation(this.m_program, name);
-        console.log(name, location); 
+        //console.log(name, location); 
         if (location == -1 || location == null) {
             throw "Could not find " + name;
         }
@@ -65,6 +74,15 @@ class ShaderProgram {
 
     attributeLocation(name) {
         const loc = gl.getAttribLocation(this.m_program, name);
+        if (loc == -1 || loc == null) {
+            throw "Could not find " + name;
+        }
+
+        return loc;
+    }
+
+    uniformLocation(name) {
+        const loc = gl.getUniformLocation(this.m_program, name);
         if (loc == -1 || loc == null) {
             throw "Could not find " + name;
         }

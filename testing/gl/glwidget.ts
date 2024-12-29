@@ -1,4 +1,3 @@
-
 declare var gl: WebGL2RenderingContext;
 declare var canvas: HTMLCanvasElement;
 
@@ -435,14 +434,13 @@ class GLWidget {
         //     gl.TEXTURE_MAX_FILTER,
         //     gl.LINEAR_MIPMAP_NEAREST,
         //   );
-
         let offset = 0;
         const vertexLocation = this.m_shaderProgram2d.attributeLocation("a_position");
         this.m_shaderProgram2d.enableAttributeArray(vertexLocation);
         this.m_shaderProgram2d.setAttributeBuffer(vertexLocation, gl.FLOAT, offset, 2, 2 * 4 * 2);
 
         offset += Utils.VECTOR2D_SIZE;
-        
+
         const textureLocation = this.m_shaderProgram2d.attributeLocation("a_texcoord");
         this.m_shaderProgram2d.enableAttributeArray(textureLocation);
         this.m_shaderProgram2d.setAttributeBuffer(textureLocation, gl.FLOAT, offset, 2, 2 * 4 * 2);

@@ -2,7 +2,7 @@
 class VertexData {
     m_position;
     m_color;
-    m_start;
+    m_start; // = m_normal
 
     constructor(position, color, start) {
         this.m_position = position;

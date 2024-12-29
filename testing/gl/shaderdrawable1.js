@@ -164,6 +164,14 @@ class ShaderDrawable1 {
         return normal;
     }
 
+    calculateMidNormal(N1, N2) {
+        let normal = glMatrix.vec3.fromValues(0, 0, 0);
+        glMatrix.vec3.add(normal, N1, N2);
+        //glMatrix.vec3.scale(normal, normal, 120.5);
+        glMatrix.vec3.normalize(normal, normal);
+        return normal;
+    }
+
     once = true;
     m_lines = null;
 

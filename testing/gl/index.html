@@ -2,8 +2,8 @@
     <body>
         <canvas
             id="glcanvas"
-            width="512"
-            height="512"
+            width="800"
+            height="600"
             onmousewheel="glWidget.zoom(event);"
             onmousedown="glWidget.onMouseDown(event);"
             onmouseup="glWidget.onMouseUp(event);"
@@ -35,12 +35,14 @@
         <script src="glwidget.js"></script>
         <script>
 
+            console.clear();
+
             const canvas = document.querySelector("#glcanvas");
             if (!canvas) {
                 alert("Failed to retrieve the <canvas> element");
             }
 
-            let gl = canvas.getContext("webgl2");
+            let gl = canvas.getContext("webgl2", { antialias: true });
 
             gl = WebGLDebugUtils.makeDebugContext(gl,
                 function (err, funcName, args) {
@@ -49,10 +51,14 @@
             );
 
             const glWidget = new GLWidget(new Cube(100, 100));
-            setInterval(() => {
+            function draw() {
                 glWidget.paintEvent();
                 glWidget.rotate();
-            }, 10);
+
+                requestAnimationFrame(draw);
+            };
+
+            requestAnimationFrame(draw);
 
             function fit() {
                 glWidget.fit();

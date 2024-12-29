@@ -4,6 +4,7 @@ export declare global {
     declare var glMatrix: {
         vec3: typeof glMatrixType.vec3;
         vec4: typeof glMatrixType.vec4;
+        mat3: typeof glMatrixType.mat3;
         mat4: typeof glMatrixType.mat4;
     }
 
@@ -11,9 +12,12 @@ export declare global {
         constructor(vertexShaderSource: string, fragmentShaderSource: string);
         bind(): void;
         release(): void;
-        setUniformValueMatrix(name: string, matrix: any): void;
+        setUniformValueMatrix(name: string, matrix: glMatrixType.mat4): void;
+        setUniformValueMatrix3(name: string, matrix: glMatrixType.mat3): void;
         setUniformValueVec3(name: string, vec: any): void;
+        setUniformValue(name: string, value: any): void; 
         attributeLocation(name: string): number;
+        uniformLocation(name: string): number;
         enableAttributeArray(location: number): void;
         setAttributeBuffer(location: number, type: number, offset: number, size: number, stride: number): void;    
     };
@@ -25,7 +29,7 @@ export declare global {
         constructor(shaderProgram: ShaderProgram);
         needsUpdateGeometry(): boolean;
         updateGeometry(): void;
-        draw(eye2: any, mvpMatrix: any): void;
+        draw(eye2: any, mvpMatrix: any, lightPosRot: any): void;
         getVertexCount(): any;
     }
     declare class ShaderDrawable2 {
