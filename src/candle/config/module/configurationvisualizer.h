@@ -20,7 +20,6 @@ class ConfigurationVisualizer : public ConfigurationModule
     Q_PROPERTY(bool msaa MEMBER m_msaa NOTIFY changed)
     Q_PROPERTY(bool zBuffer MEMBER m_zBuffer NOTIFY changed)
     Q_PROPERTY(bool vsync MEMBER m_vsync NOTIFY changed)
-    Q_PROPERTY(ProgramDrawMode programDrawMode MEMBER m_programDrawMode NOTIFY changed)
     Q_PROPERTY(bool simplifyGeometry MEMBER m_simplifyGeometry NOTIFY changed)
     Q_PROPERTY(double simplifyGeometryPrecision MEMBER m_simplifyGeometryPrecision NOTIFY changed)
     Q_PROPERTY(bool grayscaleSegments MEMBER m_grayscaleSegments NOTIFY changed)
@@ -50,12 +49,6 @@ class ConfigurationVisualizer : public ConfigurationModule
         ConfigurationVisualizer& operator=(const ConfigurationVisualizer&) { return *this; }
         QString getSectionName() override { return "baseui.visualizer"; }
 
-        enum ProgramDrawMode {
-            Vectors,
-            Raster
-        };
-        Q_ENUM(ProgramDrawMode);
-
         enum ToolType {
             Flat,
             Conic
@@ -68,7 +61,6 @@ class ConfigurationVisualizer : public ConfigurationModule
         bool msaa() const { return m_msaa; }
         bool zBuffer() const { return m_zBuffer; }
         bool vsync() const { return m_vsync; }
-        ConfigurationVisualizer::ProgramDrawMode programDrawMode() const { return m_programDrawMode; }
         bool simplifyGeometry() const { return m_simplifyGeometry; }
         double simplifyGeometryPrecision() const { return m_simplifyGeometryPrecision; }
         bool grayscaleSegments() const { return m_grayscaleSegments; }
@@ -102,7 +94,6 @@ class ConfigurationVisualizer : public ConfigurationModule
         bool m_msaa;
         bool m_zBuffer;
         bool m_vsync;
-        ProgramDrawMode m_programDrawMode;
         bool m_simplifyGeometry;
         double m_simplifyGeometryPrecision;
         bool m_grayscaleSegments;

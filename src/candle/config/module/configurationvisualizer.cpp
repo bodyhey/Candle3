@@ -11,7 +11,6 @@ const QMap<QString, QVariant> DEFAULTS = {
     {"msaa", true},
     {"zBuffer", false},
     {"vsync", false},
-    {"programDrawMode", ConfigurationVisualizer::ProgramDrawMode::Vectors},
     {"simplifyGeometry", false},
     {"simplifyGeometryPrecision", 0.1},
     {"grayscaleSegments", false},

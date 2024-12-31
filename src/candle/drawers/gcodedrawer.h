@@ -15,7 +15,6 @@ class GcodeDrawer : public QObject, public ShaderDrawable
     Q_OBJECT
 public:
     enum GrayscaleCode { S, Z };
-    enum DrawMode { Vectors, Raster };
 
     explicit GcodeDrawer();
 
@@ -71,9 +70,6 @@ public:
     int grayscaleMax() const;
     void setGrayscaleMax(int grayscaleMax);
 
-    DrawMode drawMode() const;
-    void setDrawMode(const DrawMode &drawMode);
-
     ProgramType programType() override { return ProgramType::GCode; };
 
     void setEyePos(QVector3D eye) { m_eye = eye; }
@@ -83,8 +79,6 @@ private slots:
 
 private:
     GcodeViewParse *m_viewParser;
-
-    DrawMode m_drawMode;
 
     bool m_simplify;
     double m_simplifyPrecision;
@@ -111,8 +105,6 @@ private:
 
     bool prepareVectors();
     bool updateVectors();
-    bool prepareRaster();
-    bool updateRaster();
 
     QVector3D initialNormal(QVector3D p1, QVector3D p2);
     int getSegmentType(LineSegment *segment);

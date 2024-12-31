@@ -42,7 +42,6 @@ private slots:
     void on_cboToolType_currentIndexChanged(int index);
     void on_listCategories_currentRowChanged(int currentRow);
     void onCmdDefaultsClicked();
-    void onDrawModeVectorsToggled(bool checked);
     void onArcApproximationModeChanged(bool checked);
     void onConnectionModeChanged(int);
 

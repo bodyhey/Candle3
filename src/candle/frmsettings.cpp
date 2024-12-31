@@ -79,7 +79,6 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
     connect(ui->cmdCancel, &QAbstractButton::clicked, this, &frmSettings::onCmdCancelClicked);
     connect(ui->cmdDefaults, &QAbstractButton::clicked, this, &frmSettings::onCmdDefaultsClicked);
     connect(ui->cmdSerialPortsRefresh, &QAbstractButton::clicked, this, &frmSettings::onCmdSerialPortsRefreshClicked);
-    connect(ui->radDrawModeVectors, &QRadioButton::toggled, this, &frmSettings::onDrawModeVectorsToggled);
     connect(ui->radArcDegreeMode, &QRadioButton::toggled, this, &frmSettings::onArcApproximationModeChanged);
     connect(ui->radArcLengthMode, &QRadioButton::toggled, this, &frmSettings::onArcApproximationModeChanged);
     connect(ui->chkOverrideMaxTravel, &QAbstractButton::toggled, [=](bool checked) {
@@ -203,8 +202,6 @@ void frmSettings::initializeWidgets()
     ui->chkGrayscaleSegments->setChecked(visualizer.grayscaleSegments());
     ui->radGrayscaleSegmentsByS->setChecked(visualizer.grayscaleSegmentsBySCode());
     ui->radGrayscaleSegmentsByZ->setChecked(visualizer.grayscaleSegmentsByZCode());
-    ui->radDrawModeVectors->setChecked(visualizer.programDrawMode() == ConfigurationVisualizer::ProgramDrawMode::Vectors);
-    ui->radDrawModeRaster->setChecked(visualizer.programDrawMode() == ConfigurationVisualizer::ProgramDrawMode::Raster);
     ui->cboToolType->setCurrentIndex(visualizer.toolType());
     ui->txtToolAngle->setValue(visualizer.toolAngle());
     ui->txtToolDiameter->setValue(visualizer.toolDiameter());
@@ -298,7 +295,6 @@ void frmSettings::applySettings()
     visualizer.m_grayscaleSegments = ui->chkGrayscaleSegments->isChecked();
     visualizer.m_grayscaleSegmentsBySCode = ui->radGrayscaleSegmentsByS->isChecked();
     visualizer.m_grayscaleSegmentsByZCode = ui->radGrayscaleSegmentsByZ->isChecked();
-    visualizer.m_programDrawMode = ui->radDrawModeVectors->isChecked() ? ConfigurationVisualizer::ProgramDrawMode::Vectors : ConfigurationVisualizer::ProgramDrawMode::Raster;
     visualizer.m_toolType = (ConfigurationVisualizer::ToolType) ui->cboToolType->currentIndex();
     visualizer.m_toolAngle = ui->txtToolAngle->value();
     visualizer.m_toolDiameter = ui->txtToolDiameter->value();
@@ -582,13 +578,6 @@ void frmSettings::onCmdDefaultsClicked()
     ui->chkConfirmToolChangeCommandsExecution->setChecked(false);
 
     emit settingsSetToDefault();
-}
-
-void frmSettings::onDrawModeVectorsToggled(bool checked)
-{
-    ui->chkSimplifyGeometry->setEnabled(checked);
-    ui->lblSimpilyPrecision->setEnabled(checked && ui->chkSimplifyGeometry->isChecked());
-    ui->txtSimplifyPrecision->setEnabled(checked && ui->chkSimplifyGeometry->isChecked());
 }
 
 void frmSettings::onArcApproximationModeChanged(bool checked)

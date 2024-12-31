@@ -47,8 +47,6 @@ frmMain::frmMain(QWidget *parent) :
 {
     m_configuration.load();
 
-    qDebug() << (int) m_configuration.visualizerModule().programDrawMode();
-
     // Loading settings
     m_settingsFileName = qApp->applicationDirPath() + "/settings.ini";
     preloadSettings();
@@ -2351,14 +2349,9 @@ void frmMain::applyCodeDrawerConfiguration(ConfigurationVisualizer &visualizerCo
     m_codeDrawer->setColorZMovement(visualizerConfiguration.zMovementColor());
     m_codeDrawer->setColorStart(visualizerConfiguration.startPointColor());
     m_codeDrawer->setColorEnd(visualizerConfiguration.endPointColor());
-    m_codeDrawer->setIgnoreZ(visualizerConfiguration.grayscaleSegments() || visualizerConfiguration.programDrawMode() != ConfigurationVisualizer::ProgramDrawMode::Vectors);
+    m_codeDrawer->setIgnoreZ(false);
     m_codeDrawer->setGrayscaleSegments(visualizerConfiguration.grayscaleSegments());
     m_codeDrawer->setGrayscaleCode(visualizerConfiguration.grayscaleSegmentsBySCode() ? GcodeDrawer::S : GcodeDrawer::Z);
-    m_codeDrawer->setDrawMode(
-        visualizerConfiguration.programDrawMode() == ConfigurationVisualizer::ProgramDrawMode::Vectors
-            ? GcodeDrawer::Vectors
-            : GcodeDrawer::Raster
-        );
     m_codeDrawer->setGrayscaleMin(m_configuration.machineModule().laserPowerRange().min);
     m_codeDrawer->setGrayscaleMax(m_configuration.machineModule().laserPowerRange().max);
     m_codeDrawer->update();
