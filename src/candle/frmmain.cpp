@@ -85,21 +85,21 @@ frmMain::frmMain(QWidget *parent) :
     ui->console->append(QString("G-Candle %1 started").arg( qApp->applicationVersion()));
     ui->console->append("---");
 
-    connect(ui->control, &partMainControl::unlock, this, [=]() {
+    connect(ui->control, &partMainControl::unlock, this, [this]() {
         m_communicator->m_updateSpindleSpeed = true;
         m_communicator->sendCommand(CommandSource::GeneralUI, "$X", TABLE_INDEX_UI);
     });
-    connect(ui->control, &partMainControl::home, this, [=]() {
+    connect(ui->control, &partMainControl::home, this, [this]() {
         // m_communicator->m_homing = true;
         // m_communicator->m_updateSpindleSpeed = true;
         // m_communicator->sendCommand(CommandSource::GeneralUI, "$H", TABLE_INDEX_UI);
 
         m_communicator->home();
     });
-    connect(ui->control, &partMainControl::probe, this, [=]() {
+    connect(ui->control, &partMainControl::probe, this, [this]() {
         m_communicator->probe();
     });
-    connect(ui->control, &partMainControl::reset, this, [=]() {
+    connect(ui->control, &partMainControl::reset, this, [this]() {
         m_communicator->reset();
     });
     // connect(ui->control, &partMainControl::command, this, [=](GRBLCommand command) {
@@ -107,19 +107,19 @@ frmMain::frmMain(QWidget *parent) :
     // });
 
     // toggle section visibility
-    connect(ui->grpControl, &QGroupBox::toggled, this, [=](bool checked) {
+    connect(ui->grpControl, &QGroupBox::toggled, this, [this](bool checked) {
         updateLayouts();
         ui->control->setVisible(checked);
     });
-    connect(ui->grpState, &QGroupBox::toggled, this, [=](bool checked) {
+    connect(ui->grpState, &QGroupBox::toggled, this, [this](bool checked) {
         updateLayouts();
         ui->state->setVisible(checked);
     });
-    connect(ui->grpSpindle, &QGroupBox::toggled, this, [=](bool checked) {
+    connect(ui->grpSpindle, &QGroupBox::toggled, this, [this](bool checked) {
         updateLayouts();
         ui->spindle->setVisible(checked);
     });
-    connect(ui->grpSpindle, &QGroupBox::toggled, this, [=](bool checked) {
+    connect(ui->grpSpindle, &QGroupBox::toggled, this, [this](bool checked) {
         ui->grpSpindle->setProperty("overrided", checked);
         style()->unpolish(ui->grpSpindle);
         ui->grpSpindle->ensurePolished();
@@ -131,12 +131,12 @@ frmMain::frmMain(QWidget *parent) :
         }
     });
 
-    connect(ui->jog, &partMainJog::jog, this, [=](JoggindDir dir, QVector3D jog) {
+    connect(ui->jog, &partMainJog::jog, this, [this](JoggindDir dir, QVector3D jog) {
         Q_UNUSED(dir)
         qDebug() << "Jog: " << jog;
         jogStep(jog);
     });
-    connect(ui->jog, &partMainJog::stop, this, [=]() {
+    connect(ui->jog, &partMainJog::stop, this, [this]() {
         m_communicator->clearQueue();
         m_communicator->sendRealtimeCommand(GRBL_LIVE_JOG_CANCEL);
         while (m_communicator->deviceState() == DeviceState::Jog) {
