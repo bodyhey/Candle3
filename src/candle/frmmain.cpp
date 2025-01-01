@@ -32,6 +32,7 @@
 #include "ui_partmainoverride.h"
 #include "widgets/widgetmimedata.h"
 #include "connection/connectionmanager.h"
+#include "gcode/gcodethreadedloader.h"
 
 #define FILE_FILTER_TEXT "G-Code files (*.nc *.ncc *.ngc *.tap *.gc *.gcode *.txt)"
 
@@ -1786,7 +1787,7 @@ void frmMain::onTableCurrentChanged(QModelIndex currentIndex, QModelIndex previo
     int rowPrevious = qMax(qMin(previousIndex.row(), m_currentProgram->lastCommandIndex()), 0);
 
     // Update toolpath hightlighting
-    GcodeViewParse *parser = m_currentDrawer->viewParser();
+    GCodeViewParser *parser = m_currentDrawer->viewParser();
     QList<LineSegment*> list = parser->getLineSegmentList();
     QVector<QList<int>> lineIndexes = parser->getLinesIndexes();
 
@@ -2477,7 +2478,7 @@ void frmMain::openPortIfNeeded()
 
 void frmMain::updateParser()
 {
-    GcodeViewParse *viewParse = m_currentDrawer->viewParser();
+    GCodeViewParser *viewParse = m_currentDrawer->viewParser();
 
     GcodeParser parser;
     parser.setTraverseSpeed(m_communicator->machineConfiguration().maxRate().x()); // uses only x axis speed
@@ -2572,28 +2573,38 @@ void frmMain::updateParser()
 
 void frmMain::loadFile(QString fileName)
 {
-    QFile file(fileName);
+    GCodeThreadedLoader *loader = new GCodeThreadedLoader(this);
+    connect(loader, &GCodeThreadedLoader::progress, this, [](int progress) {
+        qDebug() << "Progress: " << progress;
+    });
+    connect(loader, &GCodeThreadedLoader::finished, this, [this](GCodeLoaderData *data) {
+        qDebug() << "Finished loading file" << data->gcode->count();
+    });
 
-    if (!file.open(QIODevice::ReadOnly)) {
-        QMessageBox::critical(this, this->windowTitle(), tr("Can't open file:\n") + fileName);
-        return;
-    }
+    loader->loadFromFile(fileName, m_configuration.parserModule());
 
-    // Set filename
-    m_programFileName = fileName;
+    // QFile file(fileName);
 
-    // Prepare text stream
-    QTextStream textStream(&file);
+    // if (!file.open(QIODevice::ReadOnly)) {
+    //     QMessageBox::critical(this, this->windowTitle(), tr("Can't open file:\n") + fileName);
+    //     return;
+    // }
 
-    // Read lines
-    QList<std::string> data;
-    while (!textStream.atEnd()) {
-        data.append(textStream.readLine().toStdString());
-    }
+    // // Set filename
+    // m_programFileName = fileName;
 
-    qDebug() << "Lines: " << data.count();
+    // // Prepare text stream
+    // QTextStream textStream(&file);
 
-    loadLines(data);
+    // // Read lines
+    // QList<std::string> data;
+    // while (!textStream.atEnd()) {
+    //     data.append(textStream.readLine().toStdString());
+    // }
+
+    // qDebug() << "Lines: " << data.count();
+
+    // loadLines(data);
 }
 
 void frmMain::loadLines(QList<std::string> data)
@@ -2630,9 +2641,9 @@ void frmMain::loadLines(QList<std::string> data)
     ui->tblProgram->setModel(NULL);
 
     // Prepare parser
-    GcodeParser gp;
-    gp.setTraverseSpeed(m_communicator->machineConfiguration().maxRate().x()); // uses only x axis speed
-    if (m_codeDrawer->getIgnoreZ()) gp.reset(QVector3D(qQNaN(), qQNaN(), 0));
+    GcodeParser parser;
+    parser.setTraverseSpeed(m_communicator->machineConfiguration().maxRate().x()); // uses only x axis speed
+    if (m_codeDrawer->getIgnoreZ()) parser.reset(QVector3D(qQNaN(), qQNaN(), 0));
 
     // Block parser updates on table changes
     m_programLoading = true;
@@ -2670,11 +2681,11 @@ void frmMain::loadLines(QList<std::string> data)
             stripped = GcodePreprocessorUtils::removeComment(command);
             args = GcodePreprocessorUtils::splitCommand(stripped);
 
-            gp.addCommand(args);
+            parser.addCommand(args);
 
             item.command = QString::fromStdString(trimmed);
             item.state = GCodeItem::InQueue;
-            item.lineNumber = gp.getCommandNumber();
+            item.lineNumber = parser.getCommandNumber();
             item.args = args;
 
             m_program.append(item);
@@ -2695,7 +2706,7 @@ void frmMain::loadLines(QList<std::string> data)
 
     updateProgramEstimatedTime(
         m_viewParser.getLinesFromParser(
-            &gp,
+            &parser,
             m_configuration.parserModule().arcApproximationValue(),
             m_configuration.parserModule().arcApproximationMode() == ConfigurationParser::ParserArcApproximationMode::ByAngle
         )
@@ -3386,7 +3397,7 @@ void frmMain::updateToolPositionAndToolpathShadowing(QVector3D toolPosition)
     DeviceState deviceState = m_communicator->deviceState();
     if (((senderState == SenderState::Transferring) || (senderState == SenderState::Stopping)
          || (senderState == SenderState::Pausing) || (senderState == SenderState::Pausing2) || (senderState == SenderState::Paused)) && deviceState != DeviceState::Check) {
-        GcodeViewParse *parser = m_currentDrawer->viewParser();
+        GCodeViewParser *parser = m_currentDrawer->viewParser();
 
         bool toolOntoolpath = false;
 
@@ -3417,7 +3428,7 @@ void frmMain::updateToolPositionAndToolpathShadowing(QVector3D toolPosition)
 
 void frmMain::updateToolpathShadowingOnCheckMode()
 {
-    GcodeViewParse *parser = m_currentDrawer->viewParser();
+    GCodeViewParser *parser = m_currentDrawer->viewParser();
     QList<LineSegment*> list = parser->getLineSegmentList();
 
     if ((m_communicator->m_senderState != SenderState::Stopping) && m_program.processedCommandIndex() < m_currentModel->rowCount() - 1) {
@@ -3643,7 +3654,7 @@ void frmMain::jogContinuous()
 void frmMain::onTransferCompleted()
 {
     // Shadow last segment
-    GcodeViewParse *parser = m_currentDrawer->viewParser();
+    GCodeViewParser *parser = m_currentDrawer->viewParser();
     QList<LineSegment*> list = parser->getLineSegmentList();
     if (m_lastDrawnLineIndex < list.count()) {
         list[m_lastDrawnLineIndex]->setDrawn(true);
@@ -3670,7 +3681,7 @@ QString frmMain::getLineInitCommands(int row)
 {
     int commandIndex = row;
 
-    GcodeViewParse *parser = m_currentDrawer->viewParser();
+    GCodeViewParser *parser = m_currentDrawer->viewParser();
     QList<LineSegment*> list = parser->getLineSegmentList();
     QVector<QList<int>> lineIndexes = parser->getLinesIndexes();
     QString commands;

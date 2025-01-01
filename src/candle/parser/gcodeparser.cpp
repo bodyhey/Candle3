@@ -201,6 +201,7 @@ QList<PointSegment*> GcodeParser::expandArc()
 QList<PointSegment*> GcodeParser::getPointSegmentList() {
     return this->m_points;
 }
+
 double GcodeParser::getTraverseSpeed() const
 {
     return m_traverseSpeed;

@@ -33,7 +33,7 @@
 #include "form_partial/main/partmainstate.h"
 #include "form_partial/main/partmainconsole.h"
 #include "frmgrblconfigurator.h"
-#include "parser/gcodeviewparse.h"
+#include "parser/gcodeviewparser.h"
 
 #include "drawers/origindrawer.h"
 #include "drawers/gcodedrawer.h"
@@ -236,8 +236,8 @@ private:
 #endif
 
     // Parsers
-    GcodeViewParse m_viewParser;
-    GcodeViewParse m_probeParser;
+    GCodeViewParser m_viewParser;
+    GCodeViewParser m_probeParser;
 
     // Visualizer drawers
     // TODO: Add machine table visualizer

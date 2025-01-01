@@ -124,6 +124,7 @@ SOURCES += main.cpp\
     gcode/gcode.cpp \
     gcode/gcodeexporter.cpp \
     gcode/gcodeloader.cpp \
+    gcode/gcodethreadedloader.cpp \
     heightmap.cpp \
     machine/machineconfiguration.cpp \
     module/camera/camera.cpp \
@@ -135,7 +136,7 @@ SOURCES += main.cpp\
     parser/arcproperties.cpp \
     parser/gcodeparser.cpp \
     parser/gcodepreprocessorutils.cpp \
-    parser/gcodeviewparse.cpp \
+    parser/gcodeviewparser.cpp \
     parser/linesegment.cpp \
     parser/pointsegment.cpp \
     state/state.cpp \
@@ -210,6 +211,7 @@ HEADERS  += frmmain.h \
     gcode/gcode.h \
     gcode/gcodeexporter.h \
     gcode/gcodeloader.h \
+    gcode/gcodethreadedloader.h \
     globals.h \
     heightmap.h \
     machine/machineconfiguration.h \
@@ -222,7 +224,7 @@ HEADERS  += frmmain.h \
     parser/arcproperties.h \
     parser/gcodeparser.h \
     parser/gcodepreprocessorutils.h \
-    parser/gcodeviewparse.h \
+    parser/gcodeviewparser.h \
     parser/linesegment.h \
     parser/pointsegment.h \
     state/state.h \

@@ -4,15 +4,21 @@
 
 #include "gcodeloader.h"
 #include "parser/gcodeparser.h"
+#include "parser/gcodeviewparser.h"
 #include <QDebug>
 
-GCodeLoader::GCodeLoader() {}
+GCodeLoader::GCodeLoader(QObject *parent)
+    : AbstractGCodeLoader(parent)
+{
+}
 
-void GCodeLoader::loadFromFile(const QString &fileName)
+void GCodeLoader::loadFromFile(const QString &fileName, ConfigurationParser &configuration)
 {
     QFile file(fileName);
 
     if (!file.open(QIODevice::ReadOnly)) {
+        emit cancelled();
+
         //        QMessageBox::critical(this, this->windowTitle(), tr("Can't open file:\n") + fileName);
         return;
     }
@@ -26,7 +32,7 @@ void GCodeLoader::loadFromFile(const QString &fileName)
 
     qDebug() << "Size: " << file.size();
 
-    loadFromFileObject(file, file.size());
+    loadFromFileObject(file, file.size(), configuration);
 
     file.close();
 
@@ -41,11 +47,18 @@ void GCodeLoader::loadFromFile(const QString &fileName)
     //loadFromString(data);
 }
 
-void GCodeLoader::loadFromFileObject(QFile &file, int size)
+void GCodeLoader::loadFromLines(const QStringList &lines, ConfigurationParser &configuration)
 {
-    GCode gCode;
 
-    m_cancelling = false;
+}
+
+void GCodeLoader::loadFromFileObject(QFile &file, int size, ConfigurationParser &configuration)
+{
+    emit started();
+
+    GCode GCode;
+
+    m_cancel = false;
 
     // assert(m_communicator->isMachineConfigurationReady());
     // if (!m_communicator->isMachineConfigurationReady()) {
@@ -53,7 +66,7 @@ void GCodeLoader::loadFromFileObject(QFile &file, int size)
     // }
 
     // Reset tables
-    gCode.clear();
+    GCode.clear();
     // clearTable();
     // m_probeModel.clear();
     // m_programHeightmapModel.clear();
@@ -91,16 +104,6 @@ void GCodeLoader::loadFromFileObject(QFile &file, int size)
     // m_programModel.data().clear();
     // m_programModel.data().reserve(data.count());
 
-    // QProgressDialog progress(tr("Opening file..."), tr("Abort"), 0, data.count(), this);
-    // progress.setWindowModality(Qt::WindowModal);
-    // progress.setFixedSize(progress.sizeHint());
-    // if (data.count() > PROGRESSMINLINES) {
-    //     progress.show();
-    //     progress.setStyleSheet("QProgressBar {text-align: center; qproperty-format: \"\"}");
-    // }
-
-    emit loadingStarted();
-
     std::string command;
     std::string stripped;
     std::string trimmed;
@@ -126,7 +129,7 @@ void GCodeLoader::loadFromFileObject(QFile &file, int size)
             item.lineNumber = parser.getCommandNumber();
             item.args = args;
 
-            gCode.append(item);
+            GCode.append(item);
         }
 
         remaining = size - file.pos();
@@ -136,7 +139,6 @@ void GCodeLoader::loadFromFileObject(QFile &file, int size)
         if (percentage != lastPercentage) {
             lastPercentage = percentage;
             emit progress(percentage);
-            qDebug() << "Progress: " + QString::number(percentage) + "%";
         }
 
         // if (progress.isVisible() && (remaining % PROGRESSSTEP == 0)) {
@@ -145,23 +147,21 @@ void GCodeLoader::loadFromFileObject(QFile &file, int size)
         //     if (progress.wasCanceled()) break;
         // }
 
-        if (m_cancelling) {
-            break;
+        if (m_cancel || QThread::currentThread()->isInterruptionRequested()) {
+            emit cancelled();
+            return;
         }
     }
-
-    qDebug() << "end of file";
-    // progress.close();
-    // qApp->processEvents();
 
     // m_programModel.insertRow(m_programModel.rowCount());
 
     // updateProgramEstimatedTime(
-    //     m_viewParser.getLinesFromParser(
-    //         &gp,
-    //         m_configuration.parserModule().arcApproximationValue(),
-    //         m_configuration.parserModule().arcApproximationMode() == ConfigurationParser::ParserArcApproximationMode::ByAngle
-    //         )
+    GCodeViewParser viewParser;
+    viewParser.getLinesFromParser(
+        &parser,
+        configuration.arcApproximationValue(),
+        configuration.arcApproximationMode() == ConfigurationParser::ParserArcApproximationMode::ByAngle
+    );
     //     );
 
     // m_programLoading = false;
@@ -181,17 +181,19 @@ void GCodeLoader::loadFromFileObject(QFile &file, int size)
     // resetHeightmap();
     // updateControlsState();
 
-    if (m_cancelling) {
-        emit loadingCancelled();
+    if (m_cancel) {
+        emit cancelled();
     } else {
-        emit loadingFinished(gCode);
-    }
+        GCodeLoaderData *result = new GCodeLoaderData();
+        result->gcode = &GCode;
+        result->viewParser = &viewParser;
 
-    qDebug() << "Loaded: " << size;
+        emit finished(result);
+    }
 }
 
 
-void GCodeLoader::cancelLoading()
+void GCodeLoader::cancel()
 {
 
 }

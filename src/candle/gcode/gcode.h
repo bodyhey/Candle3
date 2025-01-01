@@ -6,6 +6,7 @@
 #define GCODE_H
 
 #include <QObject>
+#include "../parser/gcodeparser.h"
 
 enum StreamerStartResult
 {
@@ -31,7 +32,7 @@ class GCode : public QObject , public QList<GCodeItem>
     Q_OBJECT
 
     public:
-        explicit GCode(QObject *parent = nullptr);
+        explicit GCode( QObject *parent = nullptr);
         void reset(int commandIndex = 0);
         void resetProcessed(int commandIndex = 0);
         int commandIndex() { return m_commandIndex; }
@@ -51,6 +52,7 @@ class GCode : public QObject , public QList<GCodeItem>
     private:
         int m_commandIndex;
         int m_processedCommandIndex;
+        GcodeParser m_parser;
 
     signals:
         void progressChanged(int progress);

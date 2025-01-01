@@ -5,8 +5,8 @@
 
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
 
-#ifndef GCODEVIEWPARSE_H
-#define GCODEVIEWPARSE_H
+#ifndef GCODEVIEWPARSER_H
+#define GCODEVIEWPARSER_H
 
 #include <QObject>
 #include <QVector3D>
@@ -15,11 +15,11 @@
 #include "gcodeparser.h"
 #include "utils/util.h"
 
-class GcodeViewParse
+class GCodeViewParser
 {
     public:
-        explicit GcodeViewParse();
-        ~GcodeViewParse();
+        explicit GCodeViewParser();
+        ~GCodeViewParser();
 
         QVector3D &getMinimumExtremes();
         QVector3D &getMaximumExtremes();
@@ -55,4 +55,4 @@ class GcodeViewParse
         void testLength(const QVector3D &start, const QVector3D &end);
 };
 
-#endif // GCODEVIEWPARSE_H
+#endif // GCODEVIEWPARSER_H

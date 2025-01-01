@@ -6,27 +6,45 @@
 #define GCODELOADER_H
 
 #include "gcode.h"
+#include "config/module/configurationparser.h"
+#include "parser/gcodeviewparser.h"
 #include <QFile>
+#include <QThread>
 
-class GCodeLoader : public QObject
+struct GCodeLoaderData {
+    GCode *gcode;
+    GCodeViewParser *viewParser;
+};
+
+class AbstractGCodeLoader : public QObject
 {
     Q_OBJECT
 
     public:
-        GCodeLoader();
-        void loadFromFile(const QString &fileName);
-        void cancelLoading();
-
-    private:
-        static const int PROGRESSSTEP = 1000;
-        bool m_cancelling;
-        void loadFromFileObject(QFile &stream, int size);
+        explicit AbstractGCodeLoader(QObject *parent = nullptr) : QObject(parent) {}
+        virtual void loadFromFile(const QString &fileName, ConfigurationParser &configuration) = 0;
+        virtual void loadFromLines(const QStringList &lines, ConfigurationParser &configuration) = 0;
+        virtual void cancel() = 0;
 
     signals:
         void progress(int value);
-        void loadingStarted();
-        void loadingFinished(GCode &gcode);
-        void loadingCancelled();
+        void started();
+        void finished(GCodeLoaderData *result);
+        void cancelled();
+};
+
+class GCodeLoader : public AbstractGCodeLoader
+{
+    public:
+        explicit GCodeLoader(QObject *parent = nullptr);
+        void loadFromFile(const QString &fileName, ConfigurationParser &configuration) override;
+        void loadFromLines(const QStringList &lines, ConfigurationParser &configuration) override;
+        void cancel() override;
+
+    private:
+    //    static const int PROGRESSSTEP = 1000;
+        bool m_cancel;
+        void loadFromFileObject(QFile &stream, int size, ConfigurationParser &configuration);
 };
 
 #endif // GCODELOADER_H
