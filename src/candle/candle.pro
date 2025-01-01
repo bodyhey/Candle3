@@ -101,6 +101,7 @@ SOURCES += main.cpp\
     drawers/cubedrawer.cpp \
     drawers/cursordrawer.cpp \
     drawers/tablesurfacedrawer.cpp \
+    drawers/vertexdataexporter.cpp \
     form_partial/main/partmainconsole.cpp \
     form_partial/main/partmaincontrol.cpp \
     form_partial/main/partmainheightmap.cpp \
@@ -189,6 +190,7 @@ HEADERS  += frmmain.h \
     drawers/cubedrawer.h \
     drawers/cursordrawer.h \
     drawers/tablesurfacedrawer.h \
+    drawers/vertexdataexporter.h \
     form_partial/main/partmainconsole.h \
     form_partial/main/partmaincontrol.h \
     form_partial/main/partmainheightmap.h \

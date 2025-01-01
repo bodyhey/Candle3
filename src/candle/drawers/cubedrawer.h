@@ -28,7 +28,7 @@ public:
     void updateView();
     void updateEyePosition(QVector3D eye, QVector3D up);
     CubeClickableFace faceAtPos(QPoint pos);
-    void mouseMoveEvent(QMouseEvent *event);
+    CubeClickableFace mouseMoveEvent(QMouseEvent *event);
     void leaveEvent(QEvent *event);
 
 private:

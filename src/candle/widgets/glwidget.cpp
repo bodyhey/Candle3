@@ -579,9 +579,9 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
     if (m_gcodeShaderProgram) {
         m_gcodeShaderProgram->bind();
         m_gcodeShaderProgram->setUniformValue("u_mvp_matrix", m_projectionMatrix * m_viewMatrix);
+        m_gcodeShaderProgram->setUniformValue("u_mv_matrix", m_viewMatrix);
         m_gcodeShaderProgram->setUniformValue("u_light_position", m_eye);
         m_gcodeShaderProgram->setUniformValue("u_eye", m_eye);
-        m_gcodeShaderProgram->setUniformValue("u_offset", QVector2D(2.0 / width(), 2.0 / height()));
         currentProgram = m_gcodeShaderProgram;
     }
 
@@ -626,9 +626,13 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
         }
         switch (drawable->programType()) {
         case ShaderDrawable::ProgramType::GCode:
+            m_gcodeShaderProgram->setUniformValue("u_offset", QVector2D(2.0 / width(), 2.0 / height()));
             m_gcodeShaderProgram->setUniformValue("u_shadow", true);
-            drawable->draw(currentProgram);
+            //drawable->draw(currentProgram);
+            m_gcodeShaderProgram->setUniformValue("u_offset", QVector2D(-2.0 / width(), -2.0 / height()));
+            drawable->setLineWidth(1.5);
             m_gcodeShaderProgram->setUniformValue("u_shadow", false);
+            drawable->draw(currentProgram);
             break;
         case ShaderDrawable::ProgramType::Default:
             break;
@@ -845,7 +849,12 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     }
 
     if (pos.x() < 200 && pos.y() < 200) {
-        m_cubeDrawer.mouseMoveEvent(event);
+        CubeClickableFace face = m_cubeDrawer.mouseMoveEvent(event);
+        if (face != CubeClickableFace::None) {
+            setCursor(Qt::PointingHandCursor);
+        } else {
+            setCursor(Qt::ArrowCursor);
+        }
     }
 }
 

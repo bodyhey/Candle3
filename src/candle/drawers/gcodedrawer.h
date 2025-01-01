@@ -7,7 +7,7 @@
 #include <QObject>
 #include <QVector3D>
 #include "parser/linesegment.h"
-#include "parser/gcodeviewparse.h"
+#include "parser/gcodeviewparser.h"
 #include "shaderdrawable.h"
 
 class GcodeDrawer : public QObject, public ShaderDrawable
@@ -26,8 +26,8 @@ public:
     QVector3D getMinimumExtremes() override;
     QVector3D getMaximumExtremes() override;
 
-    void setViewParser(GcodeViewParse* viewParser);
-    GcodeViewParse* viewParser();        
+    void setViewParser(GCodeViewParser* viewParser);
+    GCodeViewParser* viewParser();
 
     bool simplify() const;
     void setSimplify(bool simplify);
@@ -78,7 +78,7 @@ private slots:
     void onTimerVertexUpdate();
 
 private:
-    GcodeViewParse *m_viewParser;
+    GCodeViewParser *m_viewParser;
 
     bool m_simplify;
     double m_simplifyPrecision;

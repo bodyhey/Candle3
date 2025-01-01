@@ -65,6 +65,9 @@ public:
     double pointSize() const;
     void setPointSize(double pointSize);
 
+    QList<VertexData>& lines() { return m_lines; }
+    virtual bool updateData();
+
     virtual ProgramType programType() { return ProgramType::Default; };
 
 signals:
@@ -85,7 +88,6 @@ protected:
     QOpenGLBuffer m_vbo; // Protected for direct vbo access
 
     void init();
-    virtual bool updateData();
     virtual void bindAttributes(QOpenGLShaderProgram *&shaderProgram);
 
 private:

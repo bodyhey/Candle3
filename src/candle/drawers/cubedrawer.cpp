@@ -2,7 +2,6 @@
 
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
-#include <QOpenGLTexture>
 #include "cube.h"
 #include "utils.h"
 
@@ -40,13 +39,11 @@ CubeDrawer::CubeDrawer() : m_eye({0, 0, 1}), m_animation(this, "faceAnimation")
             ;
     }
 
-    qDebug() << m_triangles.count() << m_lines.count();
-
     setProjection();
 }
 
 void CubeDrawer::drawBackground() {
-    glClearColor(0.2, 0.2, 0.0, 0.2);
+    glClearColor(0.2, 0.2, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -183,14 +180,14 @@ CubeClickableFace CubeDrawer::faceAtPos(QPoint pos)
     return CubeClickableFace::None;
 }
 
-void CubeDrawer::mouseMoveEvent(QMouseEvent *event)
+CubeClickableFace CubeDrawer::mouseMoveEvent(QMouseEvent *event)
 {
     QPoint pos = event->pos();
 
     CubeClickableFace lastFace = CubeClickableFace::None;
     m_faceAtCursor = faceAtPos(pos);
     if (m_faceAtCursor == lastFace) {
-        return;
+        return lastFace;
     }
 
     m_animation.stop();
@@ -202,7 +199,7 @@ void CubeDrawer::mouseMoveEvent(QMouseEvent *event)
     if (m_faceAtCursor == CubeClickableFace::None) {
         m_needsUpdateGeometry = true;
 
-        return;
+        return m_faceAtCursor;
     }
 
     int fi = (int)m_faceAtCursor;
@@ -221,6 +218,8 @@ void CubeDrawer::mouseMoveEvent(QMouseEvent *event)
         m_lines[li + i].color = white;
     }
     m_needsUpdateGeometry = true;
+
+    return m_faceAtCursor;
 }
 
 void CubeDrawer::leaveEvent(QEvent *event)

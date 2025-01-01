@@ -158,8 +158,8 @@ bool GcodeDrawer::prepareVectors()
 
         //qDebug() << m.map(m_eye);
 
-        m_lines.append(VertexData(QVector3D(100,100,100), Util::colorToVector(Qt::black), QVector3D(0, 0, 1)));
-        m_lines.append(VertexData(QVector3D(0,0,0), Util::colorToVector(Qt::black), QVector3D(0, 0, 1)));
+        // m_lines.append(VertexData(QVector3D(100,100,100), Util::colorToVector(Qt::black), QVector3D(0, 0, 1)));
+        // m_lines.append(VertexData(QVector3D(0,0,0), Util::colorToVector(Qt::black), QVector3D(0, 0, 1)));
 
         // Calculate normals
         int il = 0;
@@ -313,12 +313,12 @@ QVector3D GcodeDrawer::getMaximumExtremes()
     return v;
 }
 
-void GcodeDrawer::setViewParser(GcodeViewParse* viewParser)
+void GcodeDrawer::setViewParser(GCodeViewParser* viewParser)
 {
     m_viewParser = viewParser;
 }
 
-GcodeViewParse *GcodeDrawer::viewParser()
+GCodeViewParser *GcodeDrawer::viewParser()
 {
     return m_viewParser;
 }
