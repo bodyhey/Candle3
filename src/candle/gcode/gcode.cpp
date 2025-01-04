@@ -8,6 +8,12 @@ GCode::GCode(QObject *parent) : QObject(parent) {
     reset();
 }
 
+// void GCode::setData(QList<GCodeItem> data)
+// {
+//     reset();
+//     append(data);
+// }
+
 void GCode::reset(int commandIndex)
 {
     m_commandIndex = commandIndex;

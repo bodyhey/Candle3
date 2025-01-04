@@ -6,7 +6,7 @@
 #include <QMessageBox>
 #include <QTextCursor>
 #include <QRegularExpression>
-#include <parser/gcodeviewparser.h>
+//#include <parser/gcodeviewparser.h>
 
 Communicator::Communicator(
     QObject *parent,

@@ -19,6 +19,12 @@ public:
     LineSegment(LineSegment *initial);
     ~LineSegment();
 
+    bool operator==(const LineSegment &other) const {
+        return m_lineNumber == other.m_lineNumber &&
+                m_first == other.m_first &&
+               m_second == other.m_second;
+    }
+
     int getLineNumber();
     QList<QVector3D> getPointArray();
     QList<double> getPoints();

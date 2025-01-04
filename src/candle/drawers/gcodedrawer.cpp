@@ -55,10 +55,10 @@ bool GcodeDrawer::prepareVectors()
 {
     qDebug() << "preparing vectors" << this;
 
-    QList<LineSegment*> *list = m_viewParser->getLines();
+    QList<LineSegment> list = m_viewParser->getLines();
     VertexData vertex;
 
-    qDebug() << "lines count" << list->count();
+    qDebug() << "lines count" << list.count();
 
     // Clear all vertex data
     m_lines.clear();
@@ -73,20 +73,20 @@ bool GcodeDrawer::prepareVectors()
     }
 
     bool drawFirstPoint = true;
-    for (int i = 0; i < list->count(); i++) {
+    for (int i = 0; i < list.count(); i++) {
 
-        if (qIsNaN(list->at(i)->getEnd().z())) {
+        if (qIsNaN(list[i].getEnd().z())) {
             continue;
         }
 
         // Find first point of toolpath
         if (drawFirstPoint) {
 
-            if (qIsNaN(list->at(i)->getEnd().x()) || qIsNaN(list->at(i)->getEnd().y())) continue;
+            if (qIsNaN(list[i].getEnd().x()) || qIsNaN(list[i].getEnd().y())) continue;
 
             // Draw first toolpath point
             vertex.color = Util::colorToVector(m_colorStart);
-            vertex.position = list->at(i)->getEnd();
+            vertex.position = list[i].getEnd();
             if (m_ignoreZ) vertex.position.setZ(0);
             vertex.start = QVector3D(sNan, sNan, m_pointSize);
             m_points.append(vertex);
@@ -96,150 +96,164 @@ bool GcodeDrawer::prepareVectors()
         }
 
         // Prepare vertices
-        if (list->at(i)->isFastTraverse()) vertex.start = list->at(i)->getStart();
+        if (list[i].isFastTraverse()) vertex.start = list[i].getStart();
         else vertex.start = QVector3D(sNan, sNan, sNan);
 
         // Simplify geometry
         int j = i;
-        if (m_simplify && i < list->count() - 1) {
-            QVector3D start = list->at(i)->getEnd() - list->at(i)->getStart();
+        if (m_simplify && i < list.count() - 1) {
+            QVector3D start = list[i].getEnd() - list[i].getStart();
             QVector3D next;
             double length = start.length();
             bool straight = false;
 
             do {
-                list->at(i)->setVertexIndex(m_lines.count()); // Store vertex index
+                list[i].setVertexIndex(m_lines.count()); // Store vertex index
                 i++;
-                if (i < list->count() - 1) {
-                    next = list->at(i)->getEnd() - list->at(i)->getStart();
+                if (i < list.count() - 1) {
+                    next = list[i].getEnd() - list[i].getStart();
                     length += next.length();
 //                    straight = start.crossProduct(start.normalized(), next.normalized()).length() < 0.025;
                 }
             // Split short & straight lines
-            } while ((length < m_simplifyPrecision || straight) && i < list->count()
-                     && getSegmentType(list->at(i)) == getSegmentType(list->at(j)));
+            } while ((length < m_simplifyPrecision || straight) && i < list.count()
+                     && getSegmentType(list[i]) == getSegmentType(list[j]));
             i--;
         } else {
-            list->at(i)->setVertexIndex(m_lines.count()); // Store vertex index
+            list[i].setVertexIndex(m_lines.count()); // Store vertex index
         }
 
-        vertex.color = getSegmentColorVector(list->at(i));
+        vertex.color = getSegmentColorVector(list[i]);
 
         // ignore shorter than 0.0001
-        if ((list->at(i)->getEnd() - list->at(j)->getStart()).length() > 0.0001) {
+        if ((list[i].getEnd() - list[j].getStart()).length() > 0.0001) {
             // Line start
-            vertex.position = list->at(j)->getStart();
+            vertex.position = list[j].getStart();
             if (m_ignoreZ) vertex.position.setZ(0);
             m_lines.append(vertex);
 
             // Line end
-            vertex.position = list->at(i)->getEnd();
+            vertex.position = list[i].getEnd();
             if (m_ignoreZ) vertex.position.setZ(0);
             m_lines.append(vertex);
         }
 
         // Draw last toolpath point
-        if (i == list->count() - 1) {
+        if (i == list.count() - 1) {
             vertex.color = Util::colorToVector(m_colorEnd);
-            vertex.position = list->at(i)->getEnd();
+            vertex.position = list[i].getEnd();
             if (m_ignoreZ) vertex.position.setZ(0);
             vertex.start = QVector3D(sNan, sNan, m_pointSize);
             m_points.append(vertex);
         }
     }
 
-    if (m_lines.count())
-    {
-        // static float rot = 0;
-        // QMatrix4x4 m;
-        // m.setToIdentity();
-        // m.rotate(rot, 0, 0, 1);
-        // rot += 5;
+    // if (m_lines.count())
+    // {
+    //     // static float rot = 0;
+    //     // QMatrix4x4 m;
+    //     // m.setToIdentity();
+    //     // m.rotate(rot, 0, 0, 1);
+    //     // rot += 5;
 
-        //qDebug() << m.map(m_eye);
+    //     //qDebug() << m.map(m_eye);
 
-        // m_lines.append(VertexData(QVector3D(100,100,100), Util::colorToVector(Qt::black), QVector3D(0, 0, 1)));
-        // m_lines.append(VertexData(QVector3D(0,0,0), Util::colorToVector(Qt::black), QVector3D(0, 0, 1)));
+    //     // m_lines.append(VertexData(QVector3D(100,100,100), Util::colorToVector(Qt::black), QVector3D(0, 0, 1)));
+    //     // m_lines.append(VertexData(QVector3D(0,0,0), Util::colorToVector(Qt::black), QVector3D(0, 0, 1)));
 
-        // Calculate normals
-        int il = 0;
-        int vc = m_lines.count() / 2;
-        QVector<QVector3D> tangents;
+    //     // Calculate normals
+    //     int il = 0;
+    //     int vc = m_lines.count() / 2;
+    //     QVector<QVector3D> tangents;
 
-        QVector<QVector3D> normals;
-        normals.append(initialNormal(m_lines[0].position, m_lines[2].position));
-        assert((m_lines[0].position - m_lines[2].position).length());
+    //     QVector<QVector3D> normals;
+    //     normals.append(initialNormal(m_lines[0].position, m_lines[2].position));
+    //     assert((m_lines[0].position - m_lines[2].position).length());
 
-        for (int i = 0; i < vc - 1; i++) {
-            QVector3D T_i = (m_lines[il + 2].position - m_lines[il].position).normalized();
-            tangents.append(T_i);
-            assert(T_i.length());
+    //     for (int i = 0; i < vc - 1; i++) {
+    //         QVector3D T_i = (m_lines[il + 2].position - m_lines[il].position).normalized();
+    //         tangents.append(T_i);
+    //         assert(T_i.length());
 
-            if (il > 0) {
-                QVector3D N_i = QVector3D::crossProduct(
-                    QVector3D::crossProduct(tangents[i - 1], normals.last()),
-                    tangents[i]
-                ).normalized();
-                if (QVector3D::dotProduct(N_i, normals.last()) < 0) {
-                    N_i = -N_i;
-                }
+    //         if (il > 0) {
+    //             QVector3D N_i = QVector3D::crossProduct(
+    //                 QVector3D::crossProduct(tangents[i - 1], normals.last()),
+    //                 tangents[i]
+    //             ).normalized();
+    //             if (QVector3D::dotProduct(N_i, normals.last()) < 0) {
+    //                 N_i = -N_i;
+    //             }
 
-                if (!N_i.length()) {
-                    qDebug() << N_i << m_lines[il + 2].position << m_lines[il].position << m_lines[il - 2].position << tangents[i] << tangents[i - 1] << normals.last()
-                             << QVector3D::crossProduct(tangents[i - 1], normals.last());
-                }
-                assert(N_i.length());
+    //             if (!N_i.length()) {
+    //                 // qDebug() << N_i << m_lines[il + 2].position << m_lines[il].position << m_lines[il - 2].position << tangents[i] << tangents[i - 1] << normals.last()
+    //                 //          << QVector3D::crossProduct(tangents[i - 1], normals.last());
+    //             }
+    //             assert(N_i.length());
 
-                normals.append(N_i);
-            }
+    //             normals.append(N_i);
+    //         }
 
-            il+=2;
-        }
-        normals.append(normals.last());
+    //         il+=2;
+    //     }
+    //     normals.append(normals.last());
 
-        il = 0;
-        // QVector<VertexData> normalVertices;
-        // QVector3D black = Util::colorToVector(Qt::black);
-        for (auto &v : m_lines) {
-            v.start = normals[il/2];
-            il++;
-            //m_lines.append(v);
+    //     il = 0;
+    //     // QVector<VertexData> normalVertices;
+    //     // QVector3D black = Util::colorToVector(Qt::black);
+    //     for (auto &v : m_lines) {
+    //         v.start = normals[il/2];
+    //         il++;
+    //         //m_lines.append(v);
 
-            // normalVertices.append(VertexData(v.position, black, QVector3D(0,0,1)));
-            // normalVertices.append(VertexData(v.position + v.start * 1, black, QVector3D(0,0,1)));
-        }
+    //         // normalVertices.append(VertexData(v.position, black, QVector3D(0,0,1)));
+    //         // normalVertices.append(VertexData(v.position + v.start * 1, black, QVector3D(0,0,1)));
+    //     }
 
-        // m_lines += normalVertices;
+    //     // m_lines += normalVertices;
 
-        qDebug() << m_lines.count() << normals.count();
+    //     qDebug() << m_lines.count() << normals.count();
+    // }
+
+    qDebug() << m_lines.count();
+        //101928
+    QList<VertexData> err =  m_lines.mid(101828, 100);
+
+    for (auto e : err) {
+        qDebug() << e.position << e.color << e.start;
     }
+
+    // if (m_lines.count() >= 1000)
+    // m_lines.remove(10828, 100);//m_lines.count() - 101800);
+
+    qDebug() << m_lines.count();
 
     m_geometryUpdated = true;
     m_indexes.clear();
+
     return true;
 }
 
 bool GcodeDrawer::updateVectors()
 {
     // Update vertices
-    QList<LineSegment*> *list = m_viewParser->getLines();
+    QList<LineSegment>& list = m_viewParser->getLines();
 
     // Map buffer
-    VertexData *data = (VertexData*)m_vbo.map(QOpenGLBuffer::WriteOnly);
+    VertexData* data = (VertexData*)m_vbo.map(QOpenGLBuffer::WriteOnly);
 
     // Update vertices for each line segment
     int vertexIndex;
     foreach (int i, m_indexes) {
         // Update vertex pair
-        if (i < 0 || i > list->count() - 1) continue;
-        vertexIndex = list->at(i)->vertexIndex();
+        if (i < 0 || i > list.count() - 1) continue;
+        vertexIndex = list[i].vertexIndex();
         if (vertexIndex >= 0) {
             // Update vertex array            
             if (data) {
-                data[vertexIndex].color = getSegmentColorVector(list->at(i));
+                data[vertexIndex].color = getSegmentColorVector(list[i]);
                 data[vertexIndex + 1].color = data[vertexIndex].color;
             } else {
-                m_lines[vertexIndex].color = getSegmentColorVector(list->at(i));
+                m_lines[vertexIndex].color = getSegmentColorVector(list[i]);
                 m_lines[vertexIndex + 1].color = m_lines.at(vertexIndex).color;
             }
         }
@@ -247,6 +261,7 @@ bool GcodeDrawer::updateVectors()
 
     m_indexes.clear();
     if (data) m_vbo.unmap();
+
     return !data;
 }
 
@@ -264,29 +279,29 @@ bool GcodeDrawer::updateVectors()
 //     *(pixel + (int)x * 3 + 2) = qBlue(color);
 // }
 
-QVector3D GcodeDrawer::getSegmentColorVector(LineSegment *segment)
+QVector3D GcodeDrawer::getSegmentColorVector(LineSegment& segment)
 {
     return Util::colorToVector(getSegmentColor(segment));
 }
 
-QColor GcodeDrawer::getSegmentColor(LineSegment *segment)
+QColor GcodeDrawer::getSegmentColor(LineSegment& segment)
 {
-    if (segment->drawn()) return m_colorDrawn;//QVector3D(0.85, 0.85, 0.85);
-    else if (segment->isHightlight()) return m_colorHighlight;//QVector3D(0.57, 0.51, 0.9);
-    else if (segment->isFastTraverse()) return m_colorNormal;// QVector3D(0.0, 0.0, 0.0);
-    else if (segment->isZMovement()) return m_colorZMovement;//QVector3D(1.0, 0.0, 0.0);
+    if (segment.drawn()) return m_colorDrawn;//QVector3D(0.85, 0.85, 0.85);
+    else if (segment.isHightlight()) return m_colorHighlight;//QVector3D(0.57, 0.51, 0.9);
+    else if (segment.isFastTraverse()) return m_colorNormal;// QVector3D(0.0, 0.0, 0.0);
+    else if (segment.isZMovement()) return m_colorZMovement;//QVector3D(1.0, 0.0, 0.0);
     else if (m_grayscaleSegments) switch (m_grayscaleCode) {
     case GcodeDrawer::S:
-        return QColor::fromHsl(0, 0, qBound<int>(0, 255 - 255.0 / (m_grayscaleMax - m_grayscaleMin) * segment->getSpindleSpeed(), 255));
+        return QColor::fromHsl(0, 0, qBound<int>(0, 255 - 255.0 / (m_grayscaleMax - m_grayscaleMin) * segment.getSpindleSpeed(), 255));
     case GcodeDrawer::Z:
-        return QColor::fromHsl(0, 0, qBound<int>(0, 255 - 255.0 / (m_grayscaleMax - m_grayscaleMin) * segment->getStart().z(), 255));
+        return QColor::fromHsl(0, 0, qBound<int>(0, 255 - 255.0 / (m_grayscaleMax - m_grayscaleMin) * segment.getStart().z(), 255));
     }
     return m_colorNormal;//QVector3D(0.0, 0.0, 0.0);
 }
 
-int GcodeDrawer::getSegmentType(LineSegment* segment)
+int GcodeDrawer::getSegmentType(LineSegment& segment)
 {
-    return segment->isFastTraverse() + segment->isZMovement() * 2;
+    return segment.isFastTraverse() + segment.isZMovement() * 2;
 }
 
 QVector3D GcodeDrawer::getSizes()
@@ -315,6 +330,7 @@ QVector3D GcodeDrawer::getMaximumExtremes()
 
 void GcodeDrawer::setViewParser(GCodeViewParser* viewParser)
 {
+    // do not delete old parser!
     m_viewParser = viewParser;
 }
 
@@ -322,6 +338,7 @@ GCodeViewParser *GcodeDrawer::viewParser()
 {
     return m_viewParser;
 }
+
 bool GcodeDrawer::simplify() const
 {
     return m_simplify;

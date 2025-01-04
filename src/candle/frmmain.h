@@ -27,6 +27,7 @@
 #include "form_partial/main/partmainvirtualsettings.h"
 #include "gcode/gcode.h"
 #include "globals.h"
+#include "gcode/gcodeloader.h"
 
 #include "connection/connection.h"
 #include "form_partial/main/partmainjog.h"
@@ -92,7 +93,7 @@ public:
     
     //void writeConsole(QString command);
     void initializeCommunicator();
-        
+
 signals:
     void responseReceived(QString command, int tableIndex, QString response);
     void statusReceived(QString status);
@@ -318,6 +319,7 @@ private:
     // Files/models
     void loadFile(QString fileName);
     void loadLines(QList<std::string> data);
+    void applyLoaderGCode(GCodeLoaderData *data);
     bool saveChanges(bool heightmapMode);
     bool saveProgramToFile(QString fileName, GCode &data);
     void loadHeightmap(QString fileName);
@@ -349,7 +351,7 @@ private:
 
     // Utility
     int bufferLength();
-    QTime updateProgramEstimatedTime(QList<LineSegment *> lines);
+    QTime updateProgramEstimatedTime(QList<LineSegment> &lines);
     QList<LineSegment *> subdivideSegment(LineSegment *segment);
     void jogStep(QVector3D vector);
     void jogStart(QVector3D vector);

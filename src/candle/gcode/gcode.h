@@ -33,6 +33,7 @@ class GCode : public QObject , public QList<GCodeItem>
 
     public:
         explicit GCode( QObject *parent = nullptr);
+        //void setData(QList<GCodeItem> data);
         void reset(int commandIndex = 0);
         void resetProcessed(int commandIndex = 0);
         int commandIndex() { return m_commandIndex; }

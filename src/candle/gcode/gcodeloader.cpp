@@ -12,7 +12,7 @@ GCodeLoader::GCodeLoader(QObject *parent)
 {
 }
 
-void GCodeLoader::loadFromFile(const QString &fileName, ConfigurationParser &configuration)
+void GCodeLoader::loadFromFile(const QString &fileName, GCodeLoaderConfiguration &configuration)
 {
     QFile file(fileName);
 
@@ -47,16 +47,17 @@ void GCodeLoader::loadFromFile(const QString &fileName, ConfigurationParser &con
     //loadFromString(data);
 }
 
-void GCodeLoader::loadFromLines(const QStringList &lines, ConfigurationParser &configuration)
+void GCodeLoader::loadFromLines(const QStringList &lines, GCodeLoaderConfiguration &configuration)
 {
 
 }
 
-void GCodeLoader::loadFromFileObject(QFile &file, int size, ConfigurationParser &configuration)
+void GCodeLoader::loadFromFileObject(QFile &file, int size, GCodeLoaderConfiguration &configuration)
 {
     emit started();
 
-    GCode GCode;
+    qDebug() << configuration.arcApproximationValue();
+    qDebug() << configuration.arcApproximationMode();
 
     m_cancel = false;
 
@@ -66,7 +67,6 @@ void GCodeLoader::loadFromFileObject(QFile &file, int size, ConfigurationParser 
     // }
 
     // Reset tables
-    GCode.clear();
     // clearTable();
     // m_probeModel.clear();
     // m_programHeightmapModel.clear();
@@ -93,7 +93,6 @@ void GCodeLoader::loadFromFileObject(QFile &file, int size, ConfigurationParser 
     // ui->tblProgram->setModel(NULL);
 
     // Prepare parser
-    GcodeParser parser;
     // parser.setTraverseSpeed(m_communicator->machineConfiguration().maxRate().x()); // uses only x axis speed
     // if (m_codeDrawer->getIgnoreZ()) parser.reset(QVector3D(qQNaN(), qQNaN(), 0));
 
@@ -108,11 +107,11 @@ void GCodeLoader::loadFromFileObject(QFile &file, int size, ConfigurationParser 
     std::string stripped;
     std::string trimmed;
     QList<QString> args;
-    GCodeItem item;
     int remaining = size;
+    GcodeParser parser;
+    GCode* gcode = new GCode();
 
-    while (!file.atEnd())
-    {
+    while (!file.atEnd()) {
         command = file.readLine().toStdString();
 
         trimmed = GcodePreprocessorUtils::trimCommand(command);
@@ -124,12 +123,13 @@ void GCodeLoader::loadFromFileObject(QFile &file, int size, ConfigurationParser 
 
             parser.addCommand(args);
 
+            GCodeItem item;
             item.command = QString::fromStdString(trimmed);
             item.state = GCodeItem::InQueue;
             item.lineNumber = parser.getCommandNumber();
             item.args = args;
 
-            GCode.append(item);
+            *gcode << item;
         }
 
         remaining = size - file.pos();
@@ -156,8 +156,8 @@ void GCodeLoader::loadFromFileObject(QFile &file, int size, ConfigurationParser 
     // m_programModel.insertRow(m_programModel.rowCount());
 
     // updateProgramEstimatedTime(
-    GCodeViewParser viewParser;
-    viewParser.getLinesFromParser(
+    GCodeViewParser* viewParser = new GCodeViewParser();
+    viewParser->getLinesFromParser(
         &parser,
         configuration.arcApproximationValue(),
         configuration.arcApproximationMode() == ConfigurationParser::ParserArcApproximationMode::ByAngle
@@ -185,8 +185,8 @@ void GCodeLoader::loadFromFileObject(QFile &file, int size, ConfigurationParser 
         emit cancelled();
     } else {
         GCodeLoaderData *result = new GCodeLoaderData();
-        result->gcode = &GCode;
-        result->viewParser = &viewParser;
+        result->gcode = gcode;
+        result->viewParser = viewParser;
 
         emit finished(result);
     }

@@ -81,7 +81,7 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
     connect(ui->cmdSerialPortsRefresh, &QAbstractButton::clicked, this, &frmSettings::onCmdSerialPortsRefreshClicked);
     connect(ui->radArcDegreeMode, &QRadioButton::toggled, this, &frmSettings::onArcApproximationModeChanged);
     connect(ui->radArcLengthMode, &QRadioButton::toggled, this, &frmSettings::onArcApproximationModeChanged);
-    connect(ui->chkOverrideMaxTravel, &QAbstractButton::toggled, [=](bool checked) {
+    connect(ui->chkOverrideMaxTravel, &QAbstractButton::toggled, [this](bool checked) {
         ui->txtMaxTravelX->setEnabled(checked);
         ui->txtMaxTravelY->setEnabled(checked);
         ui->txtMaxTravelZ->setEnabled(checked);
@@ -135,7 +135,7 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
     ui->cboFpsLock->setValidator(&m_intValidator);
     ui->cboFontSize->setValidator(&m_intValidator);
 
-    connect(ui->txtJoggingStepChoices, &QLineEdit::editingFinished, this, [=]() {
+    connect(ui->txtJoggingStepChoices, &QLineEdit::editingFinished, this, [this]() {
         QLineEdit *sender = dynamic_cast<QLineEdit*>(QObject::sender());
         QString text = sender->text();
         int pos = 0;
@@ -149,7 +149,7 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
         this->widgetValidity("JoggingStepChoices", state != QValidator::Invalid);
         sender->setPalette(pal);
     });
-    connect(ui->txtJoggingFeedChoices, &QLineEdit::editingFinished, this, [=]() {
+    connect(ui->txtJoggingFeedChoices, &QLineEdit::editingFinished, this, [this]() {
         QLineEdit *sender = dynamic_cast<QLineEdit*>(QObject::sender());
         QString text = sender->text();
         int pos = 0;
@@ -460,7 +460,7 @@ void frmSettings::on_listCategories_currentRowChanged(int currentRow)
     animation->setEndValue(labelPos.y() - 5);
 
 
-    QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
+    QObject::connect(animation, &QPropertyAnimation::finished, [this]() {
         animation = nullptr;
         m_animatingScrollBox = false;
     });

@@ -5,9 +5,9 @@
 #include "configurationparser.h"
 
 const QMap<QString,QVariant> DEFAULTS = {
-    {"approximatationMode", ConfigurationParser::ByAngle},
-    {"approximatationLength", 0.1},
-    {"approximatationAngle", 5.0}
+    {"arcApproximationMode", ConfigurationParser::ByAngle},
+    {"arcApproximationLength", 0.1},
+    {"arcApproximationAngle", 5.0}
 };
 
 ConfigurationParser::ConfigurationParser(QObject *parent) : ConfigurationModule(parent, DEFAULTS)
