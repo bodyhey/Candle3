@@ -224,8 +224,8 @@ frmMain::frmMain(QWidget *parent) :
 
     initializeVisualizer();
 
-    connect(ui->glwVisualizer, &GLWidget::resized, this, &frmMain::placeVisualizerButtons);
-    connect(ui->glwVisualizer, &GLWidget::cursorPosChanged, this, &frmMain::onVisualizerCursorPosChanged);
+    connect(ui->glwVisualizer, &GLContainer::resized, this, &frmMain::placeVisualizerButtons);
+    connect(ui->glwVisualizer, &GLContainer::cursorPosChanged, this, &frmMain::onVisualizerCursorPosChanged);
     connect(&m_programModel, &QAbstractItemModel::dataChanged, this, &frmMain::onTableCellChanged);
     connect(&m_programHeightmapModel, &QAbstractItemModel::dataChanged, this, &frmMain::onTableCellChanged);
     connect(&m_probeModel, &QAbstractItemModel::dataChanged, this, &frmMain::onTableCellChanged);

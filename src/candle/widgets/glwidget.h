@@ -8,6 +8,7 @@
 #include <QGLWidget>
 #else
 #include <QOpenGLWidget>
+#include <QOpenGLWindow>
 #endif
 
 #include <QOpenGLFunctions_3_0>
@@ -17,7 +18,7 @@
 #include "drawers/cubedrawer.h"
 
 #ifdef GLES
-class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_0
+class GLWidget : public QOpenGLWindow, protected QOpenGLFunctions_3_0
 #else
 class GLWidget : public QGLWidget, protected QOpenGLFunctions
 #endif
@@ -178,7 +179,7 @@ protected:
 
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
-    void leaveEvent(QEvent *event) override;
+    void leaveEvent(QEvent *event);// override;
     void wheelEvent(QWheelEvent *we) override;
 
     void timerEvent(QTimerEvent *) override;

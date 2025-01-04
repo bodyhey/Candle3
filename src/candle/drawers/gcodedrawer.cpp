@@ -215,17 +215,6 @@ bool GcodeDrawer::prepareVectors()
     // }
 
     qDebug() << m_lines.count();
-        //101928
-    QList<VertexData> err =  m_lines.mid(101828, 100);
-
-    for (auto e : err) {
-        qDebug() << e.position << e.color << e.start;
-    }
-
-    // if (m_lines.count() >= 1000)
-    // m_lines.remove(10828, 100);//m_lines.count() - 101800);
-
-    qDebug() << m_lines.count();
 
     m_geometryUpdated = true;
     m_indexes.clear();

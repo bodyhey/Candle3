@@ -155,6 +155,7 @@ SOURCES += main.cpp\
     utils.cpp \
     widgets/combobox.cpp \
     widgets/comboboxkey.cpp \
+    widgets/glcontainer.cpp \
     widgets/glwidget.cpp \
     drawers/selectiondrawer.cpp \
     scripting/scriptvars.cpp \
@@ -248,6 +249,7 @@ HEADERS  += frmmain.h \
     utils/validators.h \
     widgets/combobox.h \
     widgets/comboboxkey.h \
+    widgets/glcontainer.h \
     widgets/glwidget.h \
     drawers/selectiondrawer.h \
     scripting/scriptvars.h \

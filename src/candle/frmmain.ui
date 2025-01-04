@@ -1446,7 +1446,7 @@ border-top: 0;</string>
          <number>0</number>
         </property>
         <item>
-         <widget class="GLWidget" name="glwVisualizer" native="true"/>
+         <widget class="GLContainer" name="glwVisualizer" native="true"/>
         </item>
         <item>
          <widget class="QToolButton" name="cmdFit">
@@ -2076,12 +2076,6 @@ border-top: 0;</string>
    <header>styledtoolbutton.h</header>
   </customwidget>
   <customwidget>
-   <class>GLWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">widgets/glwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>DropWidget</class>
    <extends>QWidget</extends>
    <header>widgets/dropwidget.h</header>
@@ -2127,6 +2121,12 @@ border-top: 0;</string>
    <class>QPushButtonWithMenu</class>
    <extends>QPushButton</extends>
    <header location="global">widgets/qpushbuttonwithmenu.h</header>
+  </customwidget>
+  <customwidget>
+   <class>GLContainer</class>
+   <extends>QWidget</extends>
+   <header>widgets/glcontainer.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>

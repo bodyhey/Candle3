@@ -21,7 +21,7 @@
 #define MAGIC_ZOOM_MULTIPLIER 1.9
 
 #ifdef GLES
-GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent), m_defaultShaderProgram(0), m_gcodeShaderProgram(0)
+GLWidget::GLWidget(QWidget *parent) : QOpenGLWindow(), m_defaultShaderProgram(0), m_gcodeShaderProgram(0)
 #else
 GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent), m_shaderProgram(0)
 #endif
@@ -68,7 +68,7 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent), m_shaderProgram(0)
 
     QTimer::singleShot(1000, this, SLOT(onFramesTimer()));
 
-    setMouseTracking(true);
+    //setMouseTracking(true);
 
     // enable antialiasing
     QSurfaceFormat sf = format();
@@ -884,7 +884,7 @@ void GLWidget::timerEvent(QTimerEvent *te)
 #endif
     } else {
 #ifdef GLES
-        QOpenGLWidget::timerEvent(te);
+        QOpenGLWindow::timerEvent(te);
 #else
         QGLWidget::timerEvent(te);
 #endif
