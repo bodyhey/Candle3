@@ -12,12 +12,15 @@ class GLWidget {
     m_zBuffer = true;
     m_antialiasing = false;
     m_msaa = false;
-    m_colorBackground = new QColor(1, 1, 1);
+    //#f3eedb
+    //m_colorBackground = new QColor(0.95, 0.93, 0.86);
+    m_colorBackground = new QColor(0, 0, 0);
+
     m_shaderProgram1 = new ShaderProgram(vertexShaderSource1, fragmentShaderSource1);
     m_shaderProgram2 = new ShaderProgram(vertexShaderSource2, fragmentShaderSource2);
-    m_shaderProgram2d = new ShaderProgram(vertexShaderSource2d, fragmentShaderSource2d);
+    m_shaderProgram2d = new ShaderProgram2d(vertexShaderSource2d, fragmentShaderSource2d);
     m_shaderDrawables = [
-        new ShaderDrawable1(this.m_shaderProgram1),
+        new ShaderDrawable1(this.m_shaderProgram1, this.m_shaderProgram2d),
         new ShaderDrawable2(this.m_shaderProgram2),
         new ShaderDrawable3(this.m_shaderProgram2),
     ];
@@ -31,7 +34,6 @@ class GLWidget {
     m_lastPos = {x: 0, y: 0};
     m_lookAt = glMatrix.vec3.fromValues(0, 0, 0);
     m_eye = glMatrix.vec3.create();
-    m_eye2 = glMatrix.vec3.create();
     m_perspective = false;
     m_fov = 30; m_near = 0.5; m_far = 17000.0;
     m_xMin = 0; m_xMax = 0;
@@ -93,7 +95,7 @@ class GLWidget {
 //        glMatrix.mat4.invert(m, this.m_projectionMatrix);
         //glMatrix.mat4.identity(m);
         //glMatrix.vec3.transformMat4(this.m_eye2, this.m_eye, m);
-        this.m_eye2 = this.m_eye;
+        //this.m_eye2 = this.m_eye;
     }
 
     updateView()
@@ -101,7 +103,6 @@ class GLWidget {
         // Set view matrix
         // this.m_viewMatrix.setToIdentity();
         glMatrix.mat4.identity(this.m_viewMatrix);
-        // console.log(this.m_viewMatrix);
 
         const angY = Utils.toRadians(this.m_yRot);
         const angX = Utils.toRadians(this.m_xRot);
@@ -134,8 +135,8 @@ class GLWidget {
         this.cube.updateRotation(
             eye[0], eye[1], eye[2],
 
-            // Math.cos(angX) * Math.sin(angY) * Math.PI, 
-            // Math.sin(angX)* Math.PI, 
+            // Math.cos(angX) * Math.sin(angY) * Math.PI,
+            // Math.sin(angX)* Math.PI,
             // Math.cos(angX) * Math.cos(angY)* Math.PI
         );
         gl.viewport(0, 0, this.width(), this.height());
@@ -263,7 +264,7 @@ class GLWidget {
             this.updateView();
         }
 
-        if (this.btn == 0 && event.ctrlKey) {
+        if (this.btn == 2) { //0 && event.ctrlKey) {
             // Get world to clip
             const mvp = glMatrix.mat4.create();
             glMatrix.mat4.multiply(mvp, this.m_projectionMatrix, this.m_viewMatrix);
@@ -285,7 +286,7 @@ class GLWidget {
             // Project last mouse pos to world
             // lastMouseInWorld = mvpi * lastMouseInWorld * centerVector.w();
             glMatrix.vec4.multiply(lastMouseInWorld, lastMouseInWorld, glMatrix.vec4.fromValues(centerVector[3], centerVector[3], centerVector[3], centerVector[3]));
-            glMatrix.vec4.transformMat4(lastMouseInWorld, lastMouseInWorld, mvp);
+            glMatrix.vec4.transformMat4(lastMouseInWorld, lastMouseInWorld, mvpi);
 
             // Get current mouse XY in clip
             const currentMouseInWorld = glMatrix.vec4.fromValues(
@@ -303,8 +304,6 @@ class GLWidget {
             const difference = glMatrix.vec4.create();
             glMatrix.vec4.subtract(difference, currentMouseInWorld, lastMouseInWorld);
 
-            //console.log(difference);
-
             // Subtract difference from center point
             glMatrix.vec3.subtract(this.m_lookAt, this.m_lookAt, glMatrix.vec3.fromValues(difference[0], difference[1], difference[2]));
 
@@ -312,6 +311,8 @@ class GLWidget {
 
             this.updateView();
         }
+
+        //console.log(this.m_lookAt);
     }
 
     onMouseUp(event: MouseEvent) {
@@ -376,12 +377,14 @@ class GLWidget {
 
             // Set modelview-projection matrix
             program.setUniformValueMatrix("mvp_matrix", mvpMatrix);
+
+
+            //console.log(this.m_eye);
             //program.setUniformValueMatrix("mv_matrix", this.m_viewMatrix);
-            // program.setUniformValueVec3("eye", this.m_eye);
             // program.setUniformValueVec3("u_light_color", glMatrix.vec3.fromValues(0.9, 0.6, 0.9));
             // program.setUniformValueVec3("u_object_color", glMatrix.vec3.fromValues(1.0, 1.0, 1.0));
 
-            const light_pos = glMatrix.vec3.fromValues(1110, 1111, 11);
+            const light_pos = glMatrix.vec3.fromValues(30, 10, 30);
             //console.log(light_pos);
             const light_matrix = glMatrix.mat4.create();
             glMatrix.mat4.identity(light_matrix);
@@ -389,6 +392,11 @@ class GLWidget {
             glMatrix.vec3.transformMat4(light_pos, light_pos, light_matrix);
             // /program.setUniformValueVec3("u_light_position", light_pos);
             //console.log(light_pos);
+
+            try {
+                program.setUniformValueVec3("u_eye", this.m_eye);
+                program.setUniformValueVec3("u_light_position", light_pos);
+            } catch (e) {}
 
             program.release();
 
@@ -409,24 +417,26 @@ class GLWidget {
         // }
         gl.depthMask(true);
         gl.enable(gl.DEPTH_TEST);
-        this.m_shaderDrawables[0].draw(this.m_eye2, mvpMatrix);
+        this.m_shaderDrawables[0].draw(this.m_eye, mvpMatrix);
         gl.depthMask(false);
         gl.enable(gl.DEPTH_TEST);
         // this.m_shaderDrawables[1].draw(this.m_eye2, mvpMatrix);
         // this.m_shaderDrawables[2].draw(this.m_eye2, mvpMatrix);
 //        gl.depthMask(false);
 
-        this.lightRot += 0.01;
+        this.lightRot += 0.1;
 
         // Draw 2D
         gl.disable(gl.DEPTH_TEST);
         //gl.disable(gl.MULTISAMPLE);
-        //gl.disable(gl.LINE_SMOOTH);        
+        //gl.disable(gl.LINE_SMOOTH);
 //        gl.disable(gl.BLEND);
 
         // Draw 2D texture
         this.m_shaderProgram2d.bind();
+        this.m_shaderProgram2d.setGcodeBgMode(false);
 
+        gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this.cube.renderTexture);
         gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         // gl.texParameteri(
@@ -434,16 +444,16 @@ class GLWidget {
         //     gl.TEXTURE_MAX_FILTER,
         //     gl.LINEAR_MIPMAP_NEAREST,
         //   );
-        let offset = 0;
-        const vertexLocation = this.m_shaderProgram2d.attributeLocation("a_position");
-        this.m_shaderProgram2d.enableAttributeArray(vertexLocation);
-        this.m_shaderProgram2d.setAttributeBuffer(vertexLocation, gl.FLOAT, offset, 2, 2 * 4 * 2);
+        // let offset = 0;
+        // const vertexLocation = this.m_shaderProgram2d.attributeLocation("a_position");
+        // this.m_shaderProgram2d.enableAttributeArray(vertexLocation);
+        // this.m_shaderProgram2d.setAttributeBuffer(vertexLocation, gl.FLOAT, offset, 2, 2 * 4 * 2);
 
-        offset += Utils.VECTOR2D_SIZE;
+        // offset += Utils.VECTOR2D_SIZE;
 
-        const textureLocation = this.m_shaderProgram2d.attributeLocation("a_texcoord");
-        this.m_shaderProgram2d.enableAttributeArray(textureLocation);
-        this.m_shaderProgram2d.setAttributeBuffer(textureLocation, gl.FLOAT, offset, 2, 2 * 4 * 2);
+        // const textureLocation = this.m_shaderProgram2d.attributeLocation("a_texcoord");
+        // this.m_shaderProgram2d.enableAttributeArray(textureLocation);
+        // this.m_shaderProgram2d.setAttributeBuffer(textureLocation, gl.FLOAT, offset, 2, 2 * 4 * 2);
 
         const trx = (pos: number) => (pos / this.width()) * 2.0 - 1.0;
         const try_ = (pos: number) => (pos / this.height()) * 2.0 - 1.0;
@@ -457,17 +467,17 @@ class GLWidget {
         // 2d quad vertices
         const vertices2d = [
             LEFT, TOP,
+            0, 1,
+            RIGHT, TOP,
+            1, 1,
+            LEFT, BOTTOM,
+            0, 0,
+            LEFT, BOTTOM,
             0, 0,
             RIGHT, TOP,
-            1, 0,
-            LEFT, BOTTOM,
-            0, 1,
-            LEFT, BOTTOM,
-            0, 1,
-            RIGHT, TOP,
-            1, 0,
-            RIGHT, BOTTOM,
             1, 1,
+            RIGHT, BOTTOM,
+            1, 0,
         ];
 
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2d), gl.STATIC_DRAW);

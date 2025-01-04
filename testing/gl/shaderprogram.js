@@ -3,6 +3,10 @@ class ShaderProgram {
     m_fragmentShader;
     m_program;
 
+    program() {
+        return this.m_program;
+    }
+
     constructor(vss, fss) {
         this.m_program = gl.createProgram();
 
@@ -58,10 +62,10 @@ class ShaderProgram {
         gl.uniformMatrix3fv(location, false, matrix.values().toArray());
         gl.uniform
     }
-        
+
     setUniformValueVec3(name, vec3) {
         const location = gl.getUniformLocation(this.m_program, name);
-        //console.log(name, location); 
+        //console.log(name, location);
         if (location == -1 || location == null) {
             throw "Could not find " + name;
         }
@@ -113,6 +117,54 @@ class ShaderProgram {
         if (location == -1 || location == null) {
             throw "Could not find " + name;
         }
+
         gl.uniform1f(location, value);
+    }
+
+    setUniformValuei(name, value) {
+        const location = gl.getUniformLocation(this.m_program, name);
+        if (location == -1 || location == null) {
+            throw "Could not find " + name;
+        }
+
+        gl.uniform1i(location, value);
+    }
+}
+
+class ShaderProgram2d extends ShaderProgram {
+    m_vbo = gl.createBuffer();
+
+    constructor() {
+        super(vertexShaderSource2d, fragmentShaderSource2d);
+    }
+
+    setGcodeBgMode(value) {
+        this.setUniformValue("u_gcodeBgMode", value);
+    }
+
+    bind() {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.m_vbo);
+        super.bind();
+
+        let offset = 0;
+        const vertexLocation = this.attributeLocation("a_position");
+        this.enableAttributeArray(vertexLocation);
+        this.setAttributeBuffer(vertexLocation, gl.FLOAT, offset, 2, 2 * 4 * 2);
+
+        offset += Utils.VECTOR2D_SIZE;
+
+        const textureLocation = this.attributeLocation("a_texcoord");
+        this.enableAttributeArray(textureLocation);
+        this.setAttributeBuffer(textureLocation, gl.FLOAT, offset, 2, 2 * 4 * 2);
+
+        //gl.depthMask(gl.FALSE);
+    }
+
+    release() {
+        super.release();
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        //gl.depthMask(gl.TRUE);
     }
 }

@@ -1,5 +1,5 @@
 
-const vertexShaderSource1 = `
+const vertexShaderSource1 = `#version 300 es
 
 #ifdef GL_ES
 // Set default precision to medium
@@ -10,19 +10,21 @@ precision mediump float;
 uniform mat4 mvp_matrix;
 uniform mat4 mv_matrix;
 uniform vec3 u_light_position;
+uniform bool u_shadow;
+uniform vec3 u_eye;
 
-attribute vec3 a_position;
-attribute vec3 a_color;
-attribute vec3 a_normal;
-attribute float a_alpha;
+in vec3 a_position;
+in vec3 a_color;
+in vec3 a_normal;
+in float a_alpha;
 
-varying vec4 v_color;
-varying vec3 v_position;
-varying vec2 v_start;
-varying vec3 v_normal;
-varying vec2 v_texture;
-varying float v_z;
-varying vec3 v_light_direction;
+out vec4 v_color;
+//out vec3 v_position;
+out vec2 v_start;
+out vec3 v_normal;
+out vec2 v_texture;
+out vec3 v_light_direction;
+out vec3 v_eye;
 
 // bool isNan(float val)
 // {
@@ -31,26 +33,35 @@ varying vec3 v_light_direction;
 
 void main()
 {
-    v_z = a_position.z;
-
-//    vec4 vertex_position = mv_matrix * vec4(a_position.xyz, 1.0);
     vec4 vertex_position = vec4(a_position, 1.0);
-//    v_normal = (mv_matrix * a_normal).xyz;
     v_normal = a_normal;
+    if (u_shadow) {
+        //vertex_position += vec4(a_normal, 0.0) * 0.01;
+    }
 
     //vec3 light_position_ = (mv_matrix * vec4(u_light_position, 1.0)).xyz;
     vec3 light_position_ = vec4(u_light_position, 1.0).xyz;
     v_light_direction = normalize(light_position_ - vertex_position.xyz);
 
     gl_Position = mvp_matrix * vertex_position;
-    v_position = vertex_position.xyz;
+    if (u_shadow) {
+        // gl_Position += vec4(
+        //     // (2.0 / 800.0) * a_normal,
+        //     // (2.0 / 600.0) * 5.0,
+        //     0.001,
+        //     0.0
+        // );
+    }
+
+    //v_position = vertex_position.xyz;
 
     v_color = vec4(a_color, 1.0);
+    v_eye = (vec4(u_eye, 1.0) * mvp_matrix).xyz;
 }
 
     `;
 
-const fragmentShaderSource1 = `
+const fragmentShaderSource1 = `#version 300 es
 
 #ifdef GL_ES
 // Set default precision to medium
@@ -61,23 +72,19 @@ precision mediump float;
 //Dash grid (px) = factor * pi;
 // const float factor = 2.0;
 
-varying vec4 v_color;
-varying vec3 v_position;
-varying vec3 v_normal;
+in vec4 v_color;
+//in vec3 v_position;
+in vec3 v_normal;
 // varying vec2 v_texture;
-varying vec3 v_light_direction;
-varying float v_z;
+in vec3 v_light_direction;
+in vec3 v_eye;
 
 uniform sampler2D texture;
 uniform mat4 mvp_matrix;
 uniform mat4 mv_matrix;
-uniform vec3 eye;
-varying vec3 v_world_pos;   // Pozycja punktu w przestrzeni świata
-uniform vec3 u_light_color;
-uniform vec3 u_object_color;
+uniform bool u_shadow;
 
-uniform vec3 light_color;
-uniform vec3 object_color;
+out vec4 fragColor;
 
 // bool isNan(float val)
 // {
@@ -86,6 +93,14 @@ uniform vec3 object_color;
 
 void main()
 {
+    if (u_shadow) {
+        //fragColor = vec4(0.2, 0.2, 0.2, 0.5);
+        fragColor = vec4(1.0);
+        return;
+    }
+
+    vec3 lightColor = vec3(0.5, 0.0, 0.5);
+
     // Draw dash lines
     // if (!isNan(v_start.x)) {
     //     vec2 sub = v_position - v_start;
@@ -93,69 +108,20 @@ void main()
     //     if (cos(coord / factor) > 0.0) discard;
     // }
 
-    // Set fragment color
-//     if (!isNan(v_texture.x)) {
-//         gl_FragColor = texture2D(texture, v_texture);
-//     } else
-//     {
-//         //vec3 eye2 = (mvp_matrix * vec4(eye, 1.0)).xyz;
-//         vec4 p_view = (mv_matrix * vec4(v_world_pos, 1.0)); // Pozycja punktu w przestrzeni widoku
-
-//         //float distance = length(v_world_pos - eye2) * 0.1; // Obliczenie odległości
-// //        float distance = abs(p_view.z); // Obliczenie odległości
-//         ///float distance = abs(p_view) * 0.04; // Obliczenie odległości
-
-//         // Efekt mgły
-//         // float fogDensity = 0.0011;
-//         // float fogFactor = gl_FragCoord.z * 1.0;// exp(-distance * 0.001);
-//         // //float fogFactor = distance * fogDensity;
-//         //fogFactor = clamp(fogFactor, 0.0, 1.0);
-
-//         vec4 fogColor = vec4(0.0, 1.0, 1.0, 1.0); // Kolor mgły
-//         //gl_FragColor = mix(fogColor, v_color, fogFactor); // Mieszanie ko
-
-//         gl_FragColor = v_color;
-//     }
-
-
-    // v2
-
-    // // Normalizacja wektorów
-    // vec3 normal = normalize(v_normal);
-    // vec3 light_dir = normalize(v_light_direction);
-
-    // // // Światło rozproszone (diffuse)
-    // float diff = max(dot(normal, light_dir), 0.0);
-
-    // // // Końcowy kolor: ambient + diffuse
-    // vec3 ambient = 0.1 * u_object_color;
-    // vec3 diffuse = diff * u_light_color * u_object_color;
-
-    // vec3 final_color = ambient + diffuse;
-    // gl_FragColor = vec4(final_color, 1.0);
-
-    // v3
-
-    vec3 viewDir = normalize(v_position - eye);
+    vec3 viewDir = normalize(-v_eye);
 
     // Wektor normalny (iloczyn wektorowy wektora widzenia i kierunku linii)
     vec3 normal = normalize(cross(viewDir, v_normal));
 
-    // Cieniowanie z użyciem normalnego wektora
-    // Możesz tu dodać obliczenia oświetlenia np. Phonga
-    // ...
+    // calc diffuse light
+    float diff = max(dot(v_normal, v_light_direction), 0.0);
 
-    vec4 c1 = vec4(0.0, 0.0, 1.0, 1.0);
-    vec4 c2 = vec4(1.0, 0.0, 0.0, 1.0);
+    // calc specular light
+    vec3 reflectDir = reflect(-v_light_direction, v_normal);
 
-    vec3 lightDir = vec3(0.9, 0.2, 0.0);
-    vec4 baseColor = vec4(1.0, 0.0, 0.0, 1.0);
-    vec4 green = vec4(0.8, 0.0, 0.2, 1.0);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
 
-    //float brightness = max(dot(viewDir, v_normal) + 0.1, 0.0) * 1.0;
-    //float brightness = mix(c1, c2, v_z);
-
-    gl_FragColor = mix(baseColor, green, (v_z + 15.0 ) / 30.0);
-    // gl_FragColor = v_color;
+    // calc fragment color
+    fragColor = vec4(v_color.rgb * (diff + 0.3) + spec, v_color.a);
 }
     `;

@@ -3,11 +3,12 @@ declare var vertexShaderSource1Cube: string;
 declare var fragmentShaderSource1Cube: string;
 declare const cube: any;
 
-declare class Vertexes extends Array {
+declare class Vertexes extends Array<VertexData> {
     pushVertex(position: any, color: any, start: any): void;
     toRawArray(): any[];
 }
 declare class VertexData {
+    m_position: any; m_color: any; m_start: any;
     constructor(position: any, color: any, start: any);
 }
 

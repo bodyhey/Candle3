@@ -12,11 +12,16 @@
         </canvas>
     </body>
     <head>
+        <script>
+            console.clear();
+        </script>
         <style>
             body { margin: 0; }
             canvas { border: 1px solid black; }
         </style>
         <script src="gl-matrix.js"></script>
+        <script src="vertex.js"></script>
+        <script src="vertexdata.js"></script>
         <script src="utils.js"></script>
         <script src="cube_.js"></script>
         <script src="shaders1.js"></script>
@@ -25,7 +30,6 @@
         <script src="shaders1cube.js"></script>
         <script src="webgl-debug.js"></script>
         <script src="color.js"></script>
-        <script src="vertex.js"></script>
         <script src="test.js"></script>
         <script src="cube.js"></script>
         <script src="shaderprogram.js"></script>
@@ -35,14 +39,14 @@
         <script src="glwidget.js"></script>
         <script>
 
-            console.clear();
-
             const canvas = document.querySelector("#glcanvas");
             if (!canvas) {
                 alert("Failed to retrieve the <canvas> element");
             }
 
             let gl = canvas.getContext("webgl2", { antialias: true });
+
+            console.log(gl.getParameter(gl.ALIASED_LINE_WIDTH_RANGE));
 
             gl = WebGLDebugUtils.makeDebugContext(gl,
                 function (err, funcName, args) {

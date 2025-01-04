@@ -15,16 +15,20 @@ export declare global {
         setUniformValueMatrix(name: string, matrix: glMatrixType.mat4): void;
         setUniformValueMatrix3(name: string, matrix: glMatrixType.mat3): void;
         setUniformValueVec3(name: string, vec: any): void;
-        setUniformValue(name: string, value: any): void; 
+        setUniformValue(name: string, value: any): void;
+        setUniformValuei(name: string, value: any): void;
         attributeLocation(name: string): number;
         uniformLocation(name: string): number;
         enableAttributeArray(location: number): void;
-        setAttributeBuffer(location: number, type: number, offset: number, size: number, stride: number): void;    
-    };
+        setAttributeBuffer(location: number, type: number, offset: number, size: number, stride: number): void;
+    }
+    declare class ShaderProgram2d extends ShaderProgram {
+        setGcodeBgMode(mode: bool): void;
+    }
     declare interface Cube {
         renderTexture: WebGLTexture | null;
         updateRotation(x: number, y: number, z: number);
-    };
+    }
     declare class ShaderDrawable1 {
         constructor(shaderProgram: ShaderProgram);
         needsUpdateGeometry(): boolean;
@@ -63,7 +67,10 @@ export declare global {
         static VECTOR3D_SIZE: number;
         static VECTOR2D_SIZE: number;
         static GL_FLOAT_SIZE: number;
+        static SIZE: number;
         static qIsNaN(value: number): boolean;
         static toRadians(degrees: number): number;
-    }   
+        static initBicubicInterpolation(): void;
+        static bicubicInterpolate(x: number, y: number): number;
+    }
 }

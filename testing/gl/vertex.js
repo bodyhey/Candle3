@@ -12,8 +12,17 @@ class VertexData {
 }
 
 class Vertexes extends Array {
-    constructor() {
+    constructor(data) {
         super();
+
+        if (data == null) {
+            return;
+        }
+        for (a of data) {
+            this.push(a);
+        }
+
+        console.log("Vertexes", this);
     }
 
     pushVertex(position, color, start) {
@@ -24,6 +33,7 @@ class Vertexes extends Array {
         const raw = new Array(this.length * 9);
         let index = 0;
         for (const vertex of this) {
+            //console.log(vertex);
             raw[index++] = vertex.m_position[0];
             raw[index++] = vertex.m_position[1];
             raw[index++] = vertex.m_position[2];
