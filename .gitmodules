@@ -8,6 +8,7 @@
 [submodule "src/vendor/uCNC"]
 	path = src/vendor/uCNC
 	url = https://github.com/etet100/uCNC
+	branch = candle-library
 [submodule "src/vendor/CircularBuffer"]
 	path = src/vendor/CircularBuffer
 	url = https://github.com/rlogiacco/CircularBuffer
