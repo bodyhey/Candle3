@@ -68,7 +68,7 @@ void partMainConsole::append(CommandAttributes commandAttributes)
     append(">> " + commandAttributes.commandLine);
 
     QTextBlock block = lastBlock();
-    BlockData *blockData = new BlockData(block.blockNumber(), commandAttributes.commandIndex);
+    BlockData *blockData = new CommandBlockData(block.blockNumber(), commandAttributes.commandIndex);
     block.setUserData(blockData);
 }
 
@@ -91,57 +91,74 @@ void partMainConsole::appendFiltered(CommandAttributes commandAttributes)
     append(commandAttributes);
 }
 
-void partMainConsole::appendResponse(int consoleIndex, QString command, QString response)
-{
-    bool scrolledDown = this->isScrolledToEnd();
-
-    QTextBlock block = ui->txtConsole->document()->findBlockByNumber(consoleIndex);
-    if (!block.isValid() || block.text() != command) return;
-
-    QTextCursor cursor(block);
-
-    // Update text block numbers
-    // @TODO response is added as multiple lines, do we have to do this?
-    // int blocksAdded = response.count("; ");
-
-    // if (blocksAdded > 0) for (int i = 0; i < m_communicator->m_commands.count(); i++) {
-    //         if (m_communicator->m_commands[i].consoleIndex != -1) m_communicator->m_commands[i].consoleIndex += blocksAdded;
-    //     }
-
-    cursor.beginEditBlock();
-    cursor.movePosition(QTextCursor::EndOfBlock);
-    // @TODO response was added as multiple lines, do we have to do this?
-    // cursor.insertText(" < " + QString(response).replace("; ", "\r\n"));
-    cursor.insertText(" < " + QString(response));
-    cursor.endEditBlock();
-
-    if (scrolledDown) this->scrollToEnd();
-}
-
 void partMainConsole::appendResponse(CommandAttributes commandAttributes)
 {
     QTextDocument *document = ui->txtConsole->document();
     QTextBlock block = document->lastBlock();
     int blocksCounter = 0;
     do {
-        BlockData *blockData = static_cast<BlockData *>(block.userData());
-        if (blockData && blockData->commandIndex() == commandAttributes.commandIndex) {
-            QTextCursor cursor(block);
+        BlockData *unknownBlockData = static_cast<BlockData *>(block.userData());
+        if (unknownBlockData && unknownBlockData->type() == ItemType::Command) {
+            CommandBlockData *blockData = static_cast<CommandBlockData *>(unknownBlockData);
+            if (blockData->commandIndex() == commandAttributes.commandIndex) {
+                QTextCursor cursor(block);
 
-            cursor.beginEditBlock();
-            cursor.movePosition(QTextCursor::EndOfBlock);
-            // @TODO response was added as multiple lines, do we have to do this?
-            // cursor.insertText(" < " + QString(response).replace("; ", "\r\n"));
-            cursor.insertHtml(QString("&nbsp;<span style='color: gray; font-size: 90%'>(%1)</span> ").arg(commandAttributes.response));
-            cursor.endEditBlock();
+                cursor.beginEditBlock();
+                cursor.movePosition(QTextCursor::EndOfBlock);
+                // @TODO response was added as multiple lines, do we have to do this?
+                // cursor.insertText(" < " + QString(response).replace("; ", "\r\n"));
+                cursor.insertHtml(QString("&nbsp;<span style='color: gray; font-size: 90%'>(%1)</span> ").arg(commandAttributes.response));
+                cursor.endEditBlock();
 
-            // do we need it anymore?
-            block.setUserData(nullptr);
+                // do we need it anymore?
+                block.setUserData(nullptr);
 
-            return;
+                return;
+            }
         }
         // let's check max 50 blocks from the end
-        if (blocksCounter++ > 50) {
+        if (blocksCounter++ > MAX_BLOCKS_TO_CHECK) {
+            return;
+        }
+
+        block = block.previous();
+    } while (block.isValid());
+}
+
+int partMainConsole::appendProgress(QString text)
+{
+    ProgressBlockData *blockData = new ProgressBlockData(text, m_index++);
+    append(blockData->text(0));
+
+    QTextBlock block = lastBlock();
+    block.setUserData(blockData);
+
+    return blockData->index();
+}
+
+void partMainConsole::setProgress(int index, int progress)
+{
+    QTextDocument *document = ui->txtConsole->document();
+    QTextBlock block = document->lastBlock();
+    int blocksCounter = 0;
+    do {
+        BlockData *unknownBlockData = static_cast<BlockData *>(block.userData());
+        if (unknownBlockData && unknownBlockData->type() == ItemType::Progress) {
+            ProgressBlockData *blockData = static_cast<ProgressBlockData *>(unknownBlockData);
+            if (blockData->index() == index) {
+                QTextCursor cursor(block);
+
+                cursor.beginEditBlock();
+                cursor.movePosition(QTextCursor::StartOfBlock);
+                cursor.select(QTextCursor::LineUnderCursor);
+                cursor.insertText(blockData->text(progress));
+                cursor.endEditBlock();
+
+                return;
+            }
+        }
+        // let's check max 50 blocks from the end
+        if (blocksCounter++ > MAX_BLOCKS_TO_CHECK) {
             return;
         }
 
@@ -192,4 +209,16 @@ void partMainConsole::onClearClicked()
 void partMainConsole::onSendClicked()
 {
     send();
+}
+
+QString partMainConsole::ProgressBlockData::text(int progress)
+{
+    return QString("%1 [%2%]").arg(m_text).arg(progress);
+
+    // ##### mode
+    // // 100 -> 20, progress = x
+    // int scaled = progress / 5;
+    // int rest = 20 - scaled;
+
+    // return QString("%1 [%2%3]").arg(m_text).arg(QString("#").repeated(scaled)).arg(QString("_").repeated(rest));
 }

@@ -2575,8 +2575,9 @@ void frmMain::updateParser()
 void frmMain::loadFile(QString fileName)
 {
     GCodeThreadedLoader *loader = new GCodeThreadedLoader(this);
-    connect(loader, &GCodeThreadedLoader::progress, this, [](int progress) {
-       // qDebug() << "Progress: " << progress;
+    int progressIndex = ui->console->appendProgress("Loading " + fileName);
+    connect(loader, &GCodeThreadedLoader::progress, this, [this, progressIndex](int progress) {
+        ui->console->setProgress(progressIndex, progress);
     });
     connect(loader, &GCodeThreadedLoader::cancelled, this, [this]() {
         ui->console->appendSystem("Cancelled loading");

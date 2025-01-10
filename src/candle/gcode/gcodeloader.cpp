@@ -184,6 +184,8 @@ void GCodeLoader::loadFromFileObject(QFile &file, int size, GCodeLoaderConfigura
     if (m_cancel) {
         emit cancelled();
     } else {
+        emit progress(100);
+
         GCodeLoaderData *result = new GCodeLoaderData();
         result->gcode = gcode;
         result->viewParser = viewParser;
@@ -192,8 +194,6 @@ void GCodeLoader::loadFromFileObject(QFile &file, int size, GCodeLoaderConfigura
     }
 }
 
-
 void GCodeLoader::cancel()
 {
-
 }

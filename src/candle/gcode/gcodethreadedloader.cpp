@@ -26,7 +26,7 @@ void GCodeThreadedLoader::loadFromFile(const QString& fileName, GCodeLoaderConfi
         emit cancelled();
     });
 
-    m_thread->run();
+    m_thread->start();
 
     emit started();
 }
