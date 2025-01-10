@@ -111,6 +111,7 @@ private:
     QVector3D getSegmentColorVector(LineSegment& segment);
     QColor getSegmentColor(LineSegment& segment);
     void setImagePixelColor(QImage& image, double x, double y, QRgb color) const;
+    void computeNormals();
 };
 
 #endif // GCODEDRAWER_H

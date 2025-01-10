@@ -51,6 +51,40 @@ QVector3D GcodeDrawer::initialNormal(QVector3D p1, QVector3D p2)
     return normal.normalized();
 }
 
+void GcodeDrawer::computeNormals()
+{
+    QVector3D normal;
+    QVector3D lastNormal;
+    QVector<VertexData> newPoints;
+    for (int i = 0; i < m_lines.count() - 2; i += 2) {
+        QVector3D tangent = m_lines[i + 1].position - m_lines[i].position;
+        tangent.normalize();
+        if (i == 0) {
+            normal = QVector3D(0, 0, 1); // Dowolny wektor normalny dla pierwszego odcinka
+            if (QVector3D::dotProduct(normal, tangent) != 0) {
+                // Korekta normalnej, aby była ortogonalna do tangenta
+                normal = QVector3D::crossProduct(tangent, QVector3D(0, 1, 0));
+                normal.normalize();
+            }
+            m_lines[i].start = normal;
+        } else {
+            // Korekcja normalnej na podstawie poprzedniego kierunku
+            QVector3D projectedNormal = QVector3D::crossProduct(tangent, lastNormal);
+            normal = QVector3D::crossProduct(projectedNormal, tangent);
+            normal.normalize();
+            m_lines[i - 1].start = normal;
+            m_lines[i].start = normal;
+
+            newPoints.append(VertexData(m_lines[i - 1].position, Util::colorToVector(Qt::black), normal));
+            QVector3D p3 = m_lines[i - 1].position;
+            p3 += normal * 2.0;
+            newPoints.append(VertexData(p3, Util::colorToVector(Qt::black), normal));
+        }
+        normal.normalize();
+        lastNormal = normal;
+    }
+}
+
 bool GcodeDrawer::prepareVectors()
 {
     qDebug() << "preparing vectors" << this;
@@ -147,6 +181,8 @@ bool GcodeDrawer::prepareVectors()
             m_points.append(vertex);
         }
     }
+
+    computeNormals();
 
     // if (m_lines.count())
     // {
