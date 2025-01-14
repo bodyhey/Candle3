@@ -46,7 +46,13 @@ void main()
     gl_Position = mvp_matrix * vertex_position;
     v_position = vertex_position.xyz;
 
-    v_color = a_color;
+    float y = a_position.z + 25.0;
+    // y = -25 to 25
+    y += 20.0;
+    y /= 40.0;
+    
+    v_color = mix(vec4(1.0, 0.0, 0.0, 0.5), vec4(0.0, 1.0, 0.0, 0.5), y);
+    // a_color;
 }
 
     `;
@@ -69,7 +75,6 @@ varying vec3 v_normal;
 varying vec3 v_light_direction;
 varying float v_z;
 
-uniform sampler2D texture;
 uniform mat4 mvp_matrix;
 uniform mat4 mv_matrix;
 uniform vec3 eye;
@@ -85,6 +90,6 @@ void main()
     //vec4 green = vec4(v_color.xyz, 1);
     vec4 green = vec4(0.6, 0.6, 0.1, 0.7);
 
-    gl_FragColor = green;
+    gl_FragColor = v_color;
 }
     `;

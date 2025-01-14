@@ -6,7 +6,7 @@ class GLWidget {
         this.m_msaa = false;
         //#f3eedb
         //m_colorBackground = new QColor(0.95, 0.93, 0.86);
-        this.m_colorBackground = new QColor(0, 0, 0);
+        this.m_colorBackground = new QColor(1, 1, 1);
         this.m_shaderProgram1 = new ShaderProgram(vertexShaderSource1, fragmentShaderSource1);
         this.m_shaderProgram2 = new ShaderProgram(vertexShaderSource2, fragmentShaderSource2);
         this.m_shaderProgram2d = new ShaderProgram2d(vertexShaderSource2d, fragmentShaderSource2d);
@@ -45,6 +45,8 @@ class GLWidget {
         setTimeout(() => {
             this.setPerspectiveView();
         }, 10);
+        this.generatePaletteTexture();
+        cube.setPalette(this.m_palette);
     }
     rotate() {
         //this.m_xRot++;
@@ -278,7 +280,7 @@ class GLWidget {
             //program.setUniformValueMatrix("mv_matrix", this.m_viewMatrix);
             // program.setUniformValueVec3("u_light_color", glMatrix.vec3.fromValues(0.9, 0.6, 0.9));
             // program.setUniformValueVec3("u_object_color", glMatrix.vec3.fromValues(1.0, 1.0, 1.0));
-            const light_pos = glMatrix.vec3.fromValues(30, 10, 30);
+            const light_pos = glMatrix.vec3.fromValues(100, 10, 100);
             //console.log(light_pos);
             const light_matrix = glMatrix.mat4.create();
             glMatrix.mat4.identity(light_matrix);
@@ -306,12 +308,12 @@ class GLWidget {
         //     drawable.draw(this.m_eye2);
         //     if (drawable.visible()) vertices += drawable.getVertexCount();
         // }
-        gl.depthMask(true);
-        gl.enable(gl.DEPTH_TEST);
-        this.m_shaderDrawables[0].draw(this.m_eye, mvpMatrix);
-        gl.depthMask(false);
-        gl.enable(gl.DEPTH_TEST);
-        // this.m_shaderDrawables[1].draw(this.m_eye2, mvpMatrix);
+        // gl.depthMask(true);
+        // gl.enable(gl.DEPTH_TEST);
+        this.m_shaderDrawables[0].draw(this.m_eye, mvpMatrix, this.m_palette);
+        // gl.depthMask(false);
+        // gl.enable(gl.DEPTH_TEST);
+        this.m_shaderDrawables[2].draw(this.m_eye, mvpMatrix, this.m_palette);
         // this.m_shaderDrawables[2].draw(this.m_eye2, mvpMatrix);
         //        gl.depthMask(false);
         this.lightRot += 0.1;
@@ -322,49 +324,58 @@ class GLWidget {
         //        gl.disable(gl.BLEND);
         // Draw 2D texture
         this.m_shaderProgram2d.bind();
-        this.m_shaderProgram2d.setGcodeBgMode(false);
+        //this.m_shaderProgram2d.setGcodeBgMode(false);
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this.cube.renderTexture);
         gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        // gl.texParameteri(
-        //     gl.TEXTURE_2D,
-        //     gl.TEXTURE_MAX_FILTER,
-        //     gl.LINEAR_MIPMAP_NEAREST,
-        //   );
-        // let offset = 0;
-        // const vertexLocation = this.m_shaderProgram2d.attributeLocation("a_position");
-        // this.m_shaderProgram2d.enableAttributeArray(vertexLocation);
-        // this.m_shaderProgram2d.setAttributeBuffer(vertexLocation, gl.FLOAT, offset, 2, 2 * 4 * 2);
-        // offset += Utils.VECTOR2D_SIZE;
-        // const textureLocation = this.m_shaderProgram2d.attributeLocation("a_texcoord");
-        // this.m_shaderProgram2d.enableAttributeArray(textureLocation);
-        // this.m_shaderProgram2d.setAttributeBuffer(textureLocation, gl.FLOAT, offset, 2, 2 * 4 * 2);
-        const trx = (pos) => (pos / this.width()) * 2.0 - 1.0;
-        const try_ = (pos) => (pos / this.height()) * 2.0 - 1.0;
-        const SIZE = 100;
-        const LEFT = trx(0);
-        const RIGHT = trx(SIZE + 0);
-        const TOP = try_(this.height() - 0);
-        const BOTTOM = try_(this.height() - (SIZE + 0));
-        // 2d quad vertices
-        const vertices2d = [
-            LEFT, TOP,
-            0, 1,
-            RIGHT, TOP,
-            1, 1,
-            LEFT, BOTTOM,
-            0, 0,
-            LEFT, BOTTOM,
-            0, 0,
-            RIGHT, TOP,
-            1, 1,
-            RIGHT, BOTTOM,
-            1, 0,
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2d), gl.STATIC_DRAW);
-        // Draw texture
-        gl.viewport(0, 0, this.width(), this.height());
+        gl.viewport(0, 0, 100, 100);
+        // const trx = (pos: number) => (pos / this.width()) * 2.0 - 1.0;
+        // const try_ = (pos: number) => (pos / this.height()) * 2.0 - 1.0;
+        // const SIZE = 100;
+        // const LEFT = trx(0);
+        // const RIGHT = trx(SIZE + 0);
+        // const TOP = try_(this.height() - 0);
+        // const BOTTOM = try_(this.height() - (SIZE + 0));
+        // // 2d quad vertices
+        // const vertices2d = [
+        //     LEFT, TOP,
+        //     0, 1,
+        //     RIGHT, TOP,
+        //     1, 1,
+        //     LEFT, BOTTOM,
+        //     0, 0,
+        //     LEFT, BOTTOM,
+        //     0, 0,
+        //     RIGHT, TOP,
+        //     1, 1,
+        //     RIGHT, BOTTOM,
+        //     1, 0,
+        // ];
+        // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2d), gl.STATIC_DRAW);
+        // // Draw texture
         gl.drawArrays(gl.TRIANGLES, 0, 6);
         this.m_shaderProgram2d.release();
+    }
+    generatePaletteTexture() {
+        var colorPalette = [
+            1.0, 0.0, 0.0, 1.0,
+            1.0 / 57, 1.0 / 255, 0, 1.0,
+            1.0, 1.0, 0.0, 1.0,
+            1.0, 0.0, 1.0, 1.0,
+            0.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
+            0.6, 1.0, 0.6, 1.0,
+            0.6, 0.6, 1.0, 1.0,
+            1.0, 0.6, 0.6, 1.0, // Jasnoczerwony
+        ];
+        const paletteData = new ImageData(new Uint8ClampedArray(colorPalette.map(x => x * 255)), colorPalette.length / 4, 1);
+        // GLuint textureID;
+        const palette = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, palette);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, colorPalette.length / 4, 1, 0, gl.RGBA, gl.FLOAT, paletteData);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        this.m_palette = palette;
     }
 }

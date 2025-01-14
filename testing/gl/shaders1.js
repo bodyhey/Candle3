@@ -12,9 +12,10 @@ uniform mat4 mv_matrix;
 uniform vec3 u_light_position;
 uniform bool u_shadow;
 uniform vec3 u_eye;
+uniform sampler2D u_palette;
 
 in vec3 a_position;
-in vec3 a_color;
+in float a_color;
 in vec3 a_normal;
 in float a_alpha;
 
@@ -55,7 +56,7 @@ void main()
 
     //v_position = vertex_position.xyz;
 
-    v_color = vec4(a_color, 1.0);
+    v_color = texture(u_palette, vec2(a_color * (1.0 / 5.0), 0.0));
     v_eye = (vec4(u_eye, 1.0) * mvp_matrix).xyz;
 }
 
@@ -95,11 +96,11 @@ void main()
 {
     if (u_shadow) {
         //fragColor = vec4(0.2, 0.2, 0.2, 0.5);
-        fragColor = vec4(1.0);
+        fragColor = vec4(0.0, 0.0, 0.0, 1.0);
         return;
     }
 
-    vec3 lightColor = vec3(0.5, 0.0, 0.5);
+    //vec3 lightColor = vec3(0.5, 0.2, 0.5);
 
     // Draw dash lines
     // if (!isNan(v_start.x)) {
@@ -119,9 +120,12 @@ void main()
     // calc specular light
     vec3 reflectDir = reflect(-v_light_direction, v_normal);
 
+    // ambient light
+    float ambient = 0.5;
+
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
 
     // calc fragment color
-    fragColor = vec4(v_color.rgb * (diff + 0.3) + spec, v_color.a);
+    fragColor = vec4(v_color.rgb * (diff + ambient) + spec, v_color.a);
 }
     `;

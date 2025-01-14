@@ -138,13 +138,14 @@ class ShaderProgram2d extends ShaderProgram {
         super(vertexShaderSource2d, fragmentShaderSource2d);
     }
 
-    setGcodeBgMode(value) {
-        this.setUniformValue("u_gcodeBgMode", value);
+    setMode(value) {
+        this.setUniformValuei("u_mode", value);
     }
 
     bind() {
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.m_vbo);
         super.bind();
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.m_vbo);
 
         let offset = 0;
         const vertexLocation = this.attributeLocation("a_position");

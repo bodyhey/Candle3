@@ -23,6 +23,7 @@ class Cube {
     private m_viewMatrix = glMatrix.mat4.create();
     private m_projectionMatrix = glMatrix.mat4.create();
     private m_rotation = glMatrix.vec3.fromValues(0, 0, Cube.DISTANCE);
+    private m_palette: WebGLTexture | null = null;
 
     constructor(
         private width: number, 
@@ -67,6 +68,11 @@ class Cube {
         glMatrix.mat4.ortho(this.m_projectionMatrix, -10, 10, -10, 10, 1, 70);
     }
 
+    setPalette(palette: WebGLTexture)
+    {
+        this.m_palette = palette
+    }
+
     updateView()
     {
         glMatrix.mat4.identity(this.m_viewMatrix);
@@ -83,7 +89,6 @@ class Cube {
     }
 
     drawCube() {
-
         this.m_program.bind();
 
         this.updateView();
@@ -112,10 +117,10 @@ class Cube {
 
         const colorLocation = this.m_program.attributeLocation("a_color");
         this.m_program.enableAttributeArray(colorLocation);
-        this.m_program.setAttributeBuffer(colorLocation, gl.FLOAT, offset, 3, Utils.VERTEX_SIZE);
+        this.m_program.setAttributeBuffer(colorLocation, gl.FLOAT, offset, 1, Utils.VERTEX_SIZE);
 
         // Offset for line start point
-        offset += Utils.VECTOR3D_SIZE;
+        offset += Utils.GL_FLOAT_SIZE;
 
         // Tell OpenGL programmable pipeline how to locate vertex line start point
         // const startLocation = this.m_program.attributeLocation("a_normal");
@@ -128,7 +133,10 @@ class Cube {
 
         gl.enable(gl.CULL_FACE);
 
-        gl.drawArrays(gl.TRIANGLES, 0, cube.length / 9);        
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.m_palette);
+
+        gl.drawArrays(gl.TRIANGLES, 0, cube.length / 7);        
 
         gl.disable(gl.CULL_FACE);   
 

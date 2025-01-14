@@ -189,6 +189,8 @@ class ShaderDrawable3 {
         return center;
     }
 
+    ofs = 0.0;
+
     draw(eye, mvpMatrix)
     {
         if (!this.m_visible) return;
@@ -216,9 +218,9 @@ class ShaderDrawable3 {
             offset += VECTOR3D_SIZE;
 
             // Tell OpenGL programmable pipeline how to locate vertex color data
-            const colorLocation = this.m_program.attributeLocation("a_color");
-            this.m_program.enableAttributeArray(colorLocation);
-            this.m_program.setAttributeBuffer(colorLocation, gl.FLOAT, offset, 3, VERTEX_SIZE);
+            // const colorLocation = this.m_program.attributeLocation("a_color");
+            // this.m_program.enableAttributeArray(colorLocation);
+            // this.m_program.setAttributeBuffer(colorLocation, gl.FLOAT, offset, 3, VERTEX_SIZE);
 
             // Offset for line start point
             offset += VECTOR3D_SIZE;
@@ -250,17 +252,52 @@ class ShaderDrawable3 {
             const c6 = glMatrix.vec3.fromValues(0, 1, 1);
 
             const cubeQuads = [];
-            const Y = 35;
-            for (let i = -SIZE; i < SIZE; i+=10) {
-                for (let j = -SIZE; j < SIZE; j+=10) {
+            const Z = 25;
+            for (let i = -SIZE; i <= SIZE; i+=10) {
+                for (let j = -SIZE; j <= SIZE; j+=10) {
+                    const j_ = j + this.ofs;
+                    const i_ = i + this.ofs;
+                    const z0 = Math.sin(j_ * Utils.MAP_SCALE) * Math.cos(i_ * Utils.MAP_SCALE) * Utils.MAP_HEIGHT - Z;
+                    const z1 = Math.sin(j_ * Utils.MAP_SCALE) * Math.cos((i_+10) * Utils.MAP_SCALE) * Utils.MAP_HEIGHT - Z;
+                    const z2 = Math.sin((j_+10) * Utils.MAP_SCALE) * Math.cos((i_+10) * Utils.MAP_SCALE) * Utils.MAP_HEIGHT - Z;
+                    const z3 = Math.sin((j_+10) * Utils.MAP_SCALE) * Math.cos(i_ * Utils.MAP_SCALE) * Utils.MAP_HEIGHT - Z;
                     cubeQuads.push(
                         [
-                            [i, j, Y],  [i+10, j, Y],  [i+10, j+10, Y],
-                            [i, j, Y],  [i+10, j+10, Y],  [i, j+10, Y],
+                            [i, j, z0],  [i+10, j, z1],  [i+10, j+10, z2],
+                            [i, j, z0],  [i+10, j+10, z2],  [i, j+10, z3],
                         ]
                     );
-                }
+                    if (j > -SIZE && j < SIZE) {
+                        this.m_lines.push(
+                            new VertexData(
+                                glMatrix.vec3.fromValues(i, j, z0),
+                                c1,
+                                glMatrix.vec3.fromValues(NaN, NaN, NaN)
+                            ),
+                            new VertexData(
+                                glMatrix.vec3.fromValues(i+10, j, z1),
+                                c1,
+                                glMatrix.vec3.fromValues(NaN, NaN, NaN)
+                            )
+                        );                            
+                    }
+                    if (i > -SIZE && i < SIZE) {
+                        this.m_lines.push(
+                            new VertexData(
+                                glMatrix.vec3.fromValues(i, j, z0),
+                                c1,
+                                glMatrix.vec3.fromValues(NaN, NaN, NaN)
+                            ),
+                            new VertexData(
+                                glMatrix.vec3.fromValues(i, j+10, z3),
+                                c1,
+                                glMatrix.vec3.fromValues(NaN, NaN, NaN)
+                            )
+                        );
+                    }
+                }                
             }
+            this.ofs += 0.8;
             //console.log(cubeQuads.length);
 
             const cubeTrianglesSorted = new Array(cubeQuads.length * 2);
@@ -280,6 +317,7 @@ class ShaderDrawable3 {
             //console.log([min, max]);
 
             const colors = [c1, c2, c3, c4, c5, c6];
+            const color = c1;
 
             let ic = 0;
             for (const [center,length,triangle] of cubeTrianglesSorted) {
@@ -302,7 +340,8 @@ class ShaderDrawable3 {
                     //         glMatrix.vec3.fromValues(...vertex),
                     //         color,
                     //         glMatrix.vec3.fromValues(NaN, NaN, NaN)
-                    //     )
+                    //     ),
+                    //     1
                     // );
                 }
                 // if (ic < 1) {
@@ -315,9 +354,7 @@ class ShaderDrawable3 {
                     glMatrix.vec3.fromValues(0, 0, 0),
                     c1,
                     glMatrix.vec3.fromValues(0, 0, 1)
-                )
-            );
-            this.m_lines.push(
+                ),
                 new VertexData(
                     glMatrix.vec3.fromValues(0, 0, 100),
                     c1,

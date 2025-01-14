@@ -47,6 +47,9 @@
             let gl = canvas.getContext("webgl2", { antialias: true });
 
             console.log(gl.getParameter(gl.ALIASED_LINE_WIDTH_RANGE));
+            
+            window.extensions = [];
+            window.extensions['anis'] = gl.getExtension('EXT_texture_filter_anisotropic');
 
             gl = WebGLDebugUtils.makeDebugContext(gl,
                 function (err, funcName, args) {
@@ -55,11 +58,28 @@
             );
 
             const glWidget = new GLWidget(new Cube(100, 100));
-            function draw() {
+            let fpsElem;
+            let then = 0;
+
+            let fpss = [0]
+
+            function draw(now) {
                 glWidget.paintEvent();
                 glWidget.rotate();
 
                 requestAnimationFrame(draw);
+
+                now *= 0.001;                          // convert to seconds
+                const deltaTime = now - then;          // compute time since last frame
+                then = now;                            // remember time for next frame
+                const fps = 1 / deltaTime;             // compute frames per second
+                if (!fpsElem) {
+                    fpsElem = document.getElementById("fps");
+                }
+                if (fpsElem) {
+                    fpsElem.textContent = fps.toFixed(1);  // update fps display                
+                }
+                console.log(fps);
             };
 
             requestAnimationFrame(draw);
@@ -69,6 +89,7 @@
             }
 
         </script><br/>
+        FPS: <span id="fps"></span>
         <button onClick="fit();">Fit</button>
         <button onClick="glWidget.setLeftView();">Left</button>
         <button onClick="glWidget.setTopView();">Top</button>

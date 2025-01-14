@@ -23,7 +23,7 @@ export declare global {
         setAttributeBuffer(location: number, type: number, offset: number, size: number, stride: number): void;
     }
     declare class ShaderProgram2d extends ShaderProgram {
-        setGcodeBgMode(mode: bool): void;
+        setMode(mode: number): void;
     }
     declare interface Cube {
         renderTexture: WebGLTexture | null;

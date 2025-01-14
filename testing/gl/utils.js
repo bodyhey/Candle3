@@ -14,8 +14,8 @@ class Utils {
 
     static grid = [];
     static SIZE = 300;
-    static MAP_HEIGHT = 50.0;
-    static MAP_SCALE = 0.025;
+    static MAP_HEIGHT = 20.0;
+    static MAP_SCALE = 0.015;
     static STEP = 1.0;
 
     static initBicubicInterpolation() {
@@ -83,7 +83,7 @@ class Utils {
     static GL_FLOAT_SIZE = 4;
     static VECTOR3D_SIZE = 3 * 4;
     static VECTOR2D_SIZE = 2 * 4;
-    static VERTEX_SIZE = 3 * 3 * 4;
+    static VERTEX_SIZE = 2 * 3 * 4 + 4;
 }
 const ZOOMSTEP = 1.1;
 const DEFAULT_ZOOM = 1300.0;
@@ -94,7 +94,7 @@ const M_PI = Math.PI;
 
 const GL_FLOAT_SIZE = 4;
 const VECTOR3D_SIZE = 3 * GL_FLOAT_SIZE;
-const VERTEX_SIZE = 3 * VECTOR3D_SIZE;
+const VERTEX_SIZE = 3 * VECTOR3D_SIZE;// + GL_FLOAT_SIZE;
 
 window.toRadians = glMatrix.glMatrix.toRadian;
 

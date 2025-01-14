@@ -7,11 +7,14 @@ class ShaderDrawable1 {
     m_pointSize = 1.0;
     m_globalAlpha = 1.0;
     m_texture: WebGLTexture | null = null;
+    m_texture2: WebGLTexture | null = null;
     m_depthTexture: WebGLTexture | null = null;
+    m_depthTexture2: WebGLTexture | null = null;
     private m_fbo: WebGLFramebuffer | null;
     private m_vbo: WebGLBuffer | null = null;
+    //private m_vao: WebGLVertexArrayObject | null = null;
     private m_lines: Vertexes = new Vertexes();
-    private m_triangles: Vertexes = new Vertexes();
+    //private m_triangles: Vertexes = new Vertexes();
     m_points = [];
     m_program: ShaderProgram = null;
     m_program2d: ShaderProgram2d = null;
@@ -24,9 +27,16 @@ class ShaderDrawable1 {
         this.m_program2d = program2d;
         this.m_fbo = gl.createFramebuffer();
         this.m_vbo = gl.createBuffer();
+        //this.m_vao = gl.createVertexArray();
         this.m_texture = this.createTexture();
-        this.m_depthTexture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.m_depthTexture);
+        this.m_texture2 = this.createTexture();
+        this.m_depthTexture = this.createDepthTexture();
+        this.m_depthTexture2 = this.createDepthTexture();
+    }
+
+    private createDepthTexture(): WebGLTexture {
+        const texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT32F,
             this.width, this.height, 0,
             gl.DEPTH_COMPONENT, gl.FLOAT, null);
@@ -35,6 +45,8 @@ class ShaderDrawable1 {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.bindTexture(gl.TEXTURE_2D, null);
+
+        return texture;
     }
 
     createTexture(): WebGLTexture {
@@ -51,10 +63,14 @@ class ShaderDrawable1 {
             gl.UNSIGNED_BYTE,
             null
         );
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        const anis = window.extensions['anis'];
+        //console.log(anis,  gl.getParameter(anis.MAX_TEXTURE_MAX_ANISOTROPY_EXT));
+        //gl.texParameterf(gl.TEXTURE_2D, anis.TEXTURE_MAX_ANISOTROPY_EXT, 16);
+
         gl.bindTexture(gl.TEXTURE_2D, null);
 
         return texture;
@@ -64,7 +80,7 @@ class ShaderDrawable1 {
     {
         // Create buffers
         //this.m_vao = gl.createVertexArray();
-        this.m_vbo = gl.createBuffer();
+        //this.m_vbo = gl.createBuffer();
     }
 
     update()
@@ -94,7 +110,7 @@ class ShaderDrawable1 {
         //     this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(i * 10, -SIZE * 10, 0), color1, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
         //     this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(i * 10, SIZE * 10, 0), color2, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
         //     this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(-SIZE * 10, i * 10, 0), color1, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
-        //     this.m_lines.push(new VertexData(glMatrix.vec3.fromValues(SIZE * 10, i * 10, 0), color2, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
+        //     this.m_lines.push(new VertexData(glMatrix.vec3.fromValues  (SIZE * 10, i * 10, 0), color2, glMatrix.vec3.fromValues(NaN, NaN, NaN)));
         // }
 
         return true;
@@ -185,7 +201,7 @@ class ShaderDrawable1 {
 
     private once = true;
 
-    draw(eye)
+    draw(eye, matrix, palette)
     {
         if (!this.m_visible) return;
 
@@ -217,6 +233,7 @@ class ShaderDrawable1 {
 
         //gl.colorMask(false, true, true, true);
         //252, 249, 197, 255 = 1.0
+        //gl.clearColor(1.0, 1.0, 1.0, 0.0);
         gl.clearColor(1.0, 1.0, 1.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -234,7 +251,7 @@ class ShaderDrawable1 {
         const color3 = glMatrix.vec3.fromValues(0, 1, 0);
         const color4 = glMatrix.vec3.fromValues(0, 0, 0);
 
-        this.m_triangles = new Vertexes();
+        //this.m_triangles = new Vertexes();
 
         const MICROSTEP = 4;
 
@@ -288,17 +305,25 @@ class ShaderDrawable1 {
         }
 
         if (this.once) {
+            const colors = [];
+
             for (let i = 0; i < vertexData__.length; i+=9) {
                 let color = [vertexData__[i + 3], vertexData__[i + 4], vertexData__[i + 5]];
                 //0.564706, 0, 0.027451
                 //red to dark green
-                if (color[0] == 0.564706 && color[1] == 0 && color[2] == 0.027451) {
-                    //color = [0, 0, 0];
-                    color = [0, 1, 1];
+                // if (color[0] == 0.564706 && color[1] == 0 && color[2] == 0.027451) {
+                //     //color = [0, 0, 0];
+                //     color = [0, 1, 1];
+                // }
+
+                const col = `${color[0]}, ${color[1]}, ${color[2]}`;
+                if (!colors.includes(col)) {
+                    colors.push(col);
                 }
+
                 this.m_lines.push(new VertexData(
                     [vertexData__[i], vertexData__[i + 1], vertexData__[i + 2]],
-                    color,
+                    colors.indexOf(col),
                     [vertexData__[i + 6], vertexData__[i + 7], vertexData__[i + 8]]
                 ));
             }
@@ -349,17 +374,21 @@ class ShaderDrawable1 {
             // }
         }
 
-        this.once = false;
+        if (this.once) {
+            const ra = this.m_lines.toRawArray();
 
-        const ra = this.m_lines.toRawArray();
+            let time = performance.now();
+            gl.bufferData(gl.ARRAY_BUFFER,
+                new Float32Array(ra), gl.STATIC_DRAW);
+            console.log("To raw array: ", performance.now() - time);            
 
-        gl.bufferData(gl.ARRAY_BUFFER,
-            new Float32Array(ra), gl.STATIC_DRAW);
+            // gl.bindVertexArray(this.m_vao);
+        }
 
         // this.m_program.setUniformValue("u_shadow", true);
         // gl.drawArrays(gl.LINES, 0, this.m_lines.length);
 
-        this.m_program.setUniformValue("u_shadow", false);
+        this.m_program.setUniformValue("u_shadow", true);
         gl.drawArrays(gl.LINES, 0, this.m_lines.length);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
@@ -367,9 +396,60 @@ class ShaderDrawable1 {
 
         this.m_program.release();
 
-        this.m_program2d.bind();
-        this.m_program2d.setGcodeBgMode(true);
+        // 2d
 
+        this.m_program2d.bind();
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_fbo);
+
+        if (this.once) {
+
+            // draw to screen
+
+            const LEFT = -1;
+            const RIGHT = 1;
+            const TOP = 1;
+            const BOTTOM = -1;
+
+            // 2d quad vertices
+            const vertices2d = [
+                LEFT, TOP,
+                0, 1,
+                RIGHT, TOP,
+                1, 1,
+                LEFT, BOTTOM,
+                0, 0,
+                LEFT, BOTTOM,
+                0, 0,
+                RIGHT, TOP,
+                1, 1,
+                RIGHT, BOTTOM,
+                1, 0,
+            ];
+
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2d), gl.STATIC_DRAW);
+        }
+
+        // 2D pogrubienie
+
+        gl.framebufferTexture2D(
+            gl.FRAMEBUFFER,
+            gl.COLOR_ATTACHMENT0,
+            gl.TEXTURE_2D,
+            this.m_texture2,
+            0
+        );
+        gl.framebufferTexture2D(
+            gl.FRAMEBUFFER,
+            gl.DEPTH_ATTACHMENT,
+            gl.TEXTURE_2D,
+            this.m_depthTexture2,
+            0
+        );
+
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        this.m_program2d.setMode(2);
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this.m_texture);
@@ -379,59 +459,54 @@ class ShaderDrawable1 {
         gl.activeTexture(gl.TEXTURE1);
         gl.bindTexture(gl.TEXTURE_2D, this.m_depthTexture);
         this.m_program2d.setUniformValuei("u_depthTexture", 1);
+        
+        // Draw texture
+        gl.viewport(0, 0, this.width, this.height);
+        gl.depthMask(true);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        // 2D 2
+ 
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+        this.m_program2d.setMode(1);
 
         gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.m_texture2);
+        gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        this.m_program2d.setUniformValuei("u_texture", 0);
 
-        // draw to screen
-
-        const LEFT = -1;
-        const RIGHT = 1;
-        const TOP = 1;
-        const BOTTOM = -1;
-
-        // 2d quad vertices
-        const vertices2d = [
-            LEFT, TOP,
-            0, 1,
-            RIGHT, TOP,
-            1, 1,
-            LEFT, BOTTOM,
-            0, 0,
-            LEFT, BOTTOM,
-            0, 0,
-            RIGHT, TOP,
-            1, 1,
-            RIGHT, BOTTOM,
-            1, 0,
-        ];
-
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2d), gl.STATIC_DRAW);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, this.m_depthTexture2);
+        this.m_program2d.setUniformValuei("u_depthTexture", 1);
 
         // Draw texture
-        gl.viewport(0, 0, 800, 600);
-        // gl.disable(gl.DEPTH_TEST);
+        gl.viewport(0, 0, this.width, this.height);
         gl.depthMask(true);
-        gl.depthFunc(gl.ALWAYS);
+//        gl.disable(gl.DEPTH_TEST);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
-        // gl.enable(gl.DEPTH_TEST);
-
-        gl.bindTexture(gl.TEXTURE_2D, null);
 
         this.m_program2d.release();
 
+        // 3D
+
         this.m_program.bind();
 
+        gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LESS);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.m_vbo);
         this.bindAttributes();
 
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(ra), gl.STATIC_DRAW);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, palette);
 
         this.m_program.setUniformValue("u_shadow", false);
         gl.drawArrays(gl.LINES, 0, this.m_lines.length);
 
         this.m_program.release();
+
+        this.once = false;
     }
 
     private bindAttributes() {
@@ -453,10 +528,10 @@ class ShaderDrawable1 {
         // Tell OpenGL programmable pipeline how to locate vertex color data
         const colorLocation = this.m_program.attributeLocation("a_color");
         this.m_program.enableAttributeArray(colorLocation);
-        this.m_program.setAttributeBuffer(colorLocation, gl.FLOAT, offset, 3, Utils.VERTEX_SIZE);
+        this.m_program.setAttributeBuffer(colorLocation, gl.FLOAT, offset, 1, Utils.VERTEX_SIZE);
 
         // Offset for line start point
-        offset += Utils.VECTOR3D_SIZE;
+        offset += Utils.GL_FLOAT_SIZE;
 
         // Tell OpenGL programmable pipeline how to locate vertex line start point
         const startLocation = this.m_program.attributeLocation("a_normal");

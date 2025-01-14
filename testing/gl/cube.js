@@ -5,6 +5,7 @@ class Cube {
         this.m_viewMatrix = glMatrix.mat4.create();
         this.m_projectionMatrix = glMatrix.mat4.create();
         this.m_rotation = glMatrix.vec3.fromValues(0, 0, Cube.DISTANCE);
+        this.m_palette = null;
         this.m_fbo = gl.createFramebuffer();
         this.m_vbo = gl.createBuffer();
         this.renderTexture = this.createTexture();
@@ -27,6 +28,9 @@ class Cube {
     setProjection() {
         glMatrix.mat4.identity(this.m_projectionMatrix);
         glMatrix.mat4.ortho(this.m_projectionMatrix, -10, 10, -10, 10, 1, 70);
+    }
+    setPalette(palette) {
+        this.m_palette = palette;
     }
     updateView() {
         glMatrix.mat4.identity(this.m_viewMatrix);
@@ -56,16 +60,18 @@ class Cube {
         offset += Utils.VECTOR3D_SIZE;
         const colorLocation = this.m_program.attributeLocation("a_color");
         this.m_program.enableAttributeArray(colorLocation);
-        this.m_program.setAttributeBuffer(colorLocation, gl.FLOAT, offset, 3, Utils.VERTEX_SIZE);
+        this.m_program.setAttributeBuffer(colorLocation, gl.FLOAT, offset, 1, Utils.VERTEX_SIZE);
         // Offset for line start point
-        offset += Utils.VECTOR3D_SIZE;
+        offset += Utils.GL_FLOAT_SIZE;
         // Tell OpenGL programmable pipeline how to locate vertex line start point
         // const startLocation = this.m_program.attributeLocation("a_normal");
         // this.m_program.enableAttributeArray(startLocation);
         // this.m_program.setAttributeBuffer(startLocation, gl.FLOAT, offset, 3, Utils.VERTEX_SIZE);        
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cube), gl.STATIC_DRAW);
         gl.enable(gl.CULL_FACE);
-        gl.drawArrays(gl.TRIANGLES, 0, cube.length / 9);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.m_palette);
+        gl.drawArrays(gl.TRIANGLES, 0, cube.length / 7);
         gl.disable(gl.CULL_FACE);
         this.m_program.release();
         gl.flush();

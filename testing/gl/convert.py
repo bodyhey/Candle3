@@ -115,32 +115,46 @@ colors = [
 # f 24/91/91 12/90/90 17/92/92
 # usemtl Top
 
+# colors2 = {
+#     'Front' : [1.0, 0.5, 0.0],
+#     'Back' : [1.0, 0.0, 0.5],
+#     'Top' : [0.5, 1.0, 0.0],
+#     'Bottom' : [0.5, 0.0, 1.0],
+#     'Left' : [0.0, 1.0, 0.5],
+#     'Right' : [0.0, 0.5, 1.0],
+#     'BackLeft' : [1.0, 0.5, 0.5],
+#     'BackRight' : [1.0, 0.0, 1.0],
+#     'FrontLeft' : [0.5, 1.0, 0.5],
+#     'FrontRight' : [0.5, 0.0, 1.0],
+#     'FrontTop' : [0.0, 1.0, 0.5],
+#     'FrontBottom' : [0.0, 0.5, 1.0],
+#     'BackTop' : [1.0, 0.5, 1.0],
+#     'BackBottom' : [1.0, 1.0, 0.5],
+#     'LeftTop' : [0.5, 1.0, 1.0],
+#     'RightTop' : [0.5, 1.0, 1.0],
+#     'LeftBottom' : [0.5, 0.5, 1.0],
+#     'RightBottom' : [1.0, 0.5, 1.0],
+# }
+
 colors2 = {
-    'Front' : [1.0, 0.5, 0.0],
-    'Back' : [1.0, 0.0, 0.5],
-    'Top' : [0.5, 1.0, 0.0],
-    'Bottom' : [0.5, 0.0, 1.0],
-    'Left' : [0.0, 1.0, 0.5],
-    'Right' : [0.0, 0.5, 1.0],
-    'BackLeft' : [1.0, 0.5, 0.5],
-    'BackRight' : [1.0, 0.0, 1.0],
-    'FrontLeft' : [0.5, 1.0, 0.5],
-    'FrontRight' : [0.5, 0.0, 1.0],
-    'FrontTop' : [0.0, 1.0, 0.5],
-    'FrontBottom' : [0.0, 0.5, 1.0],
-    'BackTop' : [1.0, 0.5, 1.0],
-    'BackBottom' : [1.0, 1.0, 0.5],
-    'LeftTop' : [0.5, 1.0, 1.0],
-    'RightTop' : [0.5, 1.0, 1.0],
-    'LeftBottom' : [0.5, 0.5, 1.0],
-    'RightBottom' : [1.0, 0.5, 1.0],
-}
+    'Default_Generic' : 0,
+    'Front' : 1,
+    'Back' : 2,
+    'Top' : 3,
+    'Bottom' : 4,
+    'Left' : 5,
+    'Right' : 6,
+    'Other' : 7,
+}    
 
 def color_(mtl):
     if mtl == None or mtl == 'Default_Generic':
-        return [0.5, 0.5, 0.6]
+        return 0 
     else:
-        return colors2[mtl]
+        try:
+            return colors2[mtl]
+        except KeyError:
+            return colors2['Other']
 
 def write_vertex(f, vertex, iface):
     [vi, vni, mtl] = vertex
@@ -148,8 +162,8 @@ def write_vertex(f, vertex, iface):
     vn = normals[vni]
     color = color_(mtl)
             
-    print("%f, %f, %f, %f, %f, %f, %f, %f, %f," % (v[0], v[1], v[2], color[0], color[1], color[2], vn[0], vn[1], vn[2]))
-    f.write("%f, %f, %f, %f, %f, %f, %f, %f, %f,\n" % (v[0], v[1], v[2], color[0], color[1], color[2], vn[0], vn[1], vn[2]))
+    print("%f, %f, %f, %d, %f, %f, %f," % (v[0], v[1], v[2], color, vn[0], vn[1], vn[2]))
+    f.write("%f, %f, %f, %d, %f, %f, %f,\n" % (v[0], v[1], v[2], color, vn[0], vn[1], vn[2]))
     
 def write_cpp_vertex(f, vertex, iface):
     [vi, vni, mtl] = vertex
@@ -157,7 +171,7 @@ def write_cpp_vertex(f, vertex, iface):
     vn = normals[vni]
     color = color_(mtl)
             
-    f.write("  VertexData(QVector3D(%f, %f, %f), QVector3D(%f, %f, %f), QVector3D(%f, %f, %f)),\n" % (v[0], v[1], v[2], color[0], color[1], color[2], vn[0], vn[1], vn[2]))
+    f.write("  VertexData(QVector3D(%f, %f, %f), %d, QVector3D(%f, %f, %f)),\n" % (v[0], v[1], v[2], color, vn[0], vn[1], vn[2]))
 
 def write_lines(iface, face, write_vertex, f):
     write_vertex(f, face[0], iface)
@@ -182,7 +196,7 @@ with open("cube_.js", 'w') as f:
     f.write("const cube = [\n")
     for iface, face in enumerate(faces):
         
-        f.write("  // f %d\n" % iface)
+        f.write("  // f %d %s\n" % (iface, face[0][2]))
         # write_lines(face, write_vertex, f)
         write_face(math.floor(iface / 2), face, write_vertex, f)
         
