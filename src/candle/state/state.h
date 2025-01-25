@@ -26,6 +26,10 @@ class State : public QObject
         virtual void onDeviceStateChanged(DeviceState state) {
             Q_UNUSED(state);
         };
+        virtual void onCommandResponse(QString command, QString response) {
+            Q_UNUSED(command);
+            Q_UNUSED(response);
+        };
 
     signals:
         void transition(State *state, State *newState);

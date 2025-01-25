@@ -18,11 +18,22 @@ void StateHoming::onEntry(Communicator *communicator, State *previous)
 
 void StateHoming::onDeviceStateChanged(DeviceState state)
 {
-    if (state == DeviceState::Idle) {
-        emit transition(this, m_previous);
-    }
+    // if (state == DeviceState::Idle) {
+    //     emit transition(this, m_previous);
+    // }
 
-    if (state == DeviceState::Alarm) {
-        emit error(this, "Homing failed");
+    // if (state == DeviceState::Alarm) {
+    //     emit error(this, "Homing failed");
+    // }
+}
+
+void StateHoming::onCommandResponse(QString command, QString response)
+{
+    if (command == "$H") {
+        if (response.contains("error")) {
+            emit error(this, "Homing failed");
+        } else {
+            emit transition(this, m_previous);
+        }
     }
 }
