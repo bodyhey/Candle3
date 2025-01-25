@@ -30,9 +30,9 @@ void GcodeDrawer::update(QList<int> indexes)
     m_indexes += indexes;
 }
 
-bool GcodeDrawer::updateData()
+bool GcodeDrawer::updateData(GLPalette &palette)
 {
-    if (m_indexes.isEmpty()) return prepareVectors(); else return updateVectors();
+    if (m_indexes.isEmpty()) return prepareVectors(palette); else return updateVectors(palette);
 }
 
 QVector3D GcodeDrawer::initialNormal(QVector3D p1, QVector3D p2)
@@ -75,17 +75,17 @@ void GcodeDrawer::computeNormals()
             m_lines[i - 1].start = normal;
             m_lines[i].start = normal;
 
-            newPoints.append(VertexData(m_lines[i - 1].position, Util::colorToVector(Qt::black), normal));
-            QVector3D p3 = m_lines[i - 1].position;
-            p3 += normal * 2.0;
-            newPoints.append(VertexData(p3, Util::colorToVector(Qt::black), normal));
+            // newPoints.append(VertexData(m_lines[i - 1].position, Util::colorToVector(Qt::black), normal));
+            // QVector3D p3 = m_lines[i - 1].position;
+            // p3 += normal * 2.0;
+            // newPoints.append(VertexData(p3, Util::colorToVector(Qt::black), normal));
         }
         normal.normalize();
         lastNormal = normal;
     }
 }
 
-bool GcodeDrawer::prepareVectors()
+bool GcodeDrawer::prepareVectors(GLPalette &palette)
 {
     qDebug() << "preparing vectors" << this;
 
@@ -119,7 +119,7 @@ bool GcodeDrawer::prepareVectors()
             if (qIsNaN(list[i].getEnd().x()) || qIsNaN(list[i].getEnd().y())) continue;
 
             // Draw first toolpath point
-            vertex.color = Util::colorToVector(m_colorStart);
+            vertex.color = palette.color(m_colorStart);
             vertex.position = list[i].getEnd();
             if (m_ignoreZ) vertex.position.setZ(0);
             vertex.start = QVector3D(sNan, sNan, m_pointSize);
@@ -157,7 +157,7 @@ bool GcodeDrawer::prepareVectors()
             list[i].setVertexIndex(m_lines.count()); // Store vertex index
         }
 
-        vertex.color = getSegmentColorVector(list[i]);
+        vertex.color = palette.color(getSegmentColor(list[i]));
 
         // ignore shorter than 0.0001
         if ((list[i].getEnd() - list[j].getStart()).length() > 0.0001) {
@@ -174,7 +174,7 @@ bool GcodeDrawer::prepareVectors()
 
         // Draw last toolpath point
         if (i == list.count() - 1) {
-            vertex.color = Util::colorToVector(m_colorEnd);
+            vertex.color = palette.color(m_colorEnd);
             vertex.position = list[i].getEnd();
             if (m_ignoreZ) vertex.position.setZ(0);
             vertex.start = QVector3D(sNan, sNan, m_pointSize);
@@ -258,7 +258,7 @@ bool GcodeDrawer::prepareVectors()
     return true;
 }
 
-bool GcodeDrawer::updateVectors()
+bool GcodeDrawer::updateVectors(GLPalette &palette)
 {
     // Update vertices
     QList<LineSegment>& list = m_viewParser->getLines();
@@ -275,10 +275,10 @@ bool GcodeDrawer::updateVectors()
         if (vertexIndex >= 0) {
             // Update vertex array            
             if (data) {
-                data[vertexIndex].color = getSegmentColorVector(list[i]);
+                data[vertexIndex].color = palette.color(getSegmentColor(list[i]));
                 data[vertexIndex + 1].color = data[vertexIndex].color;
             } else {
-                m_lines[vertexIndex].color = getSegmentColorVector(list[i]);
+                m_lines[vertexIndex].color = palette.color(getSegmentColor(list[i]));
                 m_lines[vertexIndex + 1].color = m_lines.at(vertexIndex).color;
             }
         }

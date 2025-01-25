@@ -4,11 +4,12 @@ precision mediump int;
 precision mediump float;
 #endif
 
-uniform mat4 mvp_matrix;
-uniform mat4 mv_matrix;
+uniform mat4 u_mvp_matrix;
+uniform mat4 u_mv_matrix;
+uniform sampler2D u_palette;
 
 attribute vec4 a_position;
-attribute vec4 a_color;
+attribute float a_color;
 attribute vec4 a_start;
 attribute float a_alpha;
 
@@ -25,10 +26,10 @@ bool isNan(float val)
 void main()
 {
     // Calculate interpolated vertex position & line start point
-    v_position = (mv_matrix * a_position).xy;
+    v_position = (u_mv_matrix * a_position).xy;
 
     if (!isNan(a_start.x) && !isNan(a_start.y)) {
-        v_start = (mv_matrix * a_start).xy;
+        v_start = (u_mv_matrix * a_start).xy;
         v_texture = vec2(65536.0, 0);
     } else {
         // v_start.x should be Nan to draw solid lines
@@ -42,8 +43,7 @@ void main()
     }
 
     // Calculate vertex position in screen space
-    gl_Position = mvp_matrix * a_position;
+    gl_Position = u_mvp_matrix * a_position;
 
-    v_color = a_color;
-    v_color.a = a_alpha;
+    v_color = texture2D(u_palette, vec2(a_color * (1.0 / 25.0) + (1.0 / 50.0), 0.0));
 }

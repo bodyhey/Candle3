@@ -57,6 +57,11 @@ void GLContainer::setPinState(const QString &pinState)
     m_glWidget->setPinState(pinState);
 }
 
+void GLContainer::updateDrawer(ShaderDrawable *drawer)
+{
+    m_glWidget->updateDrawer(drawer);
+}
+
 void GLContainer::showEvent(QShowEvent *event)
 {
     m_glWidget->show();

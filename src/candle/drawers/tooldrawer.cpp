@@ -11,7 +11,7 @@ ToolDrawer::ToolDrawer()
     m_rotationAngle = 0;
 }
 
-bool ToolDrawer::updateData()
+bool ToolDrawer::updateData(GLPalette &palette)
 {
     const int arcs = 4;
 
@@ -21,7 +21,7 @@ bool ToolDrawer::updateData()
 
     // Prepare vertex
     VertexData vertex;
-    vertex.color = Util::colorToVector(m_color);//QVector3D(1.0, 0.6, 0.0);
+    vertex.color = palette.color(m_color);
     vertex.start = QVector3D(sNan, sNan, sNan);
 
     // Draw lines
@@ -71,6 +71,7 @@ bool ToolDrawer::updateData()
 
     return true;
 }
+
 QColor ToolDrawer::color() const
 {
     return m_color;
@@ -81,8 +82,7 @@ void ToolDrawer::setColor(const QColor &color)
     m_color = color;
 }
 
-
-QVector<VertexData> ToolDrawer::createCircle(QVector3D center, double radius, int arcs, QVector3D color)
+QVector<VertexData> ToolDrawer::createCircle(QVector3D center, double radius, int arcs, uint color)
 {
     // Vertices
     QVector<VertexData> circle;

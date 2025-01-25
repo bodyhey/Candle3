@@ -14,6 +14,7 @@
 #include <QMouseEvent>
 #include "shaderdrawable.h"
 #include "cube.h"
+#include "../widgets/glpalette.h"
 
 class CubeDrawer : public QObject, protected QOpenGLFunctions_3_0
 {
@@ -23,7 +24,7 @@ class CubeDrawer : public QObject, protected QOpenGLFunctions_3_0
 
 public:
     explicit CubeDrawer();
-    void draw(QRect);
+    void draw(QRect, GLPalette &m_palette);
     void setProjection();
     void updateView();
     void updateEyePosition(QVector3D eye, QVector3D up);
@@ -53,9 +54,9 @@ private:
 
     void init();
     void initAttributes();
-    void updateGeometry();
+    void updateGeometry(GLPalette &palette);
     void drawBackground();
-    void drawCube();
+    void drawCube(GLPalette &m_palette);
     void setEye(float pos);
 };
 

@@ -6,12 +6,12 @@ SelectionDrawer::SelectionDrawer()
     m_pointSize = 6.0;
 }
 
-bool SelectionDrawer::updateData()
+bool SelectionDrawer::updateData(GLPalette &palette)
 {
     m_points.clear();
 
     VertexData vertex;
-    vertex.color = Util::colorToVector(m_color);
+    vertex.color = palette.color(m_color);
     vertex.position = m_endPosition;
     vertex.start = QVector3D(sNan, sNan, m_pointSize);
     m_points.append(vertex);

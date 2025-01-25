@@ -14,7 +14,7 @@ class TableSurfaceDrawer : public ShaderDrawable
         void setGridColor(QColor color) { m_gridColor = color; }
 
     protected:
-        bool updateData();
+        bool updateData(GLPalette &palette) override;
 
     private:
         QColor m_gridColor;

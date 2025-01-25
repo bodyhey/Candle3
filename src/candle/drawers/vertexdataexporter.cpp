@@ -14,13 +14,11 @@ void VertexDataExporter::exportToJsFile(const QString &fileName, const QVector<V
     out << "var vertexData = [\n";
 
     for (auto &vertex : data) {
-        out << QString("%1, %2, %3, %4, %5, %6, %7, %8, %9,\n")
+        out << QString("%1, %2, %3, %4, %5, %6, %7,\n")
             .arg(vertex.position.x())
             .arg(vertex.position.y())
             .arg(vertex.position.z())
-            .arg(vertex.color.x())
-            .arg(vertex.color.y())
-            .arg(vertex.color.z())
+            .arg(vertex.color)
             .arg(vertex.start.x())
             .arg(vertex.start.y())
             .arg(vertex.start.z());

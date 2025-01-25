@@ -23,7 +23,7 @@ public:
     void setBorderRect(const QRectF &borderRect);
 
 protected:
-    bool updateData();
+    bool updateData(GLPalette &palette) override;
 
 private:
     QRectF m_borderRect;

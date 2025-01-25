@@ -2806,8 +2806,10 @@ void frmMain::loadLines(QList<std::string> data)
     m_codeDrawer->update();
     ui->glwVisualizer->fitDrawable(m_codeDrawer);
 
-    m_codeDrawer->update();
-    m_codeDrawer->updateData();
+    ui->glwVisualizer->updateDrawer(m_codeDrawer);
+
+    // m_codeDrawer->update();
+    // m_codeDrawer->updateData();
     VertexDataExporter::exportToJsFile("vertexdata.js", m_codeDrawer->lines());
 
     resetHeightmap();

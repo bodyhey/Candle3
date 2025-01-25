@@ -11,8 +11,9 @@ CursorDrawer::CursorDrawer() : ShaderDrawable()
 {
 }
 
-bool CursorDrawer::updateData()
+bool CursorDrawer::updateData(GLPalette &palette)
 {
+    return false;
     const int arcs = 5;
 
     // Clear data
@@ -21,7 +22,7 @@ bool CursorDrawer::updateData()
 
     // Prepare vertex
     VertexData vertex;
-    vertex.color = Util::colorToVector(m_color);//QVector3D(1.0, 0.6, 0.0);
+    vertex.color = palette.color(m_color);
     vertex.start = QVector3D(sNan, sNan, sNan);
 
     // Draw lines
@@ -90,7 +91,7 @@ void CursorDrawer::rotate()
     }
 }
 
-QVector<VertexData> CursorDrawer::createCircle(QVector3D center, double radius, int arcs, QVector3D color)
+QVector<VertexData> CursorDrawer::createCircle(QVector3D center, double radius, int arcs, int color)
 {
     // Vertices
     QVector<VertexData> circle;

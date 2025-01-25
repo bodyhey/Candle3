@@ -38,32 +38,35 @@ void ShaderDrawable::update()
 
 void ShaderDrawable::bindAttributes(QOpenGLShaderProgram *&shaderProgram)
 {
-    // Offset for position
     quintptr offset = 0;
+    int pos;
 
     // Tell OpenGL programmable pipeline how to locate vertex position data
-    int vertexLocation = shaderProgram->attributeLocation("a_position");
-    shaderProgram->enableAttributeArray(vertexLocation);
-    shaderProgram->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+    pos = shaderProgram->attributeLocation("a_position");
+    assert(pos >= 0);
+    shaderProgram->enableAttributeArray(pos);
+    shaderProgram->setAttributeBuffer(pos, GL_FLOAT, offset, 3, sizeof(VertexData));
 
     // Offset for color
     offset = sizeof(QVector3D);
 
     // Tell OpenGL programmable pipeline how to locate vertex color data
-    int color = shaderProgram->attributeLocation("a_color");
-    shaderProgram->enableAttributeArray(color);
-    shaderProgram->setAttributeBuffer(color, GL_FLOAT, offset, 3, sizeof(VertexData));
+    pos = shaderProgram->attributeLocation("a_color");
+    assert(pos >= 0);
+    shaderProgram->enableAttributeArray(pos);
+    shaderProgram->setAttributeBuffer(pos, GL_FLOAT, offset, 1, sizeof(VertexData));
 
     // Offset for line start point
-    offset += sizeof(QVector3D);
+    offset += sizeof(GLfloat);
 
     // Tell OpenGL programmable pipeline how to locate vertex line start point
-    int start = shaderProgram->attributeLocation("a_start");
-    shaderProgram->enableAttributeArray(start);
-    shaderProgram->setAttributeBuffer(start, GL_FLOAT, offset, 3, sizeof(VertexData));
+    pos = shaderProgram->attributeLocation("a_start");
+    assert(pos >= 0);
+    shaderProgram->enableAttributeArray(pos);
+    shaderProgram->setAttributeBuffer(pos, GL_FLOAT, offset, 3, sizeof(VertexData));
 }
 
-void ShaderDrawable::updateGeometry(QOpenGLShaderProgram *shaderProgram) {
+void ShaderDrawable::updateGeometry(QOpenGLShaderProgram *shaderProgram, GLPalette &palette) {
     // Init in context
     if (!m_vbo.isCreated())
         init();
@@ -76,7 +79,7 @@ void ShaderDrawable::updateGeometry(QOpenGLShaderProgram *shaderProgram) {
     m_vbo.bind();
 
     // Update vertex buffer
-    if (updateData()) {
+    if (updateData(palette)) {
         // Fill vertices buffer
         QVector<VertexData> vertexData(m_triangles);
         vertexData += m_lines;
@@ -101,16 +104,16 @@ void ShaderDrawable::updateGeometry(QOpenGLShaderProgram *shaderProgram) {
     m_needsUpdateGeometry = false;
 }
 
-bool ShaderDrawable::updateData()
+bool ShaderDrawable::updateData(GLPalette &palette)
 {
     // Test data
     m_lines = QVector<VertexData>()
-        << VertexData(QVector3D(0, 0, 0), QVector3D(1, 0, 0), QVector3D(sNan, 0, 0))
-        << VertexData(QVector3D(10, 0, 0), QVector3D(1, 0, 0), QVector3D(sNan, 0, 0))
-        << VertexData(QVector3D(0, 0, 0), QVector3D(0, 1, 0), QVector3D(sNan, 0, 0))
-        << VertexData(QVector3D(0, 10, 0), QVector3D(0, 1, 0), QVector3D(sNan, 0, 0))
-        << VertexData(QVector3D(0, 0, 0), QVector3D(0, 0, 1), QVector3D(sNan, 0, 0))
-        << VertexData(QVector3D(0, 0, 10), QVector3D(0, 0, 1), QVector3D(sNan, 0, 0));
+        << VertexData(QVector3D(0, 0, 0), palette.color(1, 0, 0), QVector3D(sNan, 0, 0))
+        << VertexData(QVector3D(10, 0, 0), palette.color(1, 1, 0), QVector3D(sNan, 0, 0))
+        << VertexData(QVector3D(0, 0, 0), palette.color(0, 1, 0), QVector3D(sNan, 0, 0))
+        << VertexData(QVector3D(0, 10, 0), palette.color(0, 1, 0), QVector3D(sNan, 0, 0))
+        << VertexData(QVector3D(0, 0, 0), palette.color(0, 0, 1), QVector3D(sNan, 0, 0))
+        << VertexData(QVector3D(0, 0, 10), palette.color(0, 0, 1), QVector3D(sNan, 0, 0));
 
     return true;
 }

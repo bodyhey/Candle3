@@ -18,7 +18,7 @@ public:
     void setEndPosition(const QVector3D &endPosition);
 
 protected:
-    bool  updateData();
+    bool updateData(GLPalette &palette) override;
 
 private:
     QVector3D m_startPosition;

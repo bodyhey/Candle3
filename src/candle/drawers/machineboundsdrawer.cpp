@@ -10,7 +10,7 @@ MachineBoundsDrawer::MachineBoundsDrawer()
     m_borderRect = QRectF(0, 0, 1, 1);
 }
 
-bool MachineBoundsDrawer::updateData()
+bool MachineBoundsDrawer::updateData(GLPalette &palette)
 {
     // Clear data
     m_lines.clear();
@@ -19,18 +19,18 @@ bool MachineBoundsDrawer::updateData()
     QRectF r = m_borderRect.translated(-m_offset);
 
     // Color
-    QVector3D c(0.8, 0.8, 0.8);
+    int color = palette.color(0.8, 0.8, 0.8);
 
     // Vertices
     m_lines
-        << VertexData(QVector3D(r.x(), r.y(), 0), c, QVector3D(sNan, sNan, sNan))
-        << VertexData(QVector3D(r.x(), r.y() + r.height(), 0), c, QVector3D(sNan, sNan, sNan))
-        << VertexData(QVector3D(r.x(), r.y() + r.height(), 0), c, QVector3D(sNan, sNan, sNan))
-        << VertexData(QVector3D(r.x() + r.width(), r.y() + r.height(), 0), c, QVector3D(sNan, sNan, sNan))
-        << VertexData(QVector3D(r.x() + r.width(), r.y() + r.height(), 0), c, QVector3D(sNan, sNan, sNan))
-        << VertexData(QVector3D(r.x() + r.width(), r.y(), 0), c, QVector3D(sNan, sNan, sNan))
-        << VertexData(QVector3D(r.x() + r.width(), r.y(), 0), c, QVector3D(sNan, sNan, sNan))
-        << VertexData(QVector3D(r.x(), r.y(), 0), c, QVector3D(sNan, sNan, sNan));
+        << VertexData(QVector3D(r.x(), r.y(), 0), color, QVector3D(sNan, sNan, sNan))
+        << VertexData(QVector3D(r.x(), r.y() + r.height(), 0), color, QVector3D(sNan, sNan, sNan))
+        << VertexData(QVector3D(r.x(), r.y() + r.height(), 0), color, QVector3D(sNan, sNan, sNan))
+        << VertexData(QVector3D(r.x() + r.width(), r.y() + r.height(), 0), color, QVector3D(sNan, sNan, sNan))
+        << VertexData(QVector3D(r.x() + r.width(), r.y() + r.height(), 0), color, QVector3D(sNan, sNan, sNan))
+        << VertexData(QVector3D(r.x() + r.width(), r.y(), 0), color, QVector3D(sNan, sNan, sNan))
+        << VertexData(QVector3D(r.x() + r.width(), r.y(), 0), color, QVector3D(sNan, sNan, sNan))
+        << VertexData(QVector3D(r.x(), r.y(), 0), color, QVector3D(sNan, sNan, sNan));
 
     return true;
 }

@@ -16,6 +16,7 @@
 #include <QTime>
 #include "drawers/shaderdrawable.h"
 #include "drawers/cubedrawer.h"
+#include "glpalette.h"
 
 #ifdef GLES
 class GLWidget : public QOpenGLWindow, protected QOpenGLFunctions_3_0
@@ -100,6 +101,7 @@ public:
     QString pinState() const;
     void setPinState(const QString &pinState);
 
+    void updateDrawer(ShaderDrawable *);
 signals:
     void rotationChanged();
     void cursorPosChanged(QPointF);
@@ -152,8 +154,10 @@ private:
     QList<ShaderDrawable*> m_shaderDrawables;
     QOpenGLShaderProgram *m_defaultShaderProgram;
     QOpenGLShaderProgram *m_gcodeShaderProgram;
+    QOpenGLShaderProgram *m_copyProgram;    
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_viewMatrix;
+    GLPalette m_palette;
     CubeDrawer m_cubeDrawer;
 
     QColor m_colorBackground;

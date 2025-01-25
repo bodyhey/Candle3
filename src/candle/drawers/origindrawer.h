@@ -9,7 +9,7 @@ public:
     OriginDrawer();
 
 protected:
-    bool updateData();
+    bool updateData(GLPalette &palette) override;
 };
 
 #endif // ORIGINDRAWER_H

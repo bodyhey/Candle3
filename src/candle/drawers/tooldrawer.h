@@ -39,7 +39,7 @@ signals:
 public slots:
 
 protected:
-    bool updateData();
+    bool updateData(GLPalette &palette) override;
 
 private:
     double m_toolDiameter;
@@ -51,7 +51,7 @@ private:
     QColor m_color;
 
     double normalizeAngle(double angle);
-    QVector<VertexData> createCircle(QVector3D center, double radius, int arcs, QVector3D color);
+    QVector<VertexData> createCircle(QVector3D center, double radius, int arcs, uint color);
 };
 
 #endif // TOOLDRAWER_H

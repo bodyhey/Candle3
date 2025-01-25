@@ -8,18 +8,20 @@
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLTexture>
 #include "utils/util.h"
+#include "../widgets/glpalette.h"
 
 struct VertexData
 {
     VertexData() {}
-    VertexData(QVector3D pos, QVector3D col, QVector3D sta) {
+
+    VertexData(QVector3D pos, GLfloat col, QVector3D sta) {
         position = pos;
         color = col;
         start = sta;
     }
 
     QVector3D position;
-    QVector3D color;
+    GLfloat color;
     QVector3D start;
 };
 
@@ -49,7 +51,7 @@ public:
     void draw(QOpenGLShaderProgram *shaderProgram);
 
     bool needsUpdateGeometry() const;
-    virtual void updateGeometry(QOpenGLShaderProgram *shaderProgram = 0);
+    virtual void updateGeometry(QOpenGLShaderProgram *shaderProgram, GLPalette &palette);
 
     virtual QVector3D getSizes();
     virtual QVector3D getMinimumExtremes();
@@ -66,7 +68,7 @@ public:
     void setPointSize(double pointSize);
 
     QList<VertexData>& lines() { return m_lines; }
-    virtual bool updateData();
+    virtual bool updateData(GLPalette &palette);
 
     virtual ProgramType programType() { return ProgramType::Default; };
 

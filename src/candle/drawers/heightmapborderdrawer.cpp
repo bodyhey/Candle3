@@ -18,7 +18,7 @@ void HeightMapBorderDrawer::setBorderRect(const QRectF &borderRect)
     update();
 }
 
-bool HeightMapBorderDrawer::updateData()
+bool HeightMapBorderDrawer::updateData(GLPalette &palette)
 {
     // m_lines = {
     //     {QVector3D(m_borderRect.x(), m_borderRect.y(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan)},

@@ -4,8 +4,12 @@ OriginDrawer::OriginDrawer()
 {
 }
 
-bool OriginDrawer::updateData()
+bool OriginDrawer::updateData(GLPalette &palette)
 {
+    int c1 = palette.color(1.0, 0.0, 0.0);
+    int c2 = palette.color(0.0, 1.0, 0.0);
+    int c3 = palette.color(0.0, 0.0, 1.0);
+
     m_lines = QVector<VertexData>()
         // X-axis
         << VertexData(QVector3D(0, 0, 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan))

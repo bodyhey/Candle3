@@ -21,7 +21,7 @@
 #define MAGIC_ZOOM_MULTIPLIER 1.9
 
 #ifdef GLES
-GLWidget::GLWidget(QWidget *parent) : QOpenGLWindow(), m_defaultShaderProgram(0), m_gcodeShaderProgram(0)
+GLWidget::GLWidget(QWidget *parent) : QOpenGLWindow(), m_defaultShaderProgram(0), m_gcodeShaderProgram(0), m_palette()
 #else
 GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent), m_shaderProgram(0)
 #endif
@@ -198,6 +198,12 @@ QString GLWidget::pinState() const
 void GLWidget::setPinState(const QString &pinState)
 {
     m_pinState = pinState;
+}
+
+void GLWidget::updateDrawer(ShaderDrawable *drawer)
+{
+    drawer->update();
+    drawer->updateData(m_palette);
 }
 
 QString GLWidget::speedState() const
@@ -472,6 +478,13 @@ void GLWidget::initializeGL()
         }
     }
 
+    m_copyProgram = new QOpenGLShaderProgram();
+    m_copyProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/2dcopy_vertex.glsl");
+    m_copyProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/2dcopy_fragment.glsl");
+    m_copyProgram->link();
+
+    m_palette.initialize();
+
     initializeDebugLogger();
 }
 
@@ -590,8 +603,8 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
             currentProgram->release();
         }
         m_defaultShaderProgram->bind();
-        m_defaultShaderProgram->setUniformValue("mvp_matrix", m_projectionMatrix * m_viewMatrix);
-        m_defaultShaderProgram->setUniformValue("mv_matrix", m_viewMatrix);
+        m_defaultShaderProgram->setUniformValue("u_mvp_matrix", m_projectionMatrix * m_viewMatrix);
+        m_defaultShaderProgram->setUniformValue("u_mv_matrix", m_viewMatrix);
         m_defaultShaderProgram->release();
         currentProgram = m_defaultShaderProgram;
     }
@@ -622,22 +635,71 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
         }
 
         if (drawable->needsUpdateGeometry()) {
-            drawable->updateGeometry(currentProgram);
+            drawable->updateGeometry(currentProgram, m_palette);
         }
         switch (drawable->programType()) {
-        case ShaderDrawable::ProgramType::GCode:
-            m_gcodeShaderProgram->setUniformValue("u_offset", QVector2D(2.0 / width(), 2.0 / height()));
+            case ShaderDrawable::ProgramType::GCode: {
+            QOpenGLFramebufferObject* m_fbo = new QOpenGLFramebufferObject(width(), height(), QOpenGLFramebufferObject::Depth, GL_TEXTURE_2D);
+
+            m_fbo->bind();
+
             m_gcodeShaderProgram->setUniformValue("u_shadow", true);
-            //drawable->draw(currentProgram);
-            m_gcodeShaderProgram->setUniformValue("u_offset", QVector2D(-2.0 / width(), -2.0 / height()));
-            drawable->setLineWidth(1.5);
-            m_gcodeShaderProgram->setUniformValue("u_shadow", false);
             drawable->draw(currentProgram);
-            break;
-        case ShaderDrawable::ProgramType::Default:
+
+            m_fbo->release();
+
+            drawable->draw(currentProgram);
+
+            m_copyProgram->bind();
+
+            QOpenGLBuffer copyVbo;
+            copyVbo.create();
+            copyVbo.bind();
+
+            m_copyProgram->setUniformValue("u_gcodeBgMode", true);
+
+            quintptr offset = 0;
+
+            int vertexLocation = m_copyProgram->attributeLocation("a_position");
+            m_copyProgram->enableAttributeArray(vertexLocation);
+            m_copyProgram->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 2, 2 * 4 * 2);
+
+            offset += sizeof(QVector2D);
+
+            int textureLocation = m_copyProgram->attributeLocation("a_texcoord");
+            m_copyProgram->enableAttributeArray(textureLocation);
+            m_copyProgram->setAttributeBuffer(textureLocation, GL_FLOAT, offset, 2, 2 * 4 * 2);
+
+            QVector<_2DTexturedVertexData> copyTriangles;
+            copyTriangles << _2DTexturedVertexData(QVector2D(-1.0, -1.0), QVector2D(0, 0))
+                            << _2DTexturedVertexData(QVector2D(1.0, -1.0), QVector2D(1, 0))
+                            << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0, 1))
+                            << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0, 1))
+                            << _2DTexturedVertexData(QVector2D(1.0, -1.0), QVector2D(1, 0))
+                            << _2DTexturedVertexData(QVector2D(1.0, 1.0), QVector2D(1, 1));
+
+            copyVbo.allocate(copyTriangles.constData(), copyTriangles.count() * sizeof(_2DTexturedVertexData));
+
+            m_palette.bind();
+
+            //glBindTexture(GL_TEXTURE_2D, m_fbo->texture());
+            // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glDrawArrays(GL_TRIANGLES, 0, copyTriangles.count());
+
+            copyVbo.release();
+            copyVbo.destroy();
+
+            m_copyProgram->release();
+
+            delete m_fbo;
             break;
         }
-        drawable->draw(currentProgram);
+        case ShaderDrawable::ProgramType::Default:
+            m_palette.bind();
+            drawable->draw(currentProgram);
+            m_palette.release();
+            break;
+        }
         vertices += drawable->getVertexCount();
     }
 
@@ -646,7 +708,7 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
     }
 
     if (m_rotationCube) {
-        m_cubeDrawer.draw(QRect(0, height() - 100, 100, 100));
+        m_cubeDrawer.draw(QRect(0, height() - 100, 100, 100), m_palette);
 
         // viewport was changed by cube drawer
         glViewport(0, 0, this->width(), this->height());
@@ -726,6 +788,8 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
                 setRightView();
                 break;
             case CubeClickableFace::None:
+                break;
+            default:
                 break;
         }
     }

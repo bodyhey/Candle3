@@ -9,6 +9,7 @@
 #include "parser/linesegment.h"
 #include "parser/gcodeviewparser.h"
 #include "shaderdrawable.h"
+#include "widgets/glpalette.h"
 
 class GcodeDrawer : public QObject, public ShaderDrawable
 {
@@ -20,7 +21,7 @@ public:
 
     void update();
     void update(QList<int> indexes);
-    bool updateData() override;
+    bool updateData(GLPalette &palette) override;
 
     QVector3D getSizes() override;
     QVector3D getMinimumExtremes() override;
@@ -103,14 +104,14 @@ private:
     QList<int> m_indexes;
     bool m_geometryUpdated;
 
-    bool prepareVectors();
-    bool updateVectors();
+    bool prepareVectors(GLPalette &palette);
+    bool updateVectors(GLPalette &palette);
 
     QVector3D initialNormal(QVector3D p1, QVector3D p2);
     int getSegmentType(LineSegment& segment);
     QVector3D getSegmentColorVector(LineSegment& segment);
     QColor getSegmentColor(LineSegment& segment);
-    void setImagePixelColor(QImage& image, double x, double y, QRgb color) const;
+    //void setImagePixelColor(QImage& image, double x, double y, QRgb color) const;
     void computeNormals();
 };
 

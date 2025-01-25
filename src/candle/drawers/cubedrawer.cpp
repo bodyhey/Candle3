@@ -48,7 +48,7 @@ void CubeDrawer::drawBackground() {
 }
 
 // dest is normalized to -1, 1
-void CubeDrawer::draw(QRect dest) {
+void CubeDrawer::draw(QRect dest, GLPalette &m_palette) {
     if (!m_vbo.isCreated())
         init();
 
@@ -57,7 +57,7 @@ void CubeDrawer::draw(QRect dest) {
     glViewport(0, 0, this->m_width, this->m_height);
     glEnable(GL_BLEND);
     drawBackground();
-    drawCube();
+    drawCube(m_palette);
 
     m_fbo->release();
 
@@ -261,13 +261,13 @@ void CubeDrawer::initAttributes()
 
     int colorLocation = m_program->attributeLocation("a_color");
     m_program->enableAttributeArray(colorLocation);
-    m_program->setAttributeBuffer(colorLocation, GL_FLOAT, offset, 3,
+    m_program->setAttributeBuffer(colorLocation, GL_FLOAT, offset, 1,
                                   sizeof(VertexData));
 
-    offset = sizeof(QVector3D);
+    offset = sizeof(GLfloat);
 }
 
-void CubeDrawer::updateGeometry()
+void CubeDrawer::updateGeometry(GLPalette &palette)
 {
     if (!m_vbo.isCreated())
         init();
@@ -277,6 +277,38 @@ void CubeDrawer::updateGeometry()
     }
 
     m_vbo.bind();
+
+    const int lineColor = palette.color(0.0, 0.0, 0.0);
+    for (auto clickable : clickables) {
+        QVector3D ofs = cube[clickable[0]].start * 1;
+        m_lines
+            << VertexData(cube[clickable[0]].position + ofs, lineColor, cube[clickable[0]].start)
+            << VertexData(cube[clickable[1]].position + ofs, lineColor, cube[clickable[0]].start)
+
+            << VertexData(cube[clickable[1]].position + ofs, lineColor, cube[clickable[0]].start)
+            << VertexData(cube[clickable[5]].position + ofs, lineColor, cube[clickable[0]].start)
+
+            << VertexData(cube[clickable[5]].position + ofs, lineColor, cube[clickable[0]].start)
+            << VertexData(cube[clickable[2]].position + ofs, lineColor, cube[clickable[0]].start)
+
+            << VertexData(cube[clickable[2]].position + ofs, lineColor, cube[clickable[0]].start)
+            << VertexData(cube[clickable[0]].position + ofs, lineColor, cube[clickable[0]].start)
+            ;
+    }
+
+    for (auto &vertex : m_triangles) {
+        switch ((int) vertex.color) {
+            case 1:
+                vertex.color = palette.color(0.057735, 0.057735, 0.057735);
+                break;
+            case 2:
+                vertex.color = palette.color(0.070711, 0.070711, 0.000000);
+                break;
+            default:
+                assert(false);
+        }
+    }
+
     m_vbo.allocate((m_triangles + m_lines).constData(), (m_triangles.count() + m_lines.count()) * sizeof(VertexData));
 
     if (m_vao.isCreated()) {
@@ -289,18 +321,18 @@ void CubeDrawer::updateGeometry()
     m_needsUpdateGeometry = false;
 }
 
-void CubeDrawer::drawCube()
+void CubeDrawer::drawCube(GLPalette &m_palette)
 {
     if (m_needsUpdateGeometry) {
-        updateGeometry();
+        updateGeometry(m_palette);
     }
 
     m_program->bind();
-    m_program->setUniformValue("mvp_matrix", m_projectionMatrix * m_viewMatrix);
+    m_program->setUniformValue("u_mvp_matrix", m_projectionMatrix * m_viewMatrix);
 
     QMatrix4x4 cMatrix;
     cMatrix.scale(0.9);
-    m_program->setUniformValue("c_matrix", cMatrix);
+    m_program->setUniformValue("u_c_matrix", cMatrix);
 
     if (m_vao.isCreated()) m_vao.bind(); else {
         m_vbo.bind();

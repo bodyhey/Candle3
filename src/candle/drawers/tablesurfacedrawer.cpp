@@ -8,11 +8,11 @@ TableSurfaceDrawer::TableSurfaceDrawer() {
     m_globalAlpha = 0.1;
 }
 
-bool TableSurfaceDrawer::updateData()
+bool TableSurfaceDrawer::updateData(GLPalette &palette)
 {
     const float SIZE = 50;
 
-    QVector3D color = QVector3D(m_gridColor.redF(), m_gridColor.greenF(), m_gridColor.blueF());
+    int color = palette.color(m_gridColor.redF(), m_gridColor.greenF(), m_gridColor.blueF());
 
     m_lines.clear();
 

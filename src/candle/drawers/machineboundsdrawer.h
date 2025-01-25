@@ -26,7 +26,7 @@ public:
     QVector3D getMaximumExtremes();
 
 protected:
-    bool updateData();
+    bool updateData(GLPalette &palette) override;
 
 private:
     QSizeF m_gridSize;

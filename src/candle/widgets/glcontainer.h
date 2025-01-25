@@ -83,7 +83,8 @@ class GLContainer : public QWidget
 
         QString pinState() const;
         void setPinState(const QString &pinState);
-
+        
+        void updateDrawer(ShaderDrawable *);
     protected:
         void showEvent(QShowEvent *event) override;
         void resizeEvent(QResizeEvent *event) override;
