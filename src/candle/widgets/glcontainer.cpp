@@ -2,6 +2,8 @@
 #include <QLayout>
 #include <QTime>
 
+#ifdef USE_GLWINDOW
+
 GLContainer::GLContainer(QWidget *parent)
     : QWidget(parent)
 {
@@ -281,3 +283,5 @@ void GLContainer::setSpendTime(const QTime &spendTime)
 {
     m_glWidget->setSpendTime(spendTime);
 }
+
+#endif

@@ -21,24 +21,26 @@ void HeightMapBorderDrawer::setBorderRect(const QRectF &borderRect)
 bool HeightMapBorderDrawer::updateData(GLPalette &palette)
 {
     // m_lines = {
-    //     {QVector3D(m_borderRect.x(), m_borderRect.y(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan)},
-    //     {QVector3D(m_borderRect.x(), m_borderRect.y() + m_borderRect.height(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan)},
-    //     {QVector3D(m_borderRect.x(), m_borderRect.y() + m_borderRect.height(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan)},
-    //     {QVector3D(m_borderRect.x() + m_borderRect.width(), m_borderRect.y() + m_borderRect.height(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan)},
-    //     {QVector3D(m_borderRect.x() + m_borderRect.width(), m_borderRect.y() + m_borderRect.height(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan)},
-    //     {QVector3D(m_borderRect.x() + m_borderRect.width(), m_borderRect.y(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan)},
-    //     {QVector3D(m_borderRect.x() + m_borderRect.width(), m_borderRect.y(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan)},
-    //     {QVector3D(m_borderRect.x(), m_borderRect.y(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan)},
+    //     {QVector3D(m_borderRect.x(), m_borderRect.y(), 0), color, QVector3D(sNan, sNan, sNan)},
+    //     {QVector3D(m_borderRect.x(), m_borderRect.y() + m_borderRect.height(), 0), color, QVector3D(sNan, sNan, sNan)},
+    //     {QVector3D(m_borderRect.x(), m_borderRect.y() + m_borderRect.height(), 0), color, QVector3D(sNan, sNan, sNan)},
+    //     {QVector3D(m_borderRect.x() + m_borderRect.width(), m_borderRect.y() + m_borderRect.height(), 0), color, QVector3D(sNan, sNan, sNan)},
+    //     {QVector3D(m_borderRect.x() + m_borderRect.width(), m_borderRect.y() + m_borderRect.height(), 0), color, QVector3D(sNan, sNan, sNan)},
+    //     {QVector3D(m_borderRect.x() + m_borderRect.width(), m_borderRect.y(), 0), color, QVector3D(sNan, sNan, sNan)},
+    //     {QVector3D(m_borderRect.x() + m_borderRect.width(), m_borderRect.y(), 0), color, QVector3D(sNan, sNan, sNan)},
+    //     {QVector3D(m_borderRect.x(), m_borderRect.y(), 0), color, QVector3D(sNan, sNan, sNan)},
     // };
+    int color = palette.color(1.0, 0.0, 0.0);
+
     m_lines = QVector<VertexData>()
-        << VertexData(QVector3D(m_borderRect.x(), m_borderRect.y(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan))
-        << VertexData(QVector3D(m_borderRect.x(), m_borderRect.y() + m_borderRect.height(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan))
-        << VertexData(QVector3D(m_borderRect.x(), m_borderRect.y() + m_borderRect.height(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan))
-        << VertexData(QVector3D(m_borderRect.x() + m_borderRect.width(), m_borderRect.y() + m_borderRect.height(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan))
-        << VertexData(QVector3D(m_borderRect.x() + m_borderRect.width(), m_borderRect.y() + m_borderRect.height(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan))
-        << VertexData(QVector3D(m_borderRect.x() + m_borderRect.width(), m_borderRect.y(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan))
-        << VertexData(QVector3D(m_borderRect.x() + m_borderRect.width(), m_borderRect.y(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan))
-        << VertexData(QVector3D(m_borderRect.x(), m_borderRect.y(), 0), QVector3D(1.0, 0.0, 0.0), QVector3D(sNan, sNan, sNan));
+        << VertexData(QVector3D(m_borderRect.x(), m_borderRect.y(), 0), color, QVector3D(sNan, sNan, sNan))
+        << VertexData(QVector3D(m_borderRect.x(), m_borderRect.y() + m_borderRect.height(), 0), color, QVector3D(sNan, sNan, sNan))
+        << VertexData(QVector3D(m_borderRect.x(), m_borderRect.y() + m_borderRect.height(), 0), color, QVector3D(sNan, sNan, sNan))
+        << VertexData(QVector3D(m_borderRect.x() + m_borderRect.width(), m_borderRect.y() + m_borderRect.height(), 0), color, QVector3D(sNan, sNan, sNan))
+        << VertexData(QVector3D(m_borderRect.x() + m_borderRect.width(), m_borderRect.y() + m_borderRect.height(), 0), color, QVector3D(sNan, sNan, sNan))
+        << VertexData(QVector3D(m_borderRect.x() + m_borderRect.width(), m_borderRect.y(), 0), color, QVector3D(sNan, sNan, sNan))
+        << VertexData(QVector3D(m_borderRect.x() + m_borderRect.width(), m_borderRect.y(), 0), color, QVector3D(sNan, sNan, sNan))
+        << VertexData(QVector3D(m_borderRect.x(), m_borderRect.y(), 0), color, QVector3D(sNan, sNan, sNan));
     return true;
 }
 

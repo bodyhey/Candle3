@@ -72,10 +72,6 @@ public:
 
     virtual ProgramType programType() { return ProgramType::Default; };
 
-signals:
-
-public slots:
-
 protected:
     double m_lineWidth;
     double m_pointSize;
@@ -85,7 +81,7 @@ protected:
     QVector<VertexData> m_lines;
     QVector<VertexData> m_points;
     QVector<VertexData> m_triangles;
-    QOpenGLTexture *m_texture;
+    //QOpenGLTexture *m_texture;
 
     QOpenGLBuffer m_vbo; // Protected for direct vbo access
 

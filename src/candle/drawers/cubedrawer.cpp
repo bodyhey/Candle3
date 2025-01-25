@@ -7,7 +7,7 @@
 
 #define DISTANCE 50.0
 #define SIZE 100.0
-#define MULTISAMPLE 2
+#define MULTISAMPLE 4
 
 CubeDrawer::CubeDrawer() : m_eye({0, 0, 1}), m_animation(this, "faceAnimation")
 {
@@ -21,24 +21,6 @@ CubeDrawer::CubeDrawer() : m_eye({0, 0, 1}), m_animation(this, "faceAnimation")
     m_animation.setStartValue(0.0);
     m_animation.setEndValue(1.0);
 
-    const QVector3D lineColor(0.0, 0.0, 0.0);
-    for (auto clickable : clickables) {
-        QVector3D ofs = cube[clickable[0]].start * 1;
-        m_lines
-            << VertexData(cube[clickable[0]].position + ofs, lineColor, cube[clickable[0]].start)
-            << VertexData(cube[clickable[1]].position + ofs, lineColor, cube[clickable[0]].start)
-
-            << VertexData(cube[clickable[1]].position + ofs, lineColor, cube[clickable[0]].start)
-            << VertexData(cube[clickable[5]].position + ofs, lineColor, cube[clickable[0]].start)
-
-            << VertexData(cube[clickable[5]].position + ofs, lineColor, cube[clickable[0]].start)
-            << VertexData(cube[clickable[2]].position + ofs, lineColor, cube[clickable[0]].start)
-
-            << VertexData(cube[clickable[2]].position + ofs, lineColor, cube[clickable[0]].start)
-            << VertexData(cube[clickable[0]].position + ofs, lineColor, cube[clickable[0]].start)
-            ;
-    }
-
     setProjection();
 }
 
@@ -48,7 +30,7 @@ void CubeDrawer::drawBackground() {
 }
 
 // dest is normalized to -1, 1
-void CubeDrawer::draw(QRect dest, GLPalette &m_palette) {
+void CubeDrawer::draw(QRect dest, GLPalette &palette) {
     if (!m_vbo.isCreated())
         init();
 
@@ -57,7 +39,7 @@ void CubeDrawer::draw(QRect dest, GLPalette &m_palette) {
     glViewport(0, 0, this->m_width, this->m_height);
     glEnable(GL_BLEND);
     drawBackground();
-    drawCube(m_palette);
+    drawCube(palette);
 
     m_fbo->release();
 
@@ -113,7 +95,6 @@ void CubeDrawer::draw(QRect dest, GLPalette &m_palette) {
     copyVbo.allocate(copyTriangles.constData(), copyTriangles.count() * sizeof(_2DTexturedVertexData));
 
     glBindTexture(GL_TEXTURE_2D, m_fbo->texture());
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glDrawArrays(GL_TRIANGLES, 0, copyTriangles.count());
 
     copyVbo.release();
@@ -143,7 +124,7 @@ void CubeDrawer::updateEyePosition(QVector3D eye, QVector3D up)
 {
     m_eye = eye;
     m_up = up;
-    m_needsUpdateGeometry = true;
+    // m_needsUpdateGeometry = true;
 
     updateView();
 
@@ -193,7 +174,7 @@ CubeClickableFace CubeDrawer::mouseMoveEvent(QMouseEvent *event)
     m_animation.stop();
 
     for (auto &line : m_lines) {
-        line.color = QVector3D(0.0, 0.0, 0.0);
+        line.color =  4; //QVector3D(0.0, 0.0, 0.0);
     }
 
     if (m_faceAtCursor == CubeClickableFace::None) {
@@ -209,14 +190,14 @@ CubeClickableFace CubeDrawer::mouseMoveEvent(QMouseEvent *event)
 
     m_animation.start();
 
-    const QVector3D white(1.0, 1.0, 1.0);
-    QVector3D color = QVector3D(std::rand() % 100 / 100.0, std::rand() % 100 / 100.0, std::rand() % 100 / 100.0);
-    for (int i = 0; i < 6; i++) {
-        m_triangles[clickable[i]].color = color;
-    }
-    for (int i = 0; i < 8; i++) {
-        m_lines[li + i].color = white;
-    }
+    // const int white = palette.color(1.0, 1.0, 1.0);
+    // QVector3D color = QVector3D(std::rand() % 100 / 100.0, std::rand() % 100 / 100.0, std::rand() % 100 / 100.0);
+    // for (int i = 0; i < 6; i++) {
+    //     m_triangles[clickable[i]].color = 8;//color;
+    // }
+    // for (int i = 0; i < 8; i++) {
+    //     m_lines[li + i].color = white;
+    // }
     m_needsUpdateGeometry = true;
 
     return m_faceAtCursor;
@@ -225,7 +206,7 @@ CubeClickableFace CubeDrawer::mouseMoveEvent(QMouseEvent *event)
 void CubeDrawer::leaveEvent(QEvent *event)
 {
     for (auto &line : m_lines) {
-        line.color = QVector3D(0.0, 0.0, 0.0);
+        line.color = 28;//QVector3D(0.0, 0.0, 0.0);
     }
 }
 
@@ -299,13 +280,13 @@ void CubeDrawer::updateGeometry(GLPalette &palette)
     for (auto &vertex : m_triangles) {
         switch ((int) vertex.color) {
             case 1:
-                vertex.color = palette.color(0.057735, 0.057735, 0.057735);
+                vertex.color = palette.color(0.500000, 0.500000, 0.600000);
                 break;
             case 2:
-                vertex.color = palette.color(0.070711, 0.070711, 0.000000);
+                vertex.color = palette.color(1.000000, 0.500000, 0.500000);
                 break;
-            default:
-                assert(false);
+            // default:
+                // assert(false);
         }
     }
 
@@ -321,10 +302,10 @@ void CubeDrawer::updateGeometry(GLPalette &palette)
     m_needsUpdateGeometry = false;
 }
 
-void CubeDrawer::drawCube(GLPalette &m_palette)
+void CubeDrawer::drawCube(GLPalette &palette)
 {
     if (m_needsUpdateGeometry) {
-        updateGeometry(m_palette);
+        updateGeometry(palette);
     }
 
     m_program->bind();
@@ -344,8 +325,12 @@ void CubeDrawer::drawCube(GLPalette &m_palette)
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
+    glActiveTexture(GL_TEXTURE0);
+
+    palette.bind();
     glDrawArrays(GL_TRIANGLES, 0, m_triangles.count());
     glDrawArrays(GL_LINES, m_triangles.count(), m_lines.count());
+    palette.release();
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
@@ -353,6 +338,7 @@ void CubeDrawer::drawCube(GLPalette &m_palette)
     if (m_vao.isCreated()) m_vao.release(); else m_vbo.release();
 
     m_program->release();
+
     glFlush();
 }
 
@@ -361,6 +347,4 @@ void CubeDrawer::setEye(float face)
     if (m_faceAtCursor == CubeClickableFace::None) {
         return;
     }
-
- //   qDebug() << "setEye" << face;
 }

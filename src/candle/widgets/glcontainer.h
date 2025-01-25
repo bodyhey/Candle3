@@ -1,11 +1,14 @@
 #ifndef GLCONTAINER_H
 #define GLCONTAINER_H
 
+#ifdef USE_GLWINDOW
 #include <QWidget>
 #include <QOpenGLWindow>
+#endif
 #include "glwidget.h"
 #include "drawers/shaderdrawable.h"
 
+#ifdef USE_GLWINDOW
 class GLContainer : public QWidget
 {
     Q_OBJECT
@@ -97,5 +100,12 @@ class GLContainer : public QWidget
         void cursorPosChanged(QPointF);
         void resized();
 };
+#else
+class GLContainer : public GLWidget
+{
+    public:
+        GLContainer(QWidget *parent) : GLWidget(parent) {}
+};
+#endif
 
 #endif // GLCONTAINER_H

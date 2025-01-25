@@ -100,11 +100,11 @@ bool GcodeDrawer::prepareVectors(GLPalette &palette)
     m_triangles.clear();
 
     // Delete texture on mode change
-    if (m_texture) {
-        m_texture->destroy();
-        delete m_texture;
-        m_texture = NULL;
-    }
+    // if (m_texture) {
+    //     m_texture->destroy();
+    //     delete m_texture;
+    //     m_texture = NULL;
+    // }
 
     bool drawFirstPoint = true;
     for (int i = 0; i < list.count(); i++) {

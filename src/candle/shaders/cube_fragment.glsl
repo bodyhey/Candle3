@@ -4,9 +4,9 @@ precision mediump int;
 precision mediump float;
 #endif
 
-varying vec4 v_color;
-
 uniform sampler2D u_palette;
+
+varying vec4 v_color;
 
 void main()
 {

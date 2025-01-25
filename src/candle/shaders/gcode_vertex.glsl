@@ -38,7 +38,6 @@ void main()
 
     gl_Position = u_mvp_matrix * vertex_position;
 
-    v_color = texture2D(u_palette, vec2(a_color * (1.0), 0.0));
+    v_color = texture2D(u_palette, vec2(a_color * (1.0 / 25.0) + (1.0 / 50.0), 0.0));
     v_eye = (vec4(u_eye, 1.0) * u_mvp_matrix).xyz;
-    v_color.b = 1.0;
 }

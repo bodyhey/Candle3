@@ -5,6 +5,7 @@
 #define MAX_COLORS 25
 
 GLPalette::GLPalette() : m_colors(), m_indexes() {
+    m_texture = nullptr;
     // *this
     //         << GLColor(1.0, 0.0, 0.0, 1.0)
     //       << GLColor(0.0, 1.0, 0.0, 1.0)
@@ -12,18 +13,6 @@ GLPalette::GLPalette() : m_colors(), m_indexes() {
     // *this << GLColor(1.0, 0.0, 0.0, 1.0)
     //       << GLColor(0.0, 1.0, 0.0, 1.0)
     //       << GLColor(0.0, 0.0, 1.0, 1.0);
-    // *this << GLColor(1.0, 1.0, 1.0, 1.0)
-    //       << GLColor(0.3, 1.0, 0.2, 1.0)
-    //       << GLColor(0.0, 0.0, 1.0, 1.0)
-    //       << GLColor(1.0, 1.0, 0.0, 1.0);
-    // *this << GLColor(1.0, 1.0, 1.0, 1.0)
-    //       << GLColor(0.3, 1.0, 0.2, 1.0)
-    //       << GLColor(0.0, 0.0, 1.0, 1.0)
-    //       << GLColor(1.0, 1.0, 0.0, 1.0);
-    // *this << GLColor(1.0, 1.0, 1.0, 1.0)
-    //       << GLColor(0.3, 1.0, 0.2, 1.0)
-    //       << GLColor(0.0, 0.0, 1.0, 1.0)
-    //       << GLColor(1.0, 1.0, 0.0, 1.0);
 }
 
 void GLPalette::initialize()
@@ -97,8 +86,6 @@ void GLPalette::generateTexture()
 
     GLfloat colorPalette[MAX_COLORS][4];
 
-//    QScopedArrayPointer<float> colorPalette(new float[MAX_COLORS * 4]);
-
     for (int i = 0; i < m_colors.count(); i++) {
         GLColor color = m_colors[i];
         colorPalette[i][0] = color.x();
@@ -106,18 +93,14 @@ void GLPalette::generateTexture()
         colorPalette[i][2] = color.z();
         colorPalette[i][3] = color.w();
     }
-    // for (int i = m_colors.count(); i < MAX_COLORS; i++) {
-    //     int row = i * 4;
-    //     colorPalette[row + 0] = 1.0;
-    //     colorPalette[row + 1] = 1.0;
-    //     colorPalette[row + 2] = 0;
-    //     colorPalette[row + 3] = 1.0;
-    // }
+    for (int i = m_colors.count(); i < MAX_COLORS; i++) {
+        colorPalette[i][0] = 1.0;
+        colorPalette[i][1] = 0.0;
+        colorPalette[i][2] = 1.0;
+        colorPalette[i][3] = 1.0;
+    }
 
-    qDebug() << colorPalette;
-
-    m_texture->setData(QOpenGLTexture::RGBA, QOpenGLTexture::Float32, &colorPalette);
-    qDebug() << m_texture->width();
+    m_texture->setData(QOpenGLTexture::RGBA, QOpenGLTexture::Float32, colorPalette);
 
     m_updated = false;
 }

@@ -24,7 +24,7 @@ class CubeDrawer : public QObject, protected QOpenGLFunctions_3_0
 
 public:
     explicit CubeDrawer();
-    void draw(QRect, GLPalette &m_palette);
+    void draw(QRect, GLPalette &palette);
     void setProjection();
     void updateView();
     void updateEyePosition(QVector3D eye, QVector3D up);
@@ -56,7 +56,7 @@ private:
     void initAttributes();
     void updateGeometry(GLPalette &palette);
     void drawBackground();
-    void drawCube(GLPalette &m_palette);
+    void drawCube(GLPalette &palette);
     void setEye(float pos);
 };
 

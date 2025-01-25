@@ -12,7 +12,7 @@ ShaderDrawable::ShaderDrawable()
     m_visible = true;
     m_lineWidth = 1.0;
     m_pointSize = 1.0;
-    m_texture = NULL;
+    //m_texture = NULL;
 }
 
 ShaderDrawable::~ShaderDrawable()
@@ -66,7 +66,8 @@ void ShaderDrawable::bindAttributes(QOpenGLShaderProgram *&shaderProgram)
     shaderProgram->setAttributeBuffer(pos, GL_FLOAT, offset, 3, sizeof(VertexData));
 }
 
-void ShaderDrawable::updateGeometry(QOpenGLShaderProgram *shaderProgram, GLPalette &palette) {
+void ShaderDrawable::updateGeometry(QOpenGLShaderProgram *shaderProgram, GLPalette &palette)
+{
     // Init in context
     if (!m_vbo.isCreated())
         init();
@@ -91,6 +92,7 @@ void ShaderDrawable::updateGeometry(QOpenGLShaderProgram *shaderProgram, GLPalet
         if (m_vao.isCreated())
             m_vao.release();
         m_needsUpdateGeometry = false;
+
         return;
     }
 

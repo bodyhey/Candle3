@@ -19,7 +19,11 @@
 #include "glpalette.h"
 
 #ifdef GLES
+#ifdef USE_GLWINDOW
 class GLWidget : public QOpenGLWindow, protected QOpenGLFunctions_3_0
+#else
+class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_0
+#endif
 #else
 class GLWidget : public QGLWidget, protected QOpenGLFunctions
 #endif

@@ -13,7 +13,6 @@ CursorDrawer::CursorDrawer() : ShaderDrawable()
 
 bool CursorDrawer::updateData(GLPalette &palette)
 {
-    return false;
     const int arcs = 5;
 
     // Clear data

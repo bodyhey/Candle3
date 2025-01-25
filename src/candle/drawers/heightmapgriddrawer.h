@@ -29,7 +29,7 @@ public:
     void setModel(QAbstractTableModel *model);
 
 protected:
-    bool updateData(GLPalette *palette) override;
+    bool updateData(GLPalette &palette) override;
 
 private:
     QPointF m_gridSize;
