@@ -23,19 +23,24 @@ inline bool is_not_space(int ch)
 }
 
 // trim from start
-static inline std::string &ltrim(std::string &s) {
+static inline std::string &ltrim(std::string &s)
+{
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), is_not_space));
+
     return s;
 }
 
 // trim from end
-static inline std::string &rtrim(std::string &s) {
+static inline std::string &rtrim(std::string &s)
+{
     s.erase(std::find_if(s.rbegin(), s.rend(), is_not_space).base(), s.end());
+
     return s;
 }
 
 // trim from both ends
-static inline std::string &trim(std::string &s) {
+static inline std::string &trim(std::string &s)
+{
     return ltrim(rtrim(s));
 }
 
@@ -312,11 +317,11 @@ QString GcodePreprocessorUtils::generateG1FromPoints(QVector3D start, QVector3D 
     return sb;
 }
 
-///**
-//* Splits a gcode command by each word/argument, doesn't care about spaces.
-//* This command is about the same speed as the string.split(" ") command,
-//* but might be a little faster using precompiled regex.
-//*/
+/**
+ * Splits a gcode command by each word/argument, doesn't care about spaces.
+ * This command is about the same speed as the string.split(" ") command,
+ * but might be a little faster using precompiled regex.
+ */
 QStringList GcodePreprocessorUtils::splitCommand(const QString &command) {
     QStringList l;
     bool readNumeric = false;

@@ -102,11 +102,9 @@ QList<LineSegment>& GCodeViewParser::getLinesFromParser(GcodeParser *parser, dou
     QList<PointSegment*> psl = parser->getPointSegmentList();
     // For a line segment list ALL arcs must be converted to lines.
     double minArcLength = 0.1;
-    //double length;
 
-    QVector3D *start, *end;
-    start = NULL;
-    end = NULL;
+    QVector3D *start = nullptr;
+    QVector3D *end = nullptr;
 
     // Prepare segments indexes
     m_lineIndexes.resize(psl.count());
@@ -120,18 +118,21 @@ QList<LineSegment>& GCodeViewParser::getLinesFromParser(GcodeParser *parser, dou
         end = ps->point();
 
         // start is null for the first iteration.
-        if (start != NULL) {           
+        if (start != nullptr) {
             // Expand arc for graphics.            
             if (ps->isArc()) {
                 QList<QVector3D> points =
                     GcodePreprocessorUtils::generatePointsAlongArcBDring(ps->plane(),
                     *start, *end, *ps->center(), ps->isClockwise(), ps->getRadius(), minArcLength, arcPrecision, arcDegreeMode);
+
                 // Create line segments from points.
-                if (points.length() > 0) {
-                    QVector3D startPoint = *start;
-                    foreach (QVector3D nextPoint, points) {
-                        if (nextPoint == startPoint) continue;
-                        LineSegment ls(*start, nextPoint, lineIndex);
+                if (!points.empty()) {
+                    QVector3D arcStart = *start;
+                    foreach (QVector3D arcNext, points) {
+                        if (arcNext == arcStart) {
+                            continue;
+                        }
+                        LineSegment ls(arcStart, arcNext, lineIndex);
                         ls.setIsArc(ps->isArc());
                         ls.setIsClockwise(ps->isClockwise());
                         ls.setPlane(ps->plane());
@@ -143,11 +144,12 @@ QList<LineSegment>& GCodeViewParser::getLinesFromParser(GcodeParser *parser, dou
                         ls.setSpindleSpeed(ps->getSpindleSpeed());
                         ls.setDwell(ps->getDwell());
 
-                        this->testExtremes(nextPoint);
+                        this->testExtremes(arcNext);
 
                         m_lines << ls;
                         m_lineIndexes[ps->getLineNumber()] << m_lines.count() - 1;
-                        startPoint = nextPoint;
+
+                        arcStart = arcNext;
                     }
                     lineIndex++;
                 }
