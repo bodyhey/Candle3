@@ -1,22 +1,28 @@
-#include "partmainstate.h"
-#include "ui_partmainstate.h"
+#include "partmainstatelcd.h"
+#include "ui_partmainstatelcd.h"
+#include <QFontDatabase>
 
-partMainState::partMainState(QWidget *parent)
+partMainStateLcd::partMainStateLcd(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::partMainState)
+    , ui(new Ui::partMainStateLcd)
     // , m_configuration(configuration)
 {
     ui->setupUi(this);
 
     initializeColorsAndCaptions();
+
+    setWorkCoordinates(QVector3D(0, 0, 0));
+    setMachineCoordinates(QVector3D(0, 0, 0));
+
+    QFontDatabase::addApplicationFont(":/fonts/Patopian1986.ttf");
 }
 
-partMainState::~partMainState()
+partMainStateLcd::~partMainStateLcd()
 {
     delete ui;
 }
 
-void partMainState::setStatusText(QString status, QString bgColor, QString fgColor)
+void partMainStateLcd::setStatusText(QString status, QString bgColor, QString fgColor)
 {
     ui->txtStatus->setText(status);
     ui->txtStatus->setStyleSheet(QString("background-color: %1; color: %2;")
@@ -24,54 +30,59 @@ void partMainState::setStatusText(QString status, QString bgColor, QString fgCol
 
 }
 
-void partMainState::setState(DeviceState state)
+void partMainStateLcd::setState(DeviceState state)
 {
     // setStatusText(m_statusCaptions[state], m_statusBackColors[state], m_statusForeColors[state]);
 }
 
-void partMainState::setWorkCoordinates(QVector3D pos)
+QString partMainStateLcd::formatPos(float val)
 {
-    ui->txtWX->setValue(pos.x());
-    ui->txtWY->setValue(pos.y());
-    ui->txtWZ->setValue(pos.z());
+    return QString("%1").arg(val, 0, 'f', 3).rightJustified(7, ' ');
 }
 
-void partMainState::setMachineCoordinates(QVector3D pos)
+void partMainStateLcd::setWorkCoordinates(QVector3D pos)
 {
-    ui->txtMX->setValue(pos.x());
-    ui->txtMY->setValue(pos.y());
-    ui->txtMZ->setValue(pos.z());
+    ui->txtWX->setText(formatPos(pos.x()));
+    ui->txtWY->setText(formatPos(pos.y()));
+    ui->txtWZ->setText(formatPos(pos.z()));
 }
 
-void partMainState::setUnits(Units units)
+void partMainStateLcd::setMachineCoordinates(QVector3D pos)
+{
+    ui->txtMX->setText(formatPos(pos.x()));
+    ui->txtMY->setText(formatPos(pos.y()));
+    ui->txtMZ->setText(formatPos(pos.z()));
+}
+
+void partMainStateLcd::setUnits(Units units)
 {
     int prec = units == Units::Millimeters ? 3 : 4;
     // int bound = m_settings->units() == 0 ? 9999 : 999;
 
-    ui->txtMX->setDecimals(prec);
-    // @TODO what are these for?
-    // ui->txtMPosX->setMinimum(-bound);
-    // ui->txtMPosX->setMaximum(bound);
-    ui->txtMY->setDecimals(prec);
-    // @TODO what are these for?
-    // ui->txtMPosY->setMinimum(-bound);
-    // ui->txtMPosY->setMaximum(bound);
-    ui->txtMZ->setDecimals(prec);
-    // ui->txtMPosZ->setMinimum(-bound);
-    // ui->txtMPosZ->setMaximum(bound);
+    // ui->txtMX->setDecimals(prec);
+    // // @TODO what are these for?
+    // // ui->txtMX->setMinimum(-bound);
+    // // ui->txtMX->setMaximum(bound);
+    // ui->txtMY->setDecimals(prec);
+    // // @TODO what are these for?
+    // // ui->txtMY->setMinimum(-bound);
+    // // ui->txtMY->setMaximum(bound);
+    // ui->txtMZ->setDecimals(prec);
+    // // ui->txtMZ->setMinimum(-bound);
+    // // ui->txtMZ->setMaximum(bound);
 
-    ui->txtWX->setDecimals(prec);
-    // ui->txtWPosX->setMinimum(-bound);
-    // ui->txtWPosX->setMaximum(bound);
-    ui->txtWY->setDecimals(prec);
-    // ui->txtWPosY->setMinimum(-bound);
-    // ui->txtWPosY->setMaximum(bound);
-    ui->txtWZ->setDecimals(prec);
-    // ui->txtWPosZ->setMinimum(-bound);
-    // ui->txtWPosZ->setMaximum(bound);
+    // ui->txtWX->setDecimals(prec);
+    // // ui->txtWX->setMinimum(-bound);
+    // // ui->txtWX->setMaximum(bound);
+    // ui->txtWY->setDecimals(prec);
+    // // ui->txtWY->setMinimum(-bound);
+    // // ui->txtWY->setMaximum(bound);
+    // ui->txtWZ->setDecimals(prec);
+    // ui->txtWZ->setMinimum(-bound);
+    // ui->txtWZ->setMaximum(bound);
 }
 
-void partMainState::initializeColorsAndCaptions()
+void partMainStateLcd::initializeColorsAndCaptions()
 {
     m_statusCaptions[DeviceState::Unknown] = tr("Unknown");
     m_statusCaptions[DeviceState::Idle] = tr("Idle");

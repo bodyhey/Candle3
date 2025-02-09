@@ -60,7 +60,7 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QDoubleSpinBox" name="txtWPosX">
+        <widget class="QDoubleSpinBox" name="txtWX">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -94,7 +94,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="txtWPosY">
+        <widget class="QDoubleSpinBox" name="txtWY">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -128,7 +128,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="txtWPosZ">
+        <widget class="QDoubleSpinBox" name="txtWZ">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -181,7 +181,7 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
-        <widget class="QDoubleSpinBox" name="txtMPosX">
+        <widget class="QDoubleSpinBox" name="txtMX">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -215,7 +215,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="txtMPosY">
+        <widget class="QDoubleSpinBox" name="txtMY">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -249,7 +249,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="txtMPosZ">
+        <widget class="QDoubleSpinBox" name="txtMZ">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
