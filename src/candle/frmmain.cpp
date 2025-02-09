@@ -2579,13 +2579,15 @@ void frmMain::loadFile(QString fileName)
     connect(loader, &GCodeThreadedLoader::progress, this, [this, progressIndex](int progress) {
         ui->console->setProgress(progressIndex, progress);
     });
-    connect(loader, &GCodeThreadedLoader::cancelled, this, [this]() {
+    connect(loader, &GCodeThreadedLoader::cancelled, this, [this, loader]() {
         ui->console->appendSystem("Cancelled loading");
+        loader->deleteLater();
     });
-    connect(loader, &GCodeThreadedLoader::finished, this, [this](GCodeLoaderData *data) {
+    connect(loader, &GCodeThreadedLoader::finished, this, [this, loader](GCodeLoaderData *data) {
         ui->console->appendSystem("Finished loading");
         this->applyLoaderGCode(data);
         delete data;
+        loader->deleteLater();
     });
 
     GCodeLoaderConfiguration configuration(m_configuration.parserModule());
