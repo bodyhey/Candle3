@@ -12,8 +12,8 @@
 #include <QStyleHints>
 #include <QFontDatabase>
 #include <QCommandLineParser>
-
 #include "frmmain.h"
+#include "phantomstyle/src/phantom/phantomstyle.h"
 
 void messageHandler(QtMsgType type, const QMessageLogContext &, const QString & msg)
 {
@@ -111,8 +111,16 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef GLES
-    app.styleHints()->setColorScheme(Qt::ColorScheme::Light);
-    app.setStyle(QStyleFactory::create("Fusion"));
+    Configuration configuration(nullptr);
+    configuration.load();
+
+    if (configuration.uiModule().darkTheme()) {
+        app.styleHints()->setColorScheme(Qt::ColorScheme::Dark);
+    } else {
+        app.styleHints()->setColorScheme(Qt::ColorScheme::Light);
+    }
+    //app.setStyle(QStyleFactory::create("Fusion"));
+    app.setStyle(new PhantomStyle());
 
     QPalette palette;
     palette.setColor(QPalette::Highlight, QColor(204, 204, 254));

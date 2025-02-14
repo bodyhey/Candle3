@@ -257,6 +257,7 @@ void frmSettings::initializeWidgets()
     const ConfigurationUI &ui_ = m_configuration.uiModule();
     ui->cboFontSize->setCurrentText(QString::number(ui_.fontSize()));
     ui->cboLanguage->setCurrentIndex(ui->cboLanguage->findData(ui_.language()));
+    ui->chkDarkTheme->setChecked(ui_.darkTheme());
 
     const ConfigurationJogging &jogging = m_configuration.joggingModule();
     ui->txtJoggingStepChoices->setText(jogging.stepChoices().join(", "));
@@ -344,6 +345,7 @@ void frmSettings::applySettings()
     ConfigurationUI &ui_ = m_configuration.uiModule();
     ui_.m_fontSize = ui->cboFontSize->currentText().toInt();
     ui_.m_language = ui->cboLanguage->currentData().toString();
+    ui_.m_darkTheme = ui->chkDarkTheme->isChecked();
 
     ConfigurationJogging &jogging = m_configuration.joggingModule();
     QRegularExpression nonDigits("[^\\d^.]");

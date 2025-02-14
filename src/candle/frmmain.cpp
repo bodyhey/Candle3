@@ -37,18 +37,16 @@
 
 #define FILE_FILTER_TEXT "G-Code files (*.nc *.ncc *.ngc *.tap *.gc *.gcode *.txt)"
 
-frmMain::frmMain(QWidget *parent) :
+frmMain::frmMain(Configuration &configuration, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::frmMain),
     m_programModel(m_program),
     m_probeModel(m_program),
     m_programHeightmapModel(m_program),
-    m_connectionManager(this, m_configuration.connectionModule()),
+    m_connectionManager(this, configuration.connectionModule()),
     m_connection(nullptr),
-    m_configuration(this)
+    m_configuration(&configuration)
 {
-    m_configuration.load();
-
     // Loading settings
     m_settingsFileName = qApp->applicationDirPath() + "/settings.ini";
     preloadSettings();

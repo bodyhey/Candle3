@@ -22,7 +22,8 @@ const QMap<QString,QVariant> DEFAULTS = {
     {"settingsFormSlicerSizes", QVariantList{20, 200}},
     {"grblConfigratorFormGeometry", QVariantMap({{"x", -1}, {"y", -1}, {"width", 800}, {"height", 600}})},
     {"grblConfigratorFormMaximized", false},
-    {"spindleSpeedRange", QVariantMap({{"min", 0}, {"max", 100}})}
+    {"spindleSpeedRange", QVariantMap({{"min", 0}, {"max", 100}})},
+    {"darkTheme", false}
 };
 
 ConfigurationUI::ConfigurationUI(QObject *parent) : ConfigurationModule(parent, DEFAULTS)
