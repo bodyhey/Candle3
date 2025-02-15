@@ -135,9 +135,9 @@ int main(int argc, char *argv[])
                     QDialog {border: 1px solid palette(mid);}");
 #endif
 
-    app.setStyleSheet(app.styleSheet() + "QWidget {font-size: 8pt}");
+//    app.setStyleSheet(app.styleSheet() + "QWidget {font-size: 8pt}");
 
-    frmMain form;
+    frmMain form(configuration);
     form.show();
 
     return app.exec();
