@@ -32,44 +32,26 @@ QMainWindow::separator {
 }
 
 QDockWidget::title {
-	background-color: lightgray;
-	padding: 5 0 5 11;
-	text-align: left center;
+    text-align: left; /* align the text to the left */
+    background: lightgray;
+    padding: 2px;
 }
 
-QDockWidget[floating=&quot;true&quot;]&gt;QWidget&gt;QWidget {
-	margin-left: 11;
-	margin-right: 11;
-}
-
-QDockWidget::close-button {
-	subcontrol-origin: padding;
-	subcontrol-position: right center;
-	position: absolute;
-	top: 2;
-	width: 24;
+QDockWidget::close-button, QDockWidget::float-button {
+    subcontrol-origin: padding;
+    background: darkgray;
+    color: white;
+    top: 1; right: 2;
 }
 
 QDockWidget::float-button {
-	subcontrol-origin: padding;
-	subcontrol-position: right center;
-	position: absolute;
-	top: 2;
-	right: 20;
-	width: 24;
-}
-
-QToolBar#_spacerTop, QToolBar#_spacerLeft, QToolBar#_spacerRight {
-	border: none;
-	background-color: transparent;
+    subcontrol-origin: padding;
+    right: 20;
 }
 
 QSpinBox, QDoubleSpinBox {
-	padding-top: 1px;
-	padding-bottom: 1px;
-}
-
-QGroupBox {
+    padding-top: 1px;
+    padding-bottom: 1px;
 }
 
 QGroupBox:disabled {
