@@ -2100,12 +2100,6 @@ border-top: 0;</string>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>partMainState</class>
-   <extends>QWidget</extends>
-   <header location="global">form_partial/main/partmainstate.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>partMainOverride</class>
    <extends>QWidget</extends>
    <header location="global">form_partial/main/partmainoverride.h</header>
@@ -2127,6 +2121,11 @@ border-top: 0;</string>
    <extends>QWidget</extends>
    <header>widgets/glcontainer.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>partMainStateLcd</class>
+   <extends>QWidget</extends>
+   <header location="global">form_partial/main/partmainstatelcd.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
