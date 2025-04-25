@@ -24,7 +24,18 @@ Camera::Camera(QWidget* parent) : QVideoWidget(parent), ui(new Ui::Camera), m_fr
         m_menu.exec(this->mapToGlobal(pos));
     });
 
+    m_resizeTimer.setInterval(500);
+    m_resizeTimer.setSingleShot(true);
+    connect(&m_resizeTimer, &QTimer::timeout, this, [this](){
+        findBestResolution(this->width(), this->height());
+    });
+
     init();
+}
+
+Camera::~Camera()
+{
+    m_resizeTimer.stop();
 }
 
 void Camera::setCamera(const QCameraDevice &cameraDevice)
@@ -76,24 +87,27 @@ void Camera::showEvent(QShowEvent *event)
 
 void Camera::startCamera()
 {
-    if (m_camera->isActive() || !m_camera->isAvailable())
+    if (m_camera->isActive() || !m_camera->isAvailable()) {
         return;
+    }
 
     m_camera->start();
 }
 
 void Camera::stopCamera()
 {
-    if (!m_camera->isActive())
-        return
+    if (!m_camera->isActive()) {
+        return;
+    }
 
     m_camera->stop();
 }
 
 void Camera::displayCameraError()
 {
-    if (m_camera->error() != QCamera::NoError)
+    if (m_camera->error() != QCamera::NoError) {
         QMessageBox::warning(this, tr("Camera Error"), m_camera->errorString());
+    }
 }
 
 void Camera::updateCameraDevice(QAction *action)
@@ -108,7 +122,10 @@ void Camera::updateCameraActive(bool active)
 
 void Camera::resizeEvent(QResizeEvent *event)
 {
-    findBestResolution(event->size().width(), event->size().height());
+    if (m_resizeTimer.isActive()) {
+        m_resizeTimer.stop();
+    }
+    m_resizeTimer.start();
 
     QVideoWidget::resizeEvent(event);
 }
@@ -178,7 +195,9 @@ void Camera::findBestResolution(int w, int h)
     }
 
     if (!bestFormat.isNull() && m_camera->cameraFormat() != bestFormat) {
-        qDebug() << "Setting camera format to" << bestFormat.resolution() << bestScale;
+        qDebug() << "Setting camera format to" << bestFormat.resolution()
+                 << (float) bestFormat.resolution().width() / (float) bestFormat.resolution().height()
+                 << bestScale;
         m_camera->setCameraFormat(bestFormat);
     }
 

@@ -14,6 +14,7 @@
 #include <QVideoWidget>
 #include <QVideoSink>
 #include <QMenu>
+#include <QTimer>
 #include "cameraframeprocessor.h"
 
 QT_BEGIN_NAMESPACE
@@ -26,6 +27,7 @@ class Camera : public QVideoWidget
 
 public:
     Camera(QWidget* parent = nullptr);
+    ~Camera() override;
 
 private slots:
     void setCamera(const QCameraDevice &cameraDevice);
@@ -47,6 +49,7 @@ private:
     QMediaDevices m_devices;
     QScopedPointer<QCamera> m_camera;
     QMediaCaptureSession m_captureSession;
+    QTimer m_resizeTimer;
 
     QString m_videoContainerFormat;
     bool m_applicationExiting = false;
