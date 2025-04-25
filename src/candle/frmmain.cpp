@@ -383,6 +383,11 @@ void frmMain::showEvent(QShowEvent *se)
     //     }
     // }
 #endif
+
+    if (m_firstShow) {
+        Utils::positionDialog(this, m_configuration.uiModule().mainFormGeometry(), m_configuration.uiModule().mainFormMaximized());
+        m_firstShow = false;
+    }
 }
 
 void frmMain::hideEvent(QHideEvent *he)
@@ -392,10 +397,14 @@ void frmMain::hideEvent(QHideEvent *he)
 
 void frmMain::resizeEvent(QResizeEvent *re)
 {
-    Q_UNUSED(re)
+    QMainWindow::resizeEvent(re);
 
     placeVisualizerButtons();
     resizeTableHeightmapSections();
+
+    if (!m_firstShow) {
+        m_configuration.uiModule().setMainFormGeometry(this);
+    }
 }
 
 void frmMain::timerEvent(QTimerEvent *te)
@@ -438,8 +447,6 @@ void frmMain::closeEvent(QCloseEvent *ce)
     //     m_communicator->m_commands.clear();
     //     m_communicator->m_queue.clear();
     // }
-
-    m_configuration.uiModule().setMainFormGeometry(this);
 
     saveSettings();
 }
@@ -485,6 +492,22 @@ void frmMain::dropEvent(QDropEvent *de)
         addRecentHeightmap(fileName);
         updateRecentFilesMenu();
         loadHeightmap(fileName);
+    }
+}
+
+void frmMain::changeEvent(QEvent *ce)
+{
+    QMainWindow::changeEvent(ce);
+    if (ce->type() == QEvent::WindowStateChange) {
+        m_configuration.uiModule().setMainFormGeometry(this);
+    }
+}
+
+void frmMain::moveEvent(QMoveEvent *me)
+{
+    QMainWindow::moveEvent(me);
+    if (!m_firstShow) {
+        m_configuration.uiModule().setMainFormGeometry(this);
     }
 }
 

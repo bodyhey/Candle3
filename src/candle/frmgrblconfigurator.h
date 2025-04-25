@@ -40,7 +40,12 @@ class frmGrblConfigurator : public QDialog
     public:
         explicit frmGrblConfigurator(QWidget *parent, ConfigurationUI &uiConfiguration, Communicator *communicator);
         ~frmGrblConfigurator();
-        int exec() override;
+
+    protected:
+        void showEvent(QShowEvent *se) override;
+        void resizeEvent(QResizeEvent *re) override;
+        void changeEvent(QEvent *ce) override;
+        void moveEvent(QMoveEvent *me) override;
 
     private:        
         Ui::frmGrblConfigurator *ui;
@@ -49,6 +54,7 @@ class frmGrblConfigurator : public QDialog
         QMap<int, double> m_currentSettings;
         bool m_isSaving = false;
         void setInfo(QString text, QColor color);
+        bool m_firstShow = true;
         QMap<Axis, CBaseProperty*> addAxesProperty(CPropertyHeader *, ConfigEntry);
         CBaseProperty* addBooleanProperty(CPropertyHeader *, ConfigEntry);
         CBaseProperty* addIntegerProperty(CPropertyHeader *, ConfigEntry);

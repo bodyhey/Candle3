@@ -220,6 +220,8 @@ protected:
     void closeEvent(QCloseEvent *ce) override;
     void dragEnterEvent(QDragEnterEvent *dee) override;
     void dropEvent(QDropEvent *de) override;
+    void changeEvent(QEvent *ce) override;
+    void moveEvent(QMoveEvent *me) override;
     QMenu *createPopupMenu() override;
 
 private:
@@ -254,6 +256,8 @@ private:
     HeightMapInterpolationDrawer m_heightmapInterpolationDrawer;
     SelectionDrawer m_selectionDrawer;
     MachineBoundsDrawer m_machineBoundsDrawer;
+
+    bool m_firstShow = true;
 
     // Table models
     GCodeTableModel m_programModel;

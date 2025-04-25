@@ -366,8 +366,6 @@ void frmSettings::widgetValidity(QString widgetName, bool valid)
 
 int frmSettings::exec()
 {
-    Utils::positionDialog(this, m_configuration.uiModule().settingsFormGeometry(), m_configuration.uiModule().settingsFormMaximized());
-
     // Store settings to undo
     m_storedValues.clear();
     m_storedChecks.clear();
@@ -399,7 +397,6 @@ int frmSettings::exec()
 
     int result = QDialog::exec();
 
-    m_configuration.uiModule().setSettingsFormGeometry(this);
     m_configuration.uiModule().setSettingsFormSlicerSizes(ui->splitMain->sizes());
 
     return result;
@@ -608,5 +605,36 @@ void frmSettings::onConnectionModeChanged(int mod)
         case 2:
             ui->frameConnectionSimulator->show();
             break;
+
+void frmSettings::showEvent(QShowEvent *se)
+{
+    QDialog::showEvent(se);
+    if (m_firstShow) {
+        Utils::positionDialog(this, m_configuration.uiModule().settingsFormGeometry(), m_configuration.uiModule().settingsFormMaximized());
+        m_firstShow = false;
+    }
+}
+
+void frmSettings::resizeEvent(QResizeEvent *re)
+{
+    QDialog::resizeEvent(re);
+    if (!m_firstShow) {
+        m_configuration.uiModule().setSettingsFormGeometry(this);
+    }
+}
+
+void frmSettings::changeEvent(QEvent *ce)
+{
+    QDialog::changeEvent(ce);
+    if (ce->type() == QEvent::WindowStateChange) {
+        m_configuration.uiModule().setSettingsFormGeometry(this);
+    }
+}
+
+void frmSettings::moveEvent(QMoveEvent *me)
+{
+    QDialog::moveEvent(me);
+    if (!m_firstShow) {
+        m_configuration.uiModule().setSettingsFormGeometry(this);
     }
 }

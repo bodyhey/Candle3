@@ -3,34 +3,65 @@
 #include <QApplication>
 #include <QDebug>
 
-void Utils::positionDialog(QWidget *widget, QRect geometry, bool maximized)
+// info about sizing https://doc.qt.io/qt-6/application-windows.html
+void Utils::positionDialog(QWidget *widget, QRect frameGeometry, bool maximized)
 {
-    QSize screenSize = QGuiApplication::primaryScreen()->availableSize();
-    QSize size = geometry.size();
-    if (geometry.x() == -1) {
-        geometry.setLeft(screenSize.width() / 2 - geometry.width() / 2);
-        geometry.setWidth(size.width());
+    QSize screenSize = widget->screen()->availableSize();
+    QSize geometrySize = frameGeometry.size();
+\
+    // if geometry is not set, center it
+    if (frameGeometry.x() == -1) {
+        frameGeometry.setLeft(screenSize.width() / 2 - frameGeometry.width() / 2);
+        frameGeometry.setWidth(geometrySize.width());
     }
-    if (geometry.y() == -1) {
-        geometry.setTop(screenSize.height() / 2 - geometry.height() / 2);
-        geometry.setHeight(size.height());
+    if (frameGeometry.y() == -1) {
+        frameGeometry.setTop(screenSize.height() / 2 - frameGeometry.height() / 2);
+        frameGeometry.setHeight(geometrySize.height());
     }
-    if (geometry.width() == -1 || geometry.x() + geometry.width() > screenSize.width()) {
-        geometry.setWidth(screenSize.width() - geometry.x());
+
+    // prevent hiding window out of screen
+    if (frameGeometry.x() < 0) {
+        int t = frameGeometry.width();
+        frameGeometry.setX(0);
+        frameGeometry.setWidth(t);
     }
-    if (geometry.height() == -1 || geometry.y() + geometry.height() > screenSize.height()) {
-        geometry.setHeight(screenSize.height() - geometry.y());
+    if (frameGeometry.y() < 0) {
+        int t = frameGeometry.height();
+        frameGeometry.setY(0);
+        frameGeometry.setHeight(t);
     }
-    QSize frameSize = widget->frameSize();
-    size = frameSize - widget->size();
-    widget->move(geometry.x(), geometry.y());
-    widget->resize(
-        geometry.width() - size.width(),
-        geometry.height() - size.height()
-    );
+    if (frameGeometry.right() >= screenSize.width()) {
+        frameGeometry.setRight(screenSize.width());
+    }
+    if (frameGeometry.bottom() >= screenSize.height()) {
+        frameGeometry.setBottom(screenSize.height());
+    }
+
+    if (frameGeometry.width() == -1 || frameGeometry.x() + frameGeometry.width() > screenSize.width()) {
+        frameGeometry.setWidth(screenSize.width() - frameGeometry.x());
+    }
+    if (frameGeometry.height() == -1 || frameGeometry.y() + frameGeometry.height() > screenSize.height()) {
+        frameGeometry.setHeight(screenSize.height() - frameGeometry.y());
+    }
+
+    QSize frameOnlySize = widget->frameSize() - widget->size();
+    QSize clientSize = frameGeometry.size() - frameOnlySize;
+    widget->move(frameGeometry.x(), frameGeometry.y());
+    widget->resize(clientSize);
+
     if (maximized) {
         widget->showMaximized();
     }
+}
+
+QRect Utils::getDialogGeometry(QWidget *widget)
+{
+    QRect geometry = widget->geometry();
+    geometry.setWidth(widget->width() + widget->frameSize().width());
+    geometry.setHeight(widget->height() + widget->frameSize().height());
+    geometry.moveTopLeft(widget->mapToGlobal(geometry.topLeft()));
+
+    return geometry;
 }
 
 bool Utils::pointInTriangle(QPoint p, QPoint p0, QPoint p1, QPoint p2)

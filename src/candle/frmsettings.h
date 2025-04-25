@@ -28,11 +28,17 @@ public:
 
     Ui::frmSettings *ui;
 
-    int exec();
+    int exec() override;
     void addCustomSettings(QGroupBox *box);
 
 signals:
     void settingsSetToDefault();
+
+protected:
+    void showEvent(QShowEvent *se) override;
+    void resizeEvent(QResizeEvent *re) override;
+    void changeEvent(QEvent *ce) override;
+    void moveEvent(QMoveEvent *me) override;
 
 private slots:
     void onScrollBarValueChanged(int value);
@@ -47,6 +53,7 @@ private slots:
 
 private:
     Configuration &m_configuration;
+    bool m_firstShow = true;
 
     QList<double> m_storedValues;
     QList<bool> m_storedChecks;

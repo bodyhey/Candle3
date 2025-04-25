@@ -309,15 +309,37 @@ frmGrblConfigurator::~frmGrblConfigurator()
     delete ui;
 }
 
-int frmGrblConfigurator::exec()
+void frmGrblConfigurator::showEvent(QShowEvent *se)
 {
-    Utils::positionDialog(this, m_uiConfiguration.grblConfigratorFormGeometry(), m_uiConfiguration.grblConfigratorFormMaximized());
+    QDialog::showEvent(se);
+    if (m_firstShow) {
+        Utils::positionDialog(this, m_uiConfiguration.grblConfigratorFormGeometry(), m_uiConfiguration.grblConfigratorFormMaximized());
+        m_firstShow = false;
+    }
+}
 
-    int result = QDialog::exec();
+void frmGrblConfigurator::resizeEvent(QResizeEvent *re)
+{
+    QDialog::resizeEvent(re);
+    if (!m_firstShow) {
+        m_uiConfiguration.setGrblConfigratorFormGeometry(this);
+    }
+}
 
-    m_uiConfiguration.setGrblConfigratorFormGeometry(this);
+void frmGrblConfigurator::changeEvent(QEvent *ce)
+{
+    QDialog::changeEvent(ce);
+    if (ce->type() == QEvent::WindowStateChange) {
+        m_uiConfiguration.setGrblConfigratorFormGeometry(this);
+    }
+}
 
-    return result;
+void frmGrblConfigurator::moveEvent(QMoveEvent *me)
+{
+    QDialog::moveEvent(me);
+    if (!m_firstShow) {
+        m_uiConfiguration.setGrblConfigratorFormGeometry(this);
+    }
 }
 
 void frmGrblConfigurator::onConfigurationReceived(MachineConfiguration configuration, QMap<int, double> rawConfiguration)
