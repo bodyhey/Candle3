@@ -15,6 +15,9 @@ partMainStateLcd::partMainStateLcd(QWidget *parent)
     setMachineCoordinates(QVector3D(0, 0, 0));
 
     QFontDatabase::addApplicationFont(":/fonts/Patopian1986.ttf");
+
+    // qDebug() << ui->txtMX->fontMetrics().height();
+    // qDebug() << ui->txtMX->fontMetrics().lineSpacing();
 }
 
 partMainStateLcd::~partMainStateLcd()
