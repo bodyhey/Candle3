@@ -664,54 +664,6 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
 
         switch (drawable->programType()) {
         case ShaderDrawable::ProgramType::GCode: {
-            // shadow
-
-            GLFramebuffer fbo(width(), height());           
-            fbo.bind();
-            glClearColor(1.0, 1.0, 0.3, 0.0);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            m_gcodeShaderProgram->setUniformValue("u_shadow", true);
-
-            GLuint tfBuffer;
-            glGenBuffers(1, &tfBuffer);
-            glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, tfBuffer);
-            glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, drawable->getVertexCount() * sizeof(float), nullptr, GL_DYNAMIC_READ);
-            glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfBuffer);
-
-            glBeginTransformFeedback(GL_LINES);
-            drawable->draw(currentProgram);
-            glEndTransformFeedback();
-            fbo.release();
-
-            // fbo.dumpColorTexture("e:/color.png");
-            //fbo.dumpDepthTexture("e:/depth.png");
-
-            QString fboMinMax = fbo.dumpDepthMinMax();
-
-
-            //
-
-            glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, tfBuffer);
-            float* zData = (float*)glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, GL_READ_ONLY);
-
-            float zMin = 9999; // closest point
-            float zMax = -9999; // farthest point
-
-            for (size_t i = 0; i < drawable->getVertexCount(); i++) {
-                if (m_perspective) {
-                    zMin = std::min(zMin, zData[i]);
-                    zMax = std::max(zMax, zData[i]);
-                } else {
-                    zMin = std::min(zMin, zData[i]);
-                    zMax = std::max(zMax, zData[i]);
-                }
-            }
-
-            glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER);
-            glDeleteBuffers(1, &tfBuffer);
-
-            // final lines
-
             currentProgram = m_gcodeShaderProgram;
             currentProgram->bind();
             currentProgram->setUniformValue("u_shadow", false);
@@ -754,34 +706,9 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
             currentProgram->enableAttributeArray(textureLocation);
             currentProgram->setAttributeBuffer(textureLocation, GL_FLOAT, offset, 2, sizeof(_2DTexturedVertexData));
 
-            QVector<_2DTexturedVertexData> copyTriangles;
-            // single triangle to draw the whole screen
-            copyTriangles << _2DTexturedVertexData(QVector2D(-1.0, -1.0), QVector2D(0, 0))
-                          << _2DTexturedVertexData(QVector2D(-1.0, 3.0), QVector2D(0, 2))
-                          << _2DTexturedVertexData(QVector2D(3.0, -1.0), QVector2D(2, 0));
-            copyVbo.allocate(copyTriangles.constData(), copyTriangles.count() * sizeof(_2DTexturedVertexData));
-
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, fbo.depthTexture());
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, fbo.colorTexture());
-            glDrawArrays(GL_TRIANGLES, 0, copyTriangles.count());
             copyVbo.release();
 
             currentProgram->release();
-
-            //
-
-            if (zMax != -9999) {
-                m_near = std::max(1.0f, (-zMax)) * 0.9;
-                m_far = (-zMin) * 1.1;
-
-                // qDebug() << "Near: " << m_near << ", Far: " << m_far << "depth: " << fboMinMax;
-
-                updateProjection();
-                updateView();
-            }
-
             break;
         }
         case ShaderDrawable::ProgramType::Default:
