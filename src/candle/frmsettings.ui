@@ -1975,7 +1975,6 @@ QSplitter::handle:horizontal {
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="grpProgramDrawMode"/>
   <buttongroup name="grpGrayscaleSegments"/>
  </buttongroups>
 </ui>

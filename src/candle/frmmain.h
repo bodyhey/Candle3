@@ -304,7 +304,7 @@ private:
     bool m_absoluteCoordinates;
     //bool m_storedKeyboardControl;
 
-    Configuration m_configuration;
+    Configuration &m_configuration;
     ScriptVars m_scriptVars;
     
     // Settings

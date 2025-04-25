@@ -16,6 +16,12 @@ void Communicator::onConnectionLineReceived(QString data)
         return;
     }
 
+    if (data.startsWith("ALARM:")) {
+        processAlarm(data);
+
+        return;
+    }
+
     if (m_reseting) {
         if (!dataIsReset(data)) return;
         m_reseting = false;
@@ -295,8 +301,9 @@ void Communicator::processCommandResponse(QString data)
 {
     // @TODO why static?? what is this for???
     static QString response; // Full response string
+    static QStringList lines; // Response lines
 
-    qDebug() << "< CMD <" << data;
+    // qDebug() << "< CMD <" << data;
 
     assert(m_commands.length() > 0);
 
@@ -304,17 +311,23 @@ void Communicator::processCommandResponse(QString data)
     QString firstCommand = m_commands[0].commandLine;
     if ((firstCommand == "[CTRL+X]" || !dataIsEnd(data)) && (firstCommand != "[CTRL+X]" || !dataIsReset(data))) {
         response.append(data + "; ");
+        lines.append(data);
 
         return;
     }
 
     response.append(data);
+    lines.append(data);
 
     // Take command from buffer
     CommandAttributes commandAttributes = m_commands.takeFirst();
-    qDebug() << "taking command, new size " << m_commands.length() << ", command is " << commandAttributes.commandLine;
+    // qDebug() << "taking command, new size " << m_commands.length() << ", command is " << commandAttributes.commandLine;
 
     QString command = GcodePreprocessorUtils::removeComment(commandAttributes.commandLine).toUpper();
+
+    if (m_state != nullptr) {
+        m_state->onCommandResponse(command, lines);
+    }
 
     // Store current coordinate system
     if (command == "$G") {
@@ -669,21 +682,24 @@ void Communicator::processCommandResponse(QString data)
     emit responseReceived(commandAttributes.commandLine, commandAttributes.tableIndex, response);
 
     response.clear();
+    lines.clear();
 }
 
 void Communicator::processUnhandledResponse(QString data)
 {
     if (dataIsReset(data)) {
         // Welcome message, hardware reset occurred?
-        this->processWelcomeMessageDetected();
+        this->processWelcomeMessageDetected(data);
     }
 
     // @TODO do we want to log it here?
     //m_form->partConsole().append(data);
 }
 
-void Communicator::processWelcomeMessageDetected()
+void Communicator::processWelcomeMessageDetected(QString message)
 {
+    emit welcomeMessageReceived(message);
+
     setSenderStateAndEmitSignal(SenderState::Stopped);
     setDeviceStateAndEmitSignal(DeviceState::Unknown);
 
@@ -719,4 +735,19 @@ void Communicator::processMessage(QString data)
     //         stopUpdatingState();
     //     }
     // }
+}
+
+void Communicator::processAlarm(QString data)
+{
+    static QRegularExpression re("\\[ALARM:(\\d+)\\]");
+    QRegularExpressionMatch match = re.match(data);
+    if (match.hasMatch()) {
+        int code = match.captured(1).toInt();
+
+        emit alarm(code);
+
+        if (m_state != nullptr) {
+            m_state->onAlarm(code);
+        }
+    }
 }

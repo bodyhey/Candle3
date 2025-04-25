@@ -27,7 +27,7 @@ void StateHoming::onDeviceStateChanged(DeviceState state)
     // }
 }
 
-void StateHoming::onCommandResponse(QString command, QString response)
+void StateHoming::onCommandResponse(QString command, QStringList response)
 {
     if (command == "$H") {
         if (response.contains("error")) {

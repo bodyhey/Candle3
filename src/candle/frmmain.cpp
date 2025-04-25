@@ -45,7 +45,7 @@ frmMain::frmMain(Configuration &configuration, QWidget *parent) :
     m_programHeightmapModel(m_program),
     m_connectionManager(this, configuration.connectionModule()),
     m_connection(nullptr),
-    m_configuration(&configuration)
+    m_configuration(configuration)
 {
     // Loading settings
     m_settingsFileName = qApp->applicationDirPath() + "/settings.ini";
@@ -76,12 +76,10 @@ frmMain::frmMain(Configuration &configuration, QWidget *parent) :
 
     ui->setupUi(this);
 
-    Utils::positionDialog(this, m_configuration.uiModule().mainFormGeometry(), m_configuration.uiModule().mainFormMaximized());
-
     ui->jog->initialize(m_configuration.joggingModule());
 
     ui->console->initialize(m_configuration.consoleModule());
-    connect(ui->console, SIGNAL(newCommand(QString)), this, SLOT(onConsoleNewCommand(QString)));
+    connect(ui->console, &partMainConsole::newCommand, this, &frmMain::onConsoleNewCommand);
     ui->console->append(QString("G-Candle %1 started").arg( qApp->applicationVersion()));
     ui->console->append("---");
 
@@ -333,6 +331,9 @@ void frmMain::initializeCommunicator()
     connect(m_communicator, &Communicator::commandSent, this, &frmMain::onCommandSent);
     connect(m_communicator, &Communicator::commandResponseReceived, this, &frmMain::onCommandResponseReceived);
     connect(m_communicator, &Communicator::parserStateReceived, this, &frmMain::onParserStateReceived);
+    connect(m_communicator, &Communicator::welcomeMessageReceived, this, [this](QString message) {
+        ui->console->appendSystem(message);
+    });
     connect(m_communicator, &Communicator::pinStateReceived, this, &frmMain::onPinStateReceived);
     connect(m_communicator, &Communicator::spindleSpeedReceived, this, &frmMain::onSpindleSpeedReceived);
     connect(m_communicator, &Communicator::commandProcessed, this, &frmMain::onCommandProcessed);
@@ -2039,13 +2040,22 @@ void frmMain::updateHeightMapInterpolationDrawer(bool reset)
 
 void frmMain::placeVisualizerButtons()
 {
-    ui->cmdIsometric->move(ui->glwVisualizer->width() - ui->cmdIsometric->width() - 8, 8);
+    ui->cmdToggleProjection->setParent(ui->glwVisualizer);
+    ui->cmdFit->setParent(ui->glwVisualizer);
+    ui->cmdIsometric->setParent(ui->glwVisualizer);
+    ui->cmdTop->setParent(ui->glwVisualizer);
+    ui->cmdFront->setParent(ui->glwVisualizer);
+    ui->cmdLeft->setParent(ui->glwVisualizer);
+    ui->cmdRotationCube->setParent(ui->glwVisualizer);
+
+    int w = ui->glwVisualizer->width();
+    ui->cmdIsometric->move(w - ui->cmdIsometric->width() - 8, 8);
     ui->cmdTop->move(ui->cmdIsometric->geometry().left() - ui->cmdTop->width() - 8, 8);
-    ui->cmdLeft->move(ui->glwVisualizer->width() - ui->cmdLeft->width() - 8, ui->cmdIsometric->geometry().bottom() + 8);
+    ui->cmdLeft->move(w - ui->cmdLeft->width() - 8, ui->cmdIsometric->geometry().bottom() + 8);
     ui->cmdFront->move(ui->cmdLeft->geometry().left() - ui->cmdFront->width() - 8, ui->cmdIsometric->geometry().bottom() + 8);
-    ui->cmdFit->move(ui->glwVisualizer->width() - ui->cmdFit->width() - 8, ui->cmdLeft->geometry().bottom() + 8);
+    ui->cmdFit->move(w - ui->cmdFit->width() - 8, ui->cmdLeft->geometry().bottom() + 8);
     ui->cmdToggleProjection->move(ui->cmdFit->geometry().left() - ui->cmdToggleProjection->width() - 8, ui->cmdLeft->geometry().bottom() + 8);
-    ui->cmdRotationCube->move(ui->glwVisualizer->width() - ui->cmdRotationCube->width() - 8, ui->cmdFit->geometry().bottom() + 8);
+    ui->cmdRotationCube->move(w - ui->cmdRotationCube->width() - 8, ui->cmdFit->geometry().bottom() + 8);
 }
 
 void frmMain::preloadSettings()

@@ -14,7 +14,7 @@ class StateHoming : public State
         QString name() override { return "Homing"; }
         void onEntry(Communicator *communicator, State *previous = nullptr) override;
         void onDeviceStateChanged(DeviceState state) override;
-        void onCommandResponse(QString command, QString response) override;
+        void onCommandResponse(QString command, QStringList response) override;
 };
 
 #endif // STATEHOMING_H

@@ -381,15 +381,18 @@ bool Communicator::isSenderState(SenderState state) const
 
 void Communicator::probe()
 {
-    sendCommands(
-        CommandSource::GeneralUI,
-        QStringList({
-            "G91 G21 G38.2 Z-50 F100",
-            "G92 Z14.09",
-            "G0Z5 M30"
-        }),
-        TABLE_INDEX_UI
-    );
+    execute(new StateProbing(m_state));
+
+    // sendCommands(
+    //     CommandSource::GeneralUI,
+    //     QStringList({
+    //         "G38.2 Z-10 F500",
+    //         // "G91 G21 G38.2 Z-50 F100",
+    //         // "G92 Z14.09",
+    //         // "G0Z5 M30"
+    //     }),
+    //     TABLE_INDEX_UI
+    // );
 }
 
 void Communicator::home()

@@ -45,7 +45,7 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_4">
+    <layout class="QVBoxLayout" name="workLayout">
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_9">
        <item>
@@ -166,7 +166,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_5">
+    <layout class="QVBoxLayout" name="machineLayout">
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_10">
        <item>
@@ -287,7 +287,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QFormLayout" name="formLayout">
+    <layout class="QFormLayout" name="statusLayout">
      <property name="fieldGrowthPolicy">
       <enum>QFormLayout::FieldGrowthPolicy::AllNonFixedFieldsGrow</enum>
      </property>

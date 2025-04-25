@@ -22,11 +22,15 @@ class State : public QObject
         virtual bool isHomingAllowed() { return false; };
         State* previous() const { return m_previous; }
         virtual void onEntry(Communicator *communicator, State *previous = nullptr);
+
         virtual void onExit() {};
+        virtual void onAlarm(int code) {
+            qDebug() << "Alarm: " << code;
+        };
         virtual void onDeviceStateChanged(DeviceState state) {
             Q_UNUSED(state);
         };
-        virtual void onCommandResponse(QString command, QString response) {
+        virtual void onCommandResponse(QString command, QStringList response) {
             Q_UNUSED(command);
             Q_UNUSED(response);
         };

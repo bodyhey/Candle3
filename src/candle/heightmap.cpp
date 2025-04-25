@@ -4,4 +4,5 @@
 
 #include "heightmap.h"
 
-Heightmap::Heightmap() {}
+Heightmap::Heightmap() {
+}

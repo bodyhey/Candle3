@@ -120,10 +120,11 @@ class Communicator : public QObject
         void processCommandResponse(QString data);
         void processUnhandledResponse(QString data);
         void processMessage(QString data);
+        void processAlarm(QString data);
         void processFeedSpindleSpeed(QString data);
         void processOverrides(QString data);
         void processNewToolPosition();
-        void processWelcomeMessageDetected();
+        void processWelcomeMessageDetected(QString message);
         void storeParserState();
         void restoreParserState();
         void completeTransfer();
@@ -141,6 +142,8 @@ class Communicator : public QObject
     signals:
         void responseReceived(QString command, int tableIndex, QString response);
         void statusReceived(QString status);
+        void alarm(int code);
+        void welcomeMessageReceived(QString message);
         void senderStateReceived(SenderState state);
         void senderStateChanged(SenderState state);
         void deviceStateChanged(DeviceState state);
