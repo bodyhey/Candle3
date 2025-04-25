@@ -28,6 +28,8 @@ enum class PacketType: uint8_t {
     STATE = 0,
     WIFI_CONFIG = 1,
     PING = 2,
+    STEP_SIZE_CONFIG = 3,
+    FEED_RATE_CONFIG = 4,
 };
 
 enum class CommunicationMode: uint8_t {
@@ -69,6 +71,20 @@ PACK(struct WifiConfigMessage
     Footer footer;
 });
 
+PACK(struct StepSizeConfigMessage
+{
+    Header header;
+    float stepSize[12];
+    Footer footer;
+});
+
+PACK(struct FeedRateConfigMessage
+{
+    Header header;
+    float feedRate[12];
+    Footer footer;
+});
+
 class Queue {
     private:
     //CircularBuffer<char, 256> buffer;
@@ -78,45 +94,35 @@ Pendant::Pendant(QObject *parent, Communicator &communicator) : QObject{parent},
 {
     qDebug() << "Pendant created";
 
-    this->server = new QTcpServer(this);
-    this->server->listen(QHostAddress::Any, 5555);
+    this->m_server = new QTcpServer(this);
+    this->m_server->listen(QHostAddress::Any, 5555);
 
-    connect(this->server, &QTcpServer::newConnection, [this]() {
+    connect(this->m_server, &QTcpServer::newConnection, [this]() {
         qDebug() << "New pendant connection";
 
-        QTimer *timer = new QTimer(this);
-        QTcpSocket *socket = this->server->nextPendingConnection();
-        connect(socket, &QTcpSocket::readyRead, [socket, this]() {
-            QByteArray data = socket->readAll();
-            qDebug() << "Received data: " << data;
-            socket->write(data);
+        m_socket = this->m_server->nextPendingConnection();
+        connect(m_socket, &QTcpSocket::readyRead, [this]() {
+            QByteArray data = m_socket->readAll();
+            m_socket->write(data);
         });
-        connect(socket, &QTcpSocket::disconnected, [socket, timer]() {
+
+        QTimer *timer = new QTimer(this);
+        timer->setInterval(50);
+
+        sendFeedRateConfig();
+        sendStepSizeConfig();
+        sendWifiConfig();
+
+        connect(m_socket, &QTcpSocket::disconnected, [this, timer]() {
             timer->stop();
             timer->deleteLater();
-            socket->deleteLater();
+            m_socket->deleteLater();
+            m_socket = nullptr;
             qDebug() << "Pendant disconnected";
         });
 
-        timer->setInterval(50);
-        connect(timer, &QTimer::timeout, [socket, this]() {
-            StateMessage message;
-            message.header.start = 0xAA55;
-            message.header.size = sizeof(StateMessage);
-            message.header.type = static_cast<uint8_t>(PacketType::STATE);
-
-            QVector3D pos = m_communicator.machinePos();
-            message.x = pos.x();
-            message.y = pos.y();
-            message.z = pos.z();
-
-            message.machineState = (uint8_t) m_communicator.deviceState();
-
-            message.footer.crc = calcCRC8((uint8_t*)&message, sizeof(StateMessage) - sizeof(Footer));
-
-            //qDebug() << "Sending state message " << message.footer.crc << " " << message.header.size;
-            socket->write((char*)&message, sizeof(StateMessage));
-
+        connect(timer, &QTimer::timeout, [this]() {
+            sendState();
             // WifiConfigMessage wifiMessage;
             // wifiMessage.header.start = 0xAA55;
             // wifiMessage.header.size = sizeof(WifiConfigMessage);
@@ -129,9 +135,67 @@ Pendant::Pendant(QObject *parent, Communicator &communicator) : QObject{parent},
             // socket->write((char*)&wifiMessage, sizeof(WifiConfigMessage));
         });
         timer->start();
-
-        connect(socket, &QTcpSocket::disconnected, [socket]() {
-            socket->deleteLater();
-        });
     });
+}
+
+void Pendant::sendState()
+{
+    StateMessage message;
+    message.header.start = 0xAA55;
+    message.header.size = sizeof(StateMessage);
+    message.header.type = static_cast<uint8_t>(PacketType::STATE);
+
+    QVector3D pos = m_communicator.machinePos();
+    message.x = pos.x();
+    message.y = pos.y();
+    message.z = pos.z();
+    message.machineState = (uint8_t) m_communicator.deviceState();
+
+    message.footer.crc = calcCRC8((uint8_t*)&message, sizeof(StateMessage) - sizeof(Footer));
+    m_socket->write((char*)&message, sizeof(StateMessage));
+}
+
+void Pendant::sendWifiConfig()
+{
+    qDebug() << "Sending wifi config";
+
+    WifiConfigMessage message;
+
+    message.header.start = 0xAA55;
+    message.header.size = sizeof(WifiConfigMessage);
+    message.header.type = static_cast<uint8_t>(PacketType::WIFI_CONFIG);
+
+    strcpy(message.ssid, "ssid");
+    strcpy(message.password, "password");
+
+    message.footer.crc = calcCRC8((uint8_t*)&message, sizeof(WifiConfigMessage) - sizeof(Footer));
+    m_socket->write((char*)&message, sizeof(WifiConfigMessage));
+}
+
+void Pendant::sendStepSizeConfig()
+{
+    qDebug() << "Sending step size config";
+
+    StepSizeConfigMessage message;
+
+    message.header.start = 0xAA55;
+    message.header.size = sizeof(StepSizeConfigMessage);
+    message.header.type = static_cast<uint8_t>(PacketType::STEP_SIZE_CONFIG);
+
+    message.footer.crc = calcCRC8((uint8_t*)&message, sizeof(StepSizeConfigMessage) - sizeof(Footer));
+    m_socket->write((char*)&message, sizeof(StepSizeConfigMessage));
+}
+
+void Pendant::sendFeedRateConfig()
+{
+    qDebug() << "Sending feed rate config";
+
+    FeedRateConfigMessage message;
+
+    message.header.start = 0xAA55;
+    message.header.size = sizeof(FeedRateConfigMessage);
+    message.header.type = static_cast<uint8_t>(PacketType::FEED_RATE_CONFIG);
+
+    message.footer.crc = calcCRC8((uint8_t*)&message, sizeof(FeedRateConfigMessage) - sizeof(Footer));
+    m_socket->write((char*)&message, sizeof(FeedRateConfigMessage));
 }

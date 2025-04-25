@@ -11,15 +11,19 @@
 
 class Pendant : public QObject
 {
-        Q_OBJECT
+    Q_OBJECT
+
     public:
         explicit Pendant(QObject *parent, Communicator &communicator);
 
     private:
-        QTcpServer *server;
+        QTcpServer *m_server;
+        QTcpSocket *m_socket;
         Communicator &m_communicator;
-
-    signals:
+        void sendState();
+        void sendWifiConfig();
+        void sendStepSizeConfig();
+        void sendFeedRateConfig();
 };
 
 #endif // PENDANT_H
