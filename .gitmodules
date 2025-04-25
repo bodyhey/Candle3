@@ -21,3 +21,6 @@
 [submodule "src/vendor/phantomstyle"]
 	path = src/vendor/phantomstyle
 	url = https://github.com/cristianadam/phantomstyle
+[submodule "src/vendor/grblHal"]
+	path = src/vendor/grblHal
+	url = https://github.com/grblHAL/core

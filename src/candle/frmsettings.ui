@@ -149,6 +149,11 @@ QSplitter::handle:horizontal {
                     <string>uCNC virtual mode</string>
                    </property>
                   </item>
+                  <item>
+                   <property name="text">
+                    <string>GRBL virtual mode</string>
+                   </property>
+                  </item>
                  </widget>
                 </item>
                 <item row="1" column="0">
@@ -411,7 +416,7 @@ QSplitter::handle:horizontal {
                  <string notr="true">padding: 5px;</string>
                 </property>
                 <property name="text">
-                 <string>Simulator mode is based on uCNC firmware running in virtual mode. This mode allows certain functions to be tested, such as g-code execution or editing machine settings. It does not allow connection to a physical machine.</string>
+                 <string>Simulator mode is based on uCNC/GRBL firmware running in virtual mode. This mode allows certain functions to be tested, such as g-code execution or editing machine settings. It does not allow connection to a physical machine.</string>
                 </property>
                 <property name="wordWrap">
                  <bool>true</bool>

@@ -10,6 +10,7 @@
 #include "serialconnection.h"
 #include "rawtcpconnection.h"
 #include "virtualucncconnection.h"
+#include "virtualgrblconnection.h"
 #include "connection.h"
 
 class ConnectionManager : public QObject
@@ -22,7 +23,8 @@ class ConnectionManager : public QObject
 
     private:
         SerialConnection* initializeSerialConnection();
-        VirtualUCNCConnection* initializeVirtualConnection();
+        VirtualUCNCConnection* initializeVirtualUcncConnection();
+        VirtualGRBLConnection* initializeVirtualGrblConnection();
         RawTcpConnection* initializeRawTcpConnection();
         const ConfigurationConnection& m_configurationConnection;
 };

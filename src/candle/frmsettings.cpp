@@ -605,6 +605,12 @@ void frmSettings::onConnectionModeChanged(int mod)
         case 2:
             ui->frameConnectionSimulator->show();
             break;
+        // virtual GRBL
+        case 3:
+            ui->frameConnectionSimulator->show();
+            break;
+    }
+}
 
 void frmSettings::showEvent(QShowEvent *se)
 {

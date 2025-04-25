@@ -1,8 +1,8 @@
 TEMPLATE = subdirs
 
-SUBDIRS = PropertyEditor
-
-# SUBDIRS += uCNC
+SUBDIRS = PropertyEditor \
+    grblHal
+SUBDIRS += uCNC
 
 HEADERS += Arduino.h
 

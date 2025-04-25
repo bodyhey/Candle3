@@ -1,8 +1,8 @@
 // This file is a part of "G-Pilot (formerly Candle)" application.
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
-// Copyright 2024 BTS
+// Copyright 2025 BTS
 
-#include "virtualucncconnection.h"
+#include "virtualgrblconnection.h"
 #include <QDebug>
 #include <QLibrary>
 #include <QUuid>
@@ -10,46 +10,46 @@
 Q_OS_WIN
     #include <windows.h>
     #ifndef _MSC_VER
-        #define STATIC_UCNC
+        #define STATIC_GRBL
     #endif
 #endif
 #ifdef LINUX
-    #define STATIC_UCNC
+    #define STATIC_GRBL
 #endif
 
-#ifdef STATIC_UCNC
+#ifdef STATIC_GRBL
 extern "C" {
     // Q_DECL_IMPORT
-    void uCNC(QString serverName);
+    void GRBL(QString serverName);
 }
 #else
-typedef void (*uCNCFunction)(QString serverName);
+typedef void (*GRBLFunction)(QString serverName);
 #endif
 
-VirtualUCNCConnection::VirtualUCNCConnection(QObject *parent) : Connection(parent)
+VirtualGRBLConnection::VirtualGRBLConnection(QObject *parent) : Connection(parent)
 {
     m_socket = nullptr;
     m_server = nullptr;
 }
 
-VirtualUCNCConnection::~VirtualUCNCConnection()
+VirtualGRBLConnection::~VirtualGRBLConnection()
 {
 }
 
-void VirtualUCNCConnection::startLocalServer()
+void VirtualGRBLConnection::startLocalServer()
 {
     m_server = new QLocalServer(this);
-    connect(m_server, &QLocalServer::newConnection, this, &VirtualUCNCConnection::onNewConnection);    
-    m_server->listen("gpilotucnc_" + QUuid::createUuid().toString());
+    connect(m_server, &QLocalServer::newConnection, this, &VirtualGRBLConnection::onNewConnection);
+    m_server->listen("gpilotgrbl_" + QUuid::createUuid().toString());
 }
 
-void VirtualUCNCConnection::startWorkerThread()
+void VirtualGRBLConnection::startWorkerThread()
 {
-    m_thread = new VirtualUCNCWorkerThread(m_server->serverName());
+    m_thread = new VirtualGRBLWorkerThread(m_server->serverName());
     m_thread->start();
 }
 
-bool VirtualUCNCConnection::openConnection()
+bool VirtualGRBLConnection::openConnection()
 {
     if (m_state == ConnectionState::Connecting) {
         return false;
@@ -67,7 +67,7 @@ bool VirtualUCNCConnection::openConnection()
     return false;
 }
 
-void VirtualUCNCConnection::flushOutgoingData()
+void VirtualGRBLConnection::flushOutgoingData()
 {
     if (!m_socket) {
         qDebug() << "No socket connection!";
@@ -78,26 +78,26 @@ void VirtualUCNCConnection::flushOutgoingData()
     }
 }
 
-void VirtualUCNCConnection::sendByteArray(QByteArray byteArray)
+void VirtualGRBLConnection::sendByteArray(QByteArray byteArray)
 {
     assert(m_socket != nullptr);
 
     flushOutgoingData();
 
-    #ifdef DEBUG_UCNC_COMMUNICATION
-        qDebug() << "uCNC (byte) >> " << byteArray.toHex();
+    #ifdef DEBUG_GRBL_COMMUNICATION
+        qDebug() << "GRBL (byte) >> " << byteArray.toHex();
     #endif
 
     m_socket->write(byteArray.data(), 1);
     m_socket->flush();
 }
 
-void VirtualUCNCConnection::sendLine(QString line)
+void VirtualGRBLConnection::sendLine(QString line)
 {
     flushOutgoingData();
 
-    #ifdef DEBUG_UCNC_COMMUNICATION
-        qDebug() << "uCNC >> " << line;
+    #ifdef DEBUG_GRBL_COMMUNICATION
+        qDebug() << "GRBL >> " << line;
     #endif
 
     std::string str = QString(line + "\n").toStdString();
@@ -106,7 +106,7 @@ void VirtualUCNCConnection::sendLine(QString line)
     m_socket->flush();
 }
 
-void VirtualUCNCConnection::closeConnection()
+void VirtualGRBLConnection::closeConnection()
 {
     m_thread->terminate();
     m_thread->wait();
@@ -116,7 +116,7 @@ void VirtualUCNCConnection::closeConnection()
     setState(ConnectionState::Disconnected);
     if (m_socket != nullptr) {
         if (m_socket->isOpen()) {
-            disconnect(m_socket, &QLocalSocket::disconnected, this, &VirtualUCNCConnection::onDisconnected);
+            disconnect(m_socket, &QLocalSocket::disconnected, this, &VirtualGRBLConnection::onDisconnected);
             m_socket->abort();
         }
         delete m_socket;
@@ -129,26 +129,26 @@ void VirtualUCNCConnection::closeConnection()
     }
 }
 
-void VirtualUCNCConnection::onNewConnection()
+void VirtualGRBLConnection::onNewConnection()
 {
     if (m_socket != nullptr) {
-        qWarning() << "Virtual uCNC connection already exists!";
+        qWarning() << "Virtual GRBL connection already exists!";
         return;
     }
 
     m_socket = m_server->nextPendingConnection();
-    connect(m_socket, &QIODevice::readyRead, this, &VirtualUCNCConnection::onReadyRead);
-    connect(m_socket, &QLocalSocket::disconnected, this, &VirtualUCNCConnection::onDisconnected);
+    connect(m_socket, &QIODevice::readyRead, this, &VirtualGRBLConnection::onReadyRead);
+    connect(m_socket, &QLocalSocket::disconnected, this, &VirtualGRBLConnection::onDisconnected);
 
     setState(ConnectionState::Connected);
 }
 
-void VirtualUCNCConnection::onDisconnected()
+void VirtualGRBLConnection::onDisconnected()
 {
     closeConnection();
 }
 
-void VirtualUCNCConnection::onReadyRead()
+void VirtualGRBLConnection::onReadyRead()
 {
     while (m_socket->bytesAvailable() > 0) {
         m_incoming += m_socket->readAll();
@@ -156,7 +156,7 @@ void VirtualUCNCConnection::onReadyRead()
     }
 }
 
-void VirtualUCNCConnection::processIncomingData()
+void VirtualGRBLConnection::processIncomingData()
 {
     while (true) {
         if (m_incoming.isEmpty()) {
@@ -170,36 +170,36 @@ void VirtualUCNCConnection::processIncomingData()
         QString line = m_incoming.left(pos).trimmed();
         m_incoming.remove(0, pos + 1);
 
-        #ifdef DEBUG_UCNC_COMMUNICATION
-            qDebug() << "uCNC << " << line;
+        #ifdef DEBUG_GRBL_COMMUNICATION
+            qDebug() << "GRBL << " << line;
         #endif
 
         emit this->lineReceived(line);
     }
 }
 
-VirtualUCNCWorkerThread::VirtualUCNCWorkerThread(QString serverName) : QThread(nullptr), m_serverName(serverName) {
+VirtualGRBLWorkerThread::VirtualGRBLWorkerThread(QString serverName) : QThread(nullptr), m_serverName(serverName) {
 }
 
-void VirtualUCNCWorkerThread::run() {
-    qInfo() << "Starting virtual uCNC, server " << m_serverName;
-    #ifdef STATIC_UCNC
-        uCNC(m_serverName.toStdString().c_str());
+void VirtualGRBLWorkerThread::run() {
+    qInfo() << "Starting virtual GRBL, server " << m_serverName;
+    #ifdef STATIC_GRBL
+        GRBL(m_serverName.toStdString().c_str());
     #else
-        qDebug() << "uCNC dynamic mode";
-        QLibrary lib("uCNC.dll");
+        qDebug() << "GRBL dynamic mode";
+        QLibrary lib("GRBL.dll");
         if (!lib.load()) {
-            qWarning() << "uCNC library could not be loaded!";
+            qWarning() << "GRBL library could not be loaded!";
             return;
         }
-        uCNCFunction uCNC = (uCNCFunction) lib.resolve("uCNC");
-        if (uCNC != nullptr) {
-            qDebug() << "Calling uCNC() function";
-            uCNC(m_serverName.toStdString().c_str()); // Wywołanie funkcji z biblioteki
+        GRBLFunction GRBL = (GRBLFunction) lib.resolve("GRBL");
+        if (GRBL != nullptr) {
+            qDebug() << "Calling GRBL() function";
+            GRBL(m_serverName.toStdString().c_str()); // Wywołanie funkcji z biblioteki
         } else {
-            qInfo() << "uCNC not initialized. uCNC() not found!";
+            qInfo() << "GRBL not initialized. GRBL() not found!";
         }
         lib.unload();
     #endif
-    qInfo() << "uCNC stopped!";
+    qInfo() << "GRBL stopped!";
 }

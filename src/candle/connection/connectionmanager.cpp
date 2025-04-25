@@ -16,10 +16,15 @@ Connection *ConnectionManager::createConnection(ConfigurationConnection::Connect
     switch (mode) {
         case ConfigurationConnection::ConnectionMode::SERIAL:
             return initializeSerialConnection();
-        case ConfigurationConnection::ConnectionMode::VIRTUAL:
-            return initializeVirtualConnection();
+        case ConfigurationConnection::ConnectionMode::VIRTUAL_UCNC:
+            return initializeVirtualUcncConnection();
+        case ConfigurationConnection::ConnectionMode::VIRTUAL_GRBL:
+            return initializeVirtualGrblConnection();
         case ConfigurationConnection::ConnectionMode::RAW_TCP:
             return initializeRawTcpConnection();
+        default:
+            assert(false);
+            break;
     }
 
     return nullptr;
@@ -34,9 +39,16 @@ SerialConnection *ConnectionManager::initializeSerialConnection()
     return serialConnection;
 }
 
-VirtualUCNCConnection *ConnectionManager::initializeVirtualConnection()
+VirtualUCNCConnection *ConnectionManager::initializeVirtualUcncConnection()
 {
     VirtualUCNCConnection* virtualConnection = new VirtualUCNCConnection(this);
+
+    return virtualConnection;
+}
+
+VirtualGRBLConnection *ConnectionManager::initializeVirtualGrblConnection()
+{
+    VirtualGRBLConnection* virtualConnection = new VirtualGRBLConnection(this);
 
     return virtualConnection;
 }

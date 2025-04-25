@@ -13,7 +13,8 @@ QT += multimedia multimediawidgets
 VERSION=1.0.0.0
 
 # DEFINES += DEBUG_UCNC_COMMUNICATION=1
-# DEFINES += DEBUG_RAW_TCP_COMMUNICATION=1
+# DEFINES += DEBUG_GRBL_COMMUNICATION=1
+DEFINES += DEBUG_RAW_TCP_COMMUNICATION=1
 # QT_DEBUG_PLUGINS=1
 # DEFINES += QT_DEBUG_PLUGINS=1
 # DEFINES += USE_GLWINDOW
@@ -98,6 +99,7 @@ SOURCES += main.cpp\
     connection/connectionmanager.cpp \
     connection/rawtcpconnection.cpp \
     connection/serialconnection.cpp \
+    connection/virtualgrblconnection.cpp \
     connection/virtualucncconnection.cpp \
     drawers/cubedrawer.cpp \
     drawers/cursordrawer.cpp \
@@ -189,6 +191,7 @@ HEADERS  += frmmain.h \
     connection/connectionmanager.h \
     connection/rawtcpconnection.h \
     connection/serialconnection.h \
+    connection/virtualgrblconnection.h \
     connection/virtualucncconnection.h \
     drawers/cube.h \
     drawers/cubedrawer.h \
@@ -313,6 +316,7 @@ LIBS += -L../designerplugins/customwidgetsplugin -lcustomwidgets
 #LIBS += C:/Projekty/Qt/Candle/src/vendor/build/uCNC-Debug
 
 LIBS += -L../vendor/uCNC -luCNC
+LIBS += -L../vendor/grblHal -lgrblHal
 
 DISTFILES += \
     shaders/2dcopy_fragment.glsl \

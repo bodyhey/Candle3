@@ -24,10 +24,13 @@ install_propertyeditor.files = src/vendor/PropertyEditor/PropertyEditor.dll
 install_ucnc.path = bin
 install_ucnc.files = src/vendor/uCNC/uCNC.dll
 
-INSTALLS += install_propertyeditor install_ucnc
+install_grbl.path = bin
+install_grbl.files = src/vendor/grblHal/grblHal.dll
+
+INSTALLS += install_propertyeditor install_ucnc install_grbl
 
 INSTALLS += install_main
-# install_ucnc
+
 # install_translations install_license
 
 # CONFIG += c++17

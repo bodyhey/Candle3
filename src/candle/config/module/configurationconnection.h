@@ -30,7 +30,8 @@ class ConfigurationConnection : public ConfigurationModule
         enum ConnectionMode {
             SERIAL = 0,
             RAW_TCP = 1,
-            VIRTUAL = 2
+            VIRTUAL_UCNC = 2,
+            VIRTUAL_GRBL = 3,
         };
         Q_ENUM(ConnectionMode);
 
