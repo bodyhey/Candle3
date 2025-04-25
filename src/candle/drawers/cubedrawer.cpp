@@ -7,7 +7,7 @@
 
 #define DISTANCE 50.0
 #define SIZE 100.0
-#define MULTISAMPLE 4
+#define MULTISAMPLE 2
 
 CubeDrawer::CubeDrawer() : m_eye({0, 0, 1}), m_animation(this, "faceAnimation")
 {
@@ -24,13 +24,15 @@ CubeDrawer::CubeDrawer() : m_eye({0, 0, 1}), m_animation(this, "faceAnimation")
     setProjection();
 }
 
-void CubeDrawer::drawBackground() {
+void CubeDrawer::drawBackground()
+{
     glClearColor(0.2, 0.2, 0.0, 0.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 // dest is normalized to -1, 1
-void CubeDrawer::draw(QRect dest, GLPalette &palette) {
+void CubeDrawer::draw(QRect dest, GLPalette &palette)
+{
     if (!m_vbo.isCreated())
         init();
 
@@ -71,31 +73,34 @@ void CubeDrawer::draw(QRect dest, GLPalette &palette) {
     m_copyProgram->enableAttributeArray(textureLocation);
     m_copyProgram->setAttributeBuffer(textureLocation, GL_FLOAT, offset, 2, 2 * 4 * 2);
 
+    m_copyProgram->setUniformValue("u_mode", 3);
+    m_copyProgram->setUniformValue("u_resolution", QVector2D(SIZE * MULTISAMPLE, SIZE * MULTISAMPLE));
+
     QVector<_2DTexturedVertexData> copyTriangles;
-    // m_copyTriangles << _2DTexturedVertexData(QVector2D(-1.0, -1.0), QVector2D(0, 0))
-    //                 << _2DTexturedVertexData(QVector2D(1.0, -1.0), QVector2D(1, 0))
-    //                 << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0, 1))
-    //                 << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0, 1))
-    //                 << _2DTexturedVertexData(QVector2D(1.0, -1.0), QVector2D(1, 0))
-    //                 << _2DTexturedVertexData(QVector2D(1.0, 1.0), QVector2D(1, 1));
+    copyTriangles << _2DTexturedVertexData(QVector2D(-1.0, -1.0), QVector2D(0, 0))
+                    << _2DTexturedVertexData(QVector2D(1.0, -1.0), QVector2D(1, 0))
+                    << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0, 1))
+                    << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0, 1))
+                    << _2DTexturedVertexData(QVector2D(1.0, -1.0), QVector2D(1, 0))
+                    << _2DTexturedVertexData(QVector2D(1.0, 1.0), QVector2D(1, 1));
 
     // 3 triangles are used to draw chamfered corner
-    copyTriangles << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0.0, 1.0))
-                    << _2DTexturedVertexData(QVector2D(0.5, -1.0), QVector2D(0.75, 0.0))
-                    << _2DTexturedVertexData(QVector2D(-1.0, -1.0), QVector2D(0.0, 0.0))
+    // copyTriangles << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0.0, 1.0))
+    //                 << _2DTexturedVertexData(QVector2D(0.5, -1.0), QVector2D(0.75, 0.0))
+    //                 << _2DTexturedVertexData(QVector2D(-1.0, -1.0), QVector2D(0.0, 0.0))
 
-                    << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0.0, 1.0))
-                    << _2DTexturedVertexData(QVector2D(1.0, -0.5), QVector2D(1.0, 0.25))
-                    << _2DTexturedVertexData(QVector2D(0.5, -1.0), QVector2D(0.75, 0.0))
+    //                 << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0.0, 1.0))
+    //                 << _2DTexturedVertexData(QVector2D(1.0, -0.5), QVector2D(1.0, 0.25))
+    //                 << _2DTexturedVertexData(QVector2D(0.5, -1.0), QVector2D(0.75, 0.0))
 
-                    << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0.0, 1.0))
-                    << _2DTexturedVertexData(QVector2D(1.0, 1.0), QVector2D(1.0, 1.0))
-                    << _2DTexturedVertexData(QVector2D(1.0, -0.5), QVector2D(1.0, 0.25));
+    //                 << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0.0, 1.0))
+    //                 << _2DTexturedVertexData(QVector2D(1.0, 1.0), QVector2D(1.0, 1.0))
+    //                 << _2DTexturedVertexData(QVector2D(1.0, -0.5), QVector2D(1.0, 0.25));
 
     copyVbo.allocate(copyTriangles.constData(), copyTriangles.count() * sizeof(_2DTexturedVertexData));
 
-    glBindTexture(GL_TEXTURE_2D, m_fbo->texture());
-    glDrawArrays(GL_TRIANGLES, 0, copyTriangles.count());
+    // glBindTexture(GL_TEXTURE_2D, m_fbo->texture());
+    // glDrawArrays(GL_TRIANGLES, 0, copyTriangles.count());
 
     copyVbo.release();
     copyVbo.destroy();

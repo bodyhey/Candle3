@@ -6,13 +6,6 @@
 
 GLPalette::GLPalette() : m_colors(), m_indexes() {
     m_texture = nullptr;
-    // *this
-    //         << GLColor(1.0, 0.0, 0.0, 1.0)
-    //       << GLColor(0.0, 1.0, 0.0, 1.0)
-    //       << GLColor(0.0, 0.0, 1.0, 1.0);
-    // *this << GLColor(1.0, 0.0, 0.0, 1.0)
-    //       << GLColor(0.0, 1.0, 0.0, 1.0)
-    //       << GLColor(0.0, 0.0, 1.0, 1.0);
 }
 
 void GLPalette::initialize()
@@ -95,7 +88,7 @@ void GLPalette::generateTexture()
     }
     for (int i = m_colors.count(); i < MAX_COLORS; i++) {
         colorPalette[i][0] = 1.0;
-        colorPalette[i][1] = 0.0;
+        colorPalette[i][1] = 1.0;
         colorPalette[i][2] = 1.0;
         colorPalette[i][3] = 1.0;
     }

@@ -8,6 +8,7 @@
 #include <QPainter>
 #include <QEasingCurve>
 #include <QOpenGLDebugLogger>
+#include "glframebuffer.h"
 
 #ifdef GLES
 //#include <GLES/gl.h>
@@ -24,7 +25,7 @@
 #ifdef USE_GLWINDOW
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWindow(), m_defaultShaderProgram(0), m_gcodeShaderProgram(0), m_palette()
 #else
-GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(), m_defaultShaderProgram(0), m_gcodeShaderProgram(0), m_palette()
+GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent), m_defaultShaderProgram(0), m_gcodeShaderProgram(0), m_palette()
 #endif
 #else
 GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent), m_shaderProgram(0)
@@ -71,11 +72,12 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent), m_shaderProgram(0)
 
     QTimer::singleShot(1000, this, SLOT(onFramesTimer()));
 
-    //setMouseTracking(true);
+    // required for mouseMoveEvent to be called without clicking
+    setMouseTracking(true);
 
     // enable antialiasing
     QSurfaceFormat sf = format();
-    sf.setSamples(8);
+    sf.setSamples(16);
     setFormat(sf);
 }
 
@@ -476,6 +478,11 @@ void GLWidget::initializeGL()
     if (m_gcodeShaderProgram) {
         m_gcodeShaderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/gcode_vertex.glsl");
         m_gcodeShaderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/gcode_fragment.glsl");
+
+        // configure transform feedback which will be used to calculate min/max z values
+        const char* varyings[] = { "v_zpos" };
+        glTransformFeedbackVaryings(m_gcodeShaderProgram->programId(), 1, varyings, GL_INTERLEAVED_ATTRIBS);
+
         if (m_gcodeShaderProgram->link()) {
             qDebug() << "gcode shader program created";
         }
@@ -485,6 +492,8 @@ void GLWidget::initializeGL()
     m_copyProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/2dcopy_vertex.glsl");
     m_copyProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/2dcopy_fragment.glsl");
     m_copyProgram->link();
+    m_copyProgram->setUniformValue("u_texture", 0);
+    m_copyProgram->setUniformValue("u_depthTexture", 1);
 
     m_palette.initialize();
 
@@ -504,13 +513,16 @@ void GLWidget::updateProjection()
     m_projectionMatrix.setToIdentity();
 
     double aspectRatio = (double)width() / height();    
-    double orthoSize = m_zoomDistance * tan((m_fov * 0.0174533) / 2.0);
 
     // perspective / orthographic projection
     if (m_perspective) {
         m_projectionMatrix.perspective(m_fov, aspectRatio, m_near, m_far);
     } else {
-        m_projectionMatrix.ortho(-orthoSize * aspectRatio, orthoSize * aspectRatio, -orthoSize, orthoSize, -m_far/2.0, m_far/2.0);
+        double orthoSize = m_zoomDistance;// * tan((m_fov * 0.0174533) / 2.0);
+        m_projectionMatrix.ortho(-orthoSize * aspectRatio, orthoSize * aspectRatio, -orthoSize, orthoSize,
+//                                 -m_far/2.0, m_far/2.0
+                                 m_near, m_far
+        );
     }
 }
 
@@ -522,16 +534,20 @@ void GLWidget::updateView()
     double angY = M_PI / 180 * m_yRot;
     double angX = M_PI / 180 * m_xRot;
 
-    m_eye = QVector3D(cos(angX) * sin(angY), sin(angX), cos(angX) * cos(angY));
+    m_eye = QVector3D(cos(angX) * sin(angY), sin(angX), cos(angX) * cos(angY)).normalized();
+
     QVector3D up(fabs(m_xRot) == 90 ? -sin(angY + (m_xRot < 0 ? M_PI : 0)) : 0, cos(angX), fabs(m_xRot) == 90 ? -cos(angY + (m_xRot < 0 ? M_PI : 0)) : 0);
+    //QVector3D up(0, 0, 1);
 
     m_cubeDrawer.updateEyePosition(m_eye, up);
 
-    m_viewMatrix.lookAt(m_eye * m_zoomDistance, QVector3D(0,0,0), up.normalized());
+    //m_viewMatrix.lookAt(m_eye * m_zoomDistance, QVector3D(0,0,0), up.normalized());
+    if (m_perspective) {
+        m_eye *= m_zoomDistance;
+    }
+    m_viewMatrix.lookAt(m_eye, QVector3D(0,0,0), up.normalized());
     m_viewMatrix.rotate(-90, 1.0, 0.0, 0.0);
     m_viewMatrix.translate(-m_lookAt);
-
-    m_eye *= 1000;
 }
 
 void GLWidget::drawText(QPainter &painter, QPoint &pos, QString text, int lineHeight, Qt::AlignmentFlag align)
@@ -561,6 +577,8 @@ void GLWidget::paintGL() {
 void GLWidget::paintEvent(QPaintEvent *pe) {
     Q_UNUSED(pe)
 #endif
+    //m_zMinMax->getMinMax()
+
     QPainter painter(this);
 
     // Segment counter
@@ -578,30 +596,35 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
     // Update settings
     if (m_antialiasing) {
         if (m_msaa) glEnable(GL_MULTISAMPLE); else {
-            glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-            glEnable(GL_LINE_SMOOTH);
             glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
             glEnable(GL_POINT_SMOOTH);
         }
     }
+    glEnable(GL_LINE_SMOOTH);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
-    //if (m_zBuffer)
     glEnable(GL_DEPTH_TEST);
 
     QOpenGLShaderProgram *currentProgram = nullptr;
 
     if (m_gcodeShaderProgram) {
+        if (currentProgram && currentProgram != m_gcodeShaderProgram) {
+            currentProgram->release();
+        }
         currentProgram = m_gcodeShaderProgram;
         currentProgram->bind();
         currentProgram->setUniformValue("u_mvp_matrix", m_projectionMatrix * m_viewMatrix);
         currentProgram->setUniformValue("u_mv_matrix", m_viewMatrix);
-        currentProgram->setUniformValue("u_light_position", m_eye);
+        currentProgram->setUniformValue("u_light_position", QVector3D(100, 10, 100));
         currentProgram->setUniformValue("u_eye", m_eye);
+        currentProgram->setUniformValue("u_near", (GLfloat) m_near);
+        currentProgram->setUniformValue("u_far", (GLfloat) m_far);
+        // qDebug() << "Near: " << (GLfloat) m_near << ", Far: " << (GLfloat) m_far;
     }
 
     if (m_defaultShaderProgram) {
-        if (currentProgram != m_defaultShaderProgram) {
+        if (currentProgram && currentProgram != m_defaultShaderProgram) {
             currentProgram->release();
         }
         currentProgram = m_defaultShaderProgram;
@@ -628,7 +651,7 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
                 break;
         }
         if (currentProgram != newProgram) {
-            if (currentProgram != nullptr) {
+            if (currentProgram) {
                 currentProgram->release();
             }
             currentProgram = newProgram;
@@ -638,62 +661,127 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
         if (drawable->needsUpdateGeometry()) {
             drawable->updateGeometry(currentProgram, m_palette);
         }
+
         switch (drawable->programType()) {
         case ShaderDrawable::ProgramType::GCode: {
-            // QOpenGLFramebufferObject* m_fbo = new QOpenGLFramebufferObject(width(), height(), QOpenGLFramebufferObject::Depth, GL_TEXTURE_2D);
-            // m_fbo->bind();
+            // shadow
 
-            // m_gcodeShaderProgram->setUniformValue("u_shadow", true);
-            // drawable->draw(currentProgram);
+            GLFramebuffer fbo(width(), height());           
+            fbo.bind();
+            glClearColor(1.0, 1.0, 0.3, 0.0);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            m_gcodeShaderProgram->setUniformValue("u_shadow", true);
 
-            // m_fbo->release();
+            GLuint tfBuffer;
+            glGenBuffers(1, &tfBuffer);
+            glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, tfBuffer);
+            glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, drawable->getVertexCount() * sizeof(float), nullptr, GL_DYNAMIC_READ);
+            glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfBuffer);
+
+            glBeginTransformFeedback(GL_LINES);
+            drawable->draw(currentProgram);
+            glEndTransformFeedback();
+            fbo.release();
+
+            // fbo.dumpColorTexture("e:/color.png");
+            //fbo.dumpDepthTexture("e:/depth.png");
+
+            QString fboMinMax = fbo.dumpDepthMinMax();
+
+
+            //
+
+            glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, tfBuffer);
+            float* zData = (float*)glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, GL_READ_ONLY);
+
+            float zMin = 9999; // closest point
+            float zMax = -9999; // farthest point
+
+            for (size_t i = 0; i < drawable->getVertexCount(); i++) {
+                if (m_perspective) {
+                    zMin = std::min(zMin, zData[i]);
+                    zMax = std::max(zMax, zData[i]);
+                } else {
+                    zMin = std::min(zMin, zData[i]);
+                    zMax = std::max(zMax, zData[i]);
+                }
+            }
+
+            glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER);
+            glDeleteBuffers(1, &tfBuffer);
+
+            // final lines
+
+            currentProgram = m_gcodeShaderProgram;
+            currentProgram->bind();
+            currentProgram->setUniformValue("u_shadow", false);
 
             m_palette.bind();
+            // glDisable(GL_DEPTH_TEST);
+            glDepthFunc(GL_LEQUAL);
             drawable->draw(currentProgram);
+            glDepthFunc(GL_LESS);
+            // glEnable(GL_DEPTH_TEST);
             m_palette.release();
 
-            // m_copyProgram->bind();
+            currentProgram->release();
 
-            // QOpenGLBuffer copyVbo;
-            // copyVbo.create();
-            // copyVbo.bind();
+            // copy to screen
 
-            // m_copyProgram->setUniformValue("u_gcodeBgMode", true);
+            currentProgram = m_copyProgram;
+            currentProgram->bind();
 
-            // quintptr offset = 0;
+            QOpenGLBuffer copyVbo;
+            copyVbo.create();
+            copyVbo.bind();
 
-            // int vertexLocation = m_copyProgram->attributeLocation("a_position");
-            // m_copyProgram->enableAttributeArray(vertexLocation);
-            // m_copyProgram->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 2, 2 * 4 * 2);
+            currentProgram->setUniformValue("u_mode", 100);
+            currentProgram->setUniformValue("u_resolution", size());
+            currentProgram->setUniformValue("u_texture", 0);
+            currentProgram->setUniformValue("u_depthTexture", 1);
 
-            // offset += sizeof(QVector2D);
+            currentProgram->setUniformValue("u_offset", GLfloat(m_offset));
 
-            // int textureLocation = m_copyProgram->attributeLocation("a_texcoord");
-            // m_copyProgram->enableAttributeArray(textureLocation);
-            // m_copyProgram->setAttributeBuffer(textureLocation, GL_FLOAT, offset, 2, 2 * 4 * 2);
+            quintptr offset = 0;
 
-            // QVector<_2DTexturedVertexData> copyTriangles;
-            // copyTriangles << _2DTexturedVertexData(QVector2D(-1.0, -1.0), QVector2D(0, 0))
-            //                 << _2DTexturedVertexData(QVector2D(1.0, -1.0), QVector2D(1, 0))
-            //                 << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0, 1))
-            //                 << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0, 1))
-            //                 << _2DTexturedVertexData(QVector2D(1.0, -1.0), QVector2D(1, 0))
-            //                 << _2DTexturedVertexData(QVector2D(1.0, 1.0), QVector2D(1, 1));
+            int vertexLocation = m_copyProgram->attributeLocation("a_position");
+            currentProgram->enableAttributeArray(vertexLocation);
+            currentProgram->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 2, sizeof(_2DTexturedVertexData));
 
-            // copyVbo.allocate(copyTriangles.constData(), copyTriangles.count() * sizeof(_2DTexturedVertexData));
+            offset += sizeof(QVector2D);
 
-            // //m_palette.bind();
+            int textureLocation = m_copyProgram->attributeLocation("a_texcoord");
+            currentProgram->enableAttributeArray(textureLocation);
+            currentProgram->setAttributeBuffer(textureLocation, GL_FLOAT, offset, 2, sizeof(_2DTexturedVertexData));
 
-            // glBindTexture(GL_TEXTURE_2D, m_fbo->texture());
-            // // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            // glDrawArrays(GL_TRIANGLES, 0, copyTriangles.count());
+            QVector<_2DTexturedVertexData> copyTriangles;
+            // single triangle to draw the whole screen
+            copyTriangles << _2DTexturedVertexData(QVector2D(-1.0, -1.0), QVector2D(0, 0))
+                          << _2DTexturedVertexData(QVector2D(-1.0, 3.0), QVector2D(0, 2))
+                          << _2DTexturedVertexData(QVector2D(3.0, -1.0), QVector2D(2, 0));
+            copyVbo.allocate(copyTriangles.constData(), copyTriangles.count() * sizeof(_2DTexturedVertexData));
 
-            // copyVbo.release();
-            // copyVbo.destroy();
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, fbo.depthTexture());
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, fbo.colorTexture());
+            glDrawArrays(GL_TRIANGLES, 0, copyTriangles.count());
+            copyVbo.release();
 
-            // m_copyProgram->release();
+            currentProgram->release();
 
-            // delete m_fbo;
+            //
+
+            if (zMax != -9999) {
+                m_near = std::max(1.0f, (-zMax)) * 0.9;
+                m_far = (-zMin) * 1.1;
+
+                // qDebug() << "Near: " << m_near << ", Far: " << m_far << "depth: " << fboMinMax;
+
+                updateProjection();
+                updateView();
+            }
+
             break;
         }
         case ShaderDrawable::ProgramType::Default:
@@ -707,12 +795,11 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
 
     if (currentProgram != nullptr) {
         currentProgram->release();
+        currentProgram = nullptr;
     }
 
     if (m_rotationCube) {
         m_cubeDrawer.draw(QRect(0, height() - 100, 100, 100), m_palette);
-
-        //m_cubeDrawer.draw(QRect(0, height() - 100, 25, 25), m_palette);
 
         // viewport was changed by cube drawer
         glViewport(0, 0, this->width(), this->height());
@@ -742,7 +829,7 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
     drawText(painter, pos, QString("X: %1 ... %2").arg(m_xMin, 0, 'f', 3).arg(m_xMax, 0, 'f', 3), 15);
     drawText(painter, pos, QString("Y: %1 ... %2").arg(m_yMin, 0, 'f', 3).arg(m_yMax, 0, 'f', 3), 15);
     drawText(painter, pos, QString("Z: %1 ... %2").arg(m_zMin, 0, 'f', 3).arg(m_zMax, 0, 'f', 3), 15);
-    drawText(painter, pos, QString("%1 / %2 / %3").arg(m_xSize, 0, 'f', 3).arg(m_ySize, 0, 'f', 3).arg(m_zSize, 0, 'f', 3), 15);
+    drawText(painter, pos, QString("%1 / %2 / %3 / %4").arg(m_xSize, 0, 'f', 3).arg(m_ySize, 0, 'f', 3).arg(m_zSize, 0, 'f', 3).arg(m_perspective ? "p" : "o"), 15);
 
     QFontMetrics fm(painter.font());
 
@@ -761,7 +848,6 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
     drawText(painter, pos, QString("FPS: %1").arg(m_fps), 15, Qt::AlignRight);
 
     m_frames++;
-
 #ifdef GLES
     update();
 #endif
@@ -840,6 +926,9 @@ QPointF GLWidget::getClickPositionOnXYPlane(QVector2D mouseClickPosition, QMatri
     if (abs(intersection.x()) > 3000 || abs(intersection.y()) > 3000) {
         return QPointF(NAN, NAN);
     }
+
+    intersection.setX(round(intersection.x()));
+    intersection.setY(round(intersection.y()));
 
     return intersection.toPointF();
 }
@@ -941,6 +1030,8 @@ void GLWidget::wheelEvent(QWheelEvent *we)
 
     if (!m_perspective) updateProjection();
     else updateView();
+
+    qDebug() << m_zoomDistance;
 }
 
 void GLWidget::timerEvent(QTimerEvent *te)

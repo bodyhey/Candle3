@@ -31,7 +31,7 @@ class CursorDrawer : public ShaderDrawable
         double m_distanceFromSurface = 0;
         double m_endLength = 10;
         QPointF m_position = {0, 0};
-        QColor m_color = {255, 0, 0};
+        QColor m_color = {255, 255, 0};
         double m_rotationAngle = 0;
         high_resolution_clock m_clock;
         double normalizeAngle(double angle);

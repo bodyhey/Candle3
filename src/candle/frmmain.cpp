@@ -170,13 +170,13 @@ frmMain::frmMain(Configuration &configuration, QWidget *parent) :
 
     ui->widgetHeightmapSettings->setVisible(false);
 
-    ui->cmdToggleProjection->setParent(ui->glwVisualizer);
-    ui->cmdFit->setParent(ui->glwVisualizer);
-    ui->cmdIsometric->setParent(ui->glwVisualizer);
-    ui->cmdTop->setParent(ui->glwVisualizer);
-    ui->cmdFront->setParent(ui->glwVisualizer);
-    ui->cmdLeft->setParent(ui->glwVisualizer);
-    ui->cmdRotationCube->setParent(ui->glwVisualizer);
+    // ui->cmdToggleProjection->setParent(ui->glwVisualizer);
+    // ui->cmdFit->setParent(ui->glwVisualizer);
+    // ui->cmdIsometric->setParent(ui->glwVisualizer);
+    // ui->cmdTop->setParent(ui->glwVisualizer);
+    // ui->cmdFront->setParent(ui->glwVisualizer);
+    // ui->cmdLeft->setParent(ui->glwVisualizer);
+    // ui->cmdRotationCube->setParent(ui->glwVisualizer);
 
     ui->cmdHeightMapBorderAuto->setMinimumHeight(ui->chkHeightMapBorderShow->sizeHint().height());
     ui->cmdHeightMapCreate->setMinimumHeight(ui->cmdFileOpen->sizeHint().height());
@@ -354,17 +354,10 @@ void frmMain::initializeCommunicator()
 
 void frmMain::initializeVisualizer()
 {
-    *ui->glwVisualizer << &m_tableSurfaceDrawer
-                       << m_originDrawer
-                       << m_codeDrawer
-                       << m_probeDrawer
-                       << &m_toolDrawer
-                       << &m_cursorDrawer
-                       << &m_heightmapBorderDrawer
-                       << &m_heightmapGridDrawer
-                       << &m_heightmapInterpolationDrawer
-                       << &m_selectionDrawer
-                       << &m_machineBoundsDrawer;
+    *ui->glwVisualizer << &m_tableSurfaceDrawer << m_originDrawer << m_codeDrawer << m_probeDrawer
+                       << &m_toolDrawer << &m_cursorDrawer << &m_heightmapBorderDrawer
+                       << &m_heightmapGridDrawer << &m_heightmapInterpolationDrawer
+                       << &m_selectionDrawer << &m_machineBoundsDrawer;
 
     ui->glwVisualizer->fitDrawable();
 }

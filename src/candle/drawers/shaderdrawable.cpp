@@ -17,7 +17,7 @@ ShaderDrawable::ShaderDrawable()
 
 ShaderDrawable::~ShaderDrawable()
 {
-    if (!m_vao.isCreated()) m_vao.destroy();
+    //if (!m_vao.isCreated()) m_vao.destroy();
     if (!m_vbo.isCreated()) m_vbo.destroy();
 }
 
@@ -27,7 +27,7 @@ void ShaderDrawable::init()
     initializeOpenGLFunctions();
 
     // Create buffers
-    m_vao.create();
+    //m_vao.create();
     m_vbo.create();
 }
 
@@ -61,9 +61,10 @@ void ShaderDrawable::bindAttributes(QOpenGLShaderProgram *&shaderProgram)
 
     // Tell OpenGL programmable pipeline how to locate vertex line start point
     pos = shaderProgram->attributeLocation("a_start");
-    assert(pos >= 0);
-    shaderProgram->enableAttributeArray(pos);
-    shaderProgram->setAttributeBuffer(pos, GL_FLOAT, offset, 3, sizeof(VertexData));
+    if (pos > 0) {
+        shaderProgram->enableAttributeArray(pos);
+        shaderProgram->setAttributeBuffer(pos, GL_FLOAT, offset, 3, sizeof(VertexData));
+    }
 }
 
 void ShaderDrawable::updateGeometry(QOpenGLShaderProgram *shaderProgram, GLPalette &palette)
@@ -72,9 +73,9 @@ void ShaderDrawable::updateGeometry(QOpenGLShaderProgram *shaderProgram, GLPalet
     if (!m_vbo.isCreated())
         init();
 
-    if (m_vao.isCreated()) {
-        m_vao.bind();
-    }
+    // if (m_vao.isCreated()) {
+    //     //m_vao.bind();
+    // }
 
     // Prepare vbo
     m_vbo.bind();
@@ -89,17 +90,17 @@ void ShaderDrawable::updateGeometry(QOpenGLShaderProgram *shaderProgram, GLPalet
                        vertexData.count() * sizeof(VertexData));
     } else {
         m_vbo.release();
-        if (m_vao.isCreated())
-            m_vao.release();
+        // if (m_vao.isCreated())
+        //     m_vao.release();
         m_needsUpdateGeometry = false;
 
         return;
     }
 
-    if (m_vao.isCreated()) {
-        bindAttributes(shaderProgram);
-        m_vao.release();
-    }
+    // if (m_vao.isCreated()) {
+    //     bindAttributes(shaderProgram);
+    //     m_vao.release();
+    // }
 
     m_vbo.release();
 
@@ -129,34 +130,35 @@ void ShaderDrawable::draw(QOpenGLShaderProgram *shaderProgram)
 {
     if (!m_visible) return;
 
-    if (m_vao.isCreated()) {
-        m_vao.bind();
-    } else {
+    // if (m_vao.isCreated()) {
+    //     m_vao.bind();
+    // } else {
         m_vbo.bind();        
         bindAttributes(shaderProgram);
-    }
+    // }
 
     // setAttributeBuffer must used every time, because it is not stored in VAO??
     //shaderProgram->setAttributeValue("a_alpha", m_globalAlpha);
 
-    if (!m_triangles.isEmpty()) {
-        // if (m_texture) {
-        //     m_texture->bind();
-        //     shaderProgram->setUniformValue("texture", 0);
-        // }
-        glDrawArrays(GL_TRIANGLES, 0, m_triangles.count());
-    }
+    // if (!m_triangles.isEmpty()) {
+    //     // if (m_texture) {
+    //     //     m_texture->bind();
+    //     //     shaderProgram->setUniformValue("texture", 0);
+    //     // }
+    //     glDrawArrays(GL_TRIANGLES, 0, m_triangles.count());
+    // }
 
     if (!m_lines.isEmpty()) {
         glLineWidth(m_lineWidth);
         glDrawArrays(GL_LINES, m_triangles.count(), m_lines.count());
     }
 
-    if (!m_points.isEmpty()) {
-        glDrawArrays(GL_POINTS, m_triangles.count() + m_lines.count(), m_points.count());
-    }
+    // if (!m_points.isEmpty()) {
+    //     glDrawArrays(GL_POINTS, m_triangles.count() + m_lines.count(), m_points.count());
+    // }
 
-    if (m_vao.isCreated()) m_vao.release(); else m_vbo.release();
+    //if (m_vao.isCreated()) m_vao.release(); else
+    m_vbo.release();
 }
 
 QVector3D ShaderDrawable::getSizes()
@@ -176,7 +178,7 @@ QVector3D ShaderDrawable::getMaximumExtremes()
 
 int ShaderDrawable::getVertexCount()
 {
-    return m_lines.count() + m_points.count() + m_triangles.count();
+    return m_lines.count();// + m_points.count() + m_triangles.count();
 }
 
 double ShaderDrawable::lineWidth() const

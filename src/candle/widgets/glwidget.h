@@ -17,6 +17,7 @@
 #include "drawers/shaderdrawable.h"
 #include "drawers/cubedrawer.h"
 #include "glpalette.h"
+#include "glzminmax.h"
 
 #ifdef GLES
 #ifdef USE_GLWINDOW
@@ -106,6 +107,11 @@ public:
     void setPinState(const QString &pinState);
 
     void updateDrawer(ShaderDrawable *);
+
+    void setOffset(double val) {
+        m_offset = val;
+    }
+
 signals:
     void rotationChanged();
     void cursorPosChanged(QPointF);
@@ -128,6 +134,7 @@ private:
     double m_xMin, m_xMax, m_yMin, m_yMax, m_zMin, m_zMax, m_xSize, m_ySize, m_zSize;
     double m_lineWidth;
     double m_pointSize;
+    double m_offset;
     bool m_antialiasing;
     bool m_msaa;
     bool m_vsync;
@@ -163,6 +170,7 @@ private:
     QMatrix4x4 m_viewMatrix;
     GLPalette m_palette;
     CubeDrawer m_cubeDrawer;
+    //GLZMinMax m_zMinMax;
 
     QColor m_colorBackground;
     QColor m_colorText;

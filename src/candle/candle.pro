@@ -160,11 +160,13 @@ SOURCES += main.cpp\
     widgets/combobox.cpp \
     widgets/comboboxkey.cpp \
     widgets/glcontainer.cpp \
+    widgets/glframebuffer.cpp \
     widgets/glpalette.cpp \
     widgets/glwidget.cpp \
     drawers/selectiondrawer.cpp \
     scripting/scriptvars.cpp \
     widgets/dropwidget.cpp \
+    widgets/glzminmax.cpp \
     widgets/qpushbuttonwithmenu.cpp
 
 HEADERS  += frmmain.h \
@@ -257,11 +259,13 @@ HEADERS  += frmmain.h \
     widgets/combobox.h \
     widgets/comboboxkey.h \
     widgets/glcontainer.h \
+    widgets/glframebuffer.h \
     widgets/glpalette.h \
     widgets/glwidget.h \
     drawers/selectiondrawer.h \
     scripting/scriptvars.h \
     widgets/dropwidget.h \
+    widgets/glzminmax.h \
     widgets/qpushbuttonwithmenu.h
 
 FORMS    += frmmain.ui \
@@ -326,5 +330,6 @@ DISTFILES += \
     shaders/cube_fragment.glsl \
     shaders/cube_vertex.glsl \
     shaders/gcode_fragment.glsl \
-    shaders/gcode_vertex.glsl
+    shaders/gcode_vertex.glsl \
+    shaders/zminmax_vertex.glsl
 

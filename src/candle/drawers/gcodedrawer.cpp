@@ -74,11 +74,6 @@ void GcodeDrawer::computeNormals()
             normal.normalize();
             m_lines[i - 1].start = normal;
             m_lines[i].start = normal;
-
-            // newPoints.append(VertexData(m_lines[i - 1].position, Util::colorToVector(Qt::black), normal));
-            // QVector3D p3 = m_lines[i - 1].position;
-            // p3 += normal * 2.0;
-            // newPoints.append(VertexData(p3, Util::colorToVector(Qt::black), normal));
         }
         normal.normalize();
         lastNormal = normal;
@@ -290,24 +285,10 @@ bool GcodeDrawer::updateVectors(GLPalette &palette)
     return !data;
 }
 
-// void GcodeDrawer::setImagePixelColor(QImage &image, double x, double y, QRgb color) const
+// QVector3D GcodeDrawer::getSegmentColorVector(LineSegment& segment)
 // {
-//     if (qIsNaN(x) || qIsNaN(y)) {
-//         qDebug() << "Error updating pixel" << x << y;
-//         return;
-//     };
-
-//     uchar* pixel = image.scanLine((int)y);
-
-//     *(pixel + (int)x * 3) = qRed(color);
-//     *(pixel + (int)x * 3 + 1) = qGreen(color);
-//     *(pixel + (int)x * 3 + 2) = qBlue(color);
+//     return Util::colorToVector(getSegmentColor(segment));
 // }
-
-QVector3D GcodeDrawer::getSegmentColorVector(LineSegment& segment)
-{
-    return Util::colorToVector(getSegmentColor(segment));
-}
 
 QColor GcodeDrawer::getSegmentColor(LineSegment& segment)
 {
@@ -348,7 +329,9 @@ QVector3D GcodeDrawer::getMinimumExtremes()
 QVector3D GcodeDrawer::getMaximumExtremes()
 {
     QVector3D v = m_viewParser->getMaximumExtremes();
-    if (m_ignoreZ) v.setZ(0);
+    if (m_ignoreZ) {
+        v.setZ(0);
+    }
 
     return v;
 }

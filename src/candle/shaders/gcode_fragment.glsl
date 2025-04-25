@@ -13,9 +13,15 @@ in vec4 v_color;
 in vec3 v_normal;
 in vec3 v_light_direction;
 in vec3 v_eye;
+in float v_log_depth;
 
 uniform sampler2D u_texture;
 uniform bool u_shadow;
+uniform float u_near;
+uniform float u_far;
+
+out vec4 gl_FragColor;
+;
 
 //out vec4 fragColor;
 
@@ -26,12 +32,18 @@ uniform bool u_shadow;
 
 void main()
 {
+//    gl_FragDepth = v_log_depth;
     if (u_shadow) {
-        gl_FragColor = vec4(1.0);
+        //dark
+        gl_FragColor = vec4(0.9, 0.0, 0.5, 1.0);
+        //light
+        //gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
         return;
     }
 
-    vec3 lightColor = vec3(0.5, 0.0, 0.5);
+
+
+    //vec3 lightColor = vec3(0.5, 0.0, 0.5);
 
     // Draw dash lines
     // if (!isNan(v_start.x)) {
@@ -50,9 +62,11 @@ void main()
 
     // calc specular light
     vec3 reflectDir = reflect(-v_light_direction, v_normal);
-
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
 
+    // ambient light
+    float ambient = 0.7;
+
     // calc fragment color
-    gl_FragColor = vec4(v_color.rgb * (diff + 0.3) + spec, v_color.a);
+    gl_FragColor = vec4(v_color.rgb * (diff + ambient) + spec, v_color.a);
 }
