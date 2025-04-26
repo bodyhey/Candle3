@@ -49,15 +49,15 @@ private:
     QOpenGLShaderProgram *m_program;
     QOpenGLShaderProgram *m_copyProgram;;
     QPropertyAnimation m_animation;
-
     CubeClickableFace m_faceAtCursor = CubeClickableFace::None;
-
     void init();
     void initAttributes();
     void updateGeometry(GLPalette &palette);
     void drawBackground();
     void drawCube(GLPalette &palette);
     void setEye(float pos);
+    void drawToBuffer(GLPalette &palette);
+    void copyToScreen(QRect dest);
 };
 
 #endif // CUBEDRAWER_H

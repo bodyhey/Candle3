@@ -13,13 +13,17 @@ void GLPalette::initialize()
     generateTexture();
 }
 
-void GLPalette::bind()
+void GLPalette::bind(GLuint unit)
 {
     if (m_updated) {
         generateTexture();
     }
 
-    m_texture->bind();
+    if (unit == -1) {
+        m_texture->bind();
+    } else {
+        m_texture->bind(unit);
+    }
 }
 
 void GLPalette::release()

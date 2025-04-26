@@ -27,34 +27,21 @@ CubeDrawer::CubeDrawer() : m_eye({0, 0, 1}), m_animation(this, "faceAnimation")
 void CubeDrawer::drawBackground()
 {
     glClearColor(0.2, 0.2, 0.0, 0.0);
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-// dest is normalized to -1, 1
-void CubeDrawer::draw(QRect dest, GLPalette &palette)
+void CubeDrawer::drawToBuffer(GLPalette &palette)
 {
-    if (!m_vbo.isCreated())
-        init();
-
     m_fbo->bind();
-
     glViewport(0, 0, this->m_width, this->m_height);
     glEnable(GL_BLEND);
     drawBackground();
     drawCube(palette);
-
     m_fbo->release();
+}
 
-    glViewport(dest.x(), dest.y(), dest.width(), dest.height());
-
-    //
-    // glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo->handle());
-    // glBlitFramebuffer(
-    //     0, 0, m_width, m_height,
-    //     dest.x(), dest.y(), dest.x() + m_width, dest.y() + m_height,
-    //     GL_COLOR_BUFFER_BIT, GL_LINEAR
-    // );
-
+void CubeDrawer::copyToScreen(QRect dest)
+{
     m_copyProgram->bind();
 
     QOpenGLBuffer copyVbo;
@@ -75,37 +62,42 @@ void CubeDrawer::draw(QRect dest, GLPalette &palette)
 
     m_copyProgram->setUniformValue("u_mode", 3);
     m_copyProgram->setUniformValue("u_resolution", QVector2D(SIZE * MULTISAMPLE, SIZE * MULTISAMPLE));
+    m_copyProgram->setUniformValue("u_texture", 0);
 
     QVector<_2DTexturedVertexData> copyTriangles;
+    // copyTriangles << _2DTexturedVertexData(QVector2D(-1.0, -1.0), QVector2D(0, 0))
+    //               << _2DTexturedVertexData(QVector2D(1.0, -1.0), QVector2D(1, 0))
+    //               << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0, 1))
+    //               << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0, 1))
+    //               << _2DTexturedVertexData(QVector2D(1.0, -1.0), QVector2D(1, 0))
+    //               << _2DTexturedVertexData(QVector2D(1.0, 1.0), QVector2D(1, 1));
+    // use single triangle to cover the whole screen
     copyTriangles << _2DTexturedVertexData(QVector2D(-1.0, -1.0), QVector2D(0, 0))
-                    << _2DTexturedVertexData(QVector2D(1.0, -1.0), QVector2D(1, 0))
-                    << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0, 1))
-                    << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0, 1))
-                    << _2DTexturedVertexData(QVector2D(1.0, -1.0), QVector2D(1, 0))
-                    << _2DTexturedVertexData(QVector2D(1.0, 1.0), QVector2D(1, 1));
-
-    // 3 triangles are used to draw chamfered corner
-    // copyTriangles << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0.0, 1.0))
-    //                 << _2DTexturedVertexData(QVector2D(0.5, -1.0), QVector2D(0.75, 0.0))
-    //                 << _2DTexturedVertexData(QVector2D(-1.0, -1.0), QVector2D(0.0, 0.0))
-
-    //                 << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0.0, 1.0))
-    //                 << _2DTexturedVertexData(QVector2D(1.0, -0.5), QVector2D(1.0, 0.25))
-    //                 << _2DTexturedVertexData(QVector2D(0.5, -1.0), QVector2D(0.75, 0.0))
-
-    //                 << _2DTexturedVertexData(QVector2D(-1.0, 1.0), QVector2D(0.0, 1.0))
-    //                 << _2DTexturedVertexData(QVector2D(1.0, 1.0), QVector2D(1.0, 1.0))
-    //                 << _2DTexturedVertexData(QVector2D(1.0, -0.5), QVector2D(1.0, 0.25));
+                << _2DTexturedVertexData(QVector2D(-1.0, 3.0), QVector2D(0, 2))
+                << _2DTexturedVertexData(QVector2D(3.0, -1.0), QVector2D(2, 0));
 
     copyVbo.allocate(copyTriangles.constData(), copyTriangles.count() * sizeof(_2DTexturedVertexData));
 
-    // glBindTexture(GL_TEXTURE_2D, m_fbo->texture());
-    // glDrawArrays(GL_TRIANGLES, 0, copyTriangles.count());
+    glViewport(dest.x(), dest.y(), dest.width(), dest.height());
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_fbo->texture());
+
+    glDrawArrays(GL_TRIANGLES, 0, copyTriangles.count());
 
     copyVbo.release();
     copyVbo.destroy();
 
     m_copyProgram->release();
+}
+
+// dest is normalized to -1, 1
+void CubeDrawer::draw(QRect dest, GLPalette &palette)
+{
+    if (!m_vbo.isCreated()) {
+        init();
+    }
+    drawToBuffer(palette);
+    copyToScreen(dest);
 }
 
 void CubeDrawer::setProjection()
@@ -255,8 +247,9 @@ void CubeDrawer::initAttributes()
 
 void CubeDrawer::updateGeometry(GLPalette &palette)
 {
-    if (!m_vbo.isCreated())
+    if (!m_vbo.isCreated()) {
         init();
+    }
 
     if (m_vao.isCreated()) {
         m_vao.bind();
@@ -330,9 +323,7 @@ void CubeDrawer::drawCube(GLPalette &palette)
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
-    glActiveTexture(GL_TEXTURE0);
-
-    palette.bind();
+    palette.bind(GL_TEXTURE0);
     glDrawArrays(GL_TRIANGLES, 0, m_triangles.count());
     glDrawArrays(GL_LINES, m_triangles.count(), m_lines.count());
     palette.release();

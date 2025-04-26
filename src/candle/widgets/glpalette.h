@@ -14,7 +14,7 @@ class GLPalette
     public:
         GLPalette();
         void initialize();
-        void bind();
+        void bind(GLuint unit = -1);
         void release();
         int color(float r, float g, float b)
         {

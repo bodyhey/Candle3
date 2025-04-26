@@ -8,7 +8,7 @@
 #include <QPainter>
 #include <QEasingCurve>
 #include <QOpenGLDebugLogger>
-#include "glframebuffer.h"
+//#include "glframebuffer.h"
 
 #ifdef GLES
 //#include <GLES/gl.h>
@@ -493,7 +493,7 @@ void GLWidget::initializeGL()
     m_copyProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/2dcopy_fragment.glsl");
     m_copyProgram->link();
     m_copyProgram->setUniformValue("u_texture", 0);
-    m_copyProgram->setUniformValue("u_depthTexture", 1);
+    // m_copyProgram->setUniformValue("u_depthTexture", 1);
 
     m_palette.initialize();
 
@@ -642,7 +642,7 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
             case ShaderDrawable::ProgramType::GCode: {
                 GcodeDrawer *gcodeDrawable = static_cast<GcodeDrawer*>(drawable);
                 gcodeDrawable->setEyePos(m_eye);
-                //gcodeDrawable->update();
+                // gcodeDrawable->update();
                 newProgram = m_gcodeShaderProgram;
                 break;
             }
@@ -669,46 +669,42 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
             currentProgram->setUniformValue("u_shadow", false);
 
             m_palette.bind();
-            // glDisable(GL_DEPTH_TEST);
-            glDepthFunc(GL_LEQUAL);
             drawable->draw(currentProgram);
-            glDepthFunc(GL_LESS);
-            // glEnable(GL_DEPTH_TEST);
             m_palette.release();
 
             currentProgram->release();
 
             // copy to screen
 
-            currentProgram = m_copyProgram;
-            currentProgram->bind();
+            // currentProgram = m_copyProgram;
+            // currentProgram->bind();
 
-            QOpenGLBuffer copyVbo;
-            copyVbo.create();
-            copyVbo.bind();
+            // QOpenGLBuffer copyVbo;
+            // copyVbo.create();
+            // copyVbo.bind();
 
-            currentProgram->setUniformValue("u_mode", 100);
-            currentProgram->setUniformValue("u_resolution", size());
-            currentProgram->setUniformValue("u_texture", 0);
-            currentProgram->setUniformValue("u_depthTexture", 1);
+            // currentProgram->setUniformValue("u_mode", 100);
+            // currentProgram->setUniformValue("u_resolution", size());
+            // currentProgram->setUniformValue("u_texture", 0);
+            // currentProgram->setUniformValue("u_depthTexture", 1);
 
-            currentProgram->setUniformValue("u_offset", GLfloat(m_offset));
+            // currentProgram->setUniformValue("u_offset", GLfloat(m_offset));
 
-            quintptr offset = 0;
+            // quintptr offset = 0;
 
-            int vertexLocation = m_copyProgram->attributeLocation("a_position");
-            currentProgram->enableAttributeArray(vertexLocation);
-            currentProgram->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 2, sizeof(_2DTexturedVertexData));
+            // int vertexLocation = m_copyProgram->attributeLocation("a_position");
+            // currentProgram->enableAttributeArray(vertexLocation);
+            // currentProgram->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 2, sizeof(_2DTexturedVertexData));
 
-            offset += sizeof(QVector2D);
+            // offset += sizeof(QVector2D);
 
-            int textureLocation = m_copyProgram->attributeLocation("a_texcoord");
-            currentProgram->enableAttributeArray(textureLocation);
-            currentProgram->setAttributeBuffer(textureLocation, GL_FLOAT, offset, 2, sizeof(_2DTexturedVertexData));
+            // int textureLocation = m_copyProgram->attributeLocation("a_texcoord");
+            // currentProgram->enableAttributeArray(textureLocation);
+            // currentProgram->setAttributeBuffer(textureLocation, GL_FLOAT, offset, 2, sizeof(_2DTexturedVertexData));
 
-            copyVbo.release();
+            // copyVbo.release();
 
-            currentProgram->release();
+            // currentProgram->release();
             break;
         }
         case ShaderDrawable::ProgramType::Default:
@@ -726,6 +722,7 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
     }
 
     if (m_rotationCube) {
+        glDisable(GL_DEPTH_TEST);
         m_cubeDrawer.draw(QRect(0, height() - 100, 100, 100), m_palette);
 
         // viewport was changed by cube drawer

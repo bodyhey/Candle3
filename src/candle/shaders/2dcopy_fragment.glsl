@@ -7,11 +7,9 @@ precision mediump float;
 #endif
 
 uniform sampler2D u_texture;
-uniform sampler2D u_depthTexture;
 uniform int u_mode;
 // == texture size
 uniform vec2 u_resolution;
-
 uniform float u_offset;
 
 in vec2 v_texcoord;
@@ -323,48 +321,12 @@ vec4 BilinearTextureSample(sampler2D tex, vec2 resolution, vec2 P) {
 void main() {
     if (u_mode == 0) {
         fragColor = Sample(u_texture, v_texcoord);
-        gl_FragDepth = Sample(u_depthTexture, v_texcoord).r;
     } else if (u_mode == 1) {
         fragColor = ApplyFXAA(u_texture, u_resolution, v_texcoord);
-        gl_FragDepth = Sample(u_depthTexture, v_texcoord).r + 0.00005;
     } else if (u_mode == 2) {
         fragColor = BicubicCatmullRomTextureSample(u_texture, u_resolution, v_texcoord);
-//        gl_FragDepth = Sample(u_depthTexture, v_texcoord).r;
     } else if (u_mode == 3) {
         fragColor = BilinearTextureSample(u_texture, u_resolution, v_texcoord);
-    } else if (u_mode == 100) {
-        // vec4 color = Sample(u_texture, v_texcoord);
-        // float depth = Sample(u_depthTexture, v_texcoord).r;
-        // bool isLine = color.r != 1.0;
-
-        vec4 color = vec4(0.0);
-        int steps = 4; // Sample count around the current pixel
-        float thickness = 3.0; // "Grubość" linii (w jednostkach tekstury)
-        float stepSize = thickness / float(steps); // Odległość pomiędzy próbkami
-        float depthValue = 1.0;
-        vec2 texelSize = 1.0 / u_resolution; // Rozmiar jednego piksela tekstury
-//        float max = 0.35;
-
-        for (int i = -steps; i <= steps; i++) {
-            for (int j = -steps; j <= steps; j++) {
-                vec2 offset = vec2(float(i), float(j)) * texelSize * stepSize;
-                color += Sample(u_texture, v_texcoord + offset);
-                depthValue = min(depthValue, Sample(u_depthTexture, v_texcoord + offset).r);
-            }
-        }
-
-        color /= pow(float(2 * steps + 1), 2.0);
-
-        fragColor = color;
-        fragColor.a *= 4.0;
-
-        // if (isLine && depth <= depthValue + (0.005 * depth)) {
-        //     fragColor = vec4(0.0, 1.0, 0.0, 1.0);
-        //     return;
-        // }
-
-        // gl_FragDepth = depthValue + (min * rate * depth2);
-        gl_FragDepth = depthValue + u_offset;
     }
 }
 
