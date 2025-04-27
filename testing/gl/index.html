@@ -2,8 +2,8 @@
     <body>
         <canvas
             id="glcanvas"
-            width="640"
-            height="640"
+            width="800"
+            height="600"
             onmousewheel="glWidget.zoom(event);"
             onmousedown="glWidget.onMouseDown(event);"
             onmouseup="glWidget.onMouseUp(event);"
@@ -12,38 +12,30 @@
         </canvas>
     </body>
     <head>
+        <script>
+            console.clear();
+        </script>
         <style>
             body { margin: 0; }
             canvas { border: 1px solid black; }
         </style>
-        <script src="shaders.js"></script>
         <script src="gl-matrix.js"></script>
-        <script src="webgl-debug.js"></script>
-        <script>
-
-            const ZOOMSTEP = 1.1;
-            const DEFAULT_ZOOM = 5600.0;
-            const MIN_ZOOM = 0.2;
-            const ONE_DEG_IN_RAD = 0.0174533;
-            const MAGIC_ZOOM_MULTIPLIER = 1.9;
-            const M_PI = Math.PI;
-
-            const GL_FLOAT_SIZE = 4;
-            const VECTOR3D_SIZE = 3 * GL_FLOAT_SIZE;
-            const VERTEX_SIZE = 3 * VECTOR3D_SIZE;
-
-            window.toRadians = glMatrix.glMatrix.toRadian;
-
-            function qIsNaN(value) {
-                return isNaN(value);
-            }
-
-        </script>
-        <script src="color.js"></script>
         <script src="vertex.js"></script>
+        <script src="vertexdata.js"></script>
+        <script src="utils.js"></script>
+        <script src="cube_.js"></script>
+        <script src="shaders1.js"></script>
+        <script src="shaders2.js"></script>
+        <script src="shaders2d.js"></script>
+        <script src="shaders1cube.js"></script>
+        <script src="webgl-debug.js"></script>
+        <script src="color.js"></script>
         <script src="test.js"></script>
+        <script src="cube.js"></script>
         <script src="shaderprogram.js"></script>
-        <script src="shaderdrawable.js"></script>
+        <script src="shaderdrawable1.js"></script>
+        <script src="shaderdrawable2.js"></script>
+        <script src="shaderdrawable3.js"></script>
         <script src="glwidget.js"></script>
         <script>
 
@@ -52,29 +44,57 @@
                 alert("Failed to retrieve the <canvas> element");
             }
 
-            let gl = canvas.getContext("webgl2");
+            let gl = canvas.getContext("webgl2", { antialias: true });
 
-            // gl = WebGLDebugUtils.makeDebugContext(gl,
-            //     function (err, funcName, args) {
-            //         throw(WebGLDebugUtils.glEnumToString(err) + " was caused by call to " + funcName);
-            //     }
-            // );
+            console.log(gl.getParameter(gl.ALIASED_LINE_WIDTH_RANGE));
+            
+            window.extensions = [];
+            window.extensions['anis'] = gl.getExtension('EXT_texture_filter_anisotropic');
 
-            const glWidget = new GLWidget();
-            setInterval(() => {
+            gl = WebGLDebugUtils.makeDebugContext(gl,
+                function (err, funcName, args) {
+                    throw(WebGLDebugUtils.glEnumToString(err) + " was caused by call to " + funcName);
+                }
+            );
+
+            const glWidget = new GLWidget(new Cube(100, 100));
+            let fpsElem;
+            let then = 0;
+
+            let fpss = [0]
+
+            function draw(now) {
                 glWidget.paintEvent();
                 glWidget.rotate();
-            }, 10);
+
+                requestAnimationFrame(draw);
+
+                now *= 0.001;                          // convert to seconds
+                const deltaTime = now - then;          // compute time since last frame
+                then = now;                            // remember time for next frame
+                const fps = 1 / deltaTime;             // compute frames per second
+                if (!fpsElem) {
+                    fpsElem = document.getElementById("fps");
+                }
+                if (fpsElem) {
+                    fpsElem.textContent = fps.toFixed(1);  // update fps display                
+                }
+                console.log(fps);
+            };
+
+            requestAnimationFrame(draw);
 
             function fit() {
                 glWidget.fit();
             }
 
         </script><br/>
+        FPS: <span id="fps"></span>
         <button onClick="fit();">Fit</button>
         <button onClick="glWidget.setLeftView();">Left</button>
         <button onClick="glWidget.setTopView();">Top</button>
         <button onClick="glWidget.setFrontView();">Front</button>
         <button onClick="glWidget.setIsometricView();">Isometric</button>
+        <button onClick="glWidget.setPerspectiveView();">Perspective</button>
     </head>
 </html>

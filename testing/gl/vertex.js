@@ -2,7 +2,7 @@
 class VertexData {
     m_position;
     m_color;
-    m_start;
+    m_start; // = m_normal
 
     constructor(position, color, start) {
         this.m_position = position;
@@ -12,8 +12,17 @@ class VertexData {
 }
 
 class Vertexes extends Array {
-    constructor() {
+    constructor(data) {
         super();
+
+        if (data == null) {
+            return;
+        }
+        for (a of data) {
+            this.push(a);
+        }
+
+        console.log("Vertexes", this);
     }
 
     pushVertex(position, color, start) {
@@ -21,13 +30,29 @@ class Vertexes extends Array {
     }
 
     toRawArray() {
-        const raw = [];
+        const raw = new Array(this.length * 9);
+        let index = 0;
         for (const vertex of this) {
-            raw.push(...vertex.m_position);
-            raw.push(...vertex.m_color);
-            raw.push(...vertex.m_start);
+            // if (Array.isArray(vertex.m_color) || typeof vertex.m_color === 'object') {
+            //     console.debug(vertex.m_color);
+            //     throw 'a';
+            // }
+            raw[index++] = vertex.m_position[0];
+            raw[index++] = vertex.m_position[1];
+            raw[index++] = vertex.m_position[2];
+            if (typeof vertex.m_color === 'object') {
+                raw[index++] = vertex.m_color[0];
+                raw[index++] = vertex.m_color[1];
+                raw[index++] = vertex.m_color[2];
+            } else {
+                raw[index++] = vertex.m_color;
+                // raw[index++] = vertex.m_color;
+                // raw[index++] = vertex.m_color;
+            }
+            raw[index++] = vertex.m_start[0];
+            raw[index++] = vertex.m_start[1];
+            raw[index++] = vertex.m_start[2];
         }
         return raw;
-        return new Float32Array(raw)    ;
     }
 }
