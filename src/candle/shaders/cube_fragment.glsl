@@ -3,7 +3,6 @@
 precision mediump int;
 precision mediump float;
 #endif
-
 uniform sampler2D u_palette;
 
 varying vec4 v_color;

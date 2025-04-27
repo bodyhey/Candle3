@@ -44,7 +44,7 @@ void Camera::setCamera(const QCameraDevice &cameraDevice)
         m_camera->stop();
     }
 
-    qDebug() << cameraDevice.description();
+    qDebug() << "Camera device:" << cameraDevice.description();
 
     m_camera.reset(new QCamera(cameraDevice));
     m_captureSession.setCamera(m_camera.data());
