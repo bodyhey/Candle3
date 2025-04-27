@@ -11,8 +11,6 @@
 
 CubeDrawer::CubeDrawer() : m_eye({0, 0, 1}), m_animation(this, "faceAnimation")
 {
-    m_fbo = nullptr;
-
     m_width = SIZE * MULTISAMPLE;
     m_height = SIZE * MULTISAMPLE;
     m_triangles = cube;
@@ -224,6 +222,8 @@ void CubeDrawer::init()
     m_copyProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/2dcopy_vertex.glsl");
     m_copyProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/2dcopy_fragment.glsl");
     m_copyProgram->link();
+
+    m_texture = new QOpenGLTexture(QImage(":/images/cube_texture.png").mirrored());
 }
 
 void CubeDrawer::initAttributes()
@@ -232,17 +232,19 @@ void CubeDrawer::initAttributes()
 
     int vertexLocation = m_program->attributeLocation("a_position");
     m_program->enableAttributeArray(vertexLocation);
-    m_program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3,
-                                  sizeof(VertexData));
+    m_program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
 
-    offset = sizeof(QVector3D);
+    offset += sizeof(QVector2D);
 
     int colorLocation = m_program->attributeLocation("a_color");
     m_program->enableAttributeArray(colorLocation);
-    m_program->setAttributeBuffer(colorLocation, GL_FLOAT, offset, 1,
-                                  sizeof(VertexData));
+    m_program->setAttributeBuffer(colorLocation, GL_FLOAT, offset, 1, sizeof(VertexData));
 
     offset = sizeof(GLfloat);
+
+    int textureLocation = m_copyProgram->attributeLocation("a_texcoord");
+    m_copyProgram->enableAttributeArray(textureLocation);
+    m_copyProgram->setAttributeBuffer(textureLocation, GL_FLOAT, offset, sizeof(VertexData));
 }
 
 void CubeDrawer::updateGeometry(GLPalette &palette)
@@ -313,7 +315,9 @@ void CubeDrawer::drawCube(GLPalette &palette)
     cMatrix.scale(0.9);
     m_program->setUniformValue("u_c_matrix", cMatrix);
 
-    if (m_vao.isCreated()) m_vao.bind(); else {
+    if (m_vao.isCreated()) {
+        m_vao.bind();
+    } else {
         m_vbo.bind();
         initAttributes();
     }
@@ -324,6 +328,8 @@ void CubeDrawer::drawCube(GLPalette &palette)
     glEnable(GL_DEPTH_TEST);
 
     palette.bind(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_fbo->texture());
     glDrawArrays(GL_TRIANGLES, 0, m_triangles.count());
     glDrawArrays(GL_LINES, m_triangles.count(), m_lines.count());
     palette.release();

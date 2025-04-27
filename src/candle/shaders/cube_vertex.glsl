@@ -9,6 +9,7 @@ uniform mat4 u_c_matrix;
 uniform sampler2D u_palette;
 
 attribute vec3 a_position;
+attribute vec3 a_texcoord;
 attribute float a_color;
 
 varying vec4 v_color;

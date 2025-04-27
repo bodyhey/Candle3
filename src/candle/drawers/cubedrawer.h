@@ -35,7 +35,7 @@ public:
 private:
     QOpenGLVertexArrayObject m_vao;
     QOpenGLBuffer m_vbo;
-    QOpenGLFramebufferObject *m_fbo;
+    QOpenGLFramebufferObject *m_fbo = nullptr;
     int m_width;
     int m_height;
     bool m_needsUpdateGeometry = true;
@@ -50,6 +50,7 @@ private:
     QOpenGLShaderProgram *m_copyProgram;;
     QPropertyAnimation m_animation;
     CubeClickableFace m_faceAtCursor = CubeClickableFace::None;
+    QOpenGLTexture *m_texture = nullptr;
     void init();
     void initAttributes();
     void updateGeometry(GLPalette &palette);

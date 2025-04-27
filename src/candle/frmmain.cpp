@@ -2338,9 +2338,9 @@ void frmMain::applyVisualizerConfiguration(ConfigurationVisualizer &visualizerCo
     ui->cmdToggleProjection->setIcon(QIcon(":/images/toggle.png"));
     ui->cmdFit->setIcon(QIcon(":/images/fit_1.png"));
     ui->cmdIsometric->setIcon(QIcon(":/images/cube.png"));
-    ui->cmdFront->setIcon(QIcon(":/images/cubeFront.png"));
-    ui->cmdLeft->setIcon(QIcon(":/images/cubeLeft.png"));
-    ui->cmdTop->setIcon(QIcon(":/images/cubeTop.png"));
+    ui->cmdFront->setIcon(QIcon(":/images/visualizer_front.png"));
+    ui->cmdLeft->setIcon(QIcon(":/images/visualizer_left.png"));
+    ui->cmdTop->setIcon(QIcon(":/images/visualizer_top.png"));
 
     if (!light) {
         Util::invertButtonIconColors(ui->cmdToggleProjection);
