@@ -12,14 +12,9 @@
 #include <QMediaRecorder>
 #include <QScopedPointer>
 #include <QVideoWidget>
-#include <QVideoSink>
 #include <QMenu>
 #include <QTimer>
 #include "cameraframeprocessor.h"
-
-QT_BEGIN_NAMESPACE
-namespace Ui { class Camera; }
-QT_END_NAMESPACE
 
 class Camera : public QVideoWidget
 {
@@ -43,22 +38,21 @@ protected:
     void showEvent(QShowEvent *event) override;
 
 private:
-    Ui::Camera *ui;
-
     QActionGroup *videoDevicesGroup = nullptr;
     QMediaDevices m_devices;
+    QVideoSink m_videoSink;
     QScopedPointer<QCamera> m_camera;
     QMediaCaptureSession m_captureSession;
     QTimer m_resizeTimer;
-
-    QString m_videoContainerFormat;
-    bool m_applicationExiting = false;
     QMenu m_menu;
     CameraFrameProcessor m_frameProcessor;
+    int m_camerasCount = 0;
 
     void init();
     void updateCameras();
     void findBestResolution(int, int);
+    void showCameraDisabled();
+    void disableCamera();
 };
 
 #endif

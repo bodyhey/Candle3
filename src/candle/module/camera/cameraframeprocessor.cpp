@@ -7,7 +7,7 @@
 #include <QDebug>
 
 CameraFrameProcessor::CameraFrameProcessor(QObject *parent)
-    : QObject{parent}
+    : QObject(parent)
 {}
 
 void CameraFrameProcessor::setVideoSink(QVideoSink *inputSink, QVideoSink *outputSink)
@@ -30,12 +30,12 @@ void CameraFrameProcessor::processFrame(const QVideoFrame &frame)
         return;
     }
 
-    // QFont font = painter.font();
-    // font.setPixelSize(100);
-    // font.setBold(true);
-    // painter.setFont(font);
+    QFont font = painter.font();
+    font.setPixelSize(100);
+    font.setBold(true);
+    painter.setFont(font);
 
-    // painter.drawText(50, 50, "Example text");
+    painter.drawText(50, 50, "Example text");
 
     QVideoFrame frameCopy(image);
 
