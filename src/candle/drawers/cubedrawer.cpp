@@ -225,7 +225,6 @@ void CubeDrawer::init()
 
     m_texture = new QOpenGLTexture(QImage(":/images/cube_texture.png").mirrored(true, true));
     m_texture->create();
-    m_texture->setFormat(QOpenGLTexture::RGBA32F);
     m_texture->setWrapMode(QOpenGLTexture::ClampToEdge);
     m_texture->setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
     m_texture->allocateStorage();
