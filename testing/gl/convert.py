@@ -9,6 +9,7 @@ lines = read_file('Kostka.obj')
 
 vertexes = []
 normals = []
+textures = []
 faces = []
 index = {}
 mtls = []
@@ -35,6 +36,9 @@ for line in lines:
     elif type == 'vn':
         elements = list(map(to_float, elements))
         normals.append(elements)
+    elif type == 'vt':
+        elements = list(map(to_float, elements))
+        textures.append(elements)
     elif type == 'f':
         # vertex_index/texture_index/normal_index
         face = []
@@ -44,10 +48,10 @@ for line in lines:
         faces.append(face)
 
 print(vertexes)
+print(textures)
 print(normals)
 print(faces)
 print(index)
-
 
 colors = [
     [1.0, 0.0, 0.0],
@@ -147,6 +151,18 @@ colors2 = {
     'Other' : 7,
 }    
 
+thd = 1.0 / 9
+
+# textures = {
+#     'Default_Generic' : 0,
+#     'Front' : 8,
+#     'Back' : 7,
+#     'Top' : 6,
+#     'Bottom' : 5,
+#     'Left' : 4,
+#     'Right' : 3,
+# }
+
 def color_(mtl):
     if mtl == None or mtl == 'Default_Generic':
         return 0 
@@ -155,6 +171,15 @@ def color_(mtl):
             return colors2[mtl]
         except KeyError:
             return colors2['Other']
+        
+# def texture_(mtl):
+#     if mtl == None or mtl == 'Default_Generic':
+#         return 0 
+#     else:
+#         try:
+#             return textures[mtl]
+#         except KeyError:
+#             return textures['Other']        
 
 def write_vertex(f, vertex, iface):
     [vi, vni, mtl] = vertex
@@ -169,6 +194,7 @@ def write_cpp_vertex(f, vertex, iface):
     [vi, vni, mtl] = vertex
     v = vertexes[vi]
     vn = normals[vni]
+    vt = textures[vti]
     color = color_(mtl)
             
     f.write("  VertexData(QVector3D(%f, %f, %f), %d, QVector3D(%f, %f, %f)),\n" % (v[0], v[1], v[2], color, vn[0], vn[1], vn[2]))
