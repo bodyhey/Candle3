@@ -37,15 +37,15 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent), m_shaderProgram(0)
     m_animateView = false;
     m_updatesEnabled = false;
 
-    m_xRot = m_xRotTarget = 35.264;
-    m_yRot = m_yRotTarget = m_yRot > 180 ? 405 : 45;
+    m_xRot = m_xRotTarget = 0;//35.264;
+    m_yRot = m_yRotTarget = 0;// m_yRot > 180 ? 405 : 45;
 
     m_zoomDistance = DEFAULT_ZOOM;
 
     m_lookAt = QVector3D(0, 0, 0);
     m_eye = QVector3D(0, 0, -50);
 
-    m_perspective = false;
+    m_perspective = true;
 
     m_fov = 30;
     m_near = 0.5;
@@ -353,14 +353,14 @@ void GLWidget::setBackView()
     beginViewAnimation();
 }
 
-void GLWidget::setLeftView()
+void GLWidget::setRightView()
 {
     m_xRotTarget = 0;
     m_yRotTarget = m_yRot > 270 ? 450 : 90;
     beginViewAnimation();
 }
 
-void GLWidget::setRightView()
+void GLWidget::setLeftView()
 {
     m_xRotTarget = 0;
     m_yRotTarget = m_yRot > 90 ? 270 : -90;
@@ -930,7 +930,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     }
 
     if (pos.x() < 200 && pos.y() < 200) {
-        CubeClickableFace face = m_cubeDrawer.mouseMoveEvent(event);
+        CubeClickableFace face = m_cubeDrawer.mouseMoveEvent(event);        
         if (face != CubeClickableFace::None) {
             setCursor(Qt::PointingHandCursor);
         } else {
@@ -947,15 +947,17 @@ void GLWidget::leaveEvent(QEvent *event)
 void GLWidget::wheelEvent(QWheelEvent *we)
 {
     int delta = we->angleDelta().y();
-    if (m_zoomDistance > MIN_ZOOM && delta < 0)
+    if (m_zoomDistance > MIN_ZOOM && delta < 0) {
         m_zoomDistance /= ZOOMSTEP;
-    else if (delta > 0)
+    } else if (delta > 0) {
         m_zoomDistance *= ZOOMSTEP;
+    }
 
-    if (!m_perspective) updateProjection();
-    else updateView();
-
-    qDebug() << m_zoomDistance;
+    if (!m_perspective) {
+        updateProjection();
+    } else {
+        updateView();
+    }
 }
 
 void GLWidget::timerEvent(QTimerEvent *te)

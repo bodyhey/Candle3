@@ -9,15 +9,15 @@
 #define SIZE 100.0
 #define MULTISAMPLE 2
 
-CubeDrawer::CubeDrawer() : m_eye({0, 0, 1}), m_animation(this, "faceAnimation")
+CubeDrawer::CubeDrawer() : m_eye({0, 0, 1})//, m_animation(this, "faceAnimation")
 {
     m_width = SIZE * MULTISAMPLE;
     m_height = SIZE * MULTISAMPLE;
     m_triangles = cube;
 
-    m_animation.setDuration(100);
-    m_animation.setStartValue(0.0);
-    m_animation.setEndValue(1.0);
+    // m_animation.setDuration(100);
+    // m_animation.setStartValue(0.0);
+    // m_animation.setEndValue(1.0);
 
     setProjection();
 }
@@ -113,6 +113,8 @@ void CubeDrawer::updateView()
     QVector3D eye = normalized * DISTANCE;
 
     m_viewMatrix.lookAt(eye, QVector3D(0, 0, 0), m_up);
+    m_viewMatrix.rotate(90, 0.0, 1.0, 0.0);
+    m_viewMatrix.rotate(-90, 1.0, 0.0, 0.0);
 }
 
 void CubeDrawer::updateEyePosition(QVector3D eye, QVector3D up)
@@ -166,7 +168,7 @@ CubeClickableFace CubeDrawer::mouseMoveEvent(QMouseEvent *event)
         return lastFace;
     }
 
-    m_animation.stop();
+    //m_animation.stop();
 
     for (auto &line : m_lines) {
         line.color =  4; //QVector3D(0.0, 0.0, 0.0);
@@ -178,12 +180,12 @@ CubeClickableFace CubeDrawer::mouseMoveEvent(QMouseEvent *event)
         return m_faceAtCursor;
     }
 
-    int fi = (int)m_faceAtCursor;
+    int fi = (int) m_faceAtCursor;
     int li = 0;
 
     auto clickable = clickables[fi];
 
-    m_animation.start();
+    //m_animation.start();
 
     // const int white = palette.color(1.0, 1.0, 1.0);
     // QVector3D color = QVector3D(std::rand() % 100 / 100.0, std::rand() % 100 / 100.0, std::rand() % 100 / 100.0);
