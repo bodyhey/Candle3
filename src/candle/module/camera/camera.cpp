@@ -7,6 +7,7 @@
 #include <QMediaDevices>
 #include <QMessageBox>
 #include <QtWidgets>
+#include <QImageCapture>
 
 Camera::Camera(QWidget* parent) : QVideoWidget(parent), m_frameProcessor(this)
 {
@@ -40,32 +41,24 @@ void Camera::setCamera(const QCameraDevice &cameraDevice)
     if (!m_camera.isNull()) {
         m_camera->stop();
     }
+    m_captureSession.setCamera(nullptr);
 
     qDebug() << "Camera device:" << cameraDevice.description();
 
     m_camera.reset(new QCamera(cameraDevice));
     m_captureSession.setCamera(m_camera.data());
-
-        // connect(m_camera.data(), &QCamera::activeChanged, this, &Camera::updateCameraActive);
-    // connect(m_camera.data(), &QCamera::errorOccurred, this, &Camera::displayCameraError);
-
-    // QVideoSink *videoSink = new QVideoSink();
-
-    // m_captureSession.setVideoOutput(this);
-    // m_captureSession.setVideoSink(videoSink);
-
-    // m_frameProcessor.setVideoSink(
-    //     m_captureSession.videoSink(),
-    //     this->videoSink()
-    // );
-
-    updateCameraActive(m_camera->isActive());
+    m_captureSession.setVideoSink(&m_videoSink);
+    m_frameProcessor.setVideoSinks(
+        m_captureSession.videoSink(),
+        this->videoSink()
+    );
 
     if (isVisible()) {
         m_camera->start();
     }
 
     findBestResolution(this->width(), this->height());
+    updateCameraActive(m_camera->isActive());
 }
 
 void Camera::hideEvent(QHideEvent *event)
@@ -81,31 +74,6 @@ void Camera::showEvent(QShowEvent *event)
 
     startCamera();
 }
-
-// void Camera::paintEvent(QPaintEvent *event)
-// {
-//     QVideoWidget::paintEvent(event);
-//     if (!m_camera.isNull()) {
-//         // camera is available
-//         return;
-//     }
-
-//     QPainter painter(this);
-//     painter.setPen(Qt::white);
-//     painter.setFont(QFont("Arial", 30));
-//     QTextOption textOption;
-//     textOption.setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-//     textOption.setWrapMode(QTextOption::WordWrap);
-//     painter.fillRect(0, 0, 100, 100, Qt::red);
-//     painter.drawText(
-//         QRect(0, 0, width(), height()),
-//         "No camera found",
-//         textOption
-//     );
-//     painter.beginNativePainting();
-//     painter.fillRect(0, 0, 100, 100, Qt::red);
-//     painter.endNativePainting();
-// }
 
 void Camera::startCamera()
 {
@@ -158,13 +126,33 @@ void Camera::resizeEvent(QResizeEvent *event)
     }
 
     QVideoWidget::resizeEvent(event);
+
+    if (m_camera.isNull()) {
+        showCameraDisabled();
+    }
 }
 
 void Camera::showCameraDisabled()
 {
+    m_frameProcessor.setVideoSinks(nullptr, nullptr);
     m_captureSession.setCamera(nullptr);
-    QVideoFrame frame(QImage(":/images/cube_texture.png"));
-    m_videoSink.setVideoFrame(frame);
+
+    QImage image(width(), height(), QImage::Format_RGB32);
+
+    QPainter painter(&image);
+    painter.setPen(Qt::white);
+    painter.setFont(QFont("Arial", 25));
+    painter.fillRect(rect(), Qt::black);
+    QTextOption textOption;
+    textOption.setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+    textOption.setWrapMode(QTextOption::WordWrap);
+    painter.drawText(
+        QRect(5, 0, width() - 10, height()),
+        "No camera found",
+        textOption
+    );
+
+    this->videoSink()->setVideoFrame(QVideoFrame(image));
 }
 
 void Camera::disableCamera()
@@ -194,21 +182,17 @@ void Camera::init()
     videoDevicesGroup->setExclusive(true);
     updateCameras();
     connect(&m_devices, &QMediaDevices::videoInputsChanged, this, &Camera::updateCameras);
-
     connect(videoDevicesGroup, &QActionGroup::triggered, this, &Camera::updateCameraDevice);
 
-    QCameraDevice defaultCamera = QMediaDevices::defaultVideoInput();
-    if (!defaultCamera.isNull()) {
-        setCamera(QMediaDevices::defaultVideoInput());
+    if (m_camerasCount && m_camera.isNull()) {
+        QCameraDevice defaultCamera = QMediaDevices::defaultVideoInput();
+        if (!defaultCamera.isNull()) {
+            setCamera(QMediaDevices::defaultVideoInput());
+        }
     }
 
     m_captureSession.setVideoOutput(this);
     m_captureSession.setVideoSink(&m_videoSink);
-
-    m_frameProcessor.setVideoSink(
-        m_captureSession.videoSink(),
-        this->videoSink()
-    );
 
     if (m_camera.isNull()) {
         showCameraDisabled();
@@ -228,10 +212,15 @@ void Camera::updateCameras()
 
     const QList<QCameraDevice> availableCameras = QMediaDevices::videoInputs();
     for (const QCameraDevice &cameraDevice : availableCameras) {
+        if (m_camera.isNull()) {
+            setCamera(cameraDevice);
+        }
+
         QAction *videoDeviceAction = new QAction(cameraDevice.description(), videoDevicesGroup);
         videoDeviceAction->setCheckable(true);
         videoDeviceAction->setData(QVariant::fromValue(cameraDevice));
-        if (cameraDevice == QMediaDevices::defaultVideoInput()) {
+
+        if (!m_camera.isNull() && m_camera->cameraDevice() == cameraDevice) {
             videoDeviceAction->setChecked(true);
         }
 
@@ -272,3 +261,4 @@ void Camera::findBestResolution(int w, int h)
         qDebug() << "Matching camera format not found!";
     }
 }
+

@@ -10,12 +10,16 @@ CameraFrameProcessor::CameraFrameProcessor(QObject *parent)
     : QObject(parent)
 {}
 
-void CameraFrameProcessor::setVideoSink(QVideoSink *inputSink, QVideoSink *outputSink)
+void CameraFrameProcessor::setVideoSinks(QVideoSink *inputSink, QVideoSink *outputSink)
 {
-    if (m_inputSink != inputSink)
-    {
+    if (m_inputSink != inputSink) {
+        if (m_inputSink != nullptr) {
+            disconnect(m_inputSink, &QVideoSink::videoFrameChanged, this, &CameraFrameProcessor::processFrame);
+        }
         m_inputSink = inputSink;
-        connect(m_inputSink, &QVideoSink::videoFrameChanged, this, &CameraFrameProcessor::processFrame);
+        if (m_inputSink != nullptr) {
+            connect(m_inputSink, &QVideoSink::videoFrameChanged, this, &CameraFrameProcessor::processFrame);
+        }
     }
 
     m_outputSink = outputSink;
@@ -23,6 +27,12 @@ void CameraFrameProcessor::setVideoSink(QVideoSink *inputSink, QVideoSink *outpu
 
 void CameraFrameProcessor::processFrame(const QVideoFrame &frame)
 {
+    if (!m_overlay) {
+        m_outputSink->setVideoFrame(frame);
+
+        return;
+    }
+
     QImage image = frame.toImage();
 
     QPainter painter(&image);
@@ -40,4 +50,9 @@ void CameraFrameProcessor::processFrame(const QVideoFrame &frame)
     QVideoFrame frameCopy(image);
 
     m_outputSink->setVideoFrame(frameCopy);
+    m_outputSink->setSubtitleText("abc");
+}
+void CameraFrameProcessor::setOverlay(bool overlay)
+{
+    m_overlay = overlay;
 }

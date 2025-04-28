@@ -14,8 +14,8 @@ class CameraFrameProcessor : public QObject
 
     public:
         CameraFrameProcessor(QObject *parent);
-
-        void setVideoSink(QVideoSink *inputSink, QVideoSink *outputSink);
+        void setVideoSinks(QVideoSink *inputSink, QVideoSink *outputSink);
+        void setOverlay(bool overlay);
 
     signals:
         void videoSinkChanged();
@@ -24,8 +24,9 @@ class CameraFrameProcessor : public QObject
         void processFrame(const QVideoFrame &frame);
 
     private:
-        QVideoSink *m_inputSink;
-        QVideoSink *m_outputSink;
+        QVideoSink *m_inputSink = nullptr;
+        QVideoSink *m_outputSink = nullptr;
+        bool m_overlay = false;
 };
 
 #endif // CAMERAFRAMEPROCESSOR_H
