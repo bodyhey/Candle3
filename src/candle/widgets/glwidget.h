@@ -121,7 +121,7 @@ public slots:
 
 private slots:
     void onFramesTimer();
-    void viewAnimation();
+    void onAnimation();
 
 private:
     double m_xRot, m_yRot, m_xLastRot, m_yLastRot;
@@ -158,9 +158,9 @@ private:
     bool m_updatesEnabled;
 
     double normalizeAngle(double angle);
-    double calculateVolume(QVector3D size);
-    void beginViewAnimation();
-    void stopViewAnimation();
+    // double calculateVolume(QVector3D size);
+    void animate();
+    void stopAnimation();
 
     QList<ShaderDrawable*> m_shaderDrawables;
     QOpenGLShaderProgram *m_defaultShaderProgram;

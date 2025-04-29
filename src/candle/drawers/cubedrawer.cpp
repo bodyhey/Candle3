@@ -9,15 +9,11 @@
 #define SIZE 100.0
 #define MULTISAMPLE 2
 
-CubeDrawer::CubeDrawer() : m_eye({0, 0, 1})//, m_animation(this, "faceAnimation")
+CubeDrawer::CubeDrawer() : m_eye({0, 0, 1})
 {
     m_width = SIZE * MULTISAMPLE;
     m_height = SIZE * MULTISAMPLE;
     m_triangles = cube;
-
-    // m_animation.setDuration(100);
-    // m_animation.setStartValue(0.0);
-    // m_animation.setEndValue(1.0);
 
     setProjection();
 }
@@ -168,10 +164,8 @@ CubeClickableFace CubeDrawer::mouseMoveEvent(QMouseEvent *event)
         return lastFace;
     }
 
-    //m_animation.stop();
-
     for (auto &line : m_lines) {
-        line.color =  4; //QVector3D(0.0, 0.0, 0.0);
+        line.color = 2;
     }
 
     if (m_faceAtCursor == CubeClickableFace::None) {
@@ -183,18 +177,6 @@ CubeClickableFace CubeDrawer::mouseMoveEvent(QMouseEvent *event)
     int fi = (int) m_faceAtCursor;
     int li = 0;
 
-    auto clickable = clickables[fi];
-
-    //m_animation.start();
-
-    // const int white = palette.color(1.0, 1.0, 1.0);
-    // QVector3D color = QVector3D(std::rand() % 100 / 100.0, std::rand() % 100 / 100.0, std::rand() % 100 / 100.0);
-    // for (int i = 0; i < 6; i++) {
-    //     m_triangles[clickable[i]].color = 8;//color;
-    // }
-    // for (int i = 0; i < 8; i++) {
-    //     m_lines[li + i].color = white;
-    // }
     m_needsUpdateGeometry = true;
 
     return m_faceAtCursor;
@@ -265,36 +247,23 @@ void CubeDrawer::updateGeometry(GLPalette &palette)
 
     m_vbo.bind();
 
-    const int lineColor = palette.color(0.0, 0.0, 0.0);
-    for (auto clickable : clickables) {
-        QVector3D ofs = cube[clickable[0]].start * 1;
-        m_lines
-            << VertexData(cube[clickable[0]].position + ofs, lineColor, cube[clickable[0]].start)
-            << VertexData(cube[clickable[1]].position + ofs, lineColor, cube[clickable[0]].start)
+    // const int lineColor = palette.color(0.0, 0.0, 0.0);
+    // for (auto clickable : clickables) {
+    //     QVector3D ofs = cube[clickable[0]].start * 1;
+    //     m_lines
+    //         << VertexData(cube[clickable[0]].position + ofs, lineColor, cube[clickable[0]].start)
+    //         << VertexData(cube[clickable[1]].position + ofs, lineColor, cube[clickable[0]].start)
 
-            << VertexData(cube[clickable[1]].position + ofs, lineColor, cube[clickable[0]].start)
-            << VertexData(cube[clickable[5]].position + ofs, lineColor, cube[clickable[0]].start)
+    //         << VertexData(cube[clickable[1]].position + ofs, lineColor, cube[clickable[0]].start)
+    //         << VertexData(cube[clickable[5]].position + ofs, lineColor, cube[clickable[0]].start)
 
-            << VertexData(cube[clickable[5]].position + ofs, lineColor, cube[clickable[0]].start)
-            << VertexData(cube[clickable[2]].position + ofs, lineColor, cube[clickable[0]].start)
+    //         << VertexData(cube[clickable[5]].position + ofs, lineColor, cube[clickable[0]].start)
+    //         << VertexData(cube[clickable[2]].position + ofs, lineColor, cube[clickable[0]].start)
 
-            << VertexData(cube[clickable[2]].position + ofs, lineColor, cube[clickable[0]].start)
-            << VertexData(cube[clickable[0]].position + ofs, lineColor, cube[clickable[0]].start)
-            ;
-    }
-
-    for (auto &vertex : m_triangles) {
-        switch ((int) vertex.color) {
-            case 1:
-                vertex.color = palette.color(0.500000, 0.500000, 0.600000);
-                break;
-            case 2:
-                vertex.color = palette.color(1.000000, 0.500000, 0.500000);
-                break;
-            // default:
-                // assert(false);
-        }
-    }
+    //         << VertexData(cube[clickable[2]].position + ofs, lineColor, cube[clickable[0]].start)
+    //         << VertexData(cube[clickable[0]].position + ofs, lineColor, cube[clickable[0]].start)
+    //         ;
+    // }
 
     m_vbo.allocate((m_triangles + m_lines).constData(), (m_triangles.count() + m_lines.count()) * sizeof(VertexData));
 

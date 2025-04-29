@@ -91,9 +91,9 @@ GLWidget::~GLWidget()
     }
 }
 
-double GLWidget::calculateVolume(QVector3D size) {
-    return size.x() * size.y() * size.z();
-}
+// double GLWidget::calculateVolume(QVector3D size) {
+//     return size.x() * size.y() * size.z();
+// }
 
 void GLWidget::addDrawable(ShaderDrawable *drawable)
 {
@@ -109,7 +109,7 @@ GLWidget& GLWidget::operator<<(ShaderDrawable *drawable)
 
 void GLWidget::fitDrawable(ShaderDrawable *drawable)
 {
-    stopViewAnimation();
+    stopAnimation();
 
     m_zoomDistance = DEFAULT_ZOOM;
 
@@ -180,11 +180,13 @@ void GLWidget::onFramesTimer()
     QTimer::singleShot(1000, this, SLOT(onFramesTimer()));
 }
 
-void GLWidget::viewAnimation()
+void GLWidget::onAnimation()
 {
-    double t = (double)m_animationFrame++ / (m_fps * 0.2);
+    double t = (double) m_animationFrame++ / (m_fps * 0.2);
 
-    if (t >= 1) stopViewAnimation();
+    if (t >= 1) {
+        stopAnimation();
+    }
 
     QEasingCurve ec(QEasingCurve::OutExpo);
     double val = ec.valueForProgress(t);
@@ -329,42 +331,42 @@ void GLWidget::setTopView()
 {
     m_xRotTarget = 90;
     m_yRotTarget = m_yRot > 180 ? 360 : 0;
-    beginViewAnimation();
+    animate();
 }
 
 void GLWidget::setBottomView()
 {
-    m_xRotTarget = 270;
+    m_xRotTarget = -90;
     m_yRotTarget = m_yRot > 180 ? 360 : 0;
-    beginViewAnimation();
+    animate();
 }
 
 void GLWidget::setFrontView()
 {
     m_xRotTarget = 0;
     m_yRotTarget = m_yRot > 180 ? 360 : 0;
-    beginViewAnimation();
+    animate();
 }
 
 void GLWidget::setBackView()
 {
-    m_xRotTarget = 180;
-    m_yRotTarget = m_yRot > 180 ? 360 : 0;
-    beginViewAnimation();
+    m_xRotTarget = 0;
+    m_yRotTarget = 180;
+    animate();
 }
 
 void GLWidget::setRightView()
 {
     m_xRotTarget = 0;
     m_yRotTarget = m_yRot > 270 ? 450 : 90;
-    beginViewAnimation();
+    animate();
 }
 
 void GLWidget::setLeftView()
 {
     m_xRotTarget = 0;
     m_yRotTarget = m_yRot > 90 ? 270 : -90;
-    beginViewAnimation();
+    animate();
 }
 
 int GLWidget::fps()
@@ -389,19 +391,22 @@ void GLWidget::setIsometricView()
     updateProjection();
     m_xRotTarget = 35.264;
     m_yRotTarget = m_yRot > 180 ? 405 : 45;
-    beginViewAnimation();
+    animate();
 }
 
-void GLWidget::beginViewAnimation() {
+void GLWidget::animate()
+{
     m_xRotStored = m_xRot;
     m_yRotStored = m_yRot;
     m_animationFrame = 0;
     m_animateView = true;
 }
 
-void GLWidget::stopViewAnimation() {
+void GLWidget::stopAnimation()
+{
     m_animateView = false;
 }
+
 QColor GLWidget::colorText() const
 {
     return m_colorText;
@@ -520,15 +525,13 @@ void GLWidget::updateProjection()
     } else {
         double orthoSize = m_zoomDistance;// * tan((m_fov * 0.0174533) / 2.0);
         m_projectionMatrix.ortho(-orthoSize * aspectRatio, orthoSize * aspectRatio, -orthoSize, orthoSize,
-//                                 -m_far/2.0, m_far/2.0
-                                 m_near, m_far
+                                 -m_far/2.0, m_far/2.0
         );
     }
 }
 
 void GLWidget::updateView()
 {
-    // Set view matrix
     m_viewMatrix.setToIdentity();
 
     double angY = M_PI / 180 * m_yRot;
@@ -537,15 +540,14 @@ void GLWidget::updateView()
     m_eye = QVector3D(cos(angX) * sin(angY), sin(angX), cos(angX) * cos(angY)).normalized();
 
     QVector3D up(fabs(m_xRot) == 90 ? -sin(angY + (m_xRot < 0 ? M_PI : 0)) : 0, cos(angX), fabs(m_xRot) == 90 ? -cos(angY + (m_xRot < 0 ? M_PI : 0)) : 0);
-    //QVector3D up(0, 0, 1);
+    up.normalize();
 
     m_cubeDrawer.updateEyePosition(m_eye, up);
 
-    //m_viewMatrix.lookAt(m_eye * m_zoomDistance, QVector3D(0,0,0), up.normalized());
     if (m_perspective) {
         m_eye *= m_zoomDistance;
     }
-    m_viewMatrix.lookAt(m_eye, QVector3D(0,0,0), up.normalized());
+    m_viewMatrix.lookAt(m_eye, QVector3D(0,0,0), up);
     m_viewMatrix.rotate(-90, 1.0, 0.0, 0.0);
     m_viewMatrix.translate(-m_lookAt);
 }
@@ -746,7 +748,8 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
     pos = QPoint(10, this->height() - 80);
 
     if (!qIsNaN(m_bottomSurfaceCursorPos.x())) {
-        drawText(painter, pos, QString("Cursor: %1, %2").arg(m_bottomSurfaceCursorPos.x(), 0, 'f', 2).arg(m_bottomSurfaceCursorPos.y(), 0, 'f', 2), 15);
+        //drawText(painter, pos, QString("Cursor: %1, %2").arg(m_bottomSurfaceCursorPos.x(), 0, 'f', 2).arg(m_bottomSurfaceCursorPos.y(), 0, 'f', 2), 15);
+        drawText(painter, pos, QString("Cursor: %1, %2").arg(m_xRot, 0, 'f', 2).arg(m_yRot, 0, 'f', 2), 15);
     } else {
         drawText(painter, pos, "Cursor: ??", 15);
     }
@@ -873,7 +876,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     if ((event->buttons() & Qt::MiddleButton && !(event->modifiers() & Qt::ShiftModifier)) 
         || (event->buttons() & Qt::LeftButton && !(event->modifiers() & Qt::ShiftModifier))) {
 
-        stopViewAnimation();
+        stopAnimation();
 
         m_yRot = normalizeAngle(m_yLastRot - (pos.x() - m_lastPos.x()) * 0.5);
         m_xRot = m_xLastRot + (pos.y() - m_lastPos.y()) * 0.5;
@@ -963,7 +966,9 @@ void GLWidget::wheelEvent(QWheelEvent *we)
 void GLWidget::timerEvent(QTimerEvent *te)
 {
     if (te->timerId() == m_timerPaint.timerId()) {
-        if (m_animateView) viewAnimation();
+        if (m_animateView) {
+            onAnimation();
+        }
 #ifndef GLES
         update();
 #endif

@@ -10,7 +10,6 @@
 #include <QMatrix4x4>
 #include <QVector3D>
 #include <QOpenGLShaderProgram>
-#include <QPropertyAnimation>
 #include <QMouseEvent>
 #include "shaderdrawable.h"
 #include "cube.h"
@@ -48,7 +47,6 @@ private:
     QMatrix4x4 m_viewMatrix;
     QOpenGLShaderProgram *m_program;
     QOpenGLShaderProgram *m_copyProgram;;
-    //QPropertyAnimation m_animation;
     CubeClickableFace m_faceAtCursor = CubeClickableFace::None;
     QOpenGLTexture *m_texture = nullptr;
     void init();
