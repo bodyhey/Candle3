@@ -23,15 +23,16 @@ Supported functions:
 * Monitoring cnc-machine state.
 * Loading, editing, saving and sending of G-code files to cnc-machine.
 * Visualizing G-code files.
+* Camera 
 * Joystick/Joypad/Controller support.
 * Customizable interface.
-* uCNC virtual mode (cnc machine simulator).
+* uCNC/grblHAL virtual modes (cnc machine simulator).
 
 System requirements for running "G-Pilot":
 -------------------
 * Windows 10/Linux x86(not tested att all!)
 * Graphics card with OpenGL 3.0 support
-* 120 MB free storage space
+* 150 MB free storage space
 
 Usefull links:
 
@@ -157,7 +158,11 @@ How it looks:
 
 Main window:
 
-![main](/screenshots/screenshot_main.png)
+![main](/screenshots/screenshot_main_light.png)
+
+Dark mode:
+
+![main](/screenshots/screenshot_main_dark.png)
 
 Settings:
 
