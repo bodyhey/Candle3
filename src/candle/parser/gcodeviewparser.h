@@ -13,7 +13,7 @@
 #include <QVector2D>
 #include "linesegment.h"
 #include "gcodeparser.h"
-#include "utils/util.h"
+#include "utils/utils.h"
 
 class GCodeViewParser
 {

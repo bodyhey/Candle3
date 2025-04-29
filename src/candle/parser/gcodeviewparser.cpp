@@ -43,13 +43,13 @@ void GCodeViewParser::testExtremes(QVector3D p3d)
 
 void GCodeViewParser::testExtremes(double x, double y, double z)
 {
-    m_min.setX(Util::nMin(m_min.x(), x));
-    m_min.setY(Util::nMin(m_min.y(), y));
-    m_min.setZ(Util::nMin(m_min.z(), z));
+    m_min.setX(Utils::nMin(m_min.x(), x));
+    m_min.setY(Utils::nMin(m_min.y(), y));
+    m_min.setZ(Utils::nMin(m_min.z(), z));
 
-    m_max.setX(Util::nMax(m_max.x(), x));
-    m_max.setY(Util::nMax(m_max.y(), y));
-    m_max.setZ(Util::nMax(m_max.z(), z));
+    m_max.setX(Utils::nMax(m_max.x(), x));
+    m_max.setY(Utils::nMax(m_max.y(), y));
+    m_max.setZ(Utils::nMax(m_max.z(), z));
 }
 
 void GCodeViewParser::testLength(const QVector3D &start, const QVector3D &end)

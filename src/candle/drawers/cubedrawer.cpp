@@ -3,7 +3,7 @@
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
 #include "cube.h"
-#include "utils.h"
+#include "utils/utils.h"
 
 #define DISTANCE 50.0
 #define SIZE 100.0
@@ -185,7 +185,7 @@ CubeClickableFace CubeDrawer::mouseMoveEvent(QMouseEvent *event)
 void CubeDrawer::leaveEvent(QEvent *event)
 {
     for (auto &line : m_lines) {
-        line.color = 28;//QVector3D(0.0, 0.0, 0.0);
+        line.color = 0;
     }
 }
 

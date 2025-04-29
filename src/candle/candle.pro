@@ -156,7 +156,7 @@ SOURCES += main.cpp\
     state/staterunning.cpp \
     tables/gcodetablemodel.cpp \
     tables/heightmaptablemodel.cpp \
-    utils.cpp \
+    utils/utils.cpp \
     widgets/combobox.cpp \
     widgets/comboboxkey.cpp \
     widgets/glcontainer.cpp \
@@ -254,7 +254,7 @@ HEADERS  += frmmain.h \
     tables/heightmaptablemodel.h \
     utils.h \
     utils/interpolation.h \
-    utils/util.h \
+    utils/utils.h \
     utils/validators.h \
     widgets/combobox.h \
     widgets/comboboxkey.h \

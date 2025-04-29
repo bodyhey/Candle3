@@ -38,8 +38,8 @@ bool HeightMapInterpolationDrawer::updateData(GLPalette &palette)
 
     for (int i = 0; i < interpolationPointsY; i++) {
         for (int j = 0; j < interpolationPointsX; j++) {
-            min = Util::nMin(min, m_data->at(i).at(j));
-            max = Util::nMax(max, m_data->at(i).at(j));
+            min = Utils::nMin(min, m_data->at(i).at(j));
+            max = Utils::nMax(max, m_data->at(i).at(j));
         }
     }
 

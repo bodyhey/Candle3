@@ -21,7 +21,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include "frmmain.h"
-#include "utils.h"
+#include "utils/utils.h"
 #include "form_partial/main/partmainjog.h"
 #include "form_partial/main/partmaincontrol.h"
 #include "form_partial/main/partmainvirtualsettings.h"
@@ -259,7 +259,7 @@ frmMain::frmMain(Configuration &configuration, QWidget *parent) :
     // foreach (QAction* a, findChildren<QAction*>()) if (!noActions.contains(a)) addAction(a);
 
     // Handle file drop
-    if (qApp->arguments().count() > 1 && Util::isGCodeFile(qApp->arguments().last())) {
+    if (qApp->arguments().count() > 1 && Utils::isGCodeFile(qApp->arguments().last())) {
         loadFile(qApp->arguments().last());
     }
     
@@ -455,7 +455,7 @@ void frmMain::dragEnterEvent(QDragEnterEvent *dee)
     else if (dee->mimeData()->hasFormat("text/uri-list") && dee->mimeData()->urls().count() == 1) {
         QString fileName = dee->mimeData()->urls().at(0).toLocalFile();
 
-        if ((!m_heightmapMode && Util::isGCodeFile(fileName)) || (m_heightmapMode && Util::isHeightmapFile(fileName)))
+        if ((!m_heightmapMode && Utils::isGCodeFile(fileName)) || (m_heightmapMode && Utils::isHeightmapFile(fileName)))
             dee->acceptProposedAction();
     }
 }
@@ -2343,12 +2343,12 @@ void frmMain::applyVisualizerConfiguration(ConfigurationVisualizer &visualizerCo
     ui->cmdTop->setIcon(QIcon(":/images/visualizer_top.png"));
 
     if (!light) {
-        Util::invertButtonIconColors(ui->cmdToggleProjection);
-        Util::invertButtonIconColors(ui->cmdFit);
-        Util::invertButtonIconColors(ui->cmdIsometric);
-        Util::invertButtonIconColors(ui->cmdFront);
-        Util::invertButtonIconColors(ui->cmdLeft);
-        Util::invertButtonIconColors(ui->cmdTop);
+        Utils::invertButtonIconColors(ui->cmdToggleProjection);
+        Utils::invertButtonIconColors(ui->cmdFit);
+        Utils::invertButtonIconColors(ui->cmdIsometric);
+        Utils::invertButtonIconColors(ui->cmdFront);
+        Utils::invertButtonIconColors(ui->cmdLeft);
+        Utils::invertButtonIconColors(ui->cmdTop);
     }
 
     QColor normal, highlight;
