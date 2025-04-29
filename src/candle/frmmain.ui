@@ -25,6 +25,7 @@
 	min-width: 60px;
 	min-height: 60px;
 	qproperty-iconSize: 48px;
+        color: white;
 }*/
 
 QMainWindow::separator {
@@ -33,7 +34,6 @@ QMainWindow::separator {
 
 QDockWidget::title {
     text-align: left; /* align the text to the left */
-    background: lightgray;
     padding: 2px;
 }
 
@@ -52,6 +52,10 @@ QDockWidget::float-button {
 QSpinBox, QDoubleSpinBox {
     padding-top: 1px;
     padding-bottom: 1px;
+}
+
+QGroupBox {
+    border-color: red;
 }
 
 QGroupBox:disabled {
@@ -90,26 +94,26 @@ QFrame#frameManualControlXY,#frameManualControlZ {
 }
 
 QSplitter::handle {
-	background-repeat: no-repeat;
-	background-position: center center;
+    background-repeat: no-repeat;
+    background-position: center center;
 }
 
-QSplitter::handle:vertical {
-	background-image: url(&quot;:/images/handle_horizontal.png&quot;);
+<!--QSplitter::handle:vertical {
+        background-image: url(&quot;:/images/handle_horizontal_light.png&quot;);
 }
 
 QSplitter::handle:horizontal {
-	background-image: url(&quot;:/images/handle_vertical.png&quot;);
-}
+        background-image: url(&quot;:/images/handle_vertical_light.png&quot;);
+}-->
 
 QTableView {
-	selection-background-color: #cdcdff;
-	selection-color: rgb(0, 0, 0);
+    selection-background-color: #cdcdff;
+    selection-color: rgb(0, 0, 0);
 }
 
 QSlider::horizontal {
-	padding-top: 1px;
-	padding-bottom: 1px;
+    padding-top: 1px;
+    padding-bottom: 1px;
 }
 
 QSlider::groove:horizontal {
@@ -120,22 +124,30 @@ QSlider::groove:horizontal {
 }
 
 QSlider::handle:horizontal {	
-	background-image: url(:/images/handle2s.png);
+    background-image: url(:/images/handle2s.png);
     border: 0px;
     width: 16px;
     margin: -7px 0; 
 }
 
 QSlider::handle:horizontal:hover {
-	background-image: url(:/images/handle2sh.png);
+    background-image: url(:/images/handle2sh.png);
 }
 
-QMainWindow::separator:vertical {
-	image: url(&quot;:/images/handle_vertical.png&quot;);
+QMainWindow[mode="light"]::separator:vertical {
+    image: url(&quot;:/images/handle_vertical_light.png&quot;);
 }
 
-QMainWindow::separator:horizontal {
-	image: url(&quot;:/images/handle_horizontal.png&quot;);
+QMainWindow[mode="light"]::separator:horizontal {
+    image: url(&quot;:/images/handle_horizontal_light.png&quot;);
+}
+
+QMainWindow[mode="dark"]::separator:vertical {
+    image: url(&quot;:/images/handle_vertical_dark.png&quot;);
+}
+
+QMainWindow[mode="dark"]::separator:horizontal {
+    image: url(&quot;:/images/handle_horizontal_dark.png&quot;);
 }
 
 /*QSlider::sub-page:horizontal {
@@ -1498,7 +1510,7 @@ border-top: 0;</string>
           </property>
           <property name="icon">
            <iconset resource="images.qrc">
-            <normaloff>:/images/cubeTop.png</normaloff>:/images/cubeTop.png</iconset>
+            <normaloff>:/images/visualizer_top.png</normaloff>:/images/visualizer_top.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -1523,7 +1535,7 @@ border-top: 0;</string>
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="images.qrc">
+           <iconset>
             <normaloff>:/images/cube.png</normaloff>:/images/cube.png</iconset>
           </property>
           <property name="iconSize">
@@ -1550,7 +1562,7 @@ border-top: 0;</string>
           </property>
           <property name="icon">
            <iconset resource="images.qrc">
-            <normaloff>:/images/cubeFront.png</normaloff>:/images/cubeFront.png</iconset>
+            <normaloff>:/images/visualizer_front.png</normaloff>:/images/visualizer_front.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -1576,7 +1588,7 @@ border-top: 0;</string>
           </property>
           <property name="icon">
            <iconset resource="images.qrc">
-            <normaloff>:/images/cubeLeft.png</normaloff>:/images/cubeLeft.png</iconset>
+            <normaloff>:/images/visualizer_left.png</normaloff>:/images/visualizer_left.png</iconset>
           </property>
           <property name="iconSize">
            <size>

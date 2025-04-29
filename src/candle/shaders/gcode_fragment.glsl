@@ -16,7 +16,7 @@ in vec3 v_eye;
 in float v_log_depth;
 
 uniform sampler2D u_texture;
-uniform bool u_shadow;
+//uniform bool u_shadow;
 uniform float u_near;
 uniform float u_far;
 
@@ -33,13 +33,13 @@ out vec4 gl_FragColor;
 void main()
 {
 //    gl_FragDepth = v_log_depth;
-    if (u_shadow) {
-        //dark
-        gl_FragColor = vec4(0.9, 0.0, 0.5, 1.0);
-        //light
-        //gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-        return;
-    }
+    // if (u_shadow) {
+    //     //dark
+    //     gl_FragColor = vec4(0.9, 0.0, 0.5, 1.0);
+    //     //light
+    //     //gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    //     return;
+    // }
 
 
 

@@ -289,7 +289,8 @@ DEFINES += _USE_MATH_DEFINES
 RESOURCES += \
     fonts.qrc \
     shaders.qrc \
-    images.qrc
+    images.qrc \
+    stylesheets.qrc
 
 INCLUDEPATH += ../designerplugins/customwidgetsplugin
 INCLUDEPATH += ../vendor/PropertyEditor

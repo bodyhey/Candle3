@@ -49,6 +49,46 @@ void initAppInfo()
     QCoreApplication::setOrganizationName("BTS");
 }
 
+void loadStyleSheets(QApplication &app, bool dark)
+{
+    QFile stylesheetFile(":/stylesheets/main.qss");
+    if (!stylesheetFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning("Cannot open stylesheet file");
+        app.exit(-1);
+    }
+
+    QString stylesheet = stylesheetFile.readAll();
+    stylesheetFile.close();
+    if (dark) {
+        stylesheetFile.setFileName(":/stylesheets/dark.qss");
+    } else {
+        stylesheetFile.setFileName(":/stylesheets/light.qss");
+    }
+    if (!stylesheetFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning("Cannot open stylesheet file");
+        app.exit(-1);
+    }
+    stylesheet += "\n\n" + stylesheetFile.readAll();
+    stylesheetFile.close();
+    app.setStyleSheet(stylesheet);
+}
+
+void setTheme(QApplication &app, bool dark)
+{
+    if (dark) {
+        app.styleHints()->setColorScheme(Qt::ColorScheme::Dark);
+    } else {
+        app.styleHints()->setColorScheme(Qt::ColorScheme::Light);
+    }
+    app.setStyle(new PhantomStyle());
+
+    QPalette palette;
+    palette.setColor(QPalette::Highlight, QColor(204, 204, 254));
+    palette.setColor(QPalette::HighlightedText, QColor(0, 0, 0));
+    app.setPalette(palette);
+}
+
+
 int main(int argc, char *argv[])
 {
 #ifdef UNIX
@@ -110,32 +150,11 @@ int main(int argc, char *argv[])
     }
 #endif
 
-#ifdef GLES
     Configuration configuration(nullptr);
     configuration.load();
 
-    if (configuration.uiModule().darkTheme()) {
-        app.styleHints()->setColorScheme(Qt::ColorScheme::Dark);
-    } else {
-        app.styleHints()->setColorScheme(Qt::ColorScheme::Light);
-    }
-    //app.setStyle(QStyleFactory::create("Fusion"));
-    app.setStyle(new PhantomStyle());
-
-    QPalette palette;
-    palette.setColor(QPalette::Highlight, QColor(204, 204, 254));
-    palette.setColor(QPalette::HighlightedText, QColor(0, 0, 0));
-    app.setPalette(palette);
-
-    app.setStyleSheet("QWidget {font-family: \"Ubuntu\";}\
-                    QMenuBar {padding-top: 2px; padding-bottom: 2px;}\
-                    QMenuBar::item {spacing: 3px; padding: 2px 8px; background: transparent;}\
-                    QMenuBar::item:pressed {border: 1px solid #505050; border-bottom: 1px; border-top-left-radius: 3px; border-top-right-radius: 3px; background: #404040; color: white;}\
-                    QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white;}\
-                    QDialog {border: 1px solid palette(mid);}");
-#endif
-
-//    app.setStyleSheet(app.styleSheet() + "QWidget {font-size: 8pt}");
+    setTheme(app, configuration.uiModule().darkTheme());
+    loadStyleSheets(app, configuration.uiModule().darkTheme());
 
     frmMain form(configuration);
     form.show();

@@ -76,6 +76,8 @@ frmMain::frmMain(Configuration &configuration, QWidget *parent) :
 
     ui->setupUi(this);
 
+    Utils::setVisualMode(this, m_configuration.uiModule().darkTheme());
+
     ui->jog->initialize(m_configuration.joggingModule());
 
     ui->console->initialize(m_configuration.consoleModule());

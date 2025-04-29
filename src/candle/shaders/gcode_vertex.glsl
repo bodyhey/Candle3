@@ -9,7 +9,7 @@ precision mediump float;
 uniform mat4 u_mvp_matrix;
 uniform mat4 u_mv_matrix;
 uniform vec3 u_light_position;
-uniform bool u_shadow;
+//uniform bool u_shadow;
 uniform vec3 u_eye;
 uniform sampler2D u_palette;
 uniform float u_near;

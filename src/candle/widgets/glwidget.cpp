@@ -91,10 +91,6 @@ GLWidget::~GLWidget()
     }
 }
 
-// double GLWidget::calculateVolume(QVector3D size) {
-//     return size.x() * size.y() * size.z();
-// }
-
 void GLWidget::addDrawable(ShaderDrawable *drawable)
 {
     m_shaderDrawables.append(drawable);
@@ -524,9 +520,7 @@ void GLWidget::updateProjection()
         m_projectionMatrix.perspective(m_fov, aspectRatio, m_near, m_far);
     } else {
         double orthoSize = m_zoomDistance;// * tan((m_fov * 0.0174533) / 2.0);
-        m_projectionMatrix.ortho(-orthoSize * aspectRatio, orthoSize * aspectRatio, -orthoSize, orthoSize,
-                                 -m_far/2.0, m_far/2.0
-        );
+        m_projectionMatrix.ortho(-orthoSize * aspectRatio, orthoSize * aspectRatio, -orthoSize, orthoSize, -m_far/2.0, m_far/2.0);
     }
 }
 
@@ -668,45 +662,12 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
         case ShaderDrawable::ProgramType::GCode: {
             currentProgram = m_gcodeShaderProgram;
             currentProgram->bind();
-            currentProgram->setUniformValue("u_shadow", false);
 
             m_palette.bind();
             drawable->draw(currentProgram);
             m_palette.release();
 
             currentProgram->release();
-
-            // copy to screen
-
-            // currentProgram = m_copyProgram;
-            // currentProgram->bind();
-
-            // QOpenGLBuffer copyVbo;
-            // copyVbo.create();
-            // copyVbo.bind();
-
-            // currentProgram->setUniformValue("u_mode", 100);
-            // currentProgram->setUniformValue("u_resolution", size());
-            // currentProgram->setUniformValue("u_texture", 0);
-            // currentProgram->setUniformValue("u_depthTexture", 1);
-
-            // currentProgram->setUniformValue("u_offset", GLfloat(m_offset));
-
-            // quintptr offset = 0;
-
-            // int vertexLocation = m_copyProgram->attributeLocation("a_position");
-            // currentProgram->enableAttributeArray(vertexLocation);
-            // currentProgram->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 2, sizeof(_2DTexturedVertexData));
-
-            // offset += sizeof(QVector2D);
-
-            // int textureLocation = m_copyProgram->attributeLocation("a_texcoord");
-            // currentProgram->enableAttributeArray(textureLocation);
-            // currentProgram->setAttributeBuffer(textureLocation, GL_FLOAT, offset, 2, sizeof(_2DTexturedVertexData));
-
-            // copyVbo.release();
-
-            // currentProgram->release();
             break;
         }
         case ShaderDrawable::ProgramType::Default:

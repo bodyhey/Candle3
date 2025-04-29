@@ -1,0 +1,10 @@
+
+QDockWidget::title {
+    background: black;
+}
+
+QDockWidget::close-button, QDockWidget::float-button {
+    background: silver;
+    color: white;
+    top: 1; right: 2;
+}

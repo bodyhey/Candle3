@@ -158,7 +158,6 @@ private:
     bool m_updatesEnabled;
 
     double normalizeAngle(double angle);
-    // double calculateVolume(QVector3D size);
     void animate();
     void stopAnimation();
 
@@ -170,7 +169,6 @@ private:
     QMatrix4x4 m_viewMatrix;
     GLPalette m_palette;
     CubeDrawer m_cubeDrawer;
-    //GLZMinMax m_zMinMax;
 
     QColor m_colorBackground;
     QColor m_colorText;
