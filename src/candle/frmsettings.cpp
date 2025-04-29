@@ -3,7 +3,7 @@
 
 #include "frmsettings.h"
 #include "ui_frmsettings.h"
-#include "utils.h"
+#include "utils/utils.h"
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QDebug>

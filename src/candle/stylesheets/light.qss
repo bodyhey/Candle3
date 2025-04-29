@@ -1,0 +1,4 @@
+
+QDockWidget::title {
+    background: silver;
+}
