@@ -45,7 +45,9 @@ class QCommaSeparatedIntValidator : public QCommaSeparatedValidator
         {
             static QRegularExpression rx("^[\\d]*$");
 
-            return element.indexOf(rx);
+            int pos = element.indexOf(rx);
+
+            return element.indexOf(rx) != -1;
         }
 };
 
@@ -58,7 +60,9 @@ class QCommaSeparatedDoubleValidator : public QCommaSeparatedValidator
         {
             static QRegularExpression rx("^[\\d]*(\\.[\\d]{1,2})?$");
 
-            return element.indexOf(rx);
+            int pos = element.indexOf(rx);
+
+            return element.indexOf(rx) != -1;
         }
 };
 
