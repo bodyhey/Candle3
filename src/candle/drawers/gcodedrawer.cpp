@@ -288,7 +288,7 @@ QColor GcodeDrawer::getSegmentColor(LineSegment& segment)
 {
     if (segment.drawn()) return m_colorDrawn;
     else if (segment.isHightlight()) return m_colorHighlight;
-    else if (segment.isFastTraverse()) return m_colorNormal;
+    else if (segment.isFastTraverse()) return m_colorRapidMovement;
     else if (segment.isZMovement()) return m_colorZMovement;
     else if (m_grayscaleSegments) switch (m_grayscaleCode) {
     case GcodeDrawer::S:
@@ -394,6 +394,16 @@ QColor GcodeDrawer::colorZMovement() const
 void GcodeDrawer::setColorZMovement(const QColor &colorZMovement)
 {
     m_colorZMovement = colorZMovement;
+}
+
+QColor GcodeDrawer::colorRapidMovement() const
+{
+    return m_colorRapidMovement;
+}
+
+void GcodeDrawer::setColorRapidMovement(const QColor &colorRapidMovement)
+{
+    m_colorRapidMovement = colorRapidMovement;
 }
 
 QColor GcodeDrawer::colorDrawn() const

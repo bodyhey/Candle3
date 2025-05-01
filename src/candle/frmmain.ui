@@ -98,13 +98,7 @@ QSplitter::handle {
     background-position: center center;
 }
 
-<!--QSplitter::handle:vertical {
-        background-image: url(&quot;:/images/handle_horizontal_light.png&quot;);
-}
 
-QSplitter::handle:horizontal {
-        background-image: url(&quot;:/images/handle_vertical_light.png&quot;);
-}-->
 
 QTableView {
     selection-background-color: #cdcdff;
@@ -134,19 +128,19 @@ QSlider::handle:horizontal:hover {
     background-image: url(:/images/handle2sh.png);
 }
 
-QMainWindow[mode="light"]::separator:vertical {
+QMainWindow[mode=&quot;light&quot;]::separator:vertical {
     image: url(&quot;:/images/handle_vertical_light.png&quot;);
 }
 
-QMainWindow[mode="light"]::separator:horizontal {
+QMainWindow[mode=&quot;light&quot;]::separator:horizontal {
     image: url(&quot;:/images/handle_horizontal_light.png&quot;);
 }
 
-QMainWindow[mode="dark"]::separator:vertical {
+QMainWindow[mode=&quot;dark&quot;]::separator:vertical {
     image: url(&quot;:/images/handle_vertical_dark.png&quot;);
 }
 
-QMainWindow[mode="dark"]::separator:horizontal {
+QMainWindow[mode=&quot;dark&quot;]::separator:horizontal {
     image: url(&quot;:/images/handle_horizontal_dark.png&quot;);
 }
 
@@ -451,7 +445,7 @@ QLabel[overrided=&quot;false&quot;] {
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>765</height>
+          <height>771</height>
          </rect>
         </property>
         <property name="acceptDrops">
@@ -1253,7 +1247,7 @@ QLabel[overrided=&quot;false&quot;] {
           <x>0</x>
           <y>0</y>
           <width>105</width>
-          <height>461</height>
+          <height>456</height>
          </rect>
         </property>
         <property name="acceptDrops">
@@ -1778,7 +1772,7 @@ border-top: 0;</string>
           <x>0</x>
           <y>0</y>
           <width>105</width>
-          <height>234</height>
+          <height>251</height>
          </rect>
         </property>
         <property name="acceptDrops">
@@ -2078,37 +2072,37 @@ border-top: 0;</string>
   <customwidget>
    <class>partMainConsole</class>
    <extends>QWidget</extends>
-   <header location="global">form_partial/main/partmainconsole.h</header>
+   <header>form_partial/main/partmainconsole.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>partMainJog</class>
    <extends>QWidget</extends>
-   <header location="global">form_partial/main/partmainjog.h</header>
+   <header>form_partial/main/partmainjog.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>partMainControl</class>
    <extends>QWidget</extends>
-   <header location="global">form_partial/main/partmaincontrol.h</header>
+   <header>form_partial/main/partmaincontrol.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>partMainOverride</class>
    <extends>QWidget</extends>
-   <header location="global">form_partial/main/partmainoverride.h</header>
+   <header>form_partial/main/partmainoverride.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>partMainSpindle</class>
    <extends>QWidget</extends>
-   <header location="global">form_partial/main/partmainspindle.h</header>
+   <header>form_partial/main/partmainspindle.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QPushButtonWithMenu</class>
    <extends>QPushButton</extends>
-   <header location="global">widgets/qpushbuttonwithmenu.h</header>
+   <header>widgets/qpushbuttonwithmenu.h</header>
   </customwidget>
   <customwidget>
    <class>GLContainer</class>
@@ -2119,7 +2113,7 @@ border-top: 0;</string>
   <customwidget>
    <class>partMainStateLcd</class>
    <extends>QWidget</extends>
-   <header location="global">form_partial/main/partmainstatelcd.h</header>
+   <header>form_partial/main/partmainstatelcd.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

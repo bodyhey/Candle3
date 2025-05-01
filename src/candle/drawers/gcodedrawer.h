@@ -40,19 +40,16 @@ public:
 
     QColor colorNormal() const;
     void setColorNormal(const QColor &colorNormal);
-
     QColor colorHighlight() const;
     void setColorHighlight(const QColor &colorHighlight);
-
     QColor colorZMovement() const;
     void setColorZMovement(const QColor &colorZMovement);
-
+    QColor colorRapidMovement() const;
+    void setColorRapidMovement(const QColor &colorRapidMovement);
     QColor colorDrawn() const;
     void setColorDrawn(const QColor &colorDrawn);
-
     QColor colorStart() const;
     void setColorStart(const QColor &colorStart);
-
     QColor colorEnd() const;
     void setColorEnd(const QColor &colorEnd);
 
@@ -97,6 +94,7 @@ private:
     QColor m_colorZMovement;
     QColor m_colorStart;
     QColor m_colorEnd;
+    QColor m_colorRapidMovement;
 
     QTimer m_timerVertexUpdate;
 

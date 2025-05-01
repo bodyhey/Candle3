@@ -2375,6 +2375,7 @@ void frmMain::applyCodeDrawerConfiguration(ConfigurationVisualizer &visualizerCo
     m_codeDrawer->setColorDrawn(visualizerConfiguration.drawnToolpathColor());
     m_codeDrawer->setColorHighlight(visualizerConfiguration.hightlightToolpathColor());
     m_codeDrawer->setColorZMovement(visualizerConfiguration.zMovementColor());
+    m_codeDrawer->setColorRapidMovement(visualizerConfiguration.rapidMovementColor());
     m_codeDrawer->setColorStart(visualizerConfiguration.startPointColor());
     m_codeDrawer->setColorEnd(visualizerConfiguration.endPointColor());
     m_codeDrawer->setIgnoreZ(false);

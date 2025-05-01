@@ -35,6 +35,7 @@ class ConfigurationVisualizer : public ConfigurationModule
     Q_PROPERTY(QColor drawnToolpathColor MEMBER m_drawnToolpathColor NOTIFY changed)
     Q_PROPERTY(QColor hightlightToolpathColor MEMBER m_hightlightToolpathColor NOTIFY changed)
     Q_PROPERTY(QColor zMovementColor MEMBER m_zMovementColor NOTIFY changed)
+    Q_PROPERTY(QColor rapidMovementColor MEMBER m_rapidMovementColor NOTIFY changed)
     Q_PROPERTY(QColor startPointColor MEMBER m_startPointColor NOTIFY changed)
     Q_PROPERTY(QColor endPointColor MEMBER m_endPointColor NOTIFY changed)
     Q_PROPERTY(QColor tableSurfaceGridColor MEMBER m_tableSurfaceGridColor NOTIFY changed)
@@ -77,6 +78,7 @@ class ConfigurationVisualizer : public ConfigurationModule
         QColor drawnToolpathColor() const { return m_drawnToolpathColor; }
         QColor hightlightToolpathColor() const { return m_hightlightToolpathColor; }
         QColor zMovementColor() const { return m_zMovementColor; }
+        QColor rapidMovementColor() const { return m_rapidMovementColor; }
         QColor startPointColor() const { return m_startPointColor; }
         QColor endPointColor() const { return m_endPointColor; }
         QColor tableSurfaceGridColor() const { return m_tableSurfaceGridColor; }
@@ -111,6 +113,7 @@ class ConfigurationVisualizer : public ConfigurationModule
         QColor m_drawnToolpathColor;
         QColor m_hightlightToolpathColor;
         QColor m_zMovementColor;
+        QColor m_rapidMovementColor;
         QColor m_startPointColor;
         QColor m_endPointColor;
         QColor m_tableSurfaceGridColor;

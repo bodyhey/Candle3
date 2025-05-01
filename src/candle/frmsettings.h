@@ -1,5 +1,6 @@
-// This file is a part of "Candle" application.
+// This file is a part of "G-Pilot (formerly Candle)" application.
 // Copyright 2015-2021 Hayrullin Denis Ravilevich
+// Copyright 2025 BTS
 
 #ifndef FRMSETTINGS_H
 #define FRMSETTINGS_H
@@ -12,6 +13,7 @@
 #include <QVector3D>
 #include "config/configuration.h"
 #include "utils/validators.h"
+#include "colorpicker.h"
 
 namespace Ui {
 class frmSettings;

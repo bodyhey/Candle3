@@ -114,6 +114,7 @@ SOURCES += main.cpp\
     form_partial/main/partmainstate.cpp \
     form_partial/main/partmainstatelcd.cpp \
     form_partial/main/partmainvirtualsettings.cpp \
+    form_partial/settings/partsettingscolors.cpp \
     frmgrblconfigurator.cpp \
     frmmain.cpp \
     frmsettings.cpp \
@@ -209,6 +210,7 @@ HEADERS  += frmmain.h \
     form_partial/main/partmainstate.h \
     form_partial/main/partmainstatelcd.h \
     form_partial/main/partmainvirtualsettings.h \
+    form_partial/settings/partsettingscolors.h \
     frmgrblconfigurator.h \
     frmsettings.h \
     frmabout.h \
@@ -278,6 +280,7 @@ FORMS    += frmmain.ui \
     form_partial/main/partmainstate.ui \
     form_partial/main/partmainstatelcd.ui \
     form_partial/main/partmainvirtualsettings.ui \
+    form_partial/settings/partsettingscolors.ui \
     frmdebug.ui \
     frmgrblconfigurator.ui \
     frmsettings.ui \
