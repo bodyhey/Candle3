@@ -94,14 +94,8 @@ bool GcodeDrawer::prepareVectors(GLPalette &palette)
     m_points.clear();
     m_triangles.clear();
 
-    // Delete texture on mode change
-    // if (m_texture) {
-    //     m_texture->destroy();
-    //     delete m_texture;
-    //     m_texture = NULL;
-    // }
-
     bool drawFirstPoint = true;
+    float cumSegPosition = 0;
     for (int i = 0; i < list.count(); i++) {
 
         if (qIsNaN(list[i].getEnd().z())) {
@@ -110,7 +104,6 @@ bool GcodeDrawer::prepareVectors(GLPalette &palette)
 
         // Find first point of toolpath
         if (drawFirstPoint) {
-
             if (qIsNaN(list[i].getEnd().x()) || qIsNaN(list[i].getEnd().y())) continue;
 
             // Draw first toolpath point
@@ -125,8 +118,9 @@ bool GcodeDrawer::prepareVectors(GLPalette &palette)
         }
 
         // Prepare vertices
-        if (list[i].isFastTraverse()) vertex.start = list[i].getStart();
-        else vertex.start = QVector3D(sNan, sNan, sNan);
+        // if (list[i].isFastTraverse()) vertex.start = list[i].getStart();
+        // else vertex.start = QVector3D(sNan, sNan, sNan);
+        bool dashedLine = list[i].isZMovement() || list[i].isFastTraverse();
 
         // Simplify geometry
         int j = i;
@@ -155,14 +149,19 @@ bool GcodeDrawer::prepareVectors(GLPalette &palette)
         vertex.color = palette.color(getSegmentColor(list[i]));
 
         // ignore shorter than 0.0001
-        if ((list[i].getEnd() - list[j].getStart()).length() > 0.0001) {
+        float segmentLen = (list[i].getEnd() - list[j].getStart()).length();
+        if (segmentLen > 0.0001) {
             // Line start
             vertex.position = list[j].getStart();
+            vertex.cumSegPosition = dashedLine ? cumSegPosition : -1;
             if (m_ignoreZ) vertex.position.setZ(0);
             m_lines.append(vertex);
 
+            cumSegPosition += segmentLen;
+
             // Line end
             vertex.position = list[i].getEnd();
+            vertex.cumSegPosition = dashedLine ? cumSegPosition : -1;
             if (m_ignoreZ) vertex.position.setZ(0);
             m_lines.append(vertex);
         }
@@ -285,24 +284,20 @@ bool GcodeDrawer::updateVectors(GLPalette &palette)
     return !data;
 }
 
-// QVector3D GcodeDrawer::getSegmentColorVector(LineSegment& segment)
-// {
-//     return Util::colorToVector(getSegmentColor(segment));
-// }
-
 QColor GcodeDrawer::getSegmentColor(LineSegment& segment)
 {
-    if (segment.drawn()) return m_colorDrawn;//QVector3D(0.85, 0.85, 0.85);
-    else if (segment.isHightlight()) return m_colorHighlight;//QVector3D(0.57, 0.51, 0.9);
-    else if (segment.isFastTraverse()) return m_colorNormal;// QVector3D(0.0, 0.0, 0.0);
-    else if (segment.isZMovement()) return m_colorZMovement;//QVector3D(1.0, 0.0, 0.0);
+    if (segment.drawn()) return m_colorDrawn;
+    else if (segment.isHightlight()) return m_colorHighlight;
+    else if (segment.isFastTraverse()) return m_colorNormal;
+    else if (segment.isZMovement()) return m_colorZMovement;
     else if (m_grayscaleSegments) switch (m_grayscaleCode) {
     case GcodeDrawer::S:
         return QColor::fromHsl(0, 0, qBound<int>(0, 255 - 255.0 / (m_grayscaleMax - m_grayscaleMin) * segment.getSpindleSpeed(), 255));
     case GcodeDrawer::Z:
         return QColor::fromHsl(0, 0, qBound<int>(0, 255 - 255.0 / (m_grayscaleMax - m_grayscaleMin) * segment.getStart().z(), 255));
     }
-    return m_colorNormal;//QVector3D(0.0, 0.0, 0.0);
+
+    return m_colorNormal;
 }
 
 int GcodeDrawer::getSegmentType(LineSegment& segment)

@@ -16,13 +16,22 @@ struct VertexData
 
     VertexData(QVector3D pos, GLfloat col, QVector3D sta) {
         position = pos;
+        color = (GLuint) col;
+        start = sta;
+        this->cumSegPosition = 0;
+    }
+
+    VertexData(QVector3D pos, GLuint col, GLfloat cumSegPosition, QVector3D sta) {
+        position = pos;
         color = col;
         start = sta;
+        this->cumSegPosition = cumSegPosition;
     }
 
     QVector3D position;
-    GLfloat color;
+    GLuint color;
     QVector3D start;
+    GLfloat cumSegPosition;
 };
 
 struct _2DTexturedVertexData

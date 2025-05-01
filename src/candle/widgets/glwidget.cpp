@@ -479,11 +479,6 @@ void GLWidget::initializeGL()
     if (m_gcodeShaderProgram) {
         m_gcodeShaderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/gcode_vertex.glsl");
         m_gcodeShaderProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/gcode_fragment.glsl");
-
-        // configure transform feedback which will be used to calculate min/max z values
-        const char* varyings[] = { "v_zpos" };
-        glTransformFeedbackVaryings(m_gcodeShaderProgram->programId(), 1, varyings, GL_INTERLEAVED_ATTRIBS);
-
         if (m_gcodeShaderProgram->link()) {
             qDebug() << "gcode shader program created";
         }
@@ -616,7 +611,6 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
         currentProgram->setUniformValue("u_eye", m_eye);
         currentProgram->setUniformValue("u_near", (GLfloat) m_near);
         currentProgram->setUniformValue("u_far", (GLfloat) m_far);
-        // qDebug() << "Near: " << (GLfloat) m_near << ", Far: " << (GLfloat) m_far;
     }
 
     if (m_defaultShaderProgram) {

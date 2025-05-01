@@ -109,9 +109,7 @@ private:
 
     QVector3D initialNormal(QVector3D p1, QVector3D p2);
     int getSegmentType(LineSegment& segment);
-    //QVector3D getSegmentColorVector(LineSegment& segment);
     QColor getSegmentColor(LineSegment& segment);
-    //void setImagePixelColor(QImage& image, double x, double y, QRgb color) const;
     void computeNormals();
 };
 

@@ -4,6 +4,7 @@
 #include <QOpenGLBuffer>
 #include "cube.h"
 #include "utils/utils.h"
+#include "shaderdrawable.h"
 
 #define DISTANCE 50.0
 #define SIZE 100.0
@@ -220,19 +221,19 @@ void CubeDrawer::initAttributes()
 
     int vertexLocation = m_program->attributeLocation("a_position");
     m_program->enableAttributeArray(vertexLocation);
-    m_program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+    m_program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(CubeVertexData));
 
     offset += sizeof(QVector3D);
 
     int colorLocation = m_program->attributeLocation("a_color");
     m_program->enableAttributeArray(colorLocation);
-    m_program->setAttributeBuffer(colorLocation, GL_FLOAT, offset, 1, sizeof(VertexData));
+    m_program->setAttributeBuffer(colorLocation, GL_FLOAT, offset, 1, sizeof(CubeVertexData));
 
     offset += sizeof(GLfloat);
 
     int textureLocation = m_program->attributeLocation("a_texcoord");
     m_program->enableAttributeArray(textureLocation);
-    m_program->setAttributeBuffer(textureLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+    m_program->setAttributeBuffer(textureLocation, GL_FLOAT, offset, 3, sizeof(CubeVertexData));
 }
 
 void CubeDrawer::updateGeometry(GLPalette &palette)
@@ -265,7 +266,7 @@ void CubeDrawer::updateGeometry(GLPalette &palette)
     //         ;
     // }
 
-    m_vbo.allocate((m_triangles + m_lines).constData(), (m_triangles.count() + m_lines.count()) * sizeof(VertexData));
+    m_vbo.allocate((m_triangles + m_lines).constData(), (m_triangles.count() + m_lines.count()) * sizeof(CubeVertexData));
 
     if (m_vao.isCreated()) {
         initAttributes();

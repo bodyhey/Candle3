@@ -11,9 +11,23 @@
 #include <QVector3D>
 #include <QOpenGLShaderProgram>
 #include <QMouseEvent>
-#include "shaderdrawable.h"
-#include "cube.h"
 #include "../widgets/glpalette.h"
+
+struct CubeVertexData
+{
+        CubeVertexData(QVector3D position, uint color, QVector3D texCoord)
+        {
+            this->position = position;
+            this->color = color;
+            this->texCoord = texCoord;
+        }
+
+        QVector3D position;
+        GLuint color;
+        QVector3D texCoord;
+};
+
+#include "cube.h"
 
 class CubeDrawer : public QObject, protected QOpenGLFunctions_3_0
 {
@@ -41,8 +55,8 @@ private:
     QVector3D m_eye;
     QVector3D m_up;
     QVector<QPoint> m_points2d;
-    QVector<VertexData> m_triangles;
-    QVector<VertexData> m_lines;
+    QVector<CubeVertexData> m_triangles;
+    QVector<CubeVertexData> m_lines;
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_viewMatrix;
     QOpenGLShaderProgram *m_program;

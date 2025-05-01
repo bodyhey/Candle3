@@ -331,6 +331,5 @@ DISTFILES += \
     shaders/cube_fragment.glsl \
     shaders/cube_vertex.glsl \
     shaders/gcode_fragment.glsl \
-    shaders/gcode_vertex.glsl \
-    shaders/zminmax_vertex.glsl
+    shaders/gcode_vertex.glsl
 

@@ -65,6 +65,14 @@ void ShaderDrawable::bindAttributes(QOpenGLShaderProgram *&shaderProgram)
         shaderProgram->enableAttributeArray(pos);
         shaderProgram->setAttributeBuffer(pos, GL_FLOAT, offset, 3, sizeof(VertexData));
     }
+
+    offset += sizeof(QVector3D);
+
+    pos = shaderProgram->attributeLocation("a_cumSegPosition");
+    if (pos > 0) {
+        shaderProgram->enableAttributeArray(pos);
+        shaderProgram->setAttributeBuffer(pos, GL_FLOAT, offset, 1, sizeof(VertexData));
+    }
 }
 
 void ShaderDrawable::updateGeometry(QOpenGLShaderProgram *shaderProgram, GLPalette &palette)
