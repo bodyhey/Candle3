@@ -115,7 +115,11 @@ SOURCES += main.cpp\
     form_partial/main/partmainstatelcd.cpp \
     form_partial/main/partmainvirtualsettings.cpp \
     form_partial/settings/partsettingscolors.cpp \
+    form_partial/settings/partsettingsconsole.cpp \
+    form_partial/settings/partsettingsjogging.cpp \
     form_partial/settings/partsettingssender.cpp \
+    form_partial/settings/partsettingsshortcuts.cpp \
+    form_partial/settings/partsettingsvisualizer.cpp \
     frmgrblconfigurator.cpp \
     frmmain.cpp \
     frmsettings.cpp \
@@ -212,7 +216,11 @@ HEADERS  += frmmain.h \
     form_partial/main/partmainstatelcd.h \
     form_partial/main/partmainvirtualsettings.h \
     form_partial/settings/partsettingscolors.h \
+    form_partial/settings/partsettingsconsole.h \
+    form_partial/settings/partsettingsjogging.h \
     form_partial/settings/partsettingssender.h \
+    form_partial/settings/partsettingsshortcuts.h \
+    form_partial/settings/partsettingsvisualizer.h \
     frmgrblconfigurator.h \
     frmsettings.h \
     frmabout.h \
@@ -283,7 +291,11 @@ FORMS    += frmmain.ui \
     form_partial/main/partmainstatelcd.ui \
     form_partial/main/partmainvirtualsettings.ui \
     form_partial/settings/partsettingscolors.ui \
+    form_partial/settings/partsettingsconsole.ui \
+    form_partial/settings/partsettingsjogging.ui \
     form_partial/settings/partsettingssender.ui \
+    form_partial/settings/partsettingsshortcuts.ui \
+    form_partial/settings/partsettingsvisualizer.ui \
     frmdebug.ui \
     frmgrblconfigurator.ui \
     frmsettings.ui \

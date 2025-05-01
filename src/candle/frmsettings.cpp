@@ -20,59 +20,11 @@
 #include <QDir>
 #include <QLocale>
 
-class CustomKeySequenceEdit : public QKeySequenceEdit
-{
-public:
-    explicit CustomKeySequenceEdit(QWidget *parent = 0): QKeySequenceEdit(parent) {}
-    ~CustomKeySequenceEdit() {}
-
-protected:
-    void keyPressEvent(QKeyEvent *pEvent) {
-        QKeySequenceEdit::keyPressEvent(pEvent);
-        QString s = keySequence().toString().split(", ").first();
-
-        QString shiftedKeys = "~!@#$%^&*()_+{}|:?><\"";
-        QString key = s.right(1);
-        
-        if (pEvent->modifiers() & Qt::KeypadModifier) s = "Num+" + s;
-        else if (!key.isEmpty() && shiftedKeys.contains(key)) {
-            s.remove("Shift+");
-            s = s.left(s.size() - 1) + QString("Shift+%1").arg(key);
-        }
-
-        QKeySequence seq(QKeySequence::fromString(s));
-        setKeySequence(seq);
-    }
-};
-
-class ShortcutDelegate: public QStyledItemDelegate
-{
-public:
-    ShortcutDelegate() {}
-
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override
-    {
-        Q_UNUSED(option);
-        Q_UNUSED(index);
-
-        return new CustomKeySequenceEdit(parent);
-    }
-
-    void setEditorData(QWidget *editor, const QModelIndex &index) const override
-    {
-        static_cast<QKeySequenceEdit*>(editor)->setKeySequence(index.data(Qt::DisplayRole).toString());
-    }
-
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override
-    {
-        model->setData(index, static_cast<QKeySequenceEdit*>(editor)->keySequence().toString());
-    }
-};
-
 frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
     QDialog(parent),
     ui(new Ui::frmSettings),
-    m_configuration(configuration)
+    m_configuration(configuration),
+    m_intValidator(1, 999)
 {
     ui->setupUi(this);
 
@@ -98,11 +50,6 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
     ui->listCategories->item(0)->setSelected(true);
     connect(ui->scrollSettings->verticalScrollBar(), &QAbstractSlider::valueChanged, this, &frmSettings::onScrollBarValueChanged);
     // connect(this, SIGNAL(settingsSetToDefault()), parent, SIGNAL(settingsSetToDefault()));
-
-    // Shortcuts table
-    ui->tblShortcuts->setItemDelegateForColumn(2, new ShortcutDelegate);
-    ui->tblShortcuts->setTabKeyNavigation(false);
-    ui->tblShortcuts->setEditTriggers(QAbstractItemView::AllEditTriggers);
 
     searchForSerialPorts();
 
@@ -130,40 +77,12 @@ frmSettings::frmSettings(QWidget *parent, Configuration &configuration) :
 
     //Validators
     this->setLocale(QLocale::C);
-    m_intValidator.setBottom(1);
-    m_intValidator.setTop(999);
 
     ui->cboFpsLock->setValidator(&m_intValidator);
     ui->cboFontSize->setValidator(&m_intValidator);
 
-    connect(ui->txtJoggingStepChoices, &QLineEdit::editingFinished, this, [this]() {
-        QLineEdit *sender = dynamic_cast<QLineEdit*>(QObject::sender());
-        QString text = sender->text();
-        int pos = 0;
-        auto state = m_commaSeparatedDoubleValidator.validate(text, pos);
-        QPalette pal = sender->palette();
-        if (state == QValidator::Invalid) {
-            pal.setColor(QPalette::Text, Qt::red);
-        } else {
-            pal.setColor(QPalette::Text, nullptr);
-        }
-        this->widgetValidity("JoggingStepChoices", state != QValidator::Invalid);
-        sender->setPalette(pal);
-    });
-    connect(ui->txtJoggingFeedChoices, &QLineEdit::editingFinished, this, [this]() {
-        QLineEdit *sender = dynamic_cast<QLineEdit*>(QObject::sender());
-        QString text = sender->text();
-        int pos = 0;
-        auto state = m_commaSeparatedIntValidator.validate(text, pos);
-        QPalette pal = sender->palette();
-        if (state == QValidator::Invalid) {
-            pal.setColor(QPalette::Text, Qt::red);
-        } else {
-            pal.setColor(QPalette::Text, nullptr);
-        }
-        this->widgetValidity("JoggingFeedChoices", state != QValidator::Invalid);
-        sender->setPalette(pal);
-    });
+    connect(ui->jogging, &partSettingsJogging::validityChanged, this, &frmSettings::onWidgetValidity);
+    //connect(ui->visualizer, &partSettingsVisualizer::validityChanged, this, &frmSettings::onWidgetValidity);)
 }
 
 frmSettings::~frmSettings()
@@ -263,8 +182,8 @@ void frmSettings::initializeWidgets()
     ui->chkDarkTheme->setChecked(ui_.darkTheme());
 
     const ConfigurationJogging &jogging = m_configuration.joggingModule();
-    ui->txtJoggingStepChoices->setText(jogging.stepChoices().join(", "));
-    ui->txtJoggingFeedChoices->setText(jogging.feedChoices().join(", "));
+    ui->jogging->setStepChoices(jogging.stepChoices());
+    ui->jogging->setFeedChoices(jogging.feedChoices());
 }
 
 void frmSettings::applySettings()
@@ -353,9 +272,8 @@ void frmSettings::applySettings()
     ui_.m_darkTheme = ui->chkDarkTheme->isChecked();
 
     ConfigurationJogging &jogging = m_configuration.joggingModule();
-    QRegularExpression nonDigits("[^\\d^.]");
-    jogging.m_stepChoices = ui->txtJoggingStepChoices->text().split(",").replaceInStrings(nonDigits, "");
-    jogging.m_feedChoices = ui->txtJoggingFeedChoices->text().split(",").replaceInStrings(nonDigits, "");
+    jogging.m_stepChoices = ui->jogging->stepChoices();
+    jogging.m_feedChoices = ui->jogging->feedChoices();
 }
 
 void frmSettings::widgetValidity(QString widgetName, bool valid)
@@ -365,8 +283,12 @@ void frmSettings::widgetValidity(QString widgetName, bool valid)
     } else if (invalidWidgets.indexOf(widgetName) == -1) {
         invalidWidgets.append(widgetName);
     }
-    qDebug() << "Invalid widgets: " << invalidWidgets;
     ui->cmdOK->setEnabled(invalidWidgets.empty());
+}
+
+void frmSettings::onWidgetValidity(QString widgetName, bool valid)
+{
+    widgetValidity(widgetName, valid);
 }
 
 int frmSettings::exec()
@@ -543,8 +465,6 @@ void frmSettings::onCmdDefaultsClicked()
 
     resetToDefaults();
 
-    // setFontSize(9);
-
     // Shortcuts
     QMap<QString, QString> d;
     d["actFileNew"] = "Ctrl+N";
@@ -566,14 +486,9 @@ void frmSettings::onCmdDefaultsClicked()
     d["actSpindleOnOff"] = "Num+0";
     d["actSpindleSpeedPlus"] = "Num+*";
     d["actSpindleSpeedMinus"] = "Num+/";
+
+    ui->shortcuts->setDefaults();
     
-    QTableWidget *table = ui->tblShortcuts;
-
-    for (int i = 0; i < table->rowCount(); i++) {
-        QString s = table->item(i, 0)->data(Qt::DisplayRole).toString();
-        table->item(i, 2)->setData(Qt::DisplayRole, d.keys().contains(s) ? d[s] : "");
-    }
-
     ui->sender->setStartCommands("");
     ui->sender->setEndCommands("");
     ui->sender->setToolChangeCommands("");

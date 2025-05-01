@@ -52,6 +52,7 @@ private slots:
     void onCmdDefaultsClicked();
     void onArcApproximationModeChanged(bool checked);
     void onConnectionModeChanged(int);
+    void onWidgetValidity(QString widgetName, bool valid);
 
 private:
     Configuration &m_configuration;
@@ -65,11 +66,7 @@ private:
     QList<QString> m_storedPlainTexts;
     bool m_animatingScrollBox;
     bool m_scrollingManuallyScrollBox;
-
     QIntValidator m_intValidator;
-    QCommaSeparatedIntValidator m_commaSeparatedIntValidator;
-    QCommaSeparatedDoubleValidator m_commaSeparatedDoubleValidator;
-
     QList<QWidget*> m_customSettings;
 
     void searchForSerialPorts();
