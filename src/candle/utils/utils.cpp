@@ -1,5 +1,6 @@
 #include "utils.h"
 #include <QScreen>
+#include <QStyle>
 #include <QApplication>
 
 // info about sizing https://doc.qt.io/qt-6/application-windows.html
@@ -83,4 +84,11 @@ bool Utils::pointInTriangle(QPoint p, QPoint p0, QPoint p1, QPoint p2)
 bool Utils::triangleDir(QPoint p0, QPoint p1, QPoint p2)
 {
     return (p0.x() - p2.x()) * (p1.y() - p2.y()) - (p1.x() - p2.x()) * (p0.y() - p2.y()) < 0;
+}
+
+void Utils::setVisualMode(QWidget *widget, bool dark)
+{
+    widget->setProperty("mode", dark ? "dark" : "light");
+    widget->style()->unpolish(widget);
+    widget->ensurePolished();
 }
