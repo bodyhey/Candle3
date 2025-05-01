@@ -40,13 +40,23 @@ QSplitter::handle {
 	background-position: center center;
 }
 
-QSplitter::handle:vertical {
-	background-image: url(&quot;:/images/handle_horizontal.png&quot;);
+[mode=&quot;light&quot;] QSplitter::handle:vertical {
+        background-image: url(&quot;:/images/handle_horizontal_light.png&quot;);
 }
 
-QSplitter::handle:horizontal {
-	background-image: url(&quot;:/images/handle_vertical.png&quot;);
-}</string>
+[mode=&quot;light&quot;] QSplitter::handle:horizontal {
+        background-image: url(&quot;:/images/handle_vertical_light.png&quot;);
+}
+
+[mode=&quot;dark&quot;] QSplitter::handle:vertical {
+        background-image: url(&quot;:/images/handle_horizontal_dark.png&quot;);
+}
+
+[mode=&quot;dark&quot;] QSplitter::handle:horizontal {
+        background-image: url(&quot;:/images/handle_vertical_dark.png&quot;);
+}
+
+</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>

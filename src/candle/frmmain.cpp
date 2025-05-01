@@ -636,6 +636,7 @@ void frmMain::on_actServiceSettings_triggered()
     emit settingsAboutToShow();
 
     QScopedPointer<frmSettings> form(new frmSettings(this, m_configuration));
+    Utils::setVisualMode(form.data(), m_configuration.uiModule().darkTheme());
     if (form->exec()) {
         // @TODO connection
         // if (m_settings->port() != "" && (m_settings->port() != m_serialPort.portName() ||
