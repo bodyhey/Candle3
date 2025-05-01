@@ -222,19 +222,19 @@ void frmSettings::initializeWidgets()
     ui->colors->setVisualizerTableGridColor(visualizer.tableSurfaceGridColor());
 
     const ConfigurationSender &sender = m_configuration.senderModule();
-    ui->chkUseStartCommands->setChecked(sender.useProgramStartCommands());
-    ui->txtStartCommands->setPlainText(sender.programStartCommands());
-    ui->chkUseEndCommands->setChecked(sender.useProgramEndCommands());
-    ui->txtEndCommands->setPlainText(sender.programEndCommands());
-    ui->txtToolChangeCommands->setPlainText(sender.toolChangeCommands());
-    ui->chkUseToolChangeCommands->setChecked(sender.useToolChangeCommands());
-    ui->chkConfirmToolChangeCommandsExecution->setChecked(sender.confirmToolChangeCommandsExecution());
-    ui->chkPauseOnToolChange->setChecked(sender.pauseSenderOnToolChange());
-    ui->chkUsePauseCommands->setChecked(sender.usePauseCommands());
-    ui->txtBeforePauseCommands->setPlainText(sender.beforePauseCommands());
-    ui->txtAfterPauseCommands->setPlainText(sender.afterPauseCommands());
-    ui->chkSetParseStateBeforeSendFromLine->setChecked(sender.setParserStateBeforeSendingFromSelectedLine());
-    ui->chkIgnoreResponseErrors->setChecked(sender.ignoreErrorResponses());
+    ui->sender->setUseStartCommands(sender.useProgramStartCommands());
+    ui->sender->setStartCommands(sender.programStartCommands());
+    ui->sender->setUseEndCommands(sender.useProgramEndCommands());
+    ui->sender->setEndCommands(sender.programEndCommands());
+    ui->sender->setToolChangeCommands(sender.toolChangeCommands());
+    ui->sender->setUseToolChangeCommands(sender.useToolChangeCommands());
+    ui->sender->setConfirmToolChangeCommandsExecution(sender.confirmToolChangeCommandsExecution());
+    ui->sender->setPauseOnToolChange(sender.pauseSenderOnToolChange());
+    ui->sender->setUsePauseCommands(sender.usePauseCommands());
+    ui->sender->setBeforePauseCommands(sender.beforePauseCommands());
+    ui->sender->setAfterPauseCommands(sender.afterPauseCommands());
+    ui->sender->setSetParseStateBeforeSendFromLine(sender.setParserStateBeforeSendingFromSelectedLine());
+    ui->sender->setIgnoreResponseErrors(sender.ignoreErrorResponses());
 
     const ConfigurationParser &parser = m_configuration.parserModule();
     ui->radArcDegreeMode->setChecked(parser.arcApproximationMode() == ConfigurationParser::ByAngle);
@@ -318,19 +318,19 @@ void frmSettings::applySettings()
     visualizer.m_tableSurfaceGridColor = ui->colors->visualizerTableGridColor();
 
     ConfigurationSender &sender = m_configuration.senderModule();
-    sender.m_useProgramStartCommands = ui->chkUseStartCommands->isChecked();
-    sender.m_programStartCommands = ui->txtStartCommands->toPlainText();
-    sender.m_useProgramEndommands = ui->chkUseEndCommands->isChecked();
-    sender.m_programEndCommands = ui->txtEndCommands->toPlainText();
-    sender.m_usePauseCommands = ui->chkUsePauseCommands->isChecked();
-    sender.m_beforePauseCommands = ui->txtBeforePauseCommands->toPlainText();
-    sender.m_afterPauseCommands = ui->txtAfterPauseCommands->toPlainText();
-    sender.m_useToolChangeCommands = ui->chkUseToolChangeCommands->isChecked();
-    sender.m_toolChangeCommands = ui->txtToolChangeCommands->toPlainText();
-    sender.m_confirmToolChangeCommandsExecution = ui->chkConfirmToolChangeCommandsExecution->isChecked();
-    sender.m_toolChangePause = ui->chkPauseOnToolChange->isChecked();
-    sender.m_ignoreErrorResponses = ui->chkIgnoreResponseErrors->isChecked();
-    sender.m_setParserStateBeforeSendingFromSelectedLine = ui->chkSetParseStateBeforeSendFromLine->isChecked();
+    sender.m_useProgramStartCommands = ui->sender->useStartCommands();
+    sender.m_programStartCommands = ui->sender->startCommands();
+    sender.m_useProgramEndommands = ui->sender->useEndCommands();
+    sender.m_programEndCommands = ui->sender->endCommands();
+    sender.m_usePauseCommands = ui->sender->usePauseCommands();
+    sender.m_beforePauseCommands = ui->sender->beforePauseCommands();
+    sender.m_afterPauseCommands = ui->sender->afterPauseCommands();
+    sender.m_useToolChangeCommands = ui->sender->useToolChangeCommands();
+    sender.m_toolChangeCommands = ui->sender->toolChangeCommands();
+    sender.m_confirmToolChangeCommandsExecution = ui->sender->confirmToolChangeCommandsExecution();
+    sender.m_toolChangePause = ui->sender->pauseOnToolChange();
+    sender.m_ignoreErrorResponses = ui->sender->ignoreResponseErrors();
+    sender.m_setParserStateBeforeSendingFromSelectedLine = ui->sender->setParseStateBeforeSendFromLine();
 
     ConfigurationParser &parser = m_configuration.parserModule();
     parser.m_arcApproximationMode = ui->radArcDegreeMode->isChecked() ? ConfigurationParser::ByAngle : ConfigurationParser::ByLength;
@@ -574,12 +574,12 @@ void frmSettings::onCmdDefaultsClicked()
         table->item(i, 2)->setData(Qt::DisplayRole, d.keys().contains(s) ? d[s] : "");
     }
 
-    ui->txtStartCommands->clear();
-    ui->txtEndCommands->clear();
-    ui->txtToolChangeCommands->clear();
-    ui->chkPauseOnToolChange->setChecked(false);
-    ui->chkUseToolChangeCommands->setChecked(false);
-    ui->chkConfirmToolChangeCommandsExecution->setChecked(false);
+    ui->sender->setStartCommands("");
+    ui->sender->setEndCommands("");
+    ui->sender->setToolChangeCommands("");
+    ui->sender->setPauseOnToolChange(false);
+    ui->sender->setUseToolChangeCommands(false);
+    ui->sender->setConfirmToolChangeCommandsExecution(false);
 
     emit settingsSetToDefault();
 }

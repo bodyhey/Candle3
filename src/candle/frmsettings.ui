@@ -839,92 +839,16 @@ QSplitter::handle:horizontal {
          </widget>
         </item>
         <item>
-         <widget class="QGroupBox" name="grpConnection_2">
+         <widget class="QGroupBox" name="grpSender">
           <property name="title">
            <string>Sender</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_6">
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <item>
-            <layout class="QGridLayout" name="gridLayout_4">
-             <item row="0" column="1">
-              <widget class="QCheckBox" name="chkUseEndCommands">
-               <property name="text">
-                <string>Use program end commands:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QCheckBox" name="chkUseStartCommands">
-               <property name="text">
-                <string>Use program start commands:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QPlainTextEdit" name="txtEndCommands"/>
-             </item>
-             <item row="1" column="1">
-              <widget class="QPlainTextEdit" name="txtStartCommands"/>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="chkUsePauseCommands">
-             <property name="text">
-              <string>Use pause commands</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="grpPauseCommands">
-             <item>
-              <widget class="QPlainTextEdit" name="txtBeforePauseCommands"/>
-             </item>
-             <item>
-              <widget class="QPlainTextEdit" name="txtAfterPauseCommands"/>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="chkUseToolChangeCommands">
-             <property name="text">
-              <string>Use tool change commands:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPlainTextEdit" name="txtToolChangeCommands"/>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="chkConfirmToolChangeCommandsExecution">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>Confirm tool change commands execution</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="chkPauseOnToolChange">
-             <property name="text">
-              <string>Pause sender on tool change (M6) command</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="chkIgnoreResponseErrors">
-             <property name="text">
-              <string>Ignore error responses</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="chkSetParseStateBeforeSendFromLine">
-             <property name="text">
-              <string>Automatically set parser state before sending from selected line</string>
-             </property>
-            </widget>
+            <widget class="partSettingsSender" name="sender" native="true"/>
            </item>
           </layout>
          </widget>
@@ -1715,6 +1639,12 @@ QSplitter::handle:horizontal {
    <header>form_partial/settings/partsettingscolors.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>partSettingsSender</class>
+   <extends>QWidget</extends>
+   <header>form_partial/settings/partsettingssender.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>listCategories</tabstop>
@@ -1842,22 +1772,6 @@ QSplitter::handle:horizontal {
     <hint type="destinationlabel">
      <x>956</x>
      <y>381</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chkUseToolChangeCommands</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>chkConfirmToolChangeCommandsExecution</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>851</x>
-     <y>-182</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>922</x>
-     <y>44</y>
     </hint>
    </hints>
   </connection>
